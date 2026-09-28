@@ -249,6 +249,36 @@ export class Game {
     return { x, y, w, h, z: visibleHeight(this.session.state, tile.x, tile.y) ?? 0 };
   }
 
+  /**
+   * Test hook (used by the Playwright smoke test): canvas position of a tile near the town hall
+   * where clicking with the build tool would place `kind`, clear of the HUD panels.
+   */
+  findPlacement(kind: BuildingKind): { x: number; y: number } | null {
+    const state = this.session.state;
+    const th = state.world.start.townHall;
+    for (let r = 2; r < 16; r++) {
+      for (let y = th.y - r; y <= th.y + r; y++) {
+        for (let x = th.x - r; x <= th.x + r; x++) {
+          const f = this.footprintFor(kind, { x, y });
+          if (!canPlaceBuilding(state, kind, f.x, f.y).ok) continue;
+          const z = visibleHeight(state, x, y) ?? 0;
+          const p = this.camera.worldToScreen((x - y) * HALF_W, (x + y) * HALF_H + HALF_H - z);
+          const picked = this.tileAt(p.x, p.y);
+          if (picked?.x !== x || picked.y !== y) continue;
+          if (
+            p.x < 240 ||
+            p.y < 90 ||
+            p.x > this.camera.width - 240 ||
+            p.y > this.camera.height - 150
+          )
+            continue;
+          return p;
+        }
+      }
+    }
+    return null;
+  }
+
   // ------------------------------------------------------------------------- picking
 
   private tileAt(sx: number, sy: number): { x: number; y: number } | null {

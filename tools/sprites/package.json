@@ -6,7 +6,9 @@
     "palette": "tsx src/extract-palette.ts",
     "generate": "tsx src/generate.ts",
     "check": "tsx src/generate.ts --check",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "preview": "tsx src/preview.ts",
+    "preview:scene": "tsx src/scene-preview.ts"
   },
   "devDependencies": {
     "@explorer/shared": "workspace:*",

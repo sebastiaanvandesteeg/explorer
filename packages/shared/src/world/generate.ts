@@ -181,11 +181,14 @@ function shapeTerrain(islands: IslandSeed[], base: number, size: number) {
       if (!land[k]) continue;
       const h = heightField[k]!;
       const theme = themeOf(k);
+      // Islands are one broad plateau, like the concept art: a narrow bank steps down to the
+      // beaches, cliffy stretches drop straight into the sea, and outer islands get hills.
       let e: number;
       if (theme === "islet") e = h > 0.45 ? 1 : 0;
-      else if (theme === "home") e = h < 0.1 ? 0 : h < 0.46 ? 1 : 2;
-      else e = h < 0.1 ? 0 : h < 0.36 ? 1 : h < 0.66 ? 2 : 3;
-      if (e === 0 && fbm(x * 0.13, y * 0.13, cliffSeed) > 0.56) e = 1;
+      else {
+        e = h < 0.1 ? 0 : h < 0.2 ? 1 : theme !== "home" && h > 0.72 ? 3 : 2;
+        if (e < 2 && fbm(x * 0.13, y * 0.13, cliffSeed) > 0.58) e = 2;
+      }
       elevation[k] = e;
     }
   }
