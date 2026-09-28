@@ -145,7 +145,8 @@ export function applyCommand(state: GameState, cmd: Command): CommandResult {
       const tx = Math.floor(cmd.x);
       const ty = Math.floor(cmd.y);
       if (!inBounds(w, tx, ty)) return fail("Outside the map");
-      const target = sailable(state, tx, ty) ? { x: tx, y: ty } : nearestWater(state, tx, ty);
+      // Clicking an island means "sail to its shore": find the closest open water.
+      const target = sailable(state, tx, ty) ? { x: tx, y: ty } : nearestWater(state, tx, ty, 24);
       if (!target || !sailable(state, target.x, target.y)) return fail("Can't sail there");
       const path = seaPath(state, { x: Math.floor(ship.x), y: Math.floor(ship.y) }, target);
       if (!path) return fail("No route by sea");

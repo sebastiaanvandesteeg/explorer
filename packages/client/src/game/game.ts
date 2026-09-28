@@ -16,6 +16,7 @@ import type { Atlas } from "../assets";
 import type { Session, SessionStatus } from "../net/session";
 import { Camera } from "../render/camera";
 import { EntityLayer } from "../render/entities";
+import { FogLayer, shallowGlow } from "../render/masks";
 import { Overlay, type Footprint } from "../render/overlay";
 import { TerrainLayer, visibleHeight } from "../render/terrain";
 import { discoveryText, Hud, type Tool } from "../ui/hud";
@@ -28,6 +29,8 @@ interface Drag {
   lastY: number;
   moved: boolean;
   startTile: { x: number; y: number } | null;
+  /** Drag start in world pixels (for the gather marquee). */
+  startWorld: { x: number; y: number };
   shift: boolean;
   painted: Set<string>;
 }
@@ -40,6 +43,7 @@ export class Game {
   private readonly terrain: TerrainLayer;
   private readonly entities: EntityLayer;
   private readonly overlay: Overlay;
+  private readonly fog: FogLayer;
   private readonly hud: Hud;
   private tool: Tool = { kind: "select" };
   private selected: number | null = null;
@@ -65,13 +69,16 @@ export class Game {
       this.terrain.invalidateRect(r.x, r.y, r.w, r.h),
     );
     this.overlay = new Overlay(atlas);
+    this.fog = new FogLayer(state);
     this.world.addChild(
       this.terrain.ocean,
+      shallowGlow(state),
       this.terrain.container,
       this.entities.ground,
       this.overlay.under,
       this.entities.container,
       this.entities.effects,
+      this.fog.sprite,
       this.overlay.over,
     );
     app.stage.addChild(this.world, this.overlay.screen);
@@ -117,6 +124,7 @@ export class Game {
       },
       reset: () => {
         this.terrain.reset(session.state);
+        this.fog.reset(session.state);
         this.entities.rebuild(session.state);
         this.hud.setStock(session.state);
         this.selectionDirty = true;
@@ -162,7 +170,7 @@ export class Game {
       now,
     );
     if (p.revealed?.length) {
-      this.terrain.invalidateTiles(p.revealed);
+      this.fog.invalidate();
       this.entities.revealed(p.revealed);
     }
     const buildingChanged = p.entities.some((e) => e.type === "building") || p.removed.length > 0;
@@ -267,23 +275,25 @@ export class Game {
     return best?.e ?? null;
   }
 
-  private tilesInRect(a: { x: number; y: number }, b: { x: number; y: number }) {
-    return {
-      x0: Math.min(a.x, b.x),
-      y0: Math.min(a.y, b.y),
-      x1: Math.max(a.x, b.x),
-      y1: Math.max(a.y, b.y),
-    };
-  }
-
-  private nodesInRect(
-    r: { x0: number; y0: number; x1: number; y1: number },
+  /** Harvestable nodes whose base lies inside a screen-aligned rectangle (world pixels). */
+  private nodesInMarquee(
+    a: { x: number; y: number },
+    b: { x: number; y: number },
     marked: boolean,
   ): number[] {
+    const x0 = Math.min(a.x, b.x);
+    const x1 = Math.max(a.x, b.x);
+    const y0 = Math.min(a.y, b.y);
+    const y1 = Math.max(a.y, b.y);
+    const state = this.session.state;
     const ids: number[] = [];
-    for (const e of this.session.state.entities.values()) {
+    for (const e of state.entities.values()) {
       if (e.type !== "node" || e.stage !== "grown" || e.marked === marked) continue;
-      if (e.x >= r.x0 && e.x <= r.x1 && e.y >= r.y0 && e.y <= r.y1) ids.push(e.id);
+      const view = this.entities.view(e.id);
+      if (!view?.root.visible) continue;
+      const { x, y } = view.root;
+      // Count the trunk and a little of the canopy, so dragging over a tree's top works too.
+      if (x >= x0 && x <= x1 && y + HALF_H >= y0 && y - 12 <= y1) ids.push(e.id);
     }
     return ids;
   }
@@ -318,6 +328,7 @@ export class Game {
         lastY: p.y,
         moved: false,
         startTile: this.tileAt(p.x, p.y),
+        startWorld: this.camera.screenToWorld(p.x, p.y),
         shift: e.shiftKey,
         painted: new Set(),
       };
@@ -350,10 +361,15 @@ export class Game {
       const p = local(e);
       if (d.button === 0) {
         if (!d.moved) this.click(p.x, p.y, e.shiftKey);
-        else if (this.tool.kind === "harvest" && d.startTile && this.hoverTile) {
+        else if (this.tool.kind === "harvest") {
           const unmark = e.shiftKey;
-          const ids = this.nodesInRect(this.tilesInRect(d.startTile, this.hoverTile), !unmark);
+          const ids = this.nodesInMarquee(
+            d.startWorld,
+            this.camera.screenToWorld(p.x, p.y),
+            !unmark,
+          );
           if (ids.length) void this.send({ kind: "mark", nodeIds: ids, marked: !unmark });
+          else this.hud.toast("Drag across trees, rocks or bushes to mark them");
         }
       } else if (d.button === 2 && !d.moved) {
         this.rightClick(p.x, p.y);
@@ -485,6 +501,7 @@ export class Game {
     const view = this.camera.view();
     this.terrain.animate(now);
     this.terrain.update(view);
+    this.fog.update(dt);
     this.entities.frame(now, dt, view);
     this.entities.ambientSparkles(view, dt);
     this.drawOverlay();
@@ -522,13 +539,20 @@ export class Game {
       o.footprint(f, ok);
       if (tool.building !== "path")
         ghost = { name: tool.building === "farm" ? "farm_2" : tool.building, f, ok };
-    } else if (hover && tool.kind === "harvest" && this.drag?.moved && this.drag.startTile) {
-      const r = this.tilesInRect(this.drag.startTile, hover);
-      const tiles: Footprint[] = [];
-      for (let y = r.y0; y <= r.y1; y++)
-        for (let x = r.x0; x <= r.x1; x++)
-          tiles.push({ x, y, w: 1, h: 1, z: visibleHeight(state, x, y) ?? 0 });
-      o.marquee(tiles);
+    } else if (
+      tool.kind === "harvest" &&
+      this.drag?.moved &&
+      this.drag.button === 0 &&
+      this.pointer
+    ) {
+      const a = this.drag.startWorld;
+      const b = this.camera.screenToWorld(this.pointer.x, this.pointer.y);
+      const unmark = this.keys.has("shift");
+      o.marquee(a, b);
+      for (const id of this.nodesInMarquee(a, b, !unmark)) {
+        const n = state.entities.get(id)!;
+        o.highlight({ x: n.x, y: n.y, w: 1, h: 1, z: visibleHeight(state, n.x, n.y) ?? 0 });
+      }
     } else if (hover && this.pointer) {
       o.hover({
         x: hover.x,

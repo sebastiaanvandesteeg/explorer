@@ -102,7 +102,9 @@ export function nearestWater(
     for (let ty = y - r; ty <= y + r; ty++) {
       for (let tx = x - r; tx <= x + r; tx++) {
         if (Math.max(Math.abs(tx - x), Math.abs(ty - y)) !== r) continue;
-        if (!inBounds(w, tx, ty) || isLandTerrain(w.terrain[tileIndex(w, tx, ty)]!)) continue;
+        if (!inBounds(w, tx, ty)) continue;
+        const k = tileIndex(w, tx, ty);
+        if (isLandTerrain(w.terrain[k]!) || state.occupancy[k] !== 0) continue;
         const d = Math.hypot(tx - x, ty - y);
         if (!best || d < best.d) best = { x: tx, y: ty, d };
       }

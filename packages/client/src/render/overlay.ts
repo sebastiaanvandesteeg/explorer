@@ -116,8 +116,15 @@ export class Overlay {
     this.top.poly([cx, cy - 14, cx + 7, cy - 11.5, cx, cy - 9]).fill({ color: 0xe98a3a });
   }
 
-  marquee(tiles: Footprint[]): void {
-    for (const f of tiles) diamond(this.g, f).fill({ color: 0xfbf0cf, alpha: 0.18 });
+  marquee(a: { x: number; y: number }, b: { x: number; y: number }): void {
+    const x = Math.round(Math.min(a.x, b.x));
+    const y = Math.round(Math.min(a.y, b.y));
+    const w = Math.round(Math.abs(a.x - b.x));
+    const h = Math.round(Math.abs(a.y - b.y));
+    this.top
+      .rect(x, y, w, h)
+      .fill({ color: 0xfbf0cf, alpha: 0.1 })
+      .stroke({ width: 1, color: 0xfbf0cf, alpha: 0.85, pixelLine: true });
   }
 
   highlight(f: Footprint): void {

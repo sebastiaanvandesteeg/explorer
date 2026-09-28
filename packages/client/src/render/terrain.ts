@@ -182,7 +182,7 @@ export class TerrainLayer {
       s.position.set(sx - b.x, sy - b.y);
       tmp.addChild(s);
     };
-    const { world: w, explored, occupancy } = this.state;
+    const { world: w, occupancy } = this.state;
     const x0 = cx * CHUNK;
     const y0 = cy * CHUNK;
     for (let d = 0; d < CHUNK * 2 - 1; d++) {
@@ -195,19 +195,13 @@ export class TerrainLayer {
         const k = tileIndex(w, x, y);
         const sx = (x - y) * HALF_W;
         const sy = (x + y) * HALF_H;
-        if (!explored[k]) {
-          add("f_fog", sx, sy);
-          continue;
-        }
         const t = w.terrain[k]!;
         const land = isLandTerrain(t);
         const h = surfaceHeight(land, w.elevation[k]!);
         const deco = this.decor.get(k);
         if (!land) {
           const shore = w.shore[k]!;
-          if (shore === 1) add("w_shallow_1", sx, sy);
-          else if (shore === 2) add("w_shallow_2", sx, sy);
-          else if (shore > 3 && hash2d(x, y, 0x6b) < 0.05)
+          if (shore > 3 && hash2d(x, y, 0x6b) < 0.05)
             add(`w_kelp_${Math.floor(hash2d(x, y, 0x6c) * 3)}`, sx, sy);
           for (const [side, dx, dy] of SIDES) {
             if (
@@ -241,11 +235,6 @@ export class TerrainLayer {
                     ? "deco_sunflowers"
                     : null;
             if (name) add(name, sx, sy - h);
-          }
-        }
-        for (const [side, dx, dy] of SIDES) {
-          if (inBounds(w, x + dx, y + dy) && !explored[tileIndex(w, x + dx, y + dy)]) {
-            add(`f_edge_${side}`, sx, sy - h);
           }
         }
       }

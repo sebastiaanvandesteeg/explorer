@@ -248,3 +248,22 @@ describe("snapshots and patches", () => {
     expect([...client.occupancy]).toEqual([...server.occupancy]);
   });
 });
+
+describe("sailing to an island", () => {
+  it("heads for the island's shore when told to sail onto land", () => {
+    const s = fresh();
+    const dock = of<BuildingEntity>(s, "building").find((b) => b.kind === "dock")!;
+    applyCommand(s, { kind: "build-ship", buildingId: dock.id });
+    run(s, 21);
+    const ship = of<ShipEntity>(s, "ship")[0]!;
+    const island = world.islands.find((i) => i.theme !== "home" && i.theme !== "islet")!;
+    const res = applyCommand(s, {
+      kind: "move-ship",
+      shipId: ship.id,
+      x: Math.round(island.cx),
+      y: Math.round(island.cy),
+    });
+    expect(res).toEqual({ ok: true });
+    expect(world.island[ship.dest!.y * world.width + ship.dest!.x]).toBe(island.id);
+  });
+});

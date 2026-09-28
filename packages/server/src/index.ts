@@ -1,16 +1,22 @@
-import { createServer } from "node:http";
-import { WebSocketServer } from "ws";
-import { GAME_NAME } from "@explorer/shared";
+import { resolve } from "node:path";
+import { startApp } from "./app";
 
-const PORT = Number(process.env.PORT ?? 8787);
-
-const http = createServer((_req, res) => {
-  res.writeHead(200, { "content-type": "text/plain" });
-  res.end(`${GAME_NAME} server`);
+const root = resolve(import.meta.dirname, "../../..");
+const app = await startApp({
+  port: Number(process.env.PORT ?? 8787),
+  ...(process.env.HOST ? { host: process.env.HOST } : {}),
+  dataDir: process.env.DATA_DIR ?? resolve(root, "data/worlds"),
+  clientDir: process.env.CLIENT_DIR ?? resolve(root, "packages/client/dist"),
 });
-const wss = new WebSocketServer({ server: http, path: "/ws" });
-wss.on("connection", (socket) => {
-  socket.on("message", (raw) => socket.send(raw.toString()));
-});
+console.log(`[server] Explorer listening on http://localhost:${app.port}`);
 
-http.listen(PORT, () => console.log(`[server] listening on http://localhost:${PORT}`));
+let closing = false;
+for (const signal of ["SIGINT", "SIGTERM"] as const) {
+  process.on(signal, async () => {
+    if (closing) return;
+    closing = true;
+    console.log("[server] saving worlds…");
+    await app.close();
+    process.exit(0);
+  });
+}
