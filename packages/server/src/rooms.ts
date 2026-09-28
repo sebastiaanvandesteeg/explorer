@@ -63,6 +63,14 @@ export class WorldRoom {
     const world = generateWorld(seed);
     this.state = saved ? fromSnapshot(world, saved.snapshot, true) : createInitialState(world);
     this.slots = (saved?.players ?? []).map((p) => ({ ...p, sockets: new Set() }));
+    // A world nobody joins (yet) shouldn't stay in memory; joining cancels this.
+    this.scheduleUnload();
+  }
+
+  private scheduleUnload(): void {
+    if (this.unloadTimer) clearTimeout(this.unloadTimer);
+    this.unloadTimer = setTimeout(() => this.onIdle(this), UNLOAD_AFTER_MS);
+    this.unloadTimer.unref?.();
   }
 
   info(): WorldInfo {
@@ -135,8 +143,7 @@ export class WorldRoom {
     if (this.sockets.size === 0) {
       void this.save();
       this.stop();
-      this.unloadTimer = setTimeout(() => this.onIdle(this), UNLOAD_AFTER_MS);
-      this.unloadTimer.unref?.();
+      this.scheduleUnload();
     }
   }
 
