@@ -135,7 +135,8 @@ input.field:focus {
   opacity: 0.85;
   line-height: 1.4;
 }
-.lobby label {
+.lobby label,
+.lobby .field {
   display: grid;
   gap: 6px;
   font-size: 13px;

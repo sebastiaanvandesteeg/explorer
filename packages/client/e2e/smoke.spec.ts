@@ -17,10 +17,23 @@ const buildings = (page: Page, kind: string) =>
 test("start an expedition, build a house, and a friend joins", async ({ page, browser }) => {
   await page.goto("/");
   await page.getByPlaceholder("Your name").fill("Anna");
+  await page.getByRole("radio", { name: /Northfolk/ }).click();
+  await expect(page.getByRole("radio", { name: /Northfolk/ })).toHaveAttribute(
+    "aria-checked",
+    "true",
+  );
   await page.getByRole("button", { name: "Start a new expedition" }).click();
   await expect(page).toHaveURL(/\/w\/[a-z0-9]{8}$/);
   await expect(page.locator("#app > canvas")).toBeVisible();
   await expect(page.locator(".players")).toContainText("1 of 8 online");
+  await expect(page.locator(".players")).toContainText("Northfolk");
+  expect(
+    await page.evaluate(
+      () =>
+        (window as unknown as { __game: { session: { state: { world: { tribe: string } } } } })
+          .__game.session.state.world.tribe,
+    ),
+  ).toBe("northfolk");
   const wood = page.locator(".resource").first();
   await expect(wood).toHaveText("50");
 
@@ -50,8 +63,9 @@ test("start an expedition, build a house, and a friend joins", async ({ page, br
 });
 
 test("offline mode plays without a server connection", async ({ page }) => {
-  await page.goto("/?offline&seed=e2e");
+  await page.goto("/?offline&seed=e2e&tribe=sylvan");
   await expect(page.locator("#app > canvas")).toBeVisible();
   await expect(page.locator(".players")).toContainText("Offline game");
-  await expect(page.locator(".resource").nth(3)).toHaveText("3/5");
+  await expect(page.locator(".players")).toContainText("Sylvan");
+  await expect(page.locator('.resource[data-res="pop"]')).toHaveText("3/5");
 });

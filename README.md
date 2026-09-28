@@ -1,8 +1,10 @@
 # Explorer
 
-A co-op, browser-based isometric pixel-art game about exploring a randomly generated archipelago and building a settlement together. Up to 8 players share one island, one stockpile and one map.
+A co-op, browser-based isometric pixel-art game about exploring a randomly generated archipelago and building a settlement together. Up to 8 players share one tribe, one stockpile and one map.
 
 ![Gameplay](docs/screenshot.png)
+
+![Four of the ten biomes: the Infernal Isles, Frostreach, the Fungal Hollows and the Petal Isles](docs/biomes.webp)
 
 The art style follows the concept art below. Every sprite is **generated in code** using a palette sampled from it.
 
@@ -27,31 +29,63 @@ pnpm dev
 - the game server on http://localhost:8787
 - the Vite client on **http://localhost:5190**, which is the one to open
 
-Start an expedition, then use **Copy invite link** to bring up to 7 friends.
+Pick a tribe, start an expedition, then use **Copy invite link** to bring up to 7 friends.
 
-- **Offline:** "Play offline" in the lobby (or `/?offline&seed=anything`) runs the whole simulation in your browser. Nothing is saved.
+- **Offline:** "Play offline" in the lobby (or `/?offline&seed=anything&tribe=northfolk`) runs the whole simulation in your browser. Nothing is saved.
 - **Production:** `pnpm build && pnpm start` builds the client, and the Node server then serves game and API from one port (8787).
 
 ### Controls
 
-| Action | How                                                                                                                              |
-| ------ | -------------------------------------------------------------------------------------------------------------------------------- |
-| Pan    | Drag the ground, right/middle-drag, or WASD / arrow keys                                                                         |
-| Zoom   | Mouse wheel, `+` / `-`                                                                                                           |
-| Gather | `H`, then click or drag a box across trees, rocks and bushes (Shift to unmark)                                                   |
-| Build  | `1`–`6` or the build menu, then click. Shift-click keeps placing. Paths can be dragged                                           |
-| Select | Click a villager, ship, building or resource                                                                                     |
-| Order  | With a villager selected, right-click a resource, building or the ground. With a ship selected, right-click the sea or an island |
-| Cancel | `Esc` or right-click                                                                                                             |
-| Chat   | `Enter`                                                                                                                          |
-| Home   | `C` centres on the town hall                                                                                                     |
+| Action | How                                                                                                                                    |
+| ------ | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Pan    | Drag the ground, right/middle-drag, or WASD / arrow keys                                                                               |
+| Zoom   | Mouse wheel, `+` / `-`                                                                                                                 |
+| Gather | `H`, then click or drag a box across trees, rocks and bushes (Shift to unmark)                                                         |
+| Build  | `1`–`9`, `0`, `P` or the build menu, then click. Shift-click keeps placing. Paths can be dragged                                       |
+| Select | Click a villager, ship, building or resource                                                                                           |
+| Order  | With a villager selected, right-click a resource, building, ship or the ground. With a ship selected, right-click the sea or an island |
+| Cancel | `Esc` or right-click                                                                                                                   |
+| Chat   | `Enter`                                                                                                                                |
+| Home   | `C` centres on the town hall                                                                                                           |
+
+### Tribes
+
+You choose a tribe when you start a world, and the whole co-op team plays it. The tribe sets how buildings and villagers look, which biome the home island is, and one bonus.
+
+| Tribe     | Style                                             | Home biome      | Bonus                                     |
+| --------- | ------------------------------------------------- | --------------- | ----------------------------------------- |
+| Islanders | Timber frames, thatch and slate                   | Greenlands      | Ships cost 25% less and sail 25% faster   |
+| Northfolk | Log halls with steep roofs and carved ridge horns | Frostreach      | Woodcutting is 30% faster                 |
+| Sunfolk   | Adobe with flat roofs, parapets and blue domes    | Sunscorch Dunes | Quarrying and mining are 30% faster       |
+| Sylvan    | Living bark under leafy and blossom roofs         | Petal Isles     | Food gathering and farming are 30% faster |
+
+### Biomes
+
+Every island belongs to one of ten biomes, with its own ground, cliffs, plants, rocks and deposits. Gentle biomes lie near home; the hellish and magical ones are furthest out. When the camera moves over a biome, the mood shifts to match: a colour grade, a tinted vignette, particles and, for grim places, a dark gritty texture. Fog of war takes each region's colour, so the sea around the Infernal Isles fogs dark red before you even see them.
+
+| Biome           | Found       | What grows there                                | Atmosphere                 |
+| --------------- | ----------- | ----------------------------------------------- | -------------------------- |
+| Greenlands      | Near home   | Oaks, pines, fruit, berries, iron ore           | Calm                       |
+| Verdant Wilds   | Near home   | Giant jungle trees, palms, bananas              | Humid green, fireflies     |
+| Amberwood       | Near home   | Amber trees, pumpkins                           | Warm, falling leaves       |
+| Petal Isles     | Near home   | Blossom trees, honey blossoms                   | Soft pink, drifting petals |
+| Sunscorch Dunes | Further out | Palms, cacti, sandstone, gold veins             | Hot, blowing dust          |
+| Frostreach      | Further out | Snowy pines, frost berries, ice rocks           | Cold, snowfall             |
+| Murkmire        | Further out | Willows, bog mushrooms, bog iron                | Murky, fireflies           |
+| Fungal Hollows  | Further out | Giant mushrooms, glowshrooms                    | Violet, floating spores    |
+| Infernal Isles  | Far away    | Charred trees, ember fruit, obsidian, hellstone | Dark red, embers, grit     |
+| Crystal Spires  | Far away    | Silverleaf trees, crystal clusters              | Indigo, sparkling motes    |
 
 ### How a settlement grows
 
-- **Villagers pick up work by themselves:** building sites first, then staffing camps and farms, then marked resources. They carry up to 5 goods to the nearest town hall or storehouse (or camp). Trees regrow from their stumps.
+- **Villagers pick up work by themselves:** building sites first, then staffing workplaces, then marked resources. They carry up to 5 goods to the nearest town hall, storehouse or camp on their island. Trees regrow from their stumps.
 - **Houses** add room for 4 villagers. You train new villagers at the town hall for 20 food.
-- **Lumber camps and quarries** each take one worker, who harvests within 8 tiles automatically. **Farms** turn a worker's time into food.
-- **Exploring:** the dock builds scout ships. Sailing clears the fog for everyone, and each newly found island (forest, farmland, rocky or islet) is announced.
+- **Workplaces** take one worker each:
+  - Lumber camps fell trees, quarries break rocks, and mines dig ore, gold and crystal, all within a radius.
+  - Farms grow food. The blacksmith forges 2 ore into 1 set of tools. The church gathers faith.
+- **Advanced buildings** need tools: the market (sell lots of 10 goods for gold, or buy basics), the church and the magic house. The magic house will sell magical upgrades for exploring; for now it shows which are coming.
+- **Exploring:** the dock builds scout ships. Sailing clears the fog for everyone, and each newly found island is announced.
+- **Settling:** select a ship next to the shore (or at the pier) and press **Take a villager aboard**, or right-click the ship with a villager selected. Then right-click another island to sail there and put everyone ashore. Once your villagers stand on an island you can build there. Put up a storehouse first, so they have somewhere to drop off goods.
 
 ## Architecture
 
@@ -80,17 +114,24 @@ tools/sprites     palette extraction and the sprite generator → client/public/
 
 ## Pixel art pipeline
 
-`pnpm sprites` regenerates `packages/client/public/assets/atlas.{png,json}` and the ocean textures, in about a second:
+`pnpm sprites` regenerates the sprite atlas in `packages/client/public/assets` (a manifest, `atlas.json`, plus as many `atlas-N.png/json` pages as the art needs) and the ocean textures, in about a second:
 
 1. **`extract-palette.ts`** samples `docs/concept-art.webp` into `palette.extracted.json`. The curated ramps in `palette.ts` are hand-picked from those samples.
-2. **Terrain tiles** (`sprites/terrain.ts`) are drawn directly on exact 32×16 diamonds. They use tile-periodic noise so neighbouring tiles join seamlessly.
-3. **Objects** (`sprites/buildings.ts`, `nature.ts`, `units.ts`) are modelled with a tiny isometric ray-caster (`raytrace.ts`) from boxes, gable and hip roofs, prisms, cones and blobs.
+2. **Terrain tiles** (`sprites/terrain.ts`) are drawn directly on exact 32×16 diamonds, one set per biome. They use tile-periodic noise so neighbouring tiles join seamlessly. Cliff faces are drawn as a body plus a lip overlay, which keeps the sprite count down.
+3. **Objects** (`sprites/buildings.ts`, `nature.ts`, `decor.ts`, `units.ts`) are modelled with a tiny isometric ray-caster (`raytrace.ts`) from boxes, gable and hip roofs, prisms, cones and blobs.
+   - Buildings take a tribe style: wall material, roof shape and accent colours.
    - Shading snaps to the palette ramps with restrained ordered dithering.
    - Cast shadows and dark outlines make it read as pixel art.
    - Villagers are drawn pixel by pixel.
 4. **Packing:** everything goes into one atlas. Each frame keeps its anchor (a tile's top vertex, or a villager's feet) plus metadata such as chimney smoke emitters.
 
-To **replace or add art**, add or modify a function in `tools/sprites/src/sprites/*` and run `pnpm sprites`. To swap in a hand-painted sprite, draw it into a `Canvas` with the same name and anchor. Browse every frame at **http://localhost:5190/sprites.html**, shown next to the concept art.
+To **replace or add art**, add or modify a function in `tools/sprites/src/sprites/*` and run `pnpm sprites`. To swap in a hand-painted sprite, draw it into a `Canvas` with the same name and anchor. `packages/client/src/render/names.ts` maps game state to frame names.
+
+To **review art**:
+
+- Browse every frame at **http://localhost:5190/sprites.html**, shown next to the concept art.
+- Add `&reveal` to an offline URL to lift the fog.
+- With the dev server running, `node packages/client/scripts/biome-shots.mjs <dir>` screenshots one island of every biome.
 
 `pnpm sprites:check` (part of `pnpm test`) fails when the committed atlas is out of date.
 
@@ -109,9 +150,9 @@ Server environment variables: `PORT` (8787), `HOST`, `DATA_DIR` (`data/worlds`),
 
 ## Not built yet
 
-- Ferrying villagers by ship to settle other islands, including a second dock
-- Trade and cargo ships
-- Tools, the forge and ore processing
+- Buying the magic house's exploration upgrades
+- Building extra docks on other islands
+- Trade routes and cargo ships
 - Day/night cycle and sound
 - Accounts beyond name + token
 - Deployment

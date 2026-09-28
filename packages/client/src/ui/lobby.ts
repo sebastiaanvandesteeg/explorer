@@ -58,7 +58,7 @@ export function showLobby(root: HTMLElement, opts: LobbyOptions): () => void {
   const seed = h("input.field", { placeholder: "Random" }) as HTMLInputElement;
   let tribe: TribeId = "islanders";
   const tribeCards = new Map<TribeId, HTMLElement>();
-  const tribes = h("div.tribes");
+  const tribes = h("div.tribes", { role: "radiogroup", "aria-label": "Tribe" });
   for (const id of TRIBES) {
     const def = TRIBE_DEFS[id];
     const pic = h("span.pic");
@@ -66,10 +66,15 @@ export function showLobby(root: HTMLElement, opts: LobbyOptions): () => void {
       "button.tribe",
       {
         type: "button",
+        role: "radio",
+        "aria-checked": String(id === tribe),
         title: def.description,
         onclick: () => {
           tribe = id;
-          for (const [t, el] of tribeCards) el.classList.toggle("active", t === id);
+          for (const [t, el] of tribeCards) {
+            el.classList.toggle("active", t === id);
+            el.setAttribute("aria-checked", String(t === id));
+          }
         },
       },
       pic,
@@ -167,7 +172,7 @@ export function showLobby(root: HTMLElement, opts: LobbyOptions): () => void {
         `Sail a randomly generated archipelago of ten biomes, from blossom isles to infernal shores, and build a settlement with up to ${MAX_PLAYERS - 1} friends.`,
       ),
       h("label", {}, "Your name", name),
-      h("label", {}, "Choose your tribe", tribes),
+      h("div.field", {}, h("span", {}, "Choose your tribe"), tribes),
       h("label", {}, "World seed (optional)", seed),
       createBtn,
       h("div.divider"),
