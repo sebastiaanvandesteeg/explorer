@@ -1,0 +1,159 @@
+import { MAX_NAME_LENGTH, MAX_PLAYERS, type WorldInfo } from "@explorer/shared";
+import { playerName, savePlayerName } from "../net/identity";
+import { h } from "./dom";
+
+export interface LobbyOptions {
+  /** Joining through an invite link: only ask for a name. */
+  joinId?: string;
+  error?: string;
+  onEnter(name: string, worldId: string): void;
+  onOffline(name: string, seed: string): void;
+}
+
+function randomSeed(): string {
+  const words = [
+    "amber",
+    "brine",
+    "cove",
+    "drift",
+    "ember",
+    "fjord",
+    "gale",
+    "harbor",
+    "isle",
+    "jade",
+    "kelp",
+    "lagoon",
+    "moss",
+    "north",
+    "oak",
+    "pearl",
+    "reef",
+    "salt",
+    "tide",
+    "willow",
+  ];
+  const pick = () => words[Math.floor(Math.random() * words.length)]!;
+  return `${pick()}-${pick()}-${Math.floor(Math.random() * 900 + 100)}`;
+}
+
+export function showLobby(root: HTMLElement, opts: LobbyOptions): () => void {
+  const name = h("input.field", {
+    placeholder: "Your name",
+    maxlength: String(MAX_NAME_LENGTH),
+    value: playerName(),
+    autocomplete: "nickname",
+  }) as HTMLInputElement;
+  const error = h("div.error", {}, opts.error ?? "");
+  const seed = h("input.field", { placeholder: "Random" }) as HTMLInputElement;
+  const code = h("input.field", { placeholder: "Invite code or link" }) as HTMLInputElement;
+
+  const needName = (): string | null => {
+    const n = name.value.trim().slice(0, MAX_NAME_LENGTH);
+    if (!n) {
+      error.textContent = "Pick a name first.";
+      name.focus();
+      return null;
+    }
+    savePlayerName(n);
+    return n;
+  };
+
+  const create = async (btn: HTMLButtonElement) => {
+    const n = needName();
+    if (!n) return;
+    btn.disabled = true;
+    error.textContent = "";
+    try {
+      const res = await fetch("/api/worlds", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ seed: seed.value.trim() || randomSeed() }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      const info = (await res.json()) as WorldInfo;
+      opts.onEnter(n, info.id);
+    } catch {
+      error.textContent = "Couldn't reach the server. Is it running? You can still play offline.";
+      btn.disabled = false;
+    }
+  };
+
+  const join = (id: string) => {
+    const n = needName();
+    if (!n) return;
+    const match = id.trim().match(/([a-z0-9]{4,32})\/?$/i);
+    if (!match) {
+      error.textContent = "That doesn't look like an invite code.";
+      return;
+    }
+    opts.onEnter(n, match[1]!.toLowerCase());
+  };
+
+  const card = h("div.lobby-card.panel");
+  if (opts.joinId) {
+    const go = h(
+      "button.btn.primary",
+      { onclick: () => join(opts.joinId!) },
+      "Join the expedition",
+    ) as HTMLButtonElement;
+    card.append(
+      h("h1", {}, "Explorer"),
+      h(
+        "p",
+        {},
+        "You've been invited to a co-op expedition. Explore the islands and build a settlement together.",
+      ),
+      h("label", {}, "Your name", name),
+      go,
+      error,
+      h("p.small", {}, h("a", { href: "/" }, "Start your own expedition instead")),
+    );
+    name.addEventListener("keydown", (e) => e.key === "Enter" && join(opts.joinId!));
+  } else {
+    const createBtn = h("button.btn.primary", {}, "Start a new expedition") as HTMLButtonElement;
+    createBtn.onclick = () => create(createBtn);
+    card.append(
+      h("h1", {}, "Explorer"),
+      h(
+        "p",
+        {},
+        `Sail a randomly generated archipelago, gather wood and stone, and build a settlement with up to ${MAX_PLAYERS - 1} friends.`,
+      ),
+      h("label", {}, "Your name", name),
+      h("label", {}, "World seed (optional)", seed),
+      createBtn,
+      h("div.divider"),
+      h(
+        "label",
+        {},
+        "Have an invite?",
+        h("div.row", {}, code, h("button.btn", { onclick: () => join(code.value) }, "Join")),
+      ),
+      error,
+      h(
+        "p.small",
+        {},
+        "No server? ",
+        h(
+          "a",
+          {
+            href: "#",
+            onclick: (e: Event) => {
+              e.preventDefault();
+              const n = needName();
+              if (n) opts.onOffline(n, seed.value.trim() || randomSeed());
+            },
+          },
+          "Play offline",
+        ),
+        " (single player, nothing is saved).",
+      ),
+    );
+    code.addEventListener("keydown", (e) => e.key === "Enter" && join(code.value));
+  }
+  const el = h("div.lobby", {}, card);
+  root.append(el);
+  (opts.joinId ? name : name.value ? seed : name).focus();
+  return () => el.remove();
+}
