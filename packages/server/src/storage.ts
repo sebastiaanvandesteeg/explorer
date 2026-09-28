@@ -1,6 +1,6 @@
 import { mkdir, readdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import type { Snapshot } from "@explorer/shared";
+import type { Snapshot, TribeId } from "@explorer/shared";
 
 export interface SavedPlayer {
   id: string;
@@ -14,6 +14,8 @@ export interface SavedWorld {
   version: 1;
   id: string;
   seed: string;
+  /** Missing in saves from before tribes existed (they load as Islanders). */
+  tribe?: TribeId;
   createdAt: string;
   players: SavedPlayer[];
   snapshot: Snapshot;

@@ -1,6 +1,7 @@
 // Serialisation: full snapshots (join + persistence) and incremental patches (every tick).
+import type { TribeId } from "../tribes";
 import type { WorldMap } from "../world/types";
-import type { Stock } from "./catalogue";
+import { RESOURCES, type Stock } from "./catalogue";
 import {
   emptyState,
   rebuildOccupancy,
@@ -34,6 +35,8 @@ export interface Patch {
 export interface Snapshot {
   version: 1;
   seed: string;
+  /** Older saves predate tribes; they load as Islanders. */
+  tribe?: TribeId;
   tick: number;
   time: number;
   nextId: number;
@@ -43,6 +46,8 @@ export interface Snapshot {
   explored: string;
   discovered: number[];
 }
+
+const emptyStock = (): Stock => Object.fromEntries(RESOURCES.map((r) => [r, 0])) as Stock;
 
 /** Deep copy of plain JSON-like data (entities never hold Maps, Dates or cycles). */
 function clone<T>(value: T): T {
@@ -72,8 +77,11 @@ export function fromWire(w: WireEntity): Entity {
   if (e.type === "villager") {
     e.path = [];
     e.retryAt = 0;
+    e.aboard ??= null;
   } else if (e.type === "ship") {
     e.path = [];
+    e.passengers ??= [];
+    e.unload ??= false;
   }
   return e;
 }
@@ -112,6 +120,7 @@ export function toSnapshot(state: GameState): Snapshot {
   return {
     version: 1,
     seed: state.world.seed,
+    tribe: state.world.tribe,
     tick: state.tick,
     time: state.time,
     nextId: state.nextId,
@@ -131,7 +140,7 @@ export function fromSnapshot(world: WorldMap, snap: Snapshot, resume = false): G
   state.tick = snap.tick;
   state.time = snap.time;
   state.nextId = snap.nextId;
-  state.stock = { ...snap.stock };
+  state.stock = { ...emptyStock(), ...snap.stock };
   state.explored = decodeRuns(snap.explored, world.width * world.height);
   state.discovered = new Set(snap.discovered);
   for (const w of snap.entities) {
@@ -193,7 +202,7 @@ export function applyPatch(state: GameState, patch: Patch): void {
       rebuildTiles(state, e);
     }
   }
-  if (patch.stock) state.stock = { ...patch.stock };
+  if (patch.stock) state.stock = { ...emptyStock(), ...patch.stock };
   if (patch.revealed) {
     for (const k of patch.revealed) state.explored[k] = 1;
     for (const k of patch.revealed) {

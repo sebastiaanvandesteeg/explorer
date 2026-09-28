@@ -7,8 +7,10 @@ import {
   createInitialState,
   fromSnapshot,
   generateWorld,
+  harvestSeconds,
   population,
   populationCap,
+  shipCost,
   takePatch,
   tick,
   toSnapshot,
@@ -71,7 +73,16 @@ describe("initial state", () => {
     expect(buildings.map((b) => b.kind).sort()).toEqual(["dock", "town_hall"]);
     expect(population(s)).toBe(3);
     expect(populationCap(s)).toBe(5);
-    expect(s.stock).toEqual({ wood: 50, stone: 30, food: 40 });
+    expect(s.stock).toEqual({
+      wood: 50,
+      stone: 30,
+      food: 40,
+      ore: 0,
+      tools: 0,
+      gold: 0,
+      faith: 0,
+      crystal: 0,
+    });
     expect(of(s, "node").length).toBe(world.nodes.length);
     const th = world.start.townHall;
     expect(s.explored[th.y * world.width + th.x]).toBe(1);
@@ -160,7 +171,7 @@ describe("villager work", () => {
 
   it("staffs a lumber camp that fells trees without marking", () => {
     const s = fresh();
-    s.stock = { wood: 500, stone: 500, food: 500 };
+    s.stock = { ...s.stock, wood: 500, stone: 500, food: 500 };
     const tree = nearestNode(s, ["oak", "pine"]);
     // Put the camp as close as possible to a tree.
     let at: { x: number; y: number } | null = null;
@@ -256,7 +267,7 @@ describe("sailing to an island", () => {
     applyCommand(s, { kind: "build-ship", buildingId: dock.id });
     run(s, 21);
     const ship = of<ShipEntity>(s, "ship")[0]!;
-    const island = world.islands.find((i) => i.theme !== "home" && i.theme !== "islet")!;
+    const island = world.islands.find((i) => i.flavor !== "home" && i.flavor !== "islet")!;
     const res = applyCommand(s, {
       kind: "move-ship",
       shipId: ship.id,
@@ -265,5 +276,134 @@ describe("sailing to an island", () => {
     });
     expect(res).toEqual({ ok: true });
     expect(world.island[ship.dest!.y * world.width + ship.dest!.x]).toBe(island.id);
+  });
+});
+
+describe("economy", () => {
+  /** Build a finished building instantly next to the town hall for economy tests. */
+  function instant(s: GameState, kind: BuildingKind): BuildingEntity {
+    s.stock = { ...s.stock, wood: 999, stone: 999, tools: 99, gold: 99 };
+    const at = spotFor(s, kind);
+    expect(applyCommand(s, { kind: "place-building", building: kind, ...at })).toEqual({
+      ok: true,
+    });
+    const b = of<BuildingEntity>(s, "building").find((e) => e.kind === kind)!;
+    b.complete = true;
+    b.progress = 1;
+    return b;
+  }
+
+  it("a staffed blacksmith turns ore into tools", () => {
+    const s = fresh();
+    instant(s, "blacksmith");
+    s.stock.ore = 6;
+    run(s, 40);
+    expect(s.stock.tools).toBeGreaterThanOrEqual(99 + 2);
+    expect(s.stock.ore).toBeLessThanOrEqual(2);
+  });
+
+  it("a staffed church gathers faith", () => {
+    const s = fresh();
+    instant(s, "church");
+    run(s, 30);
+    expect(s.stock.faith).toBeGreaterThanOrEqual(3);
+  });
+
+  it("the market buys and sells lots of ten", () => {
+    const s = fresh();
+    expect(applyCommand(s, { kind: "trade", resource: "wood", action: "sell" })).toMatchObject({
+      ok: false,
+    });
+    instant(s, "market");
+    const gold = s.stock.gold;
+    const wood = s.stock.wood;
+    expect(applyCommand(s, { kind: "trade", resource: "wood", action: "sell" })).toEqual({
+      ok: true,
+    });
+    expect(s.stock.wood).toBe(wood - 10);
+    expect(s.stock.gold).toBe(gold + 4);
+    expect(applyCommand(s, { kind: "trade", resource: "stone", action: "buy" })).toEqual({
+      ok: true,
+    });
+    expect(s.stock.gold).toBe(gold + 4 - 10);
+    expect(applyCommand(s, { kind: "trade", resource: "faith", action: "sell" })).toMatchObject({
+      ok: false,
+    });
+  });
+
+  it("a mine digs nearby ore on its own", () => {
+    const s = fresh();
+    const ore = nearestNode(s, ["ore"]);
+    s.stock = { ...s.stock, wood: 999, stone: 999 };
+    let at: { x: number; y: number } | null = null;
+    for (let r = 1; r < 9 && !at; r++)
+      for (let y = ore.y - r; y <= ore.y + r && !at; y++)
+        for (let x = ore.x - r; x <= ore.x + r && !at; x++)
+          if (canPlaceBuilding(s, "mine", x, y).ok) at = { x, y };
+    applyCommand(s, { kind: "place-building", building: "mine", ...at! });
+    run(s, 160);
+    expect(s.stock.ore).toBeGreaterThan(0);
+  });
+
+  it("gives each tribe its bonus", () => {
+    expect(harvestSeconds("oak", "northfolk")).toBeLessThan(harvestSeconds("oak", "islanders"));
+    expect(harvestSeconds("boulder", "sunfolk")).toBeLessThan(
+      harvestSeconds("boulder", "islanders"),
+    );
+    expect(harvestSeconds("berry", "sylvan")).toBeLessThan(harvestSeconds("berry", "sunfolk"));
+    expect(shipCost("islanders").wood).toBeLessThan(shipCost("northfolk").wood!);
+  });
+});
+
+describe("settling other islands", () => {
+  it("ferries villagers to a new island where they can build", () => {
+    const s = fresh();
+    s.stock = { ...s.stock, wood: 999, stone: 999 };
+    const dock = of<BuildingEntity>(s, "building").find((b) => b.kind === "dock")!;
+    applyCommand(s, { kind: "build-ship", buildingId: dock.id });
+    run(s, 21);
+    const ship = of<ShipEntity>(s, "ship")[0]!;
+    // Villagers walk out along the pier and climb aboard.
+    expect(applyCommand(s, { kind: "call-aboard", shipId: ship.id })).toEqual({ ok: true });
+    expect(applyCommand(s, { kind: "call-aboard", shipId: ship.id })).toEqual({ ok: true });
+    run(s, 40);
+    expect(ship.passengers).toHaveLength(2);
+    // Before landing, the other island is off limits.
+    const target = world.islands
+      .filter((i) => i.flavor !== "home" && i.flavor !== "islet")
+      .sort(
+        (a, b) =>
+          Math.hypot(a.cx - ship.x, a.cy - ship.y) - Math.hypot(b.cx - ship.x, b.cy - ship.y),
+      )[0]!;
+    const res = applyCommand(s, {
+      kind: "move-ship",
+      shipId: ship.id,
+      x: Math.round(target.cx),
+      y: Math.round(target.cy),
+      unload: true,
+    });
+    expect(res).toEqual({ ok: true });
+    run(s, 60);
+    expect(ship.passengers).toHaveLength(0);
+    const landed = of<VillagerEntity>(s, "villager").filter(
+      (v) => world.island[Math.floor(v.y) * world.width + Math.floor(v.x)] === target.id,
+    );
+    expect(landed).toHaveLength(2);
+    // Now the island is settled: build a storehouse and let the settlers raise it.
+    let spot: { x: number; y: number } | null = null;
+    const v0 = landed[0]!;
+    for (let r = 2; r < 12 && !spot; r++)
+      for (let y = Math.floor(v0.y) - r; y <= Math.floor(v0.y) + r && !spot; y++)
+        for (let x = Math.floor(v0.x) - r; x <= Math.floor(v0.x) + r && !spot; x++)
+          if (
+            world.island[y * world.width + x] === target.id &&
+            canPlaceBuilding(s, "storehouse", x, y).ok
+          )
+            spot = { x, y };
+    expect(spot).not.toBeNull();
+    applyCommand(s, { kind: "place-building", building: "storehouse", ...spot! });
+    run(s, 40);
+    const store = of<BuildingEntity>(s, "building").find((b) => b.kind === "storehouse")!;
+    expect(store.complete).toBe(true);
   });
 });

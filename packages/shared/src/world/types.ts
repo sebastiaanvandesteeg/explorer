@@ -1,3 +1,6 @@
+import type { TribeId } from "../tribes";
+import type { BiomeId } from "./biomes";
+
 export const Terrain = {
   Deep: 0,
   Shallow: 1,
@@ -8,21 +11,69 @@ export const Terrain = {
 } as const;
 export type TerrainId = (typeof Terrain)[keyof typeof Terrain];
 
-export type IslandTheme = "home" | "farmland" | "forest" | "rocky" | "islet";
+/** Variation within a biome: how wooded, fertile or stony an island is. */
+export type IslandFlavor = "home" | "wooded" | "fertile" | "rocky" | "islet";
 
 export interface Island {
   id: number;
   cx: number;
   cy: number;
   radius: number;
-  theme: IslandTheme;
+  biome: BiomeId;
+  flavor: IslandFlavor;
   tiles: number;
 }
 
+export const NODE_KINDS = [
+  // Greenlands
+  "oak",
+  "pine",
+  "fruit",
+  "berry",
+  "boulder",
+  "ore",
+  // Sunscorch Dunes
+  "palm",
+  "cactus",
+  "sandstone",
+  "gold_vein",
+  // Infernal Isles
+  "charred_tree",
+  "ember_fruit",
+  "obsidian",
+  "hellstone",
+  // Frostreach
+  "snow_pine",
+  "frost_berry",
+  "ice_rock",
+  // Verdant Wilds
+  "jungle_tree",
+  "banana",
+  // Murkmire
+  "willow",
+  "swamp_shroom",
+  "bog_ore",
+  // Fungal Hollows
+  "giant_mushroom",
+  "glowshroom",
+  // Crystal Spires
+  "silver_tree",
+  "crystal",
+  // Amberwood
+  "autumn_tree",
+  "pumpkin",
+  // Petal Isles
+  "blossom_tree",
+  "flower_bush",
+] as const;
+
 /** Harvestable things placed by world generation. */
-export type NodeKind = "oak" | "pine" | "fruit" | "berry" | "boulder" | "ore";
-/** Purely visual decoration; never blocks villagers (sea rocks do block ships). */
-export type DecoKind = "flowers" | "grass" | "sunflowers" | "sea_rock";
+export type NodeKind = (typeof NODE_KINDS)[number];
+/**
+ * Purely visual decoration; never blocks villagers (sea rocks do block ships). Clients pick the
+ * sprite from the tile's biome: small ground cover (two variants) or a taller plant.
+ */
+export type DecoKind = "small" | "tall" | "sea_rock";
 
 export interface NodeSpawn {
   kind: NodeKind;
@@ -63,12 +114,18 @@ export interface StartSite {
 
 export interface WorldMap {
   seed: string;
+  tribe: TribeId;
   width: number;
   height: number;
   terrain: Uint8Array;
   elevation: Uint8Array;
   /** Island id per tile, or -1 for open water. Water tiles near an island carry its id too. */
   island: Int16Array;
+  /**
+   * Biome index per tile (see BIOMES), reaching well out to sea so fog and water can take on a
+   * region's colours; NO_BIOME in the open ocean.
+   */
+  biome: Uint8Array;
   /** Chebyshev distance from water to the nearest land (0 on land, capped at 255). */
   shore: Uint8Array;
   islands: Island[];

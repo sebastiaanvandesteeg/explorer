@@ -1,4 +1,5 @@
 import { inBounds, isLandTerrain, tileIndex } from "../world/grid";
+import type { BiomeId } from "../world/biomes";
 import { Terrain, type Dir, type NodeKind, type WorldMap } from "../world/types";
 import {
   BUILDINGS,
@@ -25,9 +26,9 @@ export interface BuildingEntity {
   dir?: Dir;
   /** Production queue (town hall trains villagers, docks build ships). */
   queue: { what: "villager" | "ship"; remaining: number }[];
-  /** Villager staffing a lumber camp, quarry or farm. */
+  /** Villager staffing a workplace (camps, quarry, mine, farm, blacksmith, church). */
   workerId: number | null;
-  /** Farm growth timer in seconds. */
+  /** Production timer in seconds (farm growth, forging, prayer). */
   growth: number;
 }
 
@@ -52,7 +53,8 @@ export type Task =
   | { kind: "harvest"; nodeId: number; auto?: number }
   | { kind: "build"; buildingId: number }
   | { kind: "staff"; buildingId: number }
-  | { kind: "move"; x: number; y: number };
+  | { kind: "move"; x: number; y: number }
+  | { kind: "board"; shipId: number };
 
 export type VillagerAction = "idle" | "walk" | "deliver" | "work";
 
@@ -72,6 +74,8 @@ export interface VillagerEntity {
   tool: Tool | null;
   /** Earliest time this villager looks for work again after failing to find any. */
   retryAt: number;
+  /** Ship carrying this villager, or null when on land. */
+  aboard: number | null;
 }
 
 export interface ShipEntity {
@@ -82,6 +86,10 @@ export interface ShipEntity {
   heading: number;
   path: { x: number; y: number }[];
   dest: { x: number; y: number } | null;
+  /** Villagers on board. */
+  passengers: number[];
+  /** Put the passengers ashore when the ship arrives. */
+  unload: boolean;
 }
 
 export type Entity = BuildingEntity | NodeEntity | VillagerEntity | ShipEntity;
@@ -90,7 +98,8 @@ export type GameEvent =
   | { type: "built"; kind: BuildingKind; x: number; y: number }
   | { type: "villager"; x: number; y: number }
   | { type: "ship"; x: number; y: number }
-  | { type: "discovered"; islandId: number; theme: string; x: number; y: number };
+  | { type: "discovered"; islandId: number; biome: BiomeId; x: number; y: number }
+  | { type: "landed"; count: number; islandId: number; x: number; y: number };
 
 export interface GameState {
   world: WorldMap;
@@ -222,6 +231,7 @@ export function newVillager(state: GameState, x: number, y: number): VillagerEnt
     workTimer: 0,
     tool: null,
     retryAt: 0,
+    aboard: null,
   };
 }
 
@@ -279,25 +289,41 @@ export function reveal(state: GameState, cx: number, cy: number, r: number): voi
       if (island >= 0 && isLandTerrain(w.terrain[k]!) && !state.discovered.has(island)) {
         state.discovered.add(island);
         const info = w.islands[island]!;
-        state.events.push({ type: "discovered", islandId: island, theme: info.theme, x, y });
+        state.events.push({ type: "discovered", islandId: island, biome: info.biome, x, y });
       }
     }
   }
 }
 
-/** Is a tile free for villagers to stand on? */
+/** Is a tile free for villagers to stand on? Piers count, even though they're over water. */
 export function walkable(state: GameState, x: number, y: number): boolean {
   const w = state.world;
   if (!inBounds(w, x, y)) return false;
   const k = tileIndex(w, x, y);
-  if (!isLandTerrain(w.terrain[k]!)) return false;
   const id = state.occupancy[k]!;
-  if (id === 0) return true;
-  const e = state.entities.get(id);
-  if (!e) return true;
-  if (e.type === "building") return !!BUILDINGS[e.kind].walkable && e.complete;
-  if (e.type === "node") return e.stage === "stump" || e.stage === "sapling";
+  const e = id === 0 ? undefined : state.entities.get(id);
+  if (e?.type === "building") return !!BUILDINGS[e.kind].walkable && e.complete;
+  if (!isLandTerrain(w.terrain[k]!)) return false;
+  if (e?.type === "node") return e.stage === "stump" || e.stage === "sapling";
   return true;
+}
+
+/** Island a villager (or anything) stands on, following piers back to their island. */
+export function islandAt(state: GameState, x: number, y: number): number {
+  const w = state.world;
+  return inBounds(w, x, y) ? w.island[tileIndex(w, x, y)]! : -1;
+}
+
+/** Islands where the team has a foothold: a villager ashore or a building. */
+export function settledIslands(state: GameState): Set<number> {
+  const out = new Set<number>([state.world.start.islandId]);
+  for (const e of state.entities.values()) {
+    if (e.type === "villager" && e.aboard === null)
+      out.add(islandAt(state, Math.floor(e.x), Math.floor(e.y)));
+    else if (e.type === "building") out.add(islandAt(state, e.x, e.y));
+  }
+  out.delete(-1);
+  return out;
 }
 
 export function isPathTile(state: GameState, x: number, y: number): boolean {
