@@ -177,3 +177,74 @@ export function cloth(rampName: RampName, bulge = 0.35): Material {
 export function solid(color: Rgba): Material {
   return () => color;
 }
+
+/** A wall surface: colour for a point `u` along the wall and `z` pixels up. */
+export type Surface = (c: ShadeContext, u: number, z: number) => Rgba;
+
+/**
+ * Wraps a wall surface with doors, windows and a stone plinth, the same way for every tribe.
+ * Tops and bottoms of the box get the frame colour.
+ */
+export function withOpenings(
+  surface: Surface,
+  opts: { openings?: Opening[]; frame: RampName; plinthPx?: number; plinth?: RampName },
+): Material {
+  const plinth = opts.plinthPx ?? 3;
+  return (c) => {
+    const f = faceOf(c);
+    const z = c.lp[2];
+    if (f === "top" || f === "bottom") return shade(opts.frame, lit(c), c.px, c.py);
+    const u = along(c);
+    for (const o of opts.openings ?? []) {
+      if (o.face !== f || u < o.u0 || u > o.u1 || z < o.z0 || z > o.z1) continue;
+      const border = u - o.u0 < 0.035 || o.u1 - u < 0.035 || o.z1 - z < 1;
+      if (o.kind === "door") {
+        const k = (u - o.u0) / 0.075;
+        const seam = k - Math.floor(k) < 0.25 ? -0.12 : 0;
+        return border ? rampColor(opts.frame, 1) : shade("plank", lit(c, -0.1 + seam), c.px, c.py);
+      }
+      if (o.kind === "arch") return rampColor("timber", 0);
+      if (border || z - o.z0 < 0.8) return rampColor(opts.frame, 1);
+      if (o.kind === "lit-window") return rampColor("glass", z > (o.z0 + o.z1) / 2 ? 3 : 2);
+      return rampColor("glass", 1);
+    }
+    if (z < plinth) {
+      return shade(
+        opts.plinth ?? "stone",
+        lit(c, (hash3(Math.floor(u * 8), 0, 0, 2) - 0.5) * 0.2),
+        c.px,
+        c.py,
+      );
+    }
+    return surface(c, u, z);
+  };
+}
+
+/** Horizontal logs with dark seams (Northfolk). */
+export function logSurface(ramp: RampName = "logs", rowPx = 3.2): Surface {
+  return (c, u, z) => {
+    const row = Math.floor(z / rowPx);
+    const seam = z - row * rowPx < 0.9 ? -0.22 : 0;
+    const grain = (hash3(row, Math.floor(u * 6), 0, 12) - 0.5) * 0.12;
+    return shade(ramp, lit(c, 0.08 + seam + grain), c.px, c.py, 0.2);
+  };
+}
+
+/** Smooth sun-baked adobe with a darker band under the roof line (Sunfolk). */
+export function adobeSurface(top: number): Surface {
+  return (c, u, z) => {
+    const n = noise3(u * 18, z / 3, 0.4, 14);
+    const band = top - z < 2.2 ? -0.18 : 0;
+    return shade("adobe", lit(c, 0.08 + band + (n - 0.5) * 0.12), c.px, c.py, 0.25);
+  };
+}
+
+/** Living bark with vertical grain and moss near the ground (Sylvan). */
+export function barkSurface(): Surface {
+  return (c, u, z) => {
+    const grain = hash3(Math.floor(u * 38), 0, 0, 15) < 0.3 ? -0.16 : 0;
+    const mossy = z < 5 && noise3(u * 20, z, 0.2, 16) > 0.5;
+    if (mossy) return shade("moss", lit(c, 0), c.px, c.py);
+    return shade("bark", lit(c, 0.1 + grain), c.px, c.py, 0.2);
+  };
+}

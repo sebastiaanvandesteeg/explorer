@@ -1,17 +1,23 @@
+// Harvestable plants and rocks for every biome, plus stumps, saplings and sea rocks.
+// Names: n_<kind>_<variant> when grown, n_<kind>_bare for picked food plants,
+// n_stump_<style> and n_sapling_<style> for regrowth stages.
+import { NODE_VARIANTS, Z_SCALE, type NodeKind } from "@explorer/shared";
 import { Canvas } from "../canvas";
 import { rocky } from "../materials";
-import { Z_SCALE } from "@explorer/shared";
 import { hash3, noise3, prng } from "../noise3";
-import { rampColor, shade, type RampName, type Rgba } from "../palette";
-import { flat, lit, Scene, type Material, type Vec3 } from "../raytrace";
+import { RAMPS, rampColor, shade, type RampName, type Rgba } from "../palette";
+import { flat, lit, Scene, type Material, type ShadeContext, type Vec3 } from "../raytrace";
 import { renderSprite, trimmed, type Sprite } from "../sprite";
 
+type Extra = (c: ShadeContext, v: number) => Rgba | null;
+
 /** Foliage: a bumpy normal gives clumps of light and shadow, like painted leaf clusters. */
-function foliage(
+export function foliage(
   rampName: RampName,
   scale = 9,
-  extras?: (c: Parameters<Material>[0], v: number) => Rgba | null,
+  extras?: Extra,
   bumpiness = 1.3,
+  bias = 0,
 ): Material {
   return (c) => {
     const [x, y, z] = [c.p[0] * scale, c.p[1] * scale, c.p[2] / (32 / scale)];
@@ -22,19 +28,37 @@ function foliage(
     ];
     const k = bumpiness;
     const n: Vec3 = [c.n[0] + bump[0] * k, c.n[1] + bump[1] * k, c.n[2] + bump[2] * k];
-    const v = 0.16 + 0.9 * c.lightFor(n) + (noise3(x * 2, y * 2, z * 2, 4) - 0.5) * 0.16;
+    const v = 0.16 + 0.9 * c.lightFor(n) + (noise3(x * 2, y * 2, z * 2, 4) - 0.5) * 0.16 + bias;
     const extra = extras?.(c, v);
     if (extra) return extra;
     return shade(rampName, v, c.px, c.py, 0.4);
   };
 }
 
-const bark: Material = (c) => {
-  const streak = hash3(Math.floor((c.p[0] - c.p[1]) * 60), 0, 0, 3) < 0.3 ? -0.15 : 0;
-  return shade("timber", lit(c, 0.1 + streak), c.px, c.py, 0.2);
-};
+/** Occasional coloured pixels (fruit, berries, flowers) on the lit side of foliage. */
+export function dots(ramp: RampName, chance: number, seed: number, minLight = 0.35): Extra {
+  return (c, v) => {
+    if (v > minLight && hash3(c.px, c.py, 0, seed) > 1 - chance) {
+      const colors = rampLength(ramp);
+      return rampColor(ramp, v > 0.7 ? colors - 2 : colors - 3);
+    }
+    return null;
+  };
+}
 
-function canopy(
+function rampLength(ramp: RampName): number {
+  return RAMPS[ramp].length;
+}
+
+export const barkOf =
+  (ramp: RampName, bias = 0.1): Material =>
+  (c) => {
+    const streak = hash3(Math.floor((c.p[0] - c.p[1]) * 60), 0, 0, 3) < 0.3 ? -0.15 : 0;
+    return shade(ramp, lit(c, bias + streak), c.px, c.py, 0.2);
+  };
+const bark = barkOf("timber");
+
+export function canopy(
   s: Scene,
   rand: () => number,
   cx: number,
@@ -59,50 +83,149 @@ function canopy(
   }
 }
 
-export function oak(variant: number): Sprite {
-  const rand = prng(1000 + variant * 77);
+/** A string of small blobs from `a` to `b` (x, y tiles; z px): branches, fronds, vines. */
+export function strand(
+  s: Scene,
+  a: Vec3,
+  b: Vec3,
+  r: number,
+  rz: number,
+  mat: Material,
+  steps = 6,
+): void {
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    s.ellipsoid(
+      [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t],
+      [r, r, rz],
+      mat,
+      {
+        castsShadow: true,
+      },
+    );
+  }
+}
+
+const SHADOW = { x0: -0.4, y0: -0.4, x1: 1.6, y1: 1.6 };
+
+// --- Broadleaf trees --------------------------------------------------------------------------
+
+function broadleaf(
+  name: string,
+  seed: number,
+  size: number,
+  leaves: Material,
+  trunk = bark,
+  trunkH = 7,
+): Sprite {
+  const rand = prng(seed);
   const s = new Scene();
-  s.groundShadow = { x0: -0.4, y0: -0.4, x1: 1.6, y1: 1.6 };
-  const size = [1, 0.9, 1.12][variant % 3]!;
-  s.prism("z", [0.5, 0.5, 7], 0.085, 7, bark, 7);
-  s.prism("z", [0.5, 0.5, 1.5], 0.12, 1.5, bark, 7);
-  canopy(
-    s,
-    rand,
-    0.5,
-    0.5,
-    23 * size,
-    0.56 * size,
-    13 * size,
-    11,
-    foliage("leaf", 7, undefined, 1),
+  s.groundShadow = SHADOW;
+  s.prism("z", [0.5, 0.5, trunkH], 0.085, trunkH, trunk, 7);
+  s.prism("z", [0.5, 0.5, 1.5], 0.12, 1.5, trunk, 7);
+  canopy(s, rand, 0.5, 0.5, (trunkH + 16) * size, 0.56 * size, 13 * size, 11, leaves);
+  return renderSprite(name, s, 1, 1, 64, 12);
+}
+
+const oak = (v: number) =>
+  broadleaf(`n_oak_${v}`, 1000 + v * 77, [1, 0.9, 1.12][v]!, foliage("leaf", 7, undefined, 1));
+const autumn = (v: number) =>
+  broadleaf(
+    `n_autumn_tree_${v}`,
+    1500 + v * 71,
+    [1, 0.92, 1.08][v]!,
+    foliage("autumnLeaf", 7, undefined, 1, [-0.02, -0.14, 0.12][v]),
   );
-  return renderSprite(`tree_oak_${variant}`, s, 1, 1, 60, 12);
+const blossom = (v: number) =>
+  broadleaf(
+    `n_blossom_tree_${v}`,
+    1700 + v * 53,
+    [1, 0.9][v]!,
+    foliage("petal", 7, dots("plaster", 0.05, 41), 1, v === 1 ? 0.1 : 0),
+    barkOf("timber", 0.05),
+    6,
+  );
+
+function fruitTree(bare: boolean): Sprite {
+  return broadleaf(
+    bare ? "n_fruit_bare" : "n_fruit_0",
+    4242,
+    0.82,
+    foliage("leaf", 7, bare ? undefined : dots("fruit", 0.07, 17)),
+    bark,
+    6,
+  );
 }
 
-export function fruitTree(): Sprite {
-  const rand = prng(4242);
+function silverTree(v: number): Sprite {
+  const rand = prng(1900 + v * 13);
   const s = new Scene();
-  s.groundShadow = { x0: -0.4, y0: -0.4, x1: 1.6, y1: 1.6 };
-  s.prism("z", [0.5, 0.5, 6], 0.07, 6, bark, 7);
-  const fruit = foliage("leaf", 7, (c, v) => {
-    const k = hash3(c.px, c.py, 0, 17);
-    if (v > 0.35 && k > 0.93) return rampColor("fruit", v > 0.7 ? 3 : 2);
-    return null;
-  });
-  canopy(s, rand, 0.5, 0.5, 19, 0.44, 10, 9, fruit);
-  return renderSprite("tree_fruit", s, 1, 1, 50, 12);
+  s.groundShadow = SHADOW;
+  const trunk = barkOf("silver", 0.2);
+  s.prism("z", [0.5, 0.5, 10], 0.05, 10, trunk, 7);
+  const leaves = foliage("silver", 9, dots("crystal", 0.04, 43, 0.5), 1.1, 0.05);
+  canopy(s, rand, 0.5, 0.5, 26, 0.36, 15, 8, leaves);
+  canopy(s, rand, 0.5, 0.5, 38, 0.22, 8, 4, leaves);
+  return renderSprite(`n_silver_tree_${v}`, s, 1, 1, 64, 12);
 }
 
-export function pine(variant: number): Sprite {
-  const rand = prng(2000 + variant * 31);
+function jungleTree(v: number): Sprite {
+  const rand = prng(2600 + v * 19);
   const s = new Scene();
-  s.groundShadow = { x0: -0.4, y0: -0.4, x1: 1.6, y1: 1.6 };
-  const tall = [1, 1.15, 0.88][variant % 3]!;
+  s.groundShadow = { x0: -0.6, y0: -0.6, x1: 1.8, y1: 1.8 };
+  s.prism("z", [0.5, 0.5, 13], 0.1, 13, barkOf("timber", 0.05), 8);
+  // Buttress roots.
+  for (let i = 0; i < 4; i++) {
+    const a = (i / 4) * Math.PI * 2 + 0.4;
+    strand(
+      s,
+      [0.5 + Math.cos(a) * 0.22, 0.5 + Math.sin(a) * 0.22, 0],
+      [0.5, 0.5, 6],
+      0.05,
+      1.5,
+      bark,
+      3,
+    );
+  }
+  const leaves = foliage("jungle", 7, undefined, 1.2);
+  canopy(s, rand, 0.5, 0.5, 30, 0.7, 9, 12, leaves);
+  canopy(s, rand, 0.45, 0.52, 40, 0.42, 7, 6, leaves);
+  // Hanging vines.
+  for (let i = 0; i < 5; i++) {
+    const a = rand() * Math.PI * 2;
+    const x = 0.5 + Math.cos(a) * 0.55;
+    const y = 0.5 + Math.sin(a) * 0.55;
+    strand(s, [x, y, 26], [x, y, 12 + rand() * 6], 0.02, 1.2, flat("jungle", -0.2), 5);
+  }
+  return renderSprite(`n_jungle_tree_${v}`, s, 1, 1, 72, 14);
+}
+
+function willow(v: number): Sprite {
+  const rand = prng(2700 + v * 7);
+  const s = new Scene();
+  s.groundShadow = SHADOW;
+  s.prism("z", [0.5, 0.5, 8], 0.09, 8, barkOf("darkwood", 0.15), 7);
+  const leaves = foliage("willow", 8, undefined, 1.1);
+  canopy(s, rand, 0.5, 0.5, 24, 0.5, 9, 8, leaves);
+  // Drooping curtains of leaves.
+  for (let i = 0; i < 14; i++) {
+    const a = (i / 14) * Math.PI * 2 + rand() * 0.3;
+    const r = 0.44 + rand() * 0.08;
+    const x = 0.5 + Math.cos(a) * r;
+    const y = 0.5 + Math.sin(a) * r;
+    s.ellipsoid([x, y, 16 + rand() * 3], [0.06, 0.06, 7 + rand() * 3], leaves);
+  }
+  return renderSprite(`n_willow_${v}`, s, 1, 1, 56, 12);
+}
+
+// --- Conifers --------------------------------------------------------------------------------
+
+function conifer(name: string, seed: number, tall: number, needles: Material): Sprite {
+  const rand = prng(seed);
+  const s = new Scene();
+  s.groundShadow = SHADOW;
   s.prism("z", [0.5, 0.5, 5], 0.055, 5, bark, 6);
-  const needles = foliage("pine", 12, undefined, 1.1);
-  const tiers = 4;
-  for (let k = 0; k < tiers; k++) {
+  for (let k = 0; k < 4; k++) {
     const base = (6 + k * 9) * tall;
     const r = (0.4 - k * 0.075) * (0.95 + rand() * 0.1);
     const h = (17 - k * 1.5) * tall;
@@ -118,37 +241,273 @@ export function pine(variant: number): Sprite {
       );
     }
   }
-  return renderSprite(`tree_pine_${variant}`, s, 1, 1, 64, 12);
+  return renderSprite(name, s, 1, 1, 66, 12);
 }
 
-export function sapling(): Sprite {
+const pine = (v: number) =>
+  conifer(`n_pine_${v}`, 2000 + v * 31, [1, 1.15, 0.88][v]!, foliage("pine", 12, undefined, 1.1));
+
+/** Snow settles on the upward-facing needles. */
+const snowy: Material = (() => {
+  const needles = foliage("pine", 12, undefined, 1.1);
+  return (c) => {
+    const n = noise3(c.p[0] * 14, c.p[1] * 14, c.p[2] / 3, 88);
+    if (c.n[2] > 0.35 + n * 0.3) return shade("snow", 0.45 + c.light * 0.6, c.px, c.py, 0.3);
+    return needles(c);
+  };
+})();
+const snowPine = (v: number) => conifer(`n_snow_pine_${v}`, 2100 + v * 17, [1, 0.9][v]!, snowy);
+
+// --- Dead and alien trees ----------------------------------------------------------------------
+
+function charredTree(v: number): Sprite {
+  const rand = prng(2800 + v * 23);
   const s = new Scene();
-  s.prism("z", [0.5, 0.5, 3], 0.025, 3, bark, 5);
-  s.ellipsoid([0.5, 0.5, 8], [0.14, 0.14, 4], foliage("leaf"));
-  s.ellipsoid([0.58, 0.44, 10], [0.09, 0.09, 3], foliage("leaf"));
-  return renderSprite("tree_sapling", s, 1, 1, 20, 6);
+  s.groundShadow = SHADOW;
+  const wood: Material = (c) => {
+    const crack = Math.abs(noise3(c.p[0] * 30, c.p[1] * 30, c.p[2] / 2, 90) - 0.5);
+    if (crack < 0.04 && c.lp[2] < 20) return rampColor("lava", 3);
+    return shade("charred", lit(c, 0.05), c.px, c.py, 0.2);
+  };
+  const h = 24 + v * 6;
+  s.prism("z", [0.5, 0.5, h / 2], 0.07, h / 2, wood, 7);
+  for (let i = 0; i < 5; i++) {
+    const a = rand() * Math.PI * 2;
+    const z0 = 10 + rand() * (h - 12);
+    const len = 0.22 + rand() * 0.18;
+    strand(
+      s,
+      [0.5, 0.5, z0],
+      [0.5 + Math.cos(a) * len, 0.5 + Math.sin(a) * len, z0 + 6 + rand() * 6],
+      0.025,
+      1.2,
+      wood,
+      5,
+    );
+  }
+  return renderSprite(`n_charred_tree_${v}`, s, 1, 1, 50, 10);
 }
 
-export function stump(): Sprite {
+function giantMushroom(v: number): Sprite {
   const s = new Scene();
-  s.groundShadow = { x0: 0, y0: 0, x1: 1, y1: 1 };
-  s.prism(
-    "z",
-    [0.5, 0.5, 2],
-    0.1,
-    2,
-    (c) => {
-      if (c.n[2] > 0.9) {
-        const d = Math.hypot(c.lp[0] - 0.5, c.lp[1] - 0.5);
-        return rampColor("wheat", (d * 40) % 2 < 1 ? 2 : 3);
-      }
-      return bark(c);
-    },
-    9,
+  s.groundShadow = SHADOW;
+  const h = v === 0 ? 20 : 15;
+  const capRamp: RampName = v === 0 ? "capRed" : "arcane";
+  s.prism("z", [0.5, 0.5, h / 2], 0.1, h / 2, flat("stalk", 0.1), 10);
+  s.ellipsoid([0.5, 0.5, 2], [0.14, 0.14, 3], flat("stalk"));
+  const cap: Material = (c) => {
+    if (c.n[2] < -0.2) return shade("stalk", 0.3 + c.light * 0.3, c.px, c.py);
+    const spot = noise3(c.p[0] * 16, c.p[1] * 16, c.p[2] / 2, 55) > 0.72;
+    if (spot && c.n[2] > 0.2) return rampColor("stalk", 5);
+    return shade(capRamp, lit(c, 0.08), c.px, c.py, 0.3);
+  };
+  s.ellipsoid([0.5, 0.5, h + 1], [0.5, 0.5, 5.5], cap);
+  s.ellipsoid([0.5, 0.5, h + 4], [0.34, 0.34, 4], cap);
+  return renderSprite(`n_giant_mushroom_${v}`, s, 1, 1, 44, 10);
+}
+
+function palm(v: number): Sprite {
+  const rand = prng(3100 + v * 29);
+  const s = new Scene();
+  s.groundShadow = SHADOW;
+  const lean = v === 0 ? 0.18 : -0.14;
+  const top: Vec3 = [0.5 + lean, 0.5 - lean * 0.4, 30];
+  const trunk: Material = (c) =>
+    shade("timber", lit(c, 0.25 + ((c.lp[2] / 3) % 1 < 0.35 ? -0.15 : 0)), c.px, c.py, 0.2);
+  strand(s, [0.5, 0.5, 0], top, 0.06, 1.6, trunk, 12);
+  const fronds = foliage("jungle", 10, undefined, 0.8, 0.05);
+  for (let i = 0; i < 7; i++) {
+    const a = (i / 7) * Math.PI * 2 + rand() * 0.4;
+    const len = 0.42 + rand() * 0.1;
+    const mid: Vec3 = [
+      top[0] + Math.cos(a) * len * 0.5,
+      top[1] + Math.sin(a) * len * 0.5,
+      top[2] + 3,
+    ];
+    const end: Vec3 = [top[0] + Math.cos(a) * len, top[1] + Math.sin(a) * len, top[2] - 6];
+    strand(s, top, mid, 0.05, 1.3, fronds, 4);
+    strand(s, mid, end, 0.045, 1.2, fronds, 4);
+  }
+  for (let i = 0; i < 3; i++)
+    s.ellipsoid(
+      [top[0] + (i - 1) * 0.05, top[1] + 0.04, top[2] - 2],
+      [0.035, 0.035, 1.6],
+      flat("timber", -0.05),
+    );
+  return renderSprite(`n_palm_${v}`, s, 1, 1, 56, 12);
+}
+
+// --- Food plants ------------------------------------------------------------------------------
+
+function bush(
+  name: string,
+  seed: number,
+  ramp: RampName,
+  r: number,
+  extras?: Extra,
+  bias = 0,
+): Sprite {
+  const rand = prng(seed);
+  const s = new Scene();
+  s.groundShadow = { x0: -0.2, y0: -0.2, x1: 1.2, y1: 1.2 };
+  canopy(s, rand, 0.5, 0.5, 6, r, 6, 6, foliage(ramp, 11, extras, 1.3, bias));
+  return renderSprite(name, s, 1, 1, 24, 8);
+}
+
+function withSnow(base: Material): Material {
+  return (c) =>
+    c.n[2] > 0.55 && noise3(c.p[0] * 20, c.p[1] * 20, 0, 5) > 0.35
+      ? shade("snow", 0.5 + c.light * 0.5, c.px, c.py)
+      : base(c);
+}
+
+function frostBerry(bare: boolean): Sprite {
+  const rand = prng(6100);
+  const s = new Scene();
+  s.groundShadow = { x0: -0.2, y0: -0.2, x1: 1.2, y1: 1.2 };
+  canopy(
+    s,
+    rand,
+    0.5,
+    0.5,
+    6,
+    0.28,
+    6,
+    6,
+    withSnow(foliage("pine", 11, bare ? undefined : dots("clothBlue", 0.12, 31, 0.25))),
   );
-  s.ellipsoid([0.36, 0.62, 0.5], [0.06, 0.04, 1], bark);
-  return renderSprite("tree_stump", s, 1, 1, 12, 6);
+  return renderSprite(bare ? "n_frost_berry_bare" : "n_frost_berry_0", s, 1, 1, 24, 8);
 }
+
+function cactus(v: number, bare: boolean): Sprite {
+  const s = new Scene();
+  s.groundShadow = { x0: -0.2, y0: -0.2, x1: 1.2, y1: 1.2 };
+  const skin: Material = (c) => {
+    const rib = Math.abs(Math.sin(Math.atan2(c.lp[1] - 0.5, c.lp[0] - 0.5) * 4)) < 0.3 ? -0.14 : 0;
+    return shade("cactus", lit(c, 0.05 + rib), c.px, c.py, 0.25);
+  };
+  const h = v === 0 ? 20 : 14;
+  s.prism("z", [0.5, 0.5, h / 2], 0.1, h / 2, skin, 10);
+  s.ellipsoid([0.5, 0.5, h], [0.1, 0.1, 2], skin);
+  const arm = (dx: number, dy: number, z: number, up: number) => {
+    s.prism(dx !== 0 ? "x" : "y", [0.5 + dx * 0.12, 0.5 + dy * 0.12, z], 0.06, 0.1, skin, 8);
+    s.prism("z", [0.5 + dx * 0.2, 0.5 + dy * 0.2, z + up / 2], 0.06, up / 2, skin, 8);
+    s.ellipsoid([0.5 + dx * 0.2, 0.5 + dy * 0.2, z + up], [0.06, 0.06, 1.3], skin);
+  };
+  arm(1, 0, h * 0.45, 6);
+  if (v === 0) arm(0, 1, h * 0.6, 5);
+  if (!bare) {
+    s.ellipsoid([0.5, 0.5, h + 2], [0.05, 0.05, 1.5], flat("petal", 0.2));
+    s.ellipsoid([0.5 + 0.2, 0.5, h * 0.45 + 7.5], [0.04, 0.04, 1.2], flat("pumpkin", 0.2));
+  }
+  return renderSprite(bare ? "n_cactus_bare" : `n_cactus_${v}`, s, 1, 1, 34, 8);
+}
+
+function emberFruit(bare: boolean): Sprite {
+  const rand = prng(6300);
+  const s = new Scene();
+  s.groundShadow = { x0: -0.2, y0: -0.2, x1: 1.2, y1: 1.2 };
+  const twig: Material = (c) => shade("charred", lit(c, 0.1), c.px, c.py);
+  for (let i = 0; i < 6; i++) {
+    const a = rand() * Math.PI * 2;
+    strand(
+      s,
+      [0.5, 0.5, 0],
+      [0.5 + Math.cos(a) * 0.25, 0.5 + Math.sin(a) * 0.25, 8 + rand() * 5],
+      0.02,
+      1,
+      twig,
+      5,
+    );
+    if (!bare)
+      s.ellipsoid(
+        [0.5 + Math.cos(a) * 0.22, 0.5 + Math.sin(a) * 0.22, 9 + rand() * 4],
+        [0.05, 0.05, 1.6],
+        (c) => rampColor("lava", c.light > 0.3 ? 5 : 4),
+      );
+  }
+  return renderSprite(bare ? "n_ember_fruit_bare" : "n_ember_fruit_0", s, 1, 1, 24, 8);
+}
+
+function banana(bare: boolean): Sprite {
+  const rand = prng(6400);
+  const s = new Scene();
+  s.groundShadow = { x0: -0.2, y0: -0.2, x1: 1.2, y1: 1.2 };
+  s.prism("z", [0.5, 0.5, 5], 0.05, 5, flat("sprout", -0.1), 8);
+  const leaf = foliage("jungle", 10, undefined, 0.7, 0.1);
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2 + rand() * 0.3;
+    strand(
+      s,
+      [0.5, 0.5, 9],
+      [0.5 + Math.cos(a) * 0.38, 0.5 + Math.sin(a) * 0.38, 13 - rand() * 6],
+      0.06,
+      1,
+      leaf,
+      5,
+    );
+  }
+  if (!bare)
+    for (let i = 0; i < 4; i++)
+      s.ellipsoid(
+        [0.56 + (i % 2) * 0.04, 0.5, 6 + i * 1.3],
+        [0.05, 0.04, 1.2],
+        flat("banana", 0.1),
+      );
+  return renderSprite(bare ? "n_banana_bare" : "n_banana_0", s, 1, 1, 26, 8);
+}
+
+function shroomPatch(
+  name: string,
+  capRamp: RampName,
+  emissive: boolean,
+  bare: boolean,
+  seed: number,
+): Sprite {
+  const rand = prng(seed);
+  const s = new Scene();
+  s.groundShadow = { x0: -0.1, y0: -0.1, x1: 1.1, y1: 1.1 };
+  const cap: Material = (c) =>
+    emissive ? rampColor(capRamp, c.light > 0.2 ? 5 : 4) : shade(capRamp, lit(c, 0.1), c.px, c.py);
+  const count = bare ? 2 : 5;
+  for (let i = 0; i < count; i++) {
+    const x = 0.25 + rand() * 0.5;
+    const y = 0.25 + rand() * 0.5;
+    const h = (bare ? 3 : 5) + rand() * 6;
+    s.prism("z", [x, y, h / 2], 0.03, h / 2, flat("stalk", 0.1), 6);
+    s.ellipsoid([x, y, h], [0.11 + rand() * 0.05, 0.11, 2.6], cap);
+  }
+  return renderSprite(name, s, 1, 1, 18, 6);
+}
+
+function pumpkinPatch(bare: boolean): Sprite {
+  const s = new Scene();
+  s.groundShadow = { x0: -0.1, y0: -0.1, x1: 1.1, y1: 1.1 };
+  const vine = flat("sprout", -0.05);
+  strand(s, [0.2, 0.3, 0.5], [0.8, 0.7, 0.5], 0.03, 0.8, vine, 8);
+  strand(s, [0.3, 0.8, 0.5], [0.7, 0.25, 0.5], 0.03, 0.8, vine, 8);
+  if (!bare) {
+    const skin: Material = (c) => {
+      const rib =
+        Math.abs(Math.sin(Math.atan2(c.lp[1] - c.p[1], 1) + c.lp[0] * 40)) < 0.2 ? -0.12 : 0;
+      return shade("pumpkin", lit(c, 0.05 + rib), c.px, c.py, 0.25);
+    };
+    for (const [x, y, r] of [
+      [0.44, 0.44, 0.22],
+      [0.7, 0.64, 0.16],
+      [0.28, 0.7, 0.14],
+    ] as const) {
+      s.ellipsoid([x, y, r * 12], [r, r, r * 14], skin);
+      s.prism("z", [x, y, r * 25], 0.015, 1.5, flat("timber"), 5);
+    }
+  } else {
+    for (let i = 0; i < 5; i++)
+      s.ellipsoid([0.3 + i * 0.1, 0.5 + (i % 2) * 0.1, 1], [0.06, 0.05, 1.5], vine);
+  }
+  return renderSprite(bare ? "n_pumpkin_bare" : "n_pumpkin_0", s, 1, 1, 20, 6);
+}
+
+// --- Rocks and deposits ----------------------------------------------------------------------
 
 /** Angular rock: an ellipsoid's support planes in random directions, jittered. */
 function rock(
@@ -175,13 +534,11 @@ function rock(
   s.convex(planes, mat);
 }
 
-export function boulder(variant: number): Sprite {
-  const rand = prng(3000 + variant * 13);
+function rockPile(name: string, seed: number, mat: Material, big = 1, height = 9): Sprite {
+  const rand = prng(seed);
   const s = new Scene();
   s.groundShadow = { x0: -0.2, y0: -0.2, x1: 1.2, y1: 1.2 };
-  const mat = rocky("rock", 8, 0.35);
-  const big = variant === 0 ? 1 : 0.8;
-  rock(s, rand, [0.5, 0.5, 3], [0.34 * big, 0.3 * big, 9 * big], mat);
+  rock(s, rand, [0.5, 0.5, 3], [0.34 * big, 0.3 * big, height * big], mat);
   for (let i = 0; i < 2; i++) {
     const a = rand() * Math.PI * 2;
     rock(
@@ -193,27 +550,61 @@ export function boulder(variant: number): Sprite {
       12,
     );
   }
-  return renderSprite(`rock_boulder_${variant}`, s, 1, 1, 30, 8);
+  return renderSprite(name, s, 1, 1, 36, 8);
 }
 
-export function oreRock(): Sprite {
-  const s = new Scene();
-  s.groundShadow = { x0: -0.3, y0: -0.3, x1: 1.3, y1: 1.3 };
-  const base = rocky("rock", 7, 0.2);
-  const mat: Material = (c) => {
-    const k = noise3(c.p[0] * 22, c.p[1] * 22, c.p[2] / 1.5, 77);
-    if (k > 0.8) return rampColor("wheat", c.light > 0.3 ? 4 : 2);
-    if (k < 0.12) return rampColor("fruit", 1);
+/** Rock with coloured flecks or veins of something valuable. */
+function veined(base: Material, vein: RampName, seed: number, amount = 0.2, scale = 22): Material {
+  return (c) => {
+    const k = noise3(c.p[0] * scale, c.p[1] * scale, c.p[2] / 1.5, seed);
+    if (k > 1 - amount) return rampColor(vein, c.light > 0.3 ? rampLength(vein) - 2 : 2);
     return base(c);
   };
-  const rand = prng(3999);
+}
+
+function deposit(name: string, seed: number, mat: Material): Sprite {
+  const s = new Scene();
+  s.groundShadow = { x0: -0.3, y0: -0.3, x1: 1.3, y1: 1.3 };
+  const rand = prng(seed);
   rock(s, rand, [0.5, 0.5, 4], [0.42, 0.36, 13], mat, 20);
   rock(s, rand, [0.18, 0.66, 1], [0.18, 0.16, 6], mat, 12);
   rock(s, rand, [0.74, 0.26, 1], [0.16, 0.14, 6], mat, 12);
-  return renderSprite("rock_ore", s, 1, 1, 36, 8);
+  return renderSprite(name, s, 1, 1, 36, 8);
 }
 
-export function seaRock(variant: number): Sprite {
+/** Glossy stone: sharp highlights on well-lit facets. */
+function glossy(ramp: RampName, highlight: RampName): Material {
+  return (c) =>
+    c.light > 0.62
+      ? rampColor(highlight, rampLength(highlight) - 2)
+      : shade(ramp, lit(c, -0.05), c.px, c.py, 0.25);
+}
+
+function crystalCluster(v: number): Sprite {
+  const s = new Scene();
+  s.groundShadow = { x0: -0.2, y0: -0.2, x1: 1.2, y1: 1.2 };
+  const gem: Material = (c) =>
+    shade("crystal", 0.35 + 0.8 * c.light + (c.n[2] > 0.3 ? 0.1 : 0), c.px, c.py, 0.2);
+  const rand = prng(3700 + v);
+  rock(s, rand, [0.5, 0.5, 1], [0.26, 0.22, 5], rocky("crystalGround", 8), 12);
+  const spikes = v === 0 ? 5 : 4;
+  s.withYaw(v * 0.6, [0.5, 0.5], () => {
+    for (let i = 0; i < spikes; i++) {
+      const a = (i / spikes) * Math.PI * 2;
+      const d = i === 0 ? 0 : 0.14;
+      s.cone(
+        [0.5 + Math.cos(a) * d, 0.5 + Math.sin(a) * d, 2],
+        i === 0 ? 0.11 : 0.07,
+        i === 0 ? 24 : 12 + rand() * 6,
+        gem,
+        6,
+      );
+    }
+  });
+  return renderSprite(`n_crystal_${v}`, s, 1, 1, 40, 10);
+}
+
+function seaRock(variant: number): Sprite {
   const rand = prng(5000 + variant);
   const s = new Scene();
   const mat = rocky("rock", 6, 0.25);
@@ -234,103 +625,144 @@ export function seaRock(variant: number): Sprite {
   return trimmed(sprite.name, out, sprite.anchorX + 4, sprite.anchorY);
 }
 
-export function berryBush(ripe: boolean): Sprite {
-  const rand = prng(6000);
+// --- Regrowth stages --------------------------------------------------------------------------
+
+export type RegrowStyle = "wood" | "charred" | "stalk" | "silver";
+
+export const REGROW_STYLE: Partial<Record<NodeKind, RegrowStyle>> = {
+  charred_tree: "charred",
+  giant_mushroom: "stalk",
+  silver_tree: "silver",
+};
+
+function stump(style: RegrowStyle): Sprite {
   const s = new Scene();
-  s.groundShadow = { x0: -0.2, y0: -0.2, x1: 1.2, y1: 1.2 };
-  const mat = foliage("leaf", 11, (c, v) => {
-    if (!ripe) return null;
-    const k = hash3(c.px, c.py, 0, 29);
-    if (v > 0.3 && k > 0.88) return rampColor("berry", v > 0.65 ? 3 : 2);
-    return null;
-  });
-  canopy(s, rand, 0.5, 0.5, 6, 0.28, 6, 6, mat);
-  return renderSprite(ripe ? "bush_berry" : "bush_bare", s, 1, 1, 22, 8);
+  s.groundShadow = { x0: 0, y0: 0, x1: 1, y1: 1 };
+  const side =
+    style === "charred"
+      ? barkOf("charred")
+      : style === "stalk"
+        ? flat("stalk")
+        : style === "silver"
+          ? barkOf("silver", 0.2)
+          : bark;
+  const top = style === "charred" ? "lava" : style === "stalk" ? "stalk" : "wheat";
+  s.prism(
+    "z",
+    [0.5, 0.5, 2],
+    0.1,
+    2,
+    (c) => {
+      if (c.n[2] > 0.9) {
+        const d = Math.hypot(c.lp[0] - 0.5, c.lp[1] - 0.5);
+        return rampColor(top, (d * 40) % 2 < 1 ? 2 : 3);
+      }
+      return side(c);
+    },
+    9,
+  );
+  if (style === "wood") s.ellipsoid([0.36, 0.62, 0.5], [0.06, 0.04, 1], bark);
+  return renderSprite(`n_stump_${style}`, s, 1, 1, 12, 6);
 }
 
-export function sunflowers(): Sprite {
-  const rand = prng(7000);
+function sapling(style: RegrowStyle): Sprite {
   const s = new Scene();
-  const stem = flat("sprout");
-  const head: Material = (c) => shade("sunflower", lit(c, 0.1), c.px, c.py);
-  for (let i = 0; i < 7; i++) {
-    const x = 0.18 + rand() * 0.64;
-    const y = 0.18 + rand() * 0.64;
-    const h = 14 + rand() * 7;
-    s.prism("z", [x, y, h / 2], 0.025, h / 2, stem, 5);
-    s.ellipsoid([x + 0.07, y, h * 0.5], [0.09, 0.04, 2], flat("sprout"));
-    s.ellipsoid([x - 0.06, y, h * 0.35], [0.08, 0.04, 2], flat("sprout"));
-    const centre: Vec3 = [x, y + 0.03, h + 2];
-    s.prism(
-      "y",
-      centre,
-      0.13,
-      0.015,
-      (c) => {
-        const r = Math.hypot(c.lp[0] - centre[0], (c.lp[2] - centre[2]) / 19.6);
-        if (r < 0.05) return rampColor("sunflower", 0);
-        return head(c);
-      },
-      10,
-    );
+  if (style === "charred") {
+    strand(s, [0.5, 0.5, 0], [0.55, 0.45, 9], 0.02, 1, barkOf("charred"), 4);
+    s.ellipsoid([0.55, 0.45, 9], [0.03, 0.03, 1], () => rampColor("lava", 4));
+  } else if (style === "stalk") {
+    s.prism("z", [0.5, 0.5, 2.5], 0.025, 2.5, flat("stalk"), 6);
+    s.ellipsoid([0.5, 0.5, 5], [0.1, 0.1, 2.5], flat("capRed", 0.1));
+  } else {
+    const leaf = style === "silver" ? "silver" : "leaf";
+    s.prism("z", [0.5, 0.5, 3], 0.025, 3, bark, 5);
+    s.ellipsoid([0.5, 0.5, 8], [0.14, 0.14, 4], foliage(leaf));
+    s.ellipsoid([0.58, 0.44, 10], [0.09, 0.09, 3], foliage(leaf));
   }
-  return renderSprite("deco_sunflowers", s, 1, 1, 30, 6);
+  return renderSprite(`n_sapling_${style}`, s, 1, 1, 20, 6);
 }
 
-export function flowers(variant: number): Sprite {
-  const c = new Canvas(32, 16);
-  const rand = prng(8000 + variant);
-  const colours: Rgba[] = [
-    rampColor("sunflower", 3),
-    rampColor("plaster", 4),
-    rampColor("cloth", 3),
-    rampColor("berry", 3),
-  ];
-  for (let i = 0; i < 9; i++) {
-    const x = 8 + Math.floor(rand() * 16);
-    const y = 4 + Math.floor(rand() * 8);
-    c.set(x, y + 1, rampColor("grass", 1));
-    c.set(x, y, colours[(i + variant) % colours.length]!);
-  }
-  return trimmed(`deco_flowers_${variant}`, c, 16, 0);
+/** Boulder sprite, also used to draw the stone icon. */
+export function boulder(variant: number): Sprite {
+  return rockPile(
+    `n_boulder_${variant}`,
+    3000 + variant * 13,
+    rocky("rock", 8, 0.35),
+    variant === 0 ? 1 : 0.8,
+  );
 }
 
-export function grassTuft(variant: number): Sprite {
-  const c = new Canvas(32, 16);
-  const rand = prng(8500 + variant);
-  for (let i = 0; i < 5; i++) {
-    const x = 10 + Math.floor(rand() * 12);
-    const y = 6 + Math.floor(rand() * 6);
-    c.set(x, y, rampColor("grass", 5));
-    c.set(x - 1, y + 1, rampColor("grass", 4));
-    c.set(x + 1, y + 1, rampColor("grass", 4));
-    c.set(x, y + 1, rampColor("grass", 3));
-  }
-  return trimmed(`deco_grass_${variant}`, c, 16, 0);
-}
+// --- Registry ---------------------------------------------------------------------------------
+
+const range = (n: number) => Array.from({ length: n }, (_, i) => i);
 
 export function natureSprites(): Sprite[] {
-  return [
-    oak(0),
-    oak(1),
-    oak(2),
-    pine(0),
-    pine(1),
-    pine(2),
-    fruitTree(),
-    sapling(),
-    stump(),
-    boulder(0),
-    boulder(1),
-    oreRock(),
+  const V = NODE_VARIANTS;
+  const out: Sprite[] = [
+    ...range(V.oak).map(oak),
+    ...range(V.pine).map(pine),
+    fruitTree(false),
+    fruitTree(true),
+    bush("n_berry_0", 6000, "leaf", 0.28, dots("berry", 0.12, 29, 0.3)),
+    bush("n_berry_bare", 6000, "leaf", 0.28),
+    ...range(V.boulder).map(boulder),
+    deposit("n_ore_0", 3999, veined(rocky("rock", 7, 0.2), "fruit", 77)),
+    ...range(V.palm).map(palm),
+    ...range(V.cactus).map((v) => cactus(v, false)),
+    cactus(1, true),
+    ...range(V.sandstone).map((v) =>
+      rockPile(
+        `n_sandstone_${v}`,
+        3200 + v * 7,
+        (c) => shade("sandstone", lit(c, (c.lp[2] / 3) % 1 < 0.3 ? -0.12 : 0.02), c.px, c.py, 0.2),
+        v === 0 ? 1 : 0.85,
+        11,
+      ),
+    ),
+    deposit("n_gold_vein_0", 3300, veined(rocky("sandstone", 7, 0), "gold", 78, 0.28)),
+    ...range(V.charred_tree).map(charredTree),
+    emberFruit(false),
+    emberFruit(true),
+    ...range(V.obsidian).map((v) =>
+      rockPile(
+        `n_obsidian_${v}`,
+        3400 + v * 11,
+        glossy("obsidian", "arcane"),
+        v === 0 ? 1 : 0.8,
+        12,
+      ),
+    ),
+    deposit("n_hellstone_0", 3500, veined(rocky("basalt", 7, 0), "lava", 79, 0.3)),
+    ...range(V.snow_pine).map(snowPine),
+    frostBerry(false),
+    frostBerry(true),
+    ...range(V.ice_rock).map((v) =>
+      rockPile(`n_ice_rock_${v}`, 3600 + v * 5, glossy("ice", "snow"), v === 0 ? 1 : 0.8, 11),
+    ),
+    ...range(V.jungle_tree).map(jungleTree),
+    banana(false),
+    banana(true),
+    ...range(V.willow).map(willow),
+    shroomPatch("n_swamp_shroom_0", "timber", false, false, 6500),
+    shroomPatch("n_swamp_shroom_bare", "timber", false, true, 6500),
+    deposit("n_bog_ore_0", 3800, veined(rocky("swampGround", 7, 0.3), "pumpkin", 80, 0.22)),
+    ...range(V.giant_mushroom).map(giantMushroom),
+    shroomPatch("n_glowshroom_0", "glow", true, false, 6600),
+    shroomPatch("n_glowshroom_bare", "glow", true, true, 6600),
+    ...range(V.silver_tree).map(silverTree),
+    ...range(V.crystal).map(crystalCluster),
+    ...range(V.autumn_tree).map(autumn),
+    pumpkinPatch(false),
+    pumpkinPatch(true),
+    ...range(V.blossom_tree).map(blossom),
+    bush("n_flower_bush_0", 6700, "blossomGround", 0.26, dots("petal", 0.16, 33, 0.25), 0.05),
+    bush("n_flower_bush_bare", 6700, "blossomGround", 0.26, undefined, 0.05),
     seaRock(0),
     seaRock(1),
-    berryBush(true),
-    berryBush(false),
-    sunflowers(),
-    flowers(0),
-    flowers(1),
-    grassTuft(0),
-    grassTuft(1),
+    ...(["wood", "charred", "stalk", "silver"] as RegrowStyle[]).flatMap((st) => [
+      stump(st),
+      sapling(st),
+    ]),
   ];
+  return out;
 }

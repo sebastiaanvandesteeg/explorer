@@ -1,5 +1,5 @@
-// Terrain tiles, cliff faces, shallow-water overlays, foam, fog and the tiling ocean texture.
-import { HALF_H, HALF_W, TILE_H, TILE_W } from "@explorer/shared";
+// Terrain tiles and cliff faces for every biome, plus foam, kelp and the tiling ocean texture.
+import { BIOMES, HALF_H, HALF_W, TILE_H, TILE_W, type BiomeId } from "@explorer/shared";
 import { Canvas } from "../canvas";
 import { hash3, prng } from "../noise3";
 import { bayer, hexToRgba, rampColor, shade, type RampName, type Rgba } from "../palette";
@@ -20,7 +20,7 @@ export function inDiamond(px: number, py: number): boolean {
 }
 
 /** Noise that repeats every tile, so all variants of a terrain type join seamlessly. */
-function periodicNoise(fx: number, fy: number, cells: number, seed: number): number {
+export function periodicNoise(fx: number, fy: number, cells: number, seed: number): number {
   const x = fx * cells;
   const y = fy * cells;
   const x0 = Math.floor(x);
@@ -51,53 +51,258 @@ function tile(
   return { name, canvas: c, anchorX: HALF_W, anchorY: 0 };
 }
 
-function groundTile(
-  name: string,
-  rampName: RampName,
-  base: number,
-  variant: number,
-  detail: (px: number, py: number, rand: number) => Rgba | null,
-): Sprite {
+/** Per-pixel detail hook: return a colour to override the base texture. */
+type Detail = (px: number, py: number, r: number, fx: number, fy: number) => Rgba | null;
+
+interface Ground {
+  ramp: RampName;
+  base: number;
+  spread?: number;
+  detail?: (variant: number) => Detail;
+}
+
+interface BiomeTerrain {
+  ground: Ground;
+  beach: Ground;
+  rock: Ground;
+  /** Tall cliff faces and low banks. */
+  cliff: RampName;
+  bank: RampName;
+  /** Sparks of lava or crystal light in the cliff cracks. */
+  seam?: RampName;
+}
+
+function groundTile(name: string, g: Ground, variant: number): Sprite {
+  const detail = g.detail?.(variant);
+  const spread = g.spread ?? 0.34;
   return tile(name, (px, py, fx, fy) => {
     const n = periodicNoise(fx, fy, 4, 11) * 0.6 + periodicNoise(fx, fy, 8, 12) * 0.4;
-    const extra = detail(px, py, hash3(px, py, variant, 91));
+    const extra = detail?.(px, py, hash3(px, py, variant, 91), fx, fy);
     if (extra) return extra;
-    return shade(rampName, base + (n - 0.5) * 0.34, px, py, 0.5);
+    return shade(g.ramp, g.base + (n - 0.5) * spread, px, py, 0.5);
   });
 }
 
-function grass(variant: number): Sprite {
-  return groundTile(`t_grass_${variant}`, "grass", 0.55, variant, (px, py, r) => {
-    if (r > 0.94) return rampColor("grass", 5);
-    if (r < 0.04) return rampColor("grass", 2);
-    if (variant === 3 && r > 0.9) return rampColor("sunflower", 3);
+const speckle =
+  (ramp: RampName, hi: number, lo: number, extra?: (v: number) => Detail) =>
+  (variant: number): Detail =>
+  (px, py, r, fx, fy) => {
+    const e = extra?.(variant)(px, py, r, fx, fy);
+    if (e) return e;
+    if (r > 0.94) return rampColor(ramp, hi);
+    if (r < 0.04) return rampColor(ramp, lo);
     return null;
-  });
-}
+  };
 
-function sand(variant: number): Sprite {
-  return groundTile(`t_sand_${variant}`, "sand", 0.58, variant, (_px, _py, r) => {
-    if (r > 0.95) return rampColor("sand", 5);
-    if (r < 0.03) return rampColor("sand", 1);
-    return null;
-  });
-}
+/** Scattered coloured pixels (flowers, petals, leaves) on some variants. */
+const sprinkle =
+  (colors: Rgba[], density: number, variants: number[]) =>
+  (variant: number): Detail =>
+  (_px, _py, r) =>
+    variants.includes(variant) && r > 1 - density
+      ? colors[Math.floor(r * 997) % colors.length]!
+      : null;
 
-function stony(variant: number): Sprite {
-  return groundTile(`t_rock_${variant}`, "rock", 0.62, variant, (px, py, r) => {
-    if (r > 0.9) return rampColor("rock", 6);
-    if (r < 0.08) return rampColor("rock", 2);
-    if (variant === 1 && hash3(px >> 2, py >> 1, 0, 4) > 0.85) return rampColor("moss", 2);
-    return null;
-  });
+const TERRAIN: Record<BiomeId, BiomeTerrain> = {
+  temperate: {
+    ground: {
+      ramp: "grass",
+      base: 0.55,
+      detail: speckle(
+        "grass",
+        5,
+        2,
+        sprinkle([rampColor("sunflower", 3), rampColor("plaster", 4)], 0.08, [3]),
+      ),
+    },
+    beach: { ramp: "sand", base: 0.58, detail: speckle("sand", 5, 1) },
+    rock: { ramp: "rock", base: 0.62, detail: speckle("rock", 6, 2) },
+    cliff: "rock",
+    bank: "soil",
+  },
+  desert: {
+    ground: {
+      ramp: "dune",
+      base: 0.55,
+      spread: 0.28,
+      detail: (v) => (px, py, r, fx, fy) => {
+        // Wind ripples across the dunes.
+        const ripple = (fx * 3 + fy * 5 + periodicNoise(fx, fy, 3, 70 + v) * 0.8) % 1;
+        if (ripple < 0.08) return rampColor("dune", 5);
+        if (ripple > 0.94) return rampColor("dune", 1);
+        if (r > 0.985) return rampColor("sandstone", 2);
+        return null;
+      },
+    },
+    beach: { ramp: "dune", base: 0.72, detail: speckle("dune", 5, 2) },
+    rock: { ramp: "sandstone", base: 0.55, detail: speckle("sandstone", 5, 1) },
+    cliff: "sandstone",
+    bank: "dune",
+  },
+  infernal: {
+    ground: {
+      ramp: "ash",
+      base: 0.45,
+      detail: (v) => (px, py, r, fx, fy) => {
+        // Glowing lava cracks through the ash.
+        const crack = Math.abs(periodicNoise(fx, fy, 3, 40 + (v % 2)) - 0.5);
+        if (v !== 1 && crack < 0.025) return rampColor("lava", 3 + (r > 0.6 ? 1 : 0));
+        if (v !== 1 && crack < 0.045) return rampColor("lava", 1);
+        if (r > 0.97) return rampColor("lava", 2);
+        if (r < 0.06) return rampColor("ash", 0);
+        return null;
+      },
+    },
+    beach: { ramp: "basalt", base: 0.5, detail: speckle("ash", 5, 0) },
+    rock: {
+      ramp: "basalt",
+      base: 0.55,
+      detail: (v) => (px, py, r, fx, fy) => {
+        const crack = Math.abs(periodicNoise(fx, fy, 4, 44 + v) - 0.5);
+        if (crack < 0.03) return rampColor("lava", 3);
+        return r > 0.94 ? rampColor("basalt", 5) : null;
+      },
+    },
+    cliff: "basalt",
+    bank: "ash",
+    seam: "lava",
+  },
+  tundra: {
+    ground: {
+      ramp: "snow",
+      base: 0.68,
+      spread: 0.26,
+      detail: speckle(
+        "snow",
+        5,
+        1,
+        (v) => (_px, _py, r) => (v === 2 && r > 0.93 ? rampColor("ice", 2) : null),
+      ),
+    },
+    beach: { ramp: "snow", base: 0.45, detail: speckle("sand", 3, 1) },
+    rock: { ramp: "ice", base: 0.6, detail: speckle("ice", 5, 1) },
+    cliff: "ice",
+    bank: "snow",
+  },
+  jungle: {
+    ground: {
+      ramp: "jungle",
+      base: 0.5,
+      detail: speckle(
+        "jungle",
+        6,
+        1,
+        sprinkle([rampColor("berry", 3), rampColor("sunflower", 3)], 0.03, [2]),
+      ),
+    },
+    beach: { ramp: "sand", base: 0.62, detail: speckle("sand", 5, 1) },
+    rock: { ramp: "rock", base: 0.55, detail: speckle("moss", 3, 0) },
+    cliff: "rock",
+    bank: "soil",
+  },
+  swamp: {
+    ground: {
+      ramp: "swampGround",
+      base: 0.5,
+      detail: (v) => (px, py, r, fx, fy) => {
+        // Murky puddles.
+        const p = periodicNoise(fx, fy, 3, 60 + v);
+        if (v !== 0 && p > 0.72) return p > 0.76 ? hexToRgba("#1e3a36") : hexToRgba("#3e5a4a");
+        if (r > 0.95) return rampColor("swampGround", 5);
+        return null;
+      },
+    },
+    beach: { ramp: "soil", base: 0.45, detail: speckle("swampGround", 3, 0) },
+    rock: { ramp: "rock", base: 0.45, detail: speckle("moss", 2, 0) },
+    cliff: "rock",
+    bank: "swampGround",
+  },
+  fungal: {
+    ground: {
+      ramp: "fungalGround",
+      base: 0.5,
+      detail: (v) => (px, py, r) => {
+        if (r > 0.975) return rampColor("glow", 3 + (v % 2));
+        if (r > 0.93) return rampColor("fungalGround", 5);
+        if (r < 0.05) return rampColor("fungalGround", 1);
+        return null;
+      },
+    },
+    beach: { ramp: "crystalGround", base: 0.45, detail: speckle("crystalGround", 4, 1) },
+    rock: { ramp: "crystalGround", base: 0.4, detail: speckle("fungalGround", 4, 0) },
+    cliff: "crystalGround",
+    bank: "fungalGround",
+    seam: "glow",
+  },
+  crystal: {
+    ground: {
+      ramp: "crystalGround",
+      base: 0.6,
+      detail: (v) => (px, py, r) => {
+        if (r > 0.975) return rampColor("crystal", 5 + (v % 2));
+        if (r > 0.93) return rampColor("crystalGround", 5);
+        if (r < 0.05) return rampColor("crystalGround", 1);
+        return null;
+      },
+    },
+    beach: { ramp: "sand", base: 0.72, detail: speckle("crystal", 5, 3) },
+    rock: { ramp: "crystalGround", base: 0.45, detail: speckle("crystal", 4, 1) },
+    cliff: "crystalGround",
+    bank: "crystalGround",
+    seam: "crystal",
+  },
+  autumn: {
+    ground: {
+      ramp: "autumnGround",
+      base: 0.55,
+      detail: speckle(
+        "autumnGround",
+        5,
+        1,
+        sprinkle(
+          [rampColor("autumnLeaf", 3), rampColor("autumnLeaf", 5), rampColor("autumnLeaf", 2)],
+          0.05,
+          [1, 2, 3],
+        ),
+      ),
+    },
+    beach: { ramp: "sand", base: 0.55, detail: speckle("sand", 5, 1) },
+    rock: { ramp: "rock", base: 0.6, detail: speckle("rock", 6, 2) },
+    cliff: "rock",
+    bank: "soil",
+  },
+  blossom: {
+    ground: {
+      ramp: "blossomGround",
+      base: 0.58,
+      detail: speckle(
+        "blossomGround",
+        5,
+        1,
+        sprinkle(
+          [rampColor("petal", 4), rampColor("petal", 5), rampColor("plaster", 4)],
+          0.06,
+          [1, 3],
+        ),
+      ),
+    },
+    beach: { ramp: "sand", base: 0.66, detail: speckle("petal", 5, 3) },
+    rock: { ramp: "rock", base: 0.65, detail: speckle("rock", 6, 2) },
+    cliff: "rock",
+    bank: "soil",
+  },
+};
+
+export function biomeGroundRamp(biome: BiomeId): RampName {
+  return TERRAIN[biome].ground.ramp;
 }
 
 function dirt(variant: number): Sprite {
-  return groundTile(`t_dirt_${variant}`, "soil", 0.62, variant, (_px, _py, r) => {
-    if (r > 0.93) return rampColor("stone", 3);
-    if (r < 0.05) return rampColor("soil", 1);
-    return null;
-  });
+  return groundTile(
+    `t_dirt_${variant}`,
+    { ramp: "soil", base: 0.62, detail: speckle("stone", 3, 1) },
+    variant,
+  );
 }
 
 /** Paved path for the Path building: flagstones on dirt. */
@@ -135,15 +340,6 @@ function edgeAlong(side: Side, fx: number, fy: number): number {
   return side === "-x" || side === "+x" ? fy : fx;
 }
 
-function shallow(level: 1 | 2): Sprite {
-  const colour = hexToRgba(level === 1 ? "#43a197" : "#2e908f", level === 1 ? 150 : 95);
-  const ripple = hexToRgba("#6cb9a8", level === 1 ? 170 : 110);
-  return tile(`w_shallow_${level}`, (_px, _py, fx, fy) => {
-    const n = periodicNoise(fx, fy, 4, 40 + level);
-    return n > 0.72 ? ripple : colour;
-  });
-}
-
 function foam(side: Side): Sprite {
   const white = rampColor("foam", 3);
   const pale = hexToRgba("#cfe3d6", 200);
@@ -178,28 +374,9 @@ function kelp(variant: number): Sprite {
   });
 }
 
-function fog(): Sprite {
-  return tile("f_fog", (px, py, fx, fy) => {
-    const n = periodicNoise(fx, fy, 3, 80);
-    return shade("fog", 0.35 + (n - 0.5) * 0.5, px, py, 0.6);
-  });
-}
-
-function fogEdge(side: Side): Sprite {
-  const colour = rampColor("fog", 1);
-  return tile(`f_edge_${side}`, (px, py, fx, fy) => {
-    const d = edgeDistance(side, fx, fy);
-    const u = edgeAlong(side, fx, fy);
-    const reach = 0.45 + (periodicNoise(u, 0.3, 5, 81) - 0.5) * 0.25;
-    if (d > reach) return null;
-    const density = 1 - d / reach;
-    return bayer(px, py) < density * 1.15 ? colour : null;
-  });
-}
-
-export type Lip = "grass" | "sand" | "rock" | "dirt";
 export const FACE_HEIGHTS = [4, 8, 12, 16, 20, 24, 28] as const;
-export const LIPS: Lip[] = ["grass", "sand", "rock", "dirt"];
+export const LIPS = ["ground", "beach", "rock", "dirt"] as const;
+export type Lip = (typeof LIPS)[number];
 
 /** First face row under the diamond for a column (left half; mirror for the right half). */
 function faceTop(px: number): number {
@@ -208,30 +385,19 @@ function faceTop(px: number): number {
   return TILE_H - 1 - r + 1;
 }
 
-/** Vertical cliff face below a tile edge. `side` "left" faces +y (lit), "right" faces +x. */
-function face(side: "left" | "right", height: number, lip: Lip): Sprite {
+/** Cliff face body below a tile edge. "left" faces +y (lit), "right" faces +x (shaded). */
+function face(biome: BiomeId, side: "left" | "right", height: number): Sprite {
+  const t = TERRAIN[biome];
   const c = new Canvas(TILE_W, TILE_H + height + 1);
   const lit = side === "left";
-  const lipRamp: RampName =
-    lip === "grass" ? "grass" : lip === "sand" ? "sand" : lip === "dirt" ? "soil" : "rock";
-  const earthy = height <= 4;
-  const bodyRamp: RampName = earthy ? (lip === "sand" ? "sand" : "soil") : "rock";
   const x0 = lit ? 0 : HALF_W;
   for (let px = x0; px < x0 + HALF_W; px++) {
     const top = faceTop(px);
-    const drip =
-      lip === "grass" || lip === "dirt" ? 1 + Math.floor(hash3(px >> 1, 0, 0, 33) * 2.99) : 1;
     for (let k = 0; k < height; k++) {
       const py = top + k;
       let col: Rgba;
-      if (k < drip && !earthy) {
-        col = rampColor(lipRamp, lit ? (k === 0 ? 3 : 2) : k === 0 ? 2 : 1);
-      } else if (earthy) {
-        const base = lipRamp === "sand" ? (lit ? 2 : 1) : lit ? 2 : 1;
-        col =
-          k === 0 && lip === "grass"
-            ? rampColor("grass", lit ? 2 : 1)
-            : rampColor(bodyRamp, base - (k >= height - 1 ? 1 : 0));
+      if (height <= 4) {
+        col = rampColor(t.bank, (lit ? 2 : 1) - (k >= height - 1 ? 1 : 0));
       } else {
         // Stratified rock: blocky slabs with horizontal cracks and vertical fissures.
         const slab = Math.floor((k + hash3(px >> 2, 1, 0, 34) * 3) / 5);
@@ -240,12 +406,39 @@ function face(side: "left" | "right", height: number, lip: Lip): Sprite {
         const depth = k / height;
         let v = (lit ? 0.62 : 0.36) - depth * 0.22 + (hash3(px >> 1, slab, 0, 36) - 0.5) * 0.18;
         if (crackH || fissure) v -= 0.22;
-        col = shade("rock", v, px, py, 0.4);
+        col = shade(t.cliff, v, px, py, 0.4);
+        if (t.seam && (crackH || fissure) && hash3(px, k, 0, 37) > 0.55) {
+          col = rampColor(t.seam, lit ? 4 : 3);
+        }
       }
       c.set(px, py, col);
     }
   }
-  return { name: `c_${side}_${height}_${lip}`, canvas: c, anchorX: HALF_W, anchorY: 0 };
+  return { name: `c_${biome}_${side}_${height}`, canvas: c, anchorX: HALF_W, anchorY: 0 };
+}
+
+/** The top rows of a cliff face, coloured by the ground above (grass drips, snow caps…). */
+function lip(biome: BiomeId, side: "left" | "right", kind: Lip): Sprite {
+  const t = TERRAIN[biome];
+  const ramp: RampName =
+    kind === "ground"
+      ? t.ground.ramp
+      : kind === "beach"
+        ? t.beach.ramp
+        : kind === "rock"
+          ? t.rock.ramp
+          : "soil";
+  const c = new Canvas(TILE_W, TILE_H + 4);
+  const lit = side === "left";
+  const x0 = lit ? 0 : HALF_W;
+  const drips = kind === "ground" || kind === "dirt";
+  for (let px = x0; px < x0 + HALF_W; px++) {
+    const top = faceTop(px);
+    const drip = drips ? 1 + Math.floor(hash3(px >> 1, 0, 0, 33) * 2.99) : 1;
+    for (let k = 0; k < drip; k++)
+      c.set(px, top + k, rampColor(ramp, lit ? (k === 0 ? 3 : 2) : k === 0 ? 2 : 1));
+  }
+  return { name: `l_${biome}_${side}_${kind}`, canvas: c, anchorX: HALF_W, anchorY: 0 };
 }
 
 /** Seamless tiling ocean texture (not in the atlas: used with a TilingSprite). */
@@ -281,31 +474,22 @@ export function oceanFrame(frame: number, size = 128): Canvas {
 
 export function terrainSprites(): Sprite[] {
   const sprites: Sprite[] = [
-    grass(0),
-    grass(1),
-    grass(2),
-    grass(3),
-    sand(0),
-    sand(1),
-    sand(2),
-    stony(0),
-    stony(1),
     dirt(0),
     dirt(1),
     path(),
-    shallow(1),
-    shallow(2),
     ...SIDES.map(foam),
     kelp(0),
     kelp(1),
     kelp(2),
-    fog(),
-    ...SIDES.map(fogEdge),
   ];
-  for (const height of FACE_HEIGHTS) {
-    for (const lip of LIPS) {
-      sprites.push(face("left", height, lip), face("right", height, lip));
-    }
+  for (const biome of BIOMES) {
+    const t = TERRAIN[biome];
+    for (let v = 0; v < 4; v++) sprites.push(groundTile(`t_${biome}_ground_${v}`, t.ground, v));
+    for (let v = 0; v < 3; v++) sprites.push(groundTile(`t_${biome}_beach_${v}`, t.beach, v));
+    for (let v = 0; v < 2; v++) sprites.push(groundTile(`t_${biome}_rock_${v}`, t.rock, v));
+    for (const height of FACE_HEIGHTS)
+      sprites.push(face(biome, "left", height), face(biome, "right", height));
+    for (const kind of LIPS) sprites.push(lip(biome, "left", kind), lip(biome, "right", kind));
   }
   return sprites;
 }
