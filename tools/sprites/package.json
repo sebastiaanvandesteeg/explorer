@@ -7,8 +7,7 @@
     "generate": "tsx src/generate.ts",
     "check": "tsx src/generate.ts --check",
     "typecheck": "tsc --noEmit",
-    "preview": "tsx src/preview.ts",
-    "preview:scene": "tsx src/scene-preview.ts"
+    "preview": "tsx src/preview.ts"
   },
   "devDependencies": {
     "@explorer/shared": "workspace:*",

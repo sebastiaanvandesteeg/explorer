@@ -1,9 +1,15 @@
 import {
+  BIOMES,
   BUILDINGS,
   canPlaceBuilding,
+  discoveryName,
   HALF_H,
   HALF_W,
+  inBounds,
+  isLand,
   pickTile,
+  tileIndex,
+  type BiomeId,
   type BuildingKind,
   type Command,
   type Entity,
@@ -11,9 +17,10 @@ import {
   type Patch,
   type PlayerInfo,
 } from "@explorer/shared";
-import { Application, Container } from "pixi.js";
+import { Application, Container, Rectangle } from "pixi.js";
 import type { Atlas } from "../assets";
 import type { Session, SessionStatus } from "../net/session";
+import { AtmosphereLayer } from "../render/atmosphere";
 import { Camera } from "../render/camera";
 import { EntityLayer } from "../render/entities";
 import { FogLayer, shallowGlow } from "../render/masks";
@@ -44,6 +51,11 @@ export class Game {
   private readonly entities: EntityLayer;
   private readonly overlay: Overlay;
   private readonly fog: FogLayer;
+  private readonly atmosphere: AtmosphereLayer;
+  /** Biome under the camera, and a candidate that must hold still briefly before we switch. */
+  private biome: BiomeId | null = null;
+  private biomeCandidate: { biome: BiomeId | null; since: number } = { biome: null, since: 0 };
+  private lastWorldPos = { x: 0, y: 0 };
   private readonly hud: Hud;
   private tool: Tool = { kind: "select" };
   private selected: number | null = null;
@@ -81,7 +93,10 @@ export class Game {
       this.fog.sprite,
       this.overlay.over,
     );
-    app.stage.addChild(this.world, this.overlay.screen);
+    this.atmosphere = new AtmosphereLayer(atlas);
+    this.world.filters = [this.atmosphere.filter];
+    this.world.filterArea = new Rectangle(0, 0, app.screen.width, app.screen.height);
+    app.stage.addChild(this.world, this.atmosphere.overlay, this.overlay.screen);
 
     const invite = session.worldId ? `${location.origin}/w/${session.worldId}` : null;
     this.hud = new Hud(
@@ -95,6 +110,7 @@ export class Game {
         deselect: () => this.select(null),
       },
       invite,
+      state.world.tribe,
     );
 
     this.entities.rebuild(state);
@@ -199,8 +215,16 @@ export class Game {
         this.hud.toast("A scout ship is ready at the dock");
         break;
       case "discovered":
-        this.hud.toast(discoveryText(ev.theme));
+        this.hud.toast(discoveryText(ev.biome));
         break;
+      case "landed": {
+        const island = this.session.state.world.islands[ev.islandId];
+        const where = island ? discoveryName(island.biome) : "the shore";
+        this.hud.toast(
+          `${ev.count === 1 ? "A villager" : `${ev.count} villagers`} landed on ${where}`,
+        );
+        break;
+      }
     }
   }
 
@@ -498,14 +522,18 @@ export class Game {
     const tile = this.tileAt(sx, sy);
     if (sel?.type === "villager") {
       const target = this.entityAt(sx, sy);
-      if (target?.type === "node")
+      if (target?.type === "ship")
+        void this.send({ kind: "assign", villagerId: sel.id, target: { ship: target.id } });
+      else if (target?.type === "node")
         void this.send({ kind: "assign", villagerId: sel.id, target: { node: target.id } });
       else if (target?.type === "building")
         void this.send({ kind: "assign", villagerId: sel.id, target: { building: target.id } });
       else if (tile)
         void this.send({ kind: "assign", villagerId: sel.id, target: { x: tile.x, y: tile.y } });
     } else if (sel?.type === "ship" && tile) {
-      void this.send({ kind: "move-ship", shipId: sel.id, x: tile.x, y: tile.y });
+      // Right-clicking land with passengers aboard means "take them there".
+      const unload = isLand(state.world, tile.x, tile.y) && sel.passengers.length > 0;
+      void this.send({ kind: "move-ship", shipId: sel.id, x: tile.x, y: tile.y, unload });
     } else {
       this.select(null);
     }
@@ -518,6 +546,10 @@ export class Game {
     const dt = Math.min(0.1, dtMs / 1000);
     const state = this.session.state;
     this.camera.resize(this.app.screen.width, this.app.screen.height);
+    const area = this.world.filterArea!;
+    if (area.width !== this.app.screen.width || area.height !== this.app.screen.height) {
+      this.world.filterArea = new Rectangle(0, 0, this.app.screen.width, this.app.screen.height);
+    }
 
     let dx = 0;
     let dy = 0;
@@ -532,6 +564,7 @@ export class Game {
     this.terrain.animate(now);
     this.terrain.update(view);
     this.fog.update(dt);
+    this.updateAtmosphere(now, dt);
     this.entities.frame(now, dt, view);
     this.entities.ambientSparkles(view, dt);
     this.drawOverlay();
@@ -554,6 +587,31 @@ export class Game {
       });
       this.hud.minimap.draw(state, corners);
     }
+  }
+
+  /** The biome under the screen centre sets the mood; it must hold for a moment to switch. */
+  private updateAtmosphere(now: number, dt: number): void {
+    const state = this.session.state;
+    const w = state.world;
+    const p = this.camera.screenToWorld(this.camera.width / 2, this.camera.height / 2);
+    const tx = Math.floor((p.x / HALF_W + p.y / HALF_H) / 2);
+    const ty = Math.floor((p.y / HALF_H - p.x / HALF_W) / 2);
+    let biome: BiomeId | null = null;
+    if (inBounds(w, tx, ty)) {
+      const k = tileIndex(w, tx, ty);
+      if (state.explored[k]) biome = BIOMES[w.biome[k]!] ?? null;
+    }
+    if (biome !== this.biomeCandidate.biome) this.biomeCandidate = { biome, since: now };
+    if (this.biomeCandidate.biome !== this.biome && now - this.biomeCandidate.since > 600) {
+      this.biome = this.biomeCandidate.biome;
+      this.atmosphere.setBiome(this.biome);
+      if (this.biome && this.biome !== w.islands[w.start.islandId]!.biome)
+        this.hud.showBiome(this.biome);
+    }
+    const pan = { dx: this.world.x - this.lastWorldPos.x, dy: this.world.y - this.lastWorldPos.y };
+    this.lastWorldPos = { x: this.world.x, y: this.world.y };
+    if (Math.abs(pan.dx) > 200 || Math.abs(pan.dy) > 200) pan.dx = pan.dy = 0;
+    this.atmosphere.update(dt, this.app.screen, this.camera.zoom, pan);
   }
 
   private drawOverlay(): void {

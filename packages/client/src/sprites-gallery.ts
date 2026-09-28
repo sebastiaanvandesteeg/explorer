@@ -2,9 +2,13 @@
 interface Frame {
   frame: { x: number; y: number; w: number; h: number };
 }
-interface Atlas {
+interface Page {
   frames: Record<string, Frame>;
-  explorer: Record<string, { anchorX: number; anchorY: number }>;
+  meta: { image: string };
+}
+interface Manifest {
+  pages: string[];
+  sprites: Record<string, { page: number; anchorX: number; anchorY: number }>;
 }
 
 const style = document.createElement("style");
@@ -21,15 +25,28 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-const [atlas, image] = await Promise.all([
-  fetch("/assets/atlas.json").then((r) => r.json() as Promise<Atlas>),
-  new Promise<HTMLImageElement>((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = reject;
-    img.src = "/assets/atlas.png";
+const manifest = (await fetch("/assets/atlas.json").then((r) => r.json())) as Manifest;
+const pages = await Promise.all(
+  manifest.pages.map(async (file) => {
+    const page = (await fetch(`/assets/${file}`).then((r) => r.json())) as Page;
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = `/assets/${page.meta.image}`;
+    });
+    return { page, image };
   }),
-]);
+);
+const atlas = {
+  frames: Object.fromEntries(
+    Object.entries(manifest.sprites).map(([name, m]) => [
+      name,
+      { ...pages[m.page]!.page.frames[name]!, page: m.page },
+    ]),
+  ),
+  explorer: manifest.sprites,
+};
 
 const header = document.createElement("header");
 header.innerHTML = `<strong>Explorer sprites</strong><span>${Object.keys(atlas.frames).length} frames</span>`;
@@ -55,7 +72,7 @@ function draw(name: string, scale: number): HTMLCanvasElement {
   c.height = h * scale;
   const ctx = c.getContext("2d")!;
   ctx.imageSmoothingEnabled = false;
-  ctx.drawImage(image, x, y, w, h, 0, 0, w * scale, h * scale);
+  ctx.drawImage(pages[atlas.frames[name]!.page]!.image, x, y, w, h, 0, 0, w * scale, h * scale);
   const a = atlas.explorer[name];
   if (a && scale > 1) {
     ctx.fillStyle = "#ff00ff";

@@ -593,15 +593,15 @@ function crystalCluster(v: number): Sprite {
       const a = (i / spikes) * Math.PI * 2;
       const d = i === 0 ? 0 : 0.14;
       s.cone(
-        [0.5 + Math.cos(a) * d, 0.5 + Math.sin(a) * d, 2],
-        i === 0 ? 0.11 : 0.07,
-        i === 0 ? 24 : 12 + rand() * 6,
+        [0.5 + Math.cos(a) * d * 1.3, 0.5 + Math.sin(a) * d * 1.3, 2],
+        i === 0 ? 0.17 : 0.11,
+        i === 0 ? 36 : 18 + rand() * 9,
         gem,
         6,
       );
     }
   });
-  return renderSprite(`n_crystal_${v}`, s, 1, 1, 40, 10);
+  return renderSprite(`n_crystal_${v}`, s, 1, 1, 52, 10);
 }
 
 function seaRock(variant: number): Sprite {

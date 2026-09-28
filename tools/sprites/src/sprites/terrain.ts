@@ -146,9 +146,9 @@ const TERRAIN: Record<BiomeId, BiomeTerrain> = {
       detail: (v) => (px, py, r, fx, fy) => {
         // Glowing lava cracks through the ash.
         const crack = Math.abs(periodicNoise(fx, fy, 3, 40 + (v % 2)) - 0.5);
-        if (v !== 1 && crack < 0.025) return rampColor("lava", 3 + (r > 0.6 ? 1 : 0));
-        if (v !== 1 && crack < 0.045) return rampColor("lava", 1);
-        if (r > 0.97) return rampColor("lava", 2);
+        if (v !== 1 && crack < 0.016) return rampColor("lava", 3 + (r > 0.6 ? 1 : 0));
+        if (v !== 1 && crack < 0.03) return rampColor("lava", 1);
+        if (r > 0.988) return rampColor("lava", 2);
         if (r < 0.06) return rampColor("ash", 0);
         return null;
       },
