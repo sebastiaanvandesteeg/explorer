@@ -1,33 +1,12 @@
-import { Assets, Sprite, Spritesheet, Texture, TextureSource, type SpritesheetData } from "pixi.js";
-
-export interface SpriteMeta {
-  page: number;
-  anchorX: number;
-  anchorY: number;
-  smoke?: { x: number; y: number }[];
-  sparkle?: { x: number; y: number }[];
-  /** Lit windows and fires: where the building glows at night, and how far. */
-  lights?: { x: number; y: number; r: number }[];
-  /** A lighthouse's lamp: where its beam starts. */
-  beam?: { x: number; y: number }[];
-}
-
-interface Manifest {
-  pages: string[];
-  sprites: Record<string, SpriteMeta>;
-}
-
-interface Page {
-  json: SpritesheetData;
-  image: string;
-}
+import { Assets, Sprite, Spritesheet, Texture, TextureSource } from "pixi.js";
+import { fetchAtlasFiles, frameStyle, type AtlasPage, type SpriteMeta } from "./atlasFiles";
 
 export class Atlas {
   constructor(
     readonly textures: Record<string, Texture>,
     readonly meta: Record<string, SpriteMeta>,
     readonly ocean: Texture[],
-    private readonly pages: Page[],
+    private readonly pages: AtlasPage[],
   ) {}
 
   has(name: string): boolean {
@@ -60,36 +39,22 @@ export class Atlas {
 
   /** CSS for showing a frame as a pixelated DOM icon. */
   iconStyle(name: string, scale = 2): Partial<CSSStyleDeclaration> {
-    const page = this.pages[this.meta[name]!.page]!;
-    const f = page.json.frames[name]!.frame;
-    const size = page.json.meta.size!;
-    return {
-      width: `${f.w * scale}px`,
-      height: `${f.h * scale}px`,
-      backgroundImage: `url(${page.image})`,
-      backgroundPosition: `-${f.x * scale}px -${f.y * scale}px`,
-      backgroundSize: `${size.w * scale}px ${size.h * scale}px`,
-      imageRendering: "pixelated",
-    };
+    return frameStyle(this.pages[this.meta[name]!.page]!, name, scale);
   }
 }
 
 export async function loadAtlas(): Promise<Atlas> {
   TextureSource.defaultOptions.scaleMode = "nearest";
-  const manifest = (await fetch("/assets/atlas.json").then((r) => r.json())) as Manifest;
-  const pages: Page[] = [];
+  const files = await fetchAtlasFiles();
   const textures: Record<string, Texture> = {};
-  for (const file of manifest.pages) {
-    const json = (await fetch(`/assets/${file}`).then((r) => r.json())) as SpritesheetData;
-    const image = `/assets/${json.meta.image}`;
-    const base = await Assets.load<Texture>(image);
-    const sheet = new Spritesheet(base, json);
+  for (const page of files.pages) {
+    const base = await Assets.load<Texture>(page.image);
+    const sheet = new Spritesheet(base, page.json);
     await sheet.parse();
     Object.assign(textures, sheet.textures);
-    pages.push({ json, image });
   }
   const ocean = await Promise.all(
     [0, 1, 2].map((i) => Assets.load<Texture>(`/assets/ocean_${i}.png`)),
   );
-  return new Atlas(textures, manifest.sprites, ocean, pages);
+  return new Atlas(textures, files.sprites, ocean, files.pages);
 }

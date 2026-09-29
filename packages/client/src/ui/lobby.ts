@@ -3,6 +3,7 @@ import {
   DIFFICULTY_DEFS,
   MAX_NAME_LENGTH,
   MAX_PLAYERS,
+  PLAY_PATH,
   TRIBE_DEFS,
   TRIBES,
   type Difficulty,
@@ -189,7 +190,7 @@ export function showLobby(root: HTMLElement, opts: LobbyOptions): () => void {
       h("label", {}, "Your name", name),
       go,
       error,
-      h("p.small", {}, h("a", { href: "/" }, "Start your own expedition instead")),
+      h("p.small", {}, h("a", { href: PLAY_PATH }, "Start your own expedition instead")),
     );
     name.addEventListener("keydown", (e) => e.key === "Enter" && join(opts.joinId!));
   } else {

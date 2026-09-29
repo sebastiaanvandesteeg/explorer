@@ -14,8 +14,24 @@ const buildings = (page: Page, kind: string) =>
     kind,
   );
 
-test("start an expedition, build a house, and a friend joins", async ({ page, browser }) => {
+test("the landing page shows the game and sets sail to /play", async ({ page }) => {
   await page.goto("/");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Explorer");
+  // Tribes and biomes come from the game's own definitions.
+  await expect(page.locator(".tribe-card")).toHaveCount(4);
+  await expect(page.locator(".tribe-card").first()).toContainText("Islanders");
+  await expect(page.locator(".biome")).toHaveCount(10);
+  await page.getByRole("link", { name: "Set sail" }).first().click();
+  await expect(page).toHaveURL(/\/play$/);
+  await expect(page.getByRole("button", { name: "Start a new expedition" })).toBeVisible();
+  // Invite links from before the game moved to /play still lead to the expedition.
+  await page.goto("/w/abcd1234");
+  await expect(page).toHaveURL(/\/play\/w\/abcd1234$/);
+  await expect(page.getByRole("button", { name: "Join the expedition" })).toBeVisible();
+});
+
+test("start an expedition, build a house, and a friend joins", async ({ page, browser }) => {
+  await page.goto("/play");
   await page.getByPlaceholder("Your name").fill("Anna");
   await page.getByRole("radio", { name: /Northfolk/ }).click();
   await expect(page.getByRole("radio", { name: /Northfolk/ })).toHaveAttribute(
@@ -23,7 +39,7 @@ test("start an expedition, build a house, and a friend joins", async ({ page, br
     "true",
   );
   await page.getByRole("button", { name: "Start a new expedition" }).click();
-  await expect(page).toHaveURL(/\/w\/[a-z0-9]{8}$/);
+  await expect(page).toHaveURL(/\/play\/w\/[a-z0-9]{8}$/);
   await expect(page.locator("#app > canvas")).toBeVisible();
   await expect(page.locator(".players")).toContainText("1 of 8 online");
   await expect(page.locator(".players")).toContainText("Northfolk");
@@ -63,7 +79,7 @@ test("start an expedition, build a house, and a friend joins", async ({ page, br
 });
 
 test("offline mode plays without a server connection", async ({ page }) => {
-  await page.goto("/?offline&seed=e2e&tribe=sylvan");
+  await page.goto("/play?offline&seed=e2e&tribe=sylvan");
   await expect(page.locator("#app > canvas")).toBeVisible();
   await expect(page.locator(".players")).toContainText("Offline game");
   await expect(page.locator(".players")).toContainText("Sylvan");

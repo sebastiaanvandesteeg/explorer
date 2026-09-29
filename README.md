@@ -29,10 +29,11 @@ pnpm dev
 - the game server on http://localhost:8787
 - the Vite client on **http://localhost:5190**, which is the one to open
 
-Pick a tribe, start an expedition, then use **Copy invite link** to bring up to 7 friends.
+The site root is the landing page; the game itself lives at **/play** (http://localhost:5190/play). Pick a tribe, start an expedition, then use **Copy invite link** to bring up to 7 friends. Invite links look like `/play/w/<id>`.
 
-- **Offline:** "Play offline" in the lobby (or `/?offline&seed=anything&tribe=northfolk`) runs the whole simulation in your browser. Nothing is saved.
-- **Production:** `pnpm build && pnpm start` builds the client, and the Node server then serves game and API from one port (8787).
+- **Offline:** "Play offline" in the lobby (or `/play?offline&seed=anything&tribe=northfolk`) runs the whole simulation in your browser. Nothing is saved.
+- **Production:** `pnpm build && pnpm start` builds the client, and the Node server then serves the landing page, the game and the API from one port (8787).
+- **Old links:** invite links (`/w/<id>`) and offline URLs (`/?offline…`) from before the game moved to /play redirect there.
 
 ### Controls
 
@@ -201,6 +202,8 @@ packages/art      @explorer/art: the colour palette and the per-pixel terrain pa
   terrain/          smooth fields from the tile data, ray-marched land, cliffs and water
 packages/server   @explorer/server: node:http + ws, world rooms, JSON persistence
 packages/client   @explorer/client: PixiJS v8 renderer, input, DOM HUD, map screen, synthesised sound, sessions
+  index.html        the landing page (src/landing/): the game's own sprites, tribes and biomes, no PixiJS
+  play/index.html   the game, served for every page under /play (routes in shared/src/routes.ts)
 tools/sprites     palette extraction and the sprite generator → client/public/assets
 ```
 
@@ -255,7 +258,7 @@ To **review art**:
 | `pnpm dev`                  | Server (watch) and Vite client                                                  |
 | `pnpm build` / `pnpm start` | Build the client / run the server, which serves the built client                |
 | `pnpm test`                 | Sprite freshness check plus shared, server and client tests                     |
-| `pnpm test:e2e`             | Playwright smoke test: create a world, build, second player joins, offline mode |
+| `pnpm test:e2e`             | Playwright smoke test: landing page, new world, building, friend joins, offline |
 | `pnpm check`                | Prettier, typecheck and tests (what CI runs, plus e2e)                          |
 | `pnpm sprites`              | Regenerate the sprite atlas                                                     |
 
