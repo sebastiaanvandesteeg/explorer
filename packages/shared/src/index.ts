@@ -25,3 +25,4 @@ export * from "./sim/light";
 export * from "./sim/weather";
 export * from "./sim/snapshot";
 export * from "./protocol";
+export * from "./routes";

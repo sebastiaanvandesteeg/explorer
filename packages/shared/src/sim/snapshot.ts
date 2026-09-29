@@ -187,7 +187,7 @@ export function fromSnapshot(world: WorldMap, snap: Snapshot, resume = false): G
   state.stock = { ...emptyStock(), ...snap.stock };
   for (const [id, st] of Object.entries(snap.outposts ?? {}))
     state.outposts.set(Number(id), { ...emptyStock(), ...st });
-  state.upgrades = new Set(snap.upgrades ?? []);
+  for (const id of snap.upgrades ?? []) state.upgrades.add(id);
   if (snap.nextRaid !== undefined) state.nextRaid = snap.nextRaid;
   if (snap.nextStorm !== undefined) state.nextStorm = snap.nextStorm;
   state.stats = { ...emptyStats(), ...snap.stats };

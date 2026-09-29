@@ -1,23 +1,4 @@
-:root {
-  --ink: #1b1a1f;
-  --wood-dark: #3e2f1d;
-  --wood: #805832;
-  --wood-light: #ab7640;
-  --parchment: #eed099;
-  --parchment-light: #fbf0cf;
-  --sea: #1b5866;
-  --sea-light: #349f98;
-  --leaf: #556128;
-  --danger: #c9431a;
-  --ok: #8fae45;
-  --panel: rgba(34, 26, 18, 0.92);
-  --panel-border: #805832;
-  --font: "Pixelify Sans", "Trebuchet MS", system-ui, sans-serif;
-}
-
-* {
-  box-sizing: border-box;
-}
+@import "./theme.css";
 
 html,
 body {
@@ -36,52 +17,6 @@ body {
   position: fixed;
   inset: 0;
   display: block;
-}
-
-button {
-  font: inherit;
-  color: inherit;
-  cursor: pointer;
-}
-
-.panel {
-  background: var(--panel);
-  border: 2px solid var(--panel-border);
-  border-radius: 6px;
-  box-shadow:
-    0 0 0 2px var(--ink),
-    0 6px 18px rgba(0, 0, 0, 0.35);
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: linear-gradient(#9b6b3e, #7a5433);
-  border: 2px solid var(--ink);
-  border-radius: 4px;
-  box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.18),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.25);
-  padding: 6px 12px;
-  color: var(--parchment-light);
-  text-shadow: 1px 1px 0 var(--ink);
-}
-.btn:hover:not(:disabled) {
-  filter: brightness(1.12);
-}
-.btn:active:not(:disabled) {
-  transform: translateY(1px);
-}
-.btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-.btn.primary {
-  background: linear-gradient(#4fa89c, #2e7f7a);
-}
-.btn.active {
-  background: linear-gradient(#e2a841, #b97436);
 }
 
 input.field {
@@ -916,16 +851,15 @@ input.field:focus {
 
 .tribes {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
 }
 .tribe {
   display: grid;
-  grid-template-columns: 56px 1fr;
-  gap: 8px;
-  align-items: center;
-  padding: 6px;
-  text-align: left;
+  justify-items: center;
+  gap: 2px;
+  padding: 4px 4px 6px;
+  text-align: center;
   background: rgba(0, 0, 0, 0.2);
   border: 2px solid var(--wood-dark);
   border-radius: 6px;
@@ -946,13 +880,7 @@ input.field:focus {
 }
 .tribe strong {
   display: block;
-  font-size: 15px;
-}
-.tribe small {
-  display: block;
-  font-size: 11px;
-  opacity: 0.8;
-  line-height: 1.3;
+  font-size: 14px;
 }
 .segmented {
   display: grid;
@@ -977,11 +905,6 @@ input.field:focus {
   opacity: 0.75;
   font-size: 12px;
   line-height: 1.3;
-}
-@media (max-width: 520px) {
-  .tribes {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* ------------------------------------------------------------------ great work */

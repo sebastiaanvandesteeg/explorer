@@ -1,3 +1,4 @@
+import { TRIBE_DEFS } from "../tribes";
 import { inBounds, isLandTerrain, tileIndex } from "../world/grid";
 import { hash2d } from "../rng";
 import { DIFFICULTY_DEFS, type Difficulty } from "./difficulty";
@@ -337,7 +338,7 @@ export function emptyState(world: WorldMap, difficulty: Difficulty = "normal"): 
     stock: { ...START_STOCK },
     outposts: new Map(),
     outpostsDirty: new Set(),
-    upgrades: new Set(),
+    upgrades: new Set(TRIBE_DEFS[world.tribe].innate),
     upgradesDirty: false,
     nextRaid: DIFFICULTY_DEFS[difficulty].firstRaid,
     nextBolt: 0,

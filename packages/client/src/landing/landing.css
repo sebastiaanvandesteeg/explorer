@@ -1,0 +1,637 @@
+@import "../theme.css";
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 84px;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #153c46;
+  color: var(--parchment-light);
+  font-family: var(--font);
+  font-size: 17px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--parchment);
+}
+a.btn {
+  text-decoration: none;
+}
+.btn.big {
+  padding: 10px 24px;
+  font-size: 20px;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.sprite {
+  display: block;
+  position: absolute;
+}
+
+/* ------------------------------------------------------------------ the sea behind everything */
+/* The game's own ocean texture and timing: three frames swapped every 450 ms, drifting slowly. */
+.sea {
+  position: fixed;
+  inset: -128px 0 0;
+  z-index: -1;
+  background: url(/assets/ocean_0.png) 0 0 / 256px 128px;
+  image-rendering: pixelated;
+  animation:
+    sea-frames 1.35s steps(1) infinite,
+    sea-drift 25.6s linear infinite;
+}
+.sea::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at center, transparent 40%, rgba(8, 24, 30, 0.6)),
+    rgba(10, 34, 42, 0.55);
+}
+@keyframes sea-frames {
+  0% {
+    background-image: url(/assets/ocean_0.png);
+  }
+  33.333% {
+    background-image: url(/assets/ocean_1.png);
+  }
+  66.667% {
+    background-image: url(/assets/ocean_2.png);
+  }
+}
+@keyframes sea-drift {
+  to {
+    transform: translateY(128px);
+  }
+}
+
+/* ------------------------------------------------------------------ top bar */
+.topbar {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  z-index: 10;
+  transform: translateX(-50%);
+  width: min(1120px, calc(100% - 24px));
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 6px 8px 6px 14px;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--parchment);
+  text-decoration: none;
+  text-shadow: 2px 2px 0 var(--ink);
+}
+.brand-mark {
+  width: 16px;
+  height: 16px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1l7 7-7 7-7-7z' fill='%23349f98'/%3E%3Cpath d='M8 4l4 4-4 4-4-4z' fill='%238a8f38'/%3E%3C/svg%3E");
+  filter: drop-shadow(2px 2px 0 var(--ink));
+}
+.topbar nav {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+.topbar nav a {
+  padding: 4px 10px;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  font-size: 15px;
+  text-decoration: none;
+  color: var(--parchment-light);
+  opacity: 0.85;
+}
+.topbar nav a:hover {
+  opacity: 1;
+  border-color: var(--wood);
+  background: rgba(255, 255, 255, 0.06);
+}
+.topbar .btn {
+  font-size: 17px;
+  padding: 5px 16px;
+}
+
+/* ------------------------------------------------------------------ hero */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 110px 16px 96px;
+  overflow: hidden;
+  isolation: isolate;
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 50% 40% at 50% 48%, rgba(12, 32, 38, 0.5), transparent),
+    linear-gradient(rgba(12, 32, 38, 0.5), rgba(12, 32, 38, 0.72)),
+    url(/concept-art.webp) center / cover no-repeat;
+  mask-image: linear-gradient(black 75%, transparent);
+}
+.hero-inner {
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  max-width: 760px;
+  text-align: center;
+}
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--parchment);
+  text-shadow: 1px 1px 0 var(--ink);
+}
+.eyebrow::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  background: #e98a3a;
+  transform: rotate(45deg);
+  box-shadow: 1px 1px 0 var(--ink);
+}
+.title {
+  margin: 0;
+  font-size: clamp(68px, 15vw, 150px);
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: 3px;
+  color: var(--parchment);
+  text-shadow:
+    6px 6px 0 var(--ink),
+    0 0 36px rgba(0, 0, 0, 0.5);
+}
+.lede {
+  margin: 0;
+  max-width: 620px;
+  font-size: clamp(18px, 2.4vw, 22px);
+  text-shadow: 2px 2px 0 var(--ink);
+}
+.cta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 6px;
+}
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 18px;
+  margin: 14px 0 0;
+  padding: 8px 16px;
+  list-style: none;
+  font-size: 16px;
+  text-shadow: 1px 1px 0 var(--ink);
+}
+.stats li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+}
+.stats [data-sprite] {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+}
+.stats .sprite {
+  position: static;
+}
+.hero-ship {
+  position: absolute;
+  bottom: 9%;
+  left: 0;
+  animation: sail 60s linear infinite;
+}
+.hero-ship .sprite {
+  position: static;
+  filter: drop-shadow(0 6px 0 rgba(0, 0, 0, 0.25));
+}
+@keyframes sail {
+  from {
+    transform: translate(-100px, -40px);
+  }
+  to {
+    transform: translate(calc(100vw + 100px), 40px);
+  }
+}
+
+/* ------------------------------------------------------------------ sections */
+.section {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  padding: 96px 16px 0;
+}
+.section-head {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  max-width: 700px;
+  margin: 0 auto 32px;
+  text-align: center;
+}
+.section-head p:not(.eyebrow) {
+  margin: 0;
+  opacity: 0.9;
+  text-shadow: 1px 1px 0 var(--ink);
+}
+h2 {
+  margin: 0;
+  font-size: clamp(32px, 5vw, 46px);
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--parchment);
+  text-shadow:
+    3px 3px 0 var(--ink),
+    0 0 18px rgba(0, 0, 0, 0.4);
+}
+h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--parchment);
+  text-shadow: 1px 1px 0 var(--ink);
+}
+
+.shot {
+  margin: 0 0 24px;
+  padding: 6px;
+  overflow: hidden;
+}
+.shot img {
+  width: 100%;
+  border-radius: 3px;
+}
+
+/* A window onto the game's sea, with a ship afloat or a sprite on its own little island. */
+.pic {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 16px;
+  background:
+    linear-gradient(rgba(10, 34, 42, 0.3), rgba(10, 34, 42, 0.3)),
+    url(/assets/ocean_1.png) 0 0 / 256px 128px;
+  image-rendering: pixelated;
+  border: 2px solid var(--wood-dark);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.pic.afloat {
+  align-items: center;
+  padding: 0;
+}
+.pic.afloat .sprite {
+  position: static;
+  filter: drop-shadow(0 6px 0 rgba(0, 0, 0, 0.25));
+}
+
+/* A sprite standing on a block of land (see plot() in main.ts), in turquoise shallows. */
+.plot {
+  position: relative;
+  flex: none;
+  isolation: isolate;
+}
+.plot::before {
+  content: "";
+  position: absolute;
+  inset: 45% -18% -14px;
+  z-index: -1;
+  background: radial-gradient(closest-side, rgba(52, 159, 152, 0.75), rgba(52, 159, 152, 0));
+}
+.islet {
+  display: block;
+  filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.3));
+}
+.islet .shade {
+  filter: brightness(0.72);
+}
+
+/* ------------------------------------------------------------------ features */
+.features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.feature {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 10px 10px 16px;
+}
+.feature h3,
+.feature p {
+  margin: 0 6px;
+}
+.feature p {
+  font-size: 15px;
+  opacity: 0.85;
+}
+.feature .pic {
+  height: 196px;
+  margin-bottom: 6px;
+}
+
+/* ------------------------------------------------------------------ tribes */
+.tribe-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.tribe-card {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 10px 10px 16px;
+  border-top: 6px solid var(--banner);
+}
+.tribe-card > :not(.pic) {
+  margin: 0 6px;
+}
+.tribe-card h3 {
+  font-size: 24px;
+  color: var(--banner);
+}
+.tribe-card p {
+  font-size: 15px;
+  opacity: 0.85;
+}
+.tribe-card .pic {
+  height: 276px;
+  margin-bottom: 4px;
+}
+.tribe-card dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 10px;
+  margin-top: 4px;
+  font-size: 14px;
+}
+.tribe-card dt {
+  color: var(--parchment);
+  opacity: 0.7;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 12px;
+  padding-top: 2px;
+}
+.tribe-card dd {
+  margin: 0;
+}
+
+/* ------------------------------------------------------------------ biomes */
+.biomes {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.biome {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: 8px 8px 12px;
+  text-align: center;
+}
+.biome .pic {
+  width: 100%;
+  height: 150px;
+  padding-bottom: 12px;
+  margin-bottom: 6px;
+}
+.biome strong {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--parchment);
+}
+.biome small {
+  font-size: 13px;
+  opacity: 0.7;
+}
+.biome small[data-tier="1"] {
+  color: #e2a841;
+  opacity: 0.85;
+}
+.biome small[data-tier="2"] {
+  color: #ff9a7a;
+  opacity: 0.9;
+}
+
+/* ------------------------------------------------------------------ co-op */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+.step {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  padding: 18px 18px 20px;
+}
+.step p {
+  margin: 0;
+  font-size: 15px;
+  opacity: 0.85;
+}
+.step-no {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 4px;
+  font-size: 20px;
+  font-weight: 600;
+  background: linear-gradient(#4fa89c, #2e7f7a);
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.25);
+  text-shadow: 1px 1px 0 var(--ink);
+}
+.controls {
+  padding: 16px 18px 18px;
+}
+.controls h3 {
+  margin-bottom: 10px;
+  font-size: 13px;
+  font-weight: normal;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+.controls dl {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px 16px;
+  margin: 0;
+}
+.controls dl > div {
+  display: grid;
+  gap: 4px;
+}
+.controls dt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  opacity: 0.85;
+}
+.controls dd {
+  margin: 0;
+  font-size: 15px;
+}
+kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  font: inherit;
+  font-size: 13px;
+  color: var(--parchment-light);
+  background: #231a12;
+  border: 2px solid var(--wood);
+  border-bottom-width: 4px;
+  border-radius: 4px;
+}
+
+/* ------------------------------------------------------------------ finale and footer */
+.finale {
+  padding-bottom: 32px;
+}
+.finale-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding: 28px 32px 28px 24px;
+}
+.finale-card > div:last-child {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+}
+.finale-card p {
+  margin: 0;
+  opacity: 0.85;
+}
+.finale-card .pic {
+  width: 240px;
+  height: 290px;
+  flex: none;
+}
+.footer {
+  padding: 24px 16px 40px;
+  text-align: center;
+  font-size: 14px;
+  opacity: 0.7;
+  text-shadow: 1px 1px 0 var(--ink);
+}
+.footer p {
+  margin: 0;
+}
+
+/* ------------------------------------------------------------------ small screens */
+@media (max-width: 960px) {
+  .features {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .tribe-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .biomes {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .controls dl {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 720px) {
+  .topbar nav {
+    display: none;
+  }
+  .topbar .btn {
+    margin-left: auto;
+  }
+  .section {
+    padding-top: 72px;
+  }
+  .steps {
+    grid-template-columns: 1fr;
+  }
+  .finale-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+  .finale-card > div:last-child {
+    justify-items: center;
+  }
+}
+@media (max-width: 560px) {
+  .features,
+  .tribe-cards {
+    grid-template-columns: 1fr;
+  }
+  .biomes {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .sea,
+  .hero-ship {
+    animation: none;
+  }
+  .hero-ship {
+    display: none;
+  }
+}

@@ -1,7 +1,14 @@
 import { existsSync } from "node:fs";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import type { AddressInfo } from "node:net";
-import { isDifficulty, isTribe, type Difficulty, type TribeId } from "@explorer/shared";
+import {
+  isDifficulty,
+  isGamePath,
+  isTribe,
+  movedPath,
+  type Difficulty,
+  type TribeId,
+} from "@explorer/shared";
 import sirv from "sirv";
 import { WebSocketServer, type WebSocket } from "ws";
 import { RoomManager, type WorldRoom } from "./rooms";
@@ -45,9 +52,13 @@ async function readBody(req: IncomingMessage, limit = 4096): Promise<string> {
 export async function startApp(opts: AppOptions): Promise<App> {
   const store = new WorldStore(opts.dataDir);
   const rooms = new RoomManager(store);
+  // The landing page and its files are served as they are; every page under /play is the game.
   const statics =
     opts.clientDir && existsSync(opts.clientDir)
-      ? sirv(opts.clientDir, { single: true, etag: true, gzip: true })
+      ? {
+          site: sirv(opts.clientDir, { etag: true, gzip: true }),
+          game: sirv(opts.clientDir, { single: "play/index.html", etag: true, gzip: true }),
+        }
       : null;
 
   const http = createServer(async (req, res) => {
@@ -91,7 +102,15 @@ export async function startApp(opts: AppOptions): Promise<App> {
         return room ? json(res, 200, room.info()) : json(res, 404, { error: "World not found" });
       }
       if (url.pathname.startsWith("/api/")) return json(res, 404, { error: "Not found" });
-      if (statics) return statics(req, res, () => json(res, 404, { error: "Not found" }));
+      const moved = movedPath(url.pathname, url.search);
+      if (moved) {
+        res.writeHead(301, { location: moved });
+        return res.end();
+      }
+      if (statics) {
+        const serve = isGamePath(url.pathname) ? statics.game : statics.site;
+        return serve(req, res, () => json(res, 404, { error: "Not found" }));
+      }
       res.writeHead(200, { "content-type": "text/plain" });
       res.end("Explorer server is running. In development, open the Vite client (pnpm dev).");
     } catch (e) {

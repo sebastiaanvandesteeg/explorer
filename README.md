@@ -29,10 +29,11 @@ pnpm dev
 - the game server on http://localhost:8787
 - the Vite client on **http://localhost:5190**, which is the one to open
 
-Pick a tribe, start an expedition, then use **Copy invite link** to bring up to 7 friends.
+The site root is the landing page; the game itself lives at **/play** (http://localhost:5190/play). Pick a tribe, start an expedition, then use **Copy invite link** to bring up to 7 friends. Invite links look like `/play/w/<id>`.
 
-- **Offline:** "Play offline" in the lobby (or `/?offline&seed=anything&tribe=northfolk`) runs the whole simulation in your browser. Nothing is saved.
-- **Production:** `pnpm build && pnpm start` builds the client, and the Node server then serves game and API from one port (8787).
+- **Offline:** "Play offline" in the lobby (or `/play?offline&seed=anything&tribe=northfolk`) runs the whole simulation in your browser. Nothing is saved.
+- **Production:** `pnpm build && pnpm start` builds the client, and the Node server then serves the landing page, the game and the API from one port (8787).
+- **Old links:** invite links (`/w/<id>`) and offline URLs (`/?offline…`) from before the game moved to /play redirect there.
 
 ### Controls
 
@@ -52,14 +53,23 @@ Pick a tribe, start an expedition, then use **Copy invite link** to bring up to 
 
 ### Tribes
 
-You choose a tribe when you start a world, and the whole co-op team plays it. The tribe sets how buildings and villagers look, which biome the home island is, and one bonus.
+You choose one of nine tribes when you start a world, and the whole co-op team plays it. The tribe sets how buildings and villagers look, which biome the home island is, and one bonus.
 
-| Tribe     | Style                                             | Home biome      | Bonus                                     |
-| --------- | ------------------------------------------------- | --------------- | ----------------------------------------- |
-| Islanders | Timber frames, thatch and slate                   | Greenlands      | Ships cost 25% less and sail 25% faster   |
-| Northfolk | Log halls with steep roofs and carved ridge horns | Frostreach      | Woodcutting is 30% faster                 |
-| Sunfolk   | Adobe with flat roofs, parapets and blue domes    | Sunscorch Dunes | Quarrying and mining are 30% faster       |
-| Sylvan    | Living bark under leafy and blossom roofs         | Petal Isles     | Food gathering and farming are 30% faster |
+| Tribe        | Style                                                   | Home biome      | Bonus                                                             |
+| ------------ | ------------------------------------------------------- | --------------- | ----------------------------------------------------------------- |
+| Islanders    | Timber frames, thatch and slate                         | Greenlands      | Ships cost 25% less and sail 25% faster                           |
+| Northfolk    | Log halls with steep roofs and carved ridge horns       | Frostreach      | Woodcutting is 30% faster                                         |
+| Sunfolk      | Adobe with flat roofs, parapets and blue domes          | Sunscorch Dunes | Quarrying and mining are 30% faster                               |
+| Sylvan       | Living bark under leafy and blossom roofs               | Petal Isles     | Food gathering and farming are 30% faster                         |
+| Glowkin      | Mushroom houses under glowing, spotted caps             | Fungal Hollows  | Lookouts and ships see as far by night as by day                  |
+| Freebooters  | Bamboo, palm thatch, patched sailcloth and ships' masts | Verdant Wilds   | Every ship carries cannons, and sunk raiders leave twice the loot |
+| Mirefolk     | Weathered boards under steep reed roofs, lantern-lit    | Murkmire        | Divers work twice as fast and bring up 50% more                   |
+| Amberwrights | Timber frames under russet shingles, clock towers       | Amberwood       | Markets pay 30% more gold for your goods                          |
+| Cinderborn   | Basalt with glowing lava joints under obsidian spires   | Infernal Isles  | Blacksmiths forge twice as fast, and no Ember Ward is needed      |
+
+- The Freebooters start with the dock's **Cannons** fitting, and the Cinderborn with the **Ember Ward**, as if already learned.
+- The Cinderborn are the hard start: their home is the grim Infernal Isles, with little food and no ore of its own (the home island always gets enough ore for a blacksmith). The gentle biomes still lie nearest home.
+- A tribe's home biome never asks for its own signature good in the Great Work, so the Glowkin need no glowcap, the Mirefolk no mirepearl and the Cinderborn no hellstone.
 
 ### Biomes
 
@@ -201,6 +211,8 @@ packages/art      @explorer/art: the colour palette and the per-pixel terrain pa
   terrain/          smooth fields from the tile data, ray-marched land, cliffs and water
 packages/server   @explorer/server: node:http + ws, world rooms, JSON persistence
 packages/client   @explorer/client: PixiJS v8 renderer, input, DOM HUD, map screen, synthesised sound, sessions
+  index.html        the landing page (src/landing/): the game's own sprites, tribes and biomes, no PixiJS
+  play/index.html   the game, served for every page under /play (routes in shared/src/routes.ts)
 tools/sprites     palette extraction and the sprite generator → client/public/assets
 ```
 
@@ -234,8 +246,9 @@ tools/sprites     palette extraction and the sprite generator → client/public/
    - Buildings take a tribe style: wall material, roof shape and accent colours.
    - Shading snaps to the palette ramps with restrained ordered dithering.
    - Cast shadows and dark outlines make it read as pixel art.
-   - Boulders, sea rocks (with surf) and villagers are built the same way; villagers are drawn pixel by pixel.
-4. **Packing:** everything goes into one atlas. Each frame keeps its anchor (a tile's top vertex, or a villager's feet) plus metadata such as chimney smoke emitters.
+   - Boulders and sea rocks (with surf) are built the same way.
+   - Villagers and the goods they carry are drawn pixel by pixel at **double resolution** (a 32×48 canvas per frame, `res: 2` in the manifest). The game shows them at half scale, so they stand as tall as before but with twice the detail; at the default zoom each of their pixels is one screen pixel.
+4. **Packing:** everything goes into one atlas. Each frame keeps its anchor (a tile's top vertex, or a villager's feet) plus metadata such as chimney smoke emitters and, for double-resolution frames, `res`.
 
 To **replace or add art**, add or modify a function in `tools/sprites/src/sprites/*` and run `pnpm sprites`. To swap in a hand-painted sprite, draw it into a `Canvas` with the same name and anchor. `packages/client/src/render/names.ts` maps game state to frame names. To change how the land looks, edit the biome materials in `packages/art/src/terrain/materials.ts` (ground, beach, rock, path and cliff textures) or the water in `water.ts`; no atlas rebuild is needed.
 
@@ -255,7 +268,7 @@ To **review art**:
 | `pnpm dev`                  | Server (watch) and Vite client                                                  |
 | `pnpm build` / `pnpm start` | Build the client / run the server, which serves the built client                |
 | `pnpm test`                 | Sprite freshness check plus shared, server and client tests                     |
-| `pnpm test:e2e`             | Playwright smoke test: create a world, build, second player joins, offline mode |
+| `pnpm test:e2e`             | Playwright smoke test: landing page, new world, building, friend joins, offline |
 | `pnpm check`                | Prettier, typecheck and tests (what CI runs, plus e2e)                          |
 | `pnpm sprites`              | Regenerate the sprite atlas                                                     |
 

@@ -2,7 +2,7 @@ import { inBounds, tileIndex } from "../world/grid";
 import {
   BUILDINGS,
   CARGO,
-  DIVE,
+  diveSeconds,
   PATROL,
   RESOURCES,
   SALVAGE_SECONDS,
@@ -12,6 +12,7 @@ import {
   MARKET_LOT,
   MARKET_PRICES,
   refund,
+  sellPrice,
   SHIP,
   shipCost,
   spend,
@@ -259,7 +260,7 @@ export function applyCommand(state: GameState, cmd: Command): CommandResult {
       ship.unload = false;
       ship.path = path;
       ship.dest = { x: site.x, y: site.y };
-      ship.dive = { siteId: site.id, remaining: DIVE.seconds };
+      ship.dive = { siteId: site.id, remaining: diveSeconds(state.world.tribe) };
       markDirty(state, ship.id);
       return OK;
     }
@@ -389,7 +390,7 @@ export function applyCommand(state: GameState, cmd: Command): CommandResult {
         if (state.stock[cmd.resource] < MARKET_LOT)
           return fail(`You need ${MARKET_LOT} ${cmd.resource} to sell`);
         state.stock[cmd.resource] -= MARKET_LOT;
-        state.stock.gold += price;
+        state.stock.gold += sellPrice(cmd.resource, state.world.tribe);
       } else {
         if (!MARKET_BUYABLE.includes(cmd.resource)) return fail("The market doesn't sell that");
         if (state.stock.gold < price * 2) return fail("Not enough gold");

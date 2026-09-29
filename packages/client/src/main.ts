@@ -1,5 +1,13 @@
 import "./styles.css";
-import { isDifficulty, isTribe, type Difficulty, type TribeId } from "@explorer/shared";
+import {
+  isDifficulty,
+  isTribe,
+  PLAY_PATH,
+  worldIdFromPath,
+  worldPath,
+  type Difficulty,
+  type TribeId,
+} from "@explorer/shared";
 import { loadAtlas, type Atlas } from "./assets";
 import { Game } from "./game/game";
 import { playerName, playerToken } from "./net/identity";
@@ -20,7 +28,7 @@ function loading(text: string): () => void {
 }
 
 async function startOnline(worldId: string, name: string): Promise<void> {
-  history.replaceState(null, "", `/w/${worldId}`);
+  history.replaceState(null, "", worldPath(worldId));
   const done = loading("Setting sail…");
   try {
     const [assets, session] = await Promise.all([
@@ -32,7 +40,7 @@ async function startOnline(worldId: string, name: string): Promise<void> {
   } catch (e) {
     done();
     lobby({
-      ...(location.pathname.startsWith("/w/") ? { joinId: worldId } : {}),
+      ...(worldIdFromPath(location.pathname) ? { joinId: worldId } : {}),
       error: (e as Error).message,
     });
   }
@@ -49,7 +57,7 @@ async function startOffline(
   history.replaceState(
     null,
     "",
-    `/?offline&seed=${encodeURIComponent(seed)}&tribe=${tribe}&difficulty=${difficulty}${reveal}${phase}`,
+    `${PLAY_PATH}?offline&seed=${encodeURIComponent(seed)}&tribe=${tribe}&difficulty=${difficulty}${reveal}${phase}`,
   );
   const done = loading("Generating islands…");
   const assets = await atlas();
@@ -77,7 +85,7 @@ function lobby(opts: { joinId?: string; error?: string } = {}): void {
 }
 
 const params = new URLSearchParams(location.search);
-const join = location.pathname.match(/^\/w\/([a-z0-9]{4,32})\/?$/i);
+const join = worldIdFromPath(location.pathname);
 void atlas();
 if (params.has("offline")) {
   const tribe = params.get("tribe");
@@ -89,9 +97,9 @@ if (params.has("offline")) {
     isDifficulty(difficulty) ? difficulty : "normal",
   );
 } else if (join && playerName()) {
-  void startOnline(join[1]!.toLowerCase(), playerName());
+  void startOnline(join, playerName());
 } else if (join) {
-  lobby({ joinId: join[1]!.toLowerCase() });
+  lobby({ joinId: join });
 } else {
   lobby();
 }

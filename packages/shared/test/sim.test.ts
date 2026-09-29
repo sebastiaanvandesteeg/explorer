@@ -53,6 +53,13 @@ import {
   toSnapshot,
   toWire,
   TRIBES,
+  DIVE,
+  diveSeconds,
+  SMITH,
+  smithSeconds,
+  shipGuns,
+  TRIBE_DEFS,
+  type TribeId,
   type BuildingEntity,
   type BuildingKind,
   type GameState,
@@ -71,6 +78,11 @@ const world = generateWorld("sim-tests");
 
 function fresh(): GameState {
   return createInitialState(world);
+}
+
+/** A fresh game for another tribe, on its own world from the same seed. */
+function freshFor(tribe: TribeId): GameState {
+  return createInitialState(generateWorld("sim-tests", tribe));
 }
 
 function run(state: GameState, seconds: number, each?: () => void): void {
@@ -381,6 +393,32 @@ describe("economy", () => {
     });
   });
 
+  it("pays the Amberwrights more at the market, at the usual buying price", () => {
+    const s = freshFor("amberwrights");
+    instant(s, "market");
+    const gold = s.stock.gold;
+    expect(applyCommand(s, { kind: "trade", resource: "wood", action: "sell" })).toEqual({
+      ok: true,
+    });
+    expect(s.stock.gold).toBe(gold + 5);
+    applyCommand(s, { kind: "trade", resource: "tools", action: "sell" });
+    expect(s.stock.gold).toBe(gold + 5 + 20);
+    applyCommand(s, { kind: "trade", resource: "stone", action: "buy" });
+    expect(s.stock.gold).toBe(gold + 5 + 20 - 10);
+  });
+
+  it("lets Cinderborn blacksmiths forge twice as fast", () => {
+    expect(smithSeconds("cinderborn")).toBe(SMITH.seconds / 2);
+    expect(smithSeconds("islanders")).toBe(SMITH.seconds);
+    const forged = (s: GameState) => {
+      instant(s, "blacksmith");
+      s.stock.ore = 40;
+      run(s, 40);
+      return s.stock.tools - 99;
+    };
+    expect(forged(freshFor("cinderborn"))).toBeGreaterThan(forged(fresh()) + 2);
+  });
+
   it("a mine digs nearby ore on its own", () => {
     const s = fresh();
     const ore = nearestNode(s, ["ore"]);
@@ -402,6 +440,14 @@ describe("economy", () => {
     );
     expect(harvestSeconds("berry", "sylvan")).toBeLessThan(harvestSeconds("berry", "sunfolk"));
     expect(shipCost("islanders").wood).toBeLessThan(shipCost("northfolk").wood!);
+  });
+
+  it("gives every tribe a distinct home biome, bonus and banner", () => {
+    const defs = TRIBES.map((t) => TRIBE_DEFS[t]);
+    expect(new Set(defs.map((d) => d.homeBiome)).size).toBe(TRIBES.length);
+    expect(new Set(defs.map((d) => d.bonus)).size).toBe(TRIBES.length);
+    expect(new Set(defs.map((d) => d.banner)).size).toBe(TRIBES.length);
+    for (const d of defs) for (const id of d.innate ?? []) expect(UPGRADES[id]).toBeDefined();
   });
 });
 
@@ -669,6 +715,22 @@ describe("magic house upgrades", () => {
     expect(landingBlock(s, found!.w.start.islandId)).toBeNull();
   });
 
+  it("gives the Cinderborn the Ember Ward from the start, and keeps it through a save", () => {
+    const s = freshFor("cinderborn");
+    expect(s.world.islands[s.world.start.islandId]!.biome).toBe("infernal");
+    expect(TRIBE_DEFS.cinderborn.innate).toEqual(["ember_ward"]);
+    expect(s.upgrades.has("ember_ward")).toBe(true);
+    expect(landingBlock(s, s.world.start.islandId)).toBeNull();
+    const crystal = s.world.islands.find((i) => i.biome === "crystal" && i.flavor !== "islet");
+    if (crystal) expect(landingBlock(s, crystal.id)).not.toBeNull();
+    expect(applyCommand(s, { kind: "buy-upgrade", upgrade: "ember_ward" }).ok).toBe(false);
+    const saved = JSON.parse(JSON.stringify(toSnapshot(s)));
+    expect(fromSnapshot(s.world, saved).upgrades.has("ember_ward")).toBe(true);
+    // Even a save that somehow lost the list still knows the tribe's own gifts.
+    expect(fromSnapshot(s.world, { ...saved, upgrades: [] }).upgrades.has("ember_ward")).toBe(true);
+    expect(fresh().upgrades.size).toBe(0);
+  });
+
   it("charts every island and travels through snapshots and patches", () => {
     const m = withMagicHouse();
     const client = fromSnapshot(world, JSON.parse(JSON.stringify(toSnapshot(m))));
@@ -859,6 +921,46 @@ describe("pirates, wrecks and sunken sites", () => {
     expect(scout.dive).toBeNull();
   });
 
+  it("arms every Freebooter ship and doubles what a sunk raider leaves", () => {
+    const s = freshFor("freebooters");
+    s.nextRaid = 1e9;
+    expect(s.upgrades.has("cannons")).toBe(true);
+    const at = nearDock(s);
+    expect(shipGuns(s, ship(s, "scout", at.x, at.y))).not.toBeNull();
+    expect(shipGuns(s, ship(s, "cargo", at.x, at.y))).not.toBeNull();
+    const p = pirate(s, at.x + 12, at.y);
+    p.loot = { wood: 10 };
+    p.hp = 0;
+    tick(s);
+    const wreck = of<WreckEntity>(s, "wreck")[0]!;
+    expect(wreck.loot.wood).toBe(20);
+    expect(wreck.loot.gold! % 2).toBe(0);
+    expect(wreck.loot.gold).toBeGreaterThanOrEqual(20);
+  });
+
+  it("lets Mirefolk divers work twice as fast and bring up more", () => {
+    expect(diveSeconds("mirefolk")).toBe(DIVE.seconds / 2);
+    const dive = (s: GameState) => {
+      s.nextRaid = 1e9;
+      const site = of<SiteEntity>(s, "site").find((x) => x.kind === "ruin")!;
+      const scout = ship(s, "scout", site.x + 0.5, site.y + 2.5);
+      run(s, 1);
+      const diver = of<VillagerEntity>(s, "villager")[0]!;
+      scout.passengers.push(diver.id);
+      diver.aboard = scout.id;
+      const treasure = site.loot.gold!;
+      applyCommand(s, { kind: "dive", shipId: scout.id, siteId: site.id });
+      const seconds = scout.dive!.remaining;
+      run(s, seconds + 1);
+      expect(scout.dive).toBeNull();
+      return { seconds, share: 1 - site.loot.gold! / treasure };
+    };
+    const usual = dive(fresh());
+    const mire = dive(freshFor("mirefolk"));
+    expect(mire.seconds).toBe(usual.seconds / 2);
+    expect(mire.share).toBeGreaterThan(usual.share * 1.3);
+  });
+
   it("keeps raid timers, upgrades and sites through a save", () => {
     const s = fresh();
     s.nextRaid = 777;
@@ -982,6 +1084,17 @@ describe("night, light and lookouts", () => {
     expect(sightFactor(s, spot.x, spot.y)).toBeLessThan(1);
     s.time = timeAtPhase(0.25);
     expect(sightFactor(s, spot.x, spot.y)).toBe(1);
+  });
+
+  it("lets the Glowkin keep their daytime sight after dark", () => {
+    const s = freshFor("glowkin");
+    const spot = nearHallFarFromDock(s);
+    s.time = timeAtPhase(0.8);
+    expect(watched(s, spot.x, spot.y)).toBe(true);
+    expect(sightFactor(s, spot.x, spot.y)).toBe(1);
+    const usual = fresh();
+    usual.time = timeAtPhase(0.8);
+    expect(sightFactor(usual, spot.x, spot.y)).toBeLessThan(1);
   });
 
   it("sees less of the sea from a ship at night", () => {

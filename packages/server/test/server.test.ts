@@ -1,4 +1,4 @@
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
@@ -138,6 +138,36 @@ describe("HTTP API", () => {
       body: JSON.stringify({ tribe: "vikings" }),
     });
     expect(bad.status).toBe(400);
+  });
+});
+
+describe("serving the built client", () => {
+  it("serves the landing page at the root and the game under /play", async () => {
+    const clientDir = join(dataDir, "client");
+    await mkdir(join(clientDir, "play"), { recursive: true });
+    await writeFile(join(clientDir, "index.html"), "landing");
+    await writeFile(join(clientDir, "play", "index.html"), "game");
+    await app.close();
+    app = await startApp({ port: 0, host: "127.0.0.1", dataDir, clientDir });
+    const page = async (path: string) => {
+      const res = await fetch(`${base()}${path}`, { redirect: "manual" });
+      return { status: res.status, body: await res.text(), location: res.headers.get("location") };
+    };
+    expect(await page("/")).toMatchObject({ status: 200, body: "landing" });
+    for (const path of ["/play", "/play/", "/play/w/abcd1234"])
+      expect(await page(path)).toMatchObject({ status: 200, body: "game" });
+    expect((await page("/nowhere")).status).toBe(404);
+    expect((await page("/play/missing.js")).status).toBe(404);
+    // Invite links and offline games from before the game moved to /play still work.
+    expect(await page("/w/abcd1234")).toMatchObject({
+      status: 301,
+      location: "/play/w/abcd1234",
+    });
+    expect(await page("/?offline&seed=reef")).toMatchObject({
+      status: 301,
+      location: "/play?offline&seed=reef",
+    });
+    expect((await page("/api/health")).status).toBe(200);
   });
 });
 

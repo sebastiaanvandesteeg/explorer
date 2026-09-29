@@ -2,12 +2,18 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="A co-op isometric pixel-art game about exploring islands and building a settlement."
+      content="Explorer is a free co-op pixel-art game in your browser: sail a generated archipelago, settle its islands and build a settlement with up to seven friends."
     />
-    <title>Explorer</title>
+    <meta property="og:title" content="Explorer" />
+    <meta
+      property="og:description"
+      content="A co-op isometric pixel-art game about exploring islands and building a settlement together."
+    />
+    <meta property="og:image" content="/concept-art.webp" />
+    <title>Explorer · a co-op island game</title>
     <link
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1l7 7-7 7-7-7z' fill='%23349f98'/%3E%3Cpath d='M8 4l4 4-4 4-4-4z' fill='%238a8f38'/%3E%3C/svg%3E"
@@ -20,7 +26,265 @@
     />
   </head>
   <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
+    <div class="sea" aria-hidden="true"></div>
+
+    <header class="topbar panel">
+      <a class="brand" href="/"><span class="brand-mark" aria-hidden="true"></span>Explorer</a>
+      <nav aria-label="Sections">
+        <a href="#world">The world</a>
+        <a href="#tribes">Tribes</a>
+        <a href="#biomes">Biomes</a>
+        <a href="#crew">Co-op</a>
+      </nav>
+      <a class="btn primary" href="/play">Play</a>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-inner">
+          <p class="eyebrow">A co-op pixel-art island game</p>
+          <h1 class="title">Explorer</h1>
+          <p class="lede">
+            Sail a randomly generated archipelago of ten biomes, settle its islands and build a
+            thriving settlement with up to seven friends. Right in your browser.
+          </p>
+          <div class="cta">
+            <a class="btn primary big" href="/play">Set sail</a>
+            <a class="btn big" href="#world">Take the tour</a>
+          </div>
+          <ul class="stats panel" aria-label="At a glance">
+            <li><span data-sprite="icon_villager"></span>Up to 8 players</li>
+            <li>
+              <span data-sprite="icon_flag"></span
+              ><span><span data-count="tribes">9</span> tribes</span>
+            </li>
+            <li>
+              <span data-sprite="icon_ship"></span
+              ><span><span data-count="biomes">10</span> biomes</span>
+            </li>
+            <li><span data-sprite="icon_gold"></span>Free, no download</li>
+          </ul>
+        </div>
+        <div class="hero-ship" aria-hidden="true" data-sprite="ship_6" data-scale="2"></div>
+      </section>
+
+      <section id="world" class="section">
+        <header class="section-head">
+          <p class="eyebrow">The world</p>
+          <h2>A whole archipelago, painted in code</h2>
+          <p>
+            Every world grows from a seed: its coasts, cliffs, beaches, foam and shallows are
+            painted pixel by pixel while you play, so the islands never look like a grid of tiles.
+            Even the sound is synthesised in your browser.
+          </p>
+        </header>
+        <figure class="shot panel">
+          <img
+            data-shot="screenshot"
+            width="1440"
+            height="900"
+            loading="lazy"
+            alt="A settlement on the home island: timber houses, a town hall, a farm and a dock, surrounded by forest and cliffs"
+          />
+        </figure>
+        <div class="features">
+          <article class="feature panel">
+            <div class="pic afloat" data-sprite="ship_6"></div>
+            <h3>Explore by sea</h3>
+            <p>
+              Launch scout ships and lift the fog for everyone. Every island you find gets a name on
+              the shared chart of the archipelago.
+            </p>
+          </article>
+          <article class="feature panel">
+            <div class="pic" data-sprite="b_house_islanders" data-tiles="2"></div>
+            <h3>Settle and grow</h3>
+            <p>
+              Villagers find work on their own: they build, fell trees, quarry, farm and forge
+              tools. Ferry them across to settle new islands.
+            </p>
+          </article>
+          <article class="feature panel">
+            <div class="pic afloat" data-sprite="cargo_0"></div>
+            <h3>Trade routes</h3>
+            <p>
+              Each island keeps its own stockpile. Build docks and send cargo ships to bring the
+              goods home to the treasury.
+            </p>
+          </article>
+          <article class="feature panel">
+            <div class="pic afloat" data-sprite="pirate_2"></div>
+            <h3>Pirates and plunder</h3>
+            <p>
+              Raiders strike at dusk. Arm your ships, send out patrol boats, loot the wrecks and
+              dive for sunken treasure.
+            </p>
+          </article>
+          <article class="feature panel">
+            <div
+              class="pic"
+              data-sprite="b_lighthouse_islanders"
+              data-tiles="2"
+              data-scale="1"
+            ></div>
+            <h3>Night and storms</h3>
+            <p>
+              Days pass, windows light up after dark and storms roll across the sea. A lighthouse
+              keeps watch through the night.
+            </p>
+          </article>
+          <article class="feature panel">
+            <div
+              class="pic"
+              data-sprite="b_great_work_3_islanders"
+              data-tiles="4"
+              data-scale="1"
+            ></div>
+            <h3>The Great Work</h3>
+            <p>
+              Gather rare goods from six far biomes to raise a monument in three stages, then read
+              the chronicle of your expedition.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section id="tribes" class="section">
+        <header class="section-head">
+          <p class="eyebrow">Tribes</p>
+          <h2>Choose your people</h2>
+          <p>
+            The whole crew plays one tribe. It decides how your buildings and villagers look, which
+            biome you call home, and one bonus.
+          </p>
+        </header>
+        <div class="tribe-cards" data-tribes></div>
+      </section>
+
+      <section id="biomes" class="section">
+        <header class="section-head">
+          <p class="eyebrow">Biomes</p>
+          <h2>Ten biomes, near and far</h2>
+          <p>
+            Gentle islands lie close to home; the hellish and magical ones wait far out at sea, each
+            with its own ground, plants, deposits and mood.
+          </p>
+        </header>
+        <figure class="shot panel">
+          <img
+            data-shot="biomes"
+            width="1288"
+            height="782"
+            loading="lazy"
+            alt="Four biomes: the Infernal Isles, Frostreach, the Fungal Hollows and the Petal Isles"
+          />
+        </figure>
+        <ul class="biomes" data-biomes></ul>
+      </section>
+
+      <section id="night" class="section">
+        <header class="section-head">
+          <p class="eyebrow">Day and night</p>
+          <h2>Keep a light burning</h2>
+          <p>
+            Dawn is warm, dusk golden and night deep blue with fireflies. After dark your lookouts
+            see less, and that is when the raiders come.
+          </p>
+        </header>
+        <figure class="shot panel">
+          <img
+            data-shot="daynight"
+            width="1696"
+            height="352"
+            loading="lazy"
+            alt="The same settlement at midday, at dusk and at night"
+          />
+        </figure>
+      </section>
+
+      <section id="crew" class="section">
+        <header class="section-head">
+          <p class="eyebrow">Co-op</p>
+          <h2>Bring your crew</h2>
+          <p>
+            Up to eight players share one tribe, one stockpile and one map. The server keeps your
+            world, so you can come back to it any time.
+          </p>
+        </header>
+        <ol class="steps">
+          <li class="step panel">
+            <span class="step-no">1</span>
+            <h3>Pick a name and a tribe</h3>
+            <p>Choose how fierce the pirates are, or pick a seed to share a world you liked.</p>
+          </li>
+          <li class="step panel">
+            <span class="step-no">2</span>
+            <h3>Start an expedition</h3>
+            <p>
+              A fresh archipelago is generated for your crew, with your home island at its heart.
+            </p>
+          </li>
+          <li class="step panel">
+            <span class="step-no">3</span>
+            <h3>Send the invite link</h3>
+            <p>Friends open it and join straight away. No server? Play offline on your own.</p>
+          </li>
+        </ol>
+        <div class="controls panel">
+          <h3>Controls at a glance</h3>
+          <dl>
+            <div>
+              <dt><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or drag</dt>
+              <dd>Pan</dd>
+            </div>
+            <div>
+              <dt>Wheel</dt>
+              <dd>Zoom</dd>
+            </div>
+            <div>
+              <dt><kbd>H</kbd></dt>
+              <dd>Gather</dd>
+            </div>
+            <div>
+              <dt><kbd>1</kbd>–<kbd>9</kbd></dt>
+              <dd>Build</dd>
+            </div>
+            <div>
+              <dt>Right-click</dt>
+              <dd>Give orders</dd>
+            </div>
+            <div>
+              <dt><kbd>M</kbd></dt>
+              <dd>Chart of the archipelago</dd>
+            </div>
+            <div>
+              <dt><kbd>Enter</kbd></dt>
+              <dd>Chat</dd>
+            </div>
+            <div>
+              <dt><kbd>C</kbd></dt>
+              <dd>Back to the town hall</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
+      <section class="section finale">
+        <div class="finale-card panel">
+          <div class="pic" data-sprite="b_lighthouse_islanders" data-tiles="2" data-scale="2"></div>
+          <div>
+            <h2>The sea is waiting</h2>
+            <p>Free to play in any modern browser. No account, no download.</p>
+            <a class="btn primary big" href="/play">Set sail</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Explorer · every sprite, coastline and sound is generated in code.</p>
+    </footer>
+
+    <script type="module" src="/src/landing/main.ts"></script>
   </body>
 </html>

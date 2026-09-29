@@ -1,7 +1,7 @@
 // Villagers (hand-drawn pixel figures), ships (ray-cast in 8 headings), smoke and UI icons.
 import { Canvas, outline } from "../canvas";
 import { cloth, planks } from "../materials";
-import { bayer, hexToRgba, rampColor, shade, type Rgba } from "../palette";
+import { bayer, hexToRgba, RAMPS, rampColor, shade, type RampName, type Rgba } from "../palette";
 import { flat, lit, Scene, type Material } from "../raytrace";
 import { renderSprite, trimmed, type Sprite } from "../sprite";
 import { TRIBES, type TribeId } from "@explorer/shared";
@@ -14,7 +14,7 @@ export type VillagerPose = (typeof VILLAGER_POSES)[number];
 export const TOOLS = ["axe", "pick", "hammer", "hoe"] as const;
 export type Tool = (typeof TOOLS)[number];
 
-type Hat = "none" | "helmet" | "wrap" | "hood";
+type Hat = "none" | "helmet" | "wrap" | "hood" | "mushroom" | "bandana" | "reed" | "cap" | "cowl";
 
 /** Clothing per tribe: three tunic colours (dark, mid, light) and a headwear style. */
 const OUTFITS: Record<TribeId, { tunics: [string, string, string][]; hat: Hat }> = {
@@ -50,11 +50,67 @@ const OUTFITS: Record<TribeId, { tunics: [string, string, string][]; hat: Hat }>
     ],
     hat: "hood",
   },
+  glowkin: {
+    tunics: [
+      ["#2e1a4a", "#4a2a6e", "#6a44a0"],
+      ["#12404a", "#1a6a78", "#2aa0a8"],
+      ["#4a2a3a", "#6e3e56", "#94607a"],
+    ],
+    hat: "mushroom",
+  },
+  freebooters: {
+    tunics: [
+      ["#8d816e", "#d6cbb4", "#f7f1e1"],
+      ["#5a1a2e", "#9a2e4e", "#d0507a"],
+      ["#1c2230", "#26304a", "#3e4d6a"],
+    ],
+    hat: "bandana",
+  },
+  mirefolk: {
+    tunics: [
+      ["#22261a", "#3c4428", "#5a6438"],
+      ["#26361e", "#445a30", "#6a8646"],
+      ["#1e3a3a", "#2e5e58", "#4a8a80"],
+    ],
+    hat: "reed",
+  },
+  amberwrights: {
+    tunics: [
+      ["#5a3e18", "#9a6c28", "#d0a444"],
+      ["#6a200c", "#9a3410", "#c85018"],
+      ["#3a2a14", "#5a4028", "#7a5a3a"],
+    ],
+    hat: "cap",
+  },
+  cinderborn: {
+    tunics: [
+      ["#1a1414", "#2a2020", "#3a2c28"],
+      ["#3a0e0e", "#6a1a18", "#9a2a22"],
+      ["#2a2024", "#3a2c30", "#4c3a3c"],
+    ],
+    hat: "cowl",
+  },
 };
 
+/** Villagers and what they carry are drawn at twice the world's pixel density. */
+export const FIGURE_RES = 2;
+
+/** Skin (shadow, base, light) and hair (dark, base, light) per tunic, for a varied crowd. */
+const SKINS: [number, number, number][] = [
+  [1, 2, 3],
+  [0, 1, 2],
+  [1, 2, 3],
+];
+const HAIRS: [RampName, [number, number, number]][] = [
+  ["hair", [0, 1, 2]],
+  ["outline", [0, 0, 1]],
+  ["thatch", [0, 1, 2]],
+];
+
 /**
- * Draw a 12×20 villager. Feet rest on (6, 19). "front" faces the viewer's lower right (+x);
- * the renderer mirrors it for +y, and uses "back" (mirrored or not) for the other two headings.
+ * Draw a villager at double resolution: a 32×48 canvas whose figure stands about 34 pixels tall
+ * with its feet on (16, 44). "front" faces the viewer's lower right (+x); the renderer mirrors it
+ * for +y, and uses "back" (mirrored or not) for the other two headings.
  */
 function villager(
   tribe: TribeId,
@@ -63,117 +119,374 @@ function villager(
   tunic: Tunic,
   tool?: Tool,
 ): Canvas {
-  const c = new Canvas(16, 24);
-  const ox = 2; // extra room on the left for raised tools
-  const oy = 4; // and on top
+  const c = new Canvas(32, 48);
+  const ox = 4; // room on the left for hats and bandana tails
+  const oy = 8; // and on top for raised tools and tall hats
   const P = (x: number, y: number, col: Rgba) => c.set(x + ox, y + oy, col);
   const R = (x: number, y: number, w: number, h: number, col: Rgba) => {
     for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) P(x + i, y + j, col);
   };
+  const front = facing === "front";
   const outfit = OUTFITS[tribe];
-  const [tDark, tMid, tLight] = outfit.tunics[tunic]!.map((h) => hexToRgba(h));
-  const skin = rampColor("skin", 2);
-  const skinShade = rampColor("skin", 1);
-  const hair = rampColor("hair", 1);
-  const hairLight = rampColor("hair", 2);
+  const trio = (f: (k: number) => Rgba) => [f(0), f(1), f(2)] as const;
+  const [tDark, tMid, tLight] = trio((k) => hexToRgba(outfit.tunics[tunic]![k]!));
+  const [skinShade, skin, skinLight] = trio((k) => rampColor("skin", SKINS[tunic]![k]!));
+  const [hairRamp, hairIdx] = HAIRS[tunic]!;
+  const [hairDark, hair, hairLight] = trio((k) => rampColor(hairRamp, hairIdx[k]!));
+  const ink = rampColor("outline", 0);
   const trousers = rampColor("timber", 2);
+  const trousersLight = rampColor("timber", 3);
+  const trousersDark = rampColor("timber", 1);
   const boots = rampColor("timber", 0);
-  const belt = rampColor("apron", 0);
-
-  // Legs.
+  const bootsLight = rampColor("timber", 1);
   const stride = pose === "walk0" ? 1 : pose === "walk1" ? -1 : 0;
-  R(4, 13, 2, 3, trousers);
-  R(6, 13, 2, 3, trousers);
-  R(4 - stride, 16, 2, 1, trousers);
-  R(6 + stride, 16, 2, 1, trousers);
-  R(4 - stride, 17, 2, 1, boots);
-  R(6 + stride, 17, 2, 1, boots);
 
-  // Torso.
-  R(3, 7, 6, 6, tMid!);
-  R(3, 7, 2, 6, tLight!);
-  R(8, 7, 1, 6, tDark!);
-  R(3, 12, 6, 1, belt);
+  // Legs: hips together, shins apart; walking swings the shins and boots.
+  R(8, 27, 8, 3, trousers);
+  R(8, 27, 1, 3, trousersLight);
+  R(15, 27, 1, 3, trousersDark);
+  const legs = [8 - 2 * stride, 13 + 2 * stride];
+  for (const [i, x] of legs.entries()) {
+    R(x, 30, 3, 3, trousers);
+    P(i === 0 ? x : x + 2, 30, i === 0 ? trousersLight : trousersDark);
+    P(i === 0 ? x : x + 2, 31, i === 0 ? trousersLight : trousersDark);
+    // Boots, their toes pointing the way the villager faces.
+    R(front ? x : x - 1, 33, 4, 3, boots);
+    R(front ? x : x - 1, 33, 4, 1, bootsLight);
+  }
 
-  // Arms.
-  const armSwing = pose === "walk0" ? 1 : pose === "walk1" ? -1 : 0;
-  R(2, 8, 1, 3 + armSwing, tLight!);
-  P(2, 11 + armSwing, skin);
+  // Tunic, lit from the left, with a belt and a darker hem.
+  R(7, 14, 10, 1, tMid);
+  R(6, 15, 12, 12, tMid);
+  R(6, 15, 2, 12, tLight);
+  P(7, 14, tLight);
+  R(16, 15, 2, 12, tDark);
+  R(13, 17, 1, 5, tDark);
+  R(9, 16, 1, 6, tLight);
+  R(6, 26, 12, 1, tDark);
+  R(6, 23, 12, 2, rampColor("apron", 0));
+  R(6, 23, 12, 1, rampColor("apron", 1));
+  if (front) {
+    R(11, 23, 2, 2, rampColor("gold", 3));
+    P(11, 23, rampColor("gold", 5));
+    // An open collar.
+    R(10, 14, 4, 1, skinShade);
+    R(11, 15, 2, 1, skinShade);
+    P(12, 16, tDark);
+  } else {
+    R(11, 15, 1, 8, tDark);
+  }
+
+  // Arms: the near (left) arm swings as they walk; the far arm swings the tool at work.
+  const swing = stride * 2;
+  R(4, 15, 2, 8 + swing, tLight);
+  R(5, 15, 1, 8 + swing, tMid);
+  P(4, 15, tMid);
+  R(4, 23 + swing, 2, 2, skin);
+  P(4, 23 + swing, skinLight);
   if (pose === "work0") {
     // Tool arm raised above the head.
-    R(9, 4, 1, 4, tDark!);
-    P(9, 3, skin);
+    R(18, 8, 2, 8, tDark);
+    P(18, 15, tMid);
+    R(18, 6, 2, 2, skin);
   } else if (pose === "work1") {
     // Tool arm swung down and forward.
-    R(9, 8, 2, 2, tDark!);
-    P(11, 10, skin);
+    R(18, 15, 2, 3, tDark);
+    R(19, 17, 2, 2, tDark);
+    R(21, 18, 2, 2, tDark);
+    R(22, 20, 2, 2, skin);
   } else {
-    R(9, 8, 1, 3 - armSwing, tDark!);
-    P(9, 11 - armSwing, skinShade);
+    R(18, 15, 2, 8 - swing, tDark);
+    P(18, 15, tMid);
+    R(18, 23 - swing, 2, 2, skinShade);
   }
 
-  // Head.
-  if (facing === "front") {
-    R(4, 2, 4, 5, skin);
-    R(7, 3, 1, 4, skinShade);
-    R(4, 1, 4, 2, hair);
-    P(4, 3, hair);
-    P(5, 1, hairLight);
-    P(5, 4, rampColor("outline", 0));
-    P(7, 4, rampColor("outline", 0));
-    P(6, 7, skinShade);
+  // Neck and head.
+  R(10, 12, 4, 2, skinShade);
+  R(9, 2, 6, 1, skin);
+  R(8, 3, 8, 8, skin);
+  R(9, 11, 6, 1, skin);
+  if (front) {
+    R(8, 5, 1, 6, skinLight);
+    R(15, 5, 1, 6, skinShade);
+    // Hair: a crown, a fringe and the back of the head, which faces the upper left.
+    R(9, 2, 6, 1, hair);
+    R(8, 3, 8, 2, hair);
+    R(8, 5, 3, 3, hair);
+    R(8, 8, 2, 2, hair);
+    P(11, 5, hair);
+    P(13, 5, hair);
+    P(15, 5, hairDark);
+    R(10, 3, 3, 1, hairLight);
+    P(9, 4, hairLight);
+    P(14, 3, hairLight);
+    P(10, 8, skinShade); // ear
+    P(10, 9, skinShade);
+    // Face: eyes, brows, nose and mouth.
+    P(12, 7, ink);
+    P(14, 7, ink);
+    P(12, 6, hairDark);
+    P(14, 6, hairDark);
+    P(15, 8, skinShade);
+    R(13, 10, 2, 1, skinShade);
   } else {
-    R(4, 1, 4, 6, hair);
-    R(4, 1, 2, 2, hairLight);
-    P(7, 6, skinShade);
+    R(9, 2, 6, 1, hair);
+    R(8, 3, 8, 8, hair);
+    R(9, 11, 6, 1, hairDark);
+    R(10, 3, 4, 1, hairLight);
+    R(9, 4, 1, 3, hairLight);
+    P(12, 5, hairLight);
+    P(11, 7, hairDark);
+    P(13, 9, hairDark);
+    P(10, 10, hairDark);
+    P(8, 7, skinShade); // ears
+    P(15, 7, skinShade);
   }
 
-  // Headwear.
-  if (outfit.hat === "helmet") {
-    const steel = rampColor("stone", 3);
-    R(4, 0, 4, 2, steel);
-    R(4, 0, 2, 1, rampColor("stone", 5));
-    P(3, 0, rampColor("plaster", 4));
-    P(8, 0, rampColor("plaster", 4));
-    P(3, -1, rampColor("plaster", 4));
-    P(8, -1, rampColor("plaster", 4));
-  } else if (outfit.hat === "wrap") {
-    R(3, 0, 6, 2, tLight!);
-    R(3, 0, 6, 1, rampColor("plaster", 4));
-    if (facing === "back") R(4, 2, 4, 2, tLight!);
-  } else if (outfit.hat === "hood") {
-    R(3, 0, 6, 2, tMid!);
-    R(3, 2, 1, 3, tMid!);
-    R(8, 2, 1, 3, tDark!);
-    P(6, -1, tLight!);
-    if (facing === "back") R(4, 2, 4, 4, tMid!);
-  }
+  drawHat(outfit.hat, front, P, R, [tDark, tMid, tLight]);
+  if (tool && (pose === "work0" || pose === "work1")) drawTool(tool, pose, P, R);
+  outline(c, 0.32);
+  return c;
+}
 
-  // Tools.
-  if (tool && (pose === "work0" || pose === "work1")) {
-    const handle = rampColor("timber", 3);
-    const metal = rampColor("stone", 4);
-    const metalDark = rampColor("stone", 2);
-    if (pose === "work0") {
-      // Handle rises from the hand at (9, 3).
-      P(9, 2, handle);
-      P(10, 1, handle);
-      P(10, 0, handle);
-      if (tool === "axe") (R(11, -1, 2, 3, metal), P(12, 2, metalDark));
-      if (tool === "pick") (R(8, -1, 6, 1, metal), P(8, 0, metalDark), P(13, 0, metalDark));
-      if (tool === "hammer") (R(10, -2, 3, 2, metalDark), R(10, -2, 2, 1, metal));
-      if (tool === "hoe") (R(10, -1, 3, 1, metal), P(12, 0, metalDark));
-    } else {
-      P(12, 11, handle);
-      P(13, 12, handle);
-      if (tool === "axe") (R(13, 12, 2, 3, metal), P(14, 14, metalDark));
-      if (tool === "pick") (R(12, 13, 1, 3, metal), R(14, 11, 1, 3, metal));
-      if (tool === "hammer") (R(13, 13, 2, 2, metalDark), P(13, 13, metal));
-      if (tool === "hoe") R(14, 13, 1, 3, metal);
+type Plot = (x: number, y: number, col: Rgba) => void;
+type Fill = (x: number, y: number, w: number, h: number, col: Rgba) => void;
+
+/** Headwear over a head that spans x 8..15 and y 2..11. */
+function drawHat(
+  hat: Hat,
+  front: boolean,
+  P: Plot,
+  R: Fill,
+  [tDark, tMid, tLight]: [Rgba, Rgba, Rgba],
+): void {
+  switch (hat) {
+    case "none":
+      return;
+    case "helmet": {
+      const steel = rampColor("stone", 3);
+      R(9, -1, 6, 1, steel);
+      R(8, 0, 8, 4, steel);
+      R(15, 0, 1, 4, rampColor("stone", 2));
+      R(9, 0, 3, 2, rampColor("stone", 5));
+      R(7, 4, 10, 1, rampColor("stone", 1));
+      for (const x of [9, 12, 15]) P(x, 3, rampColor("stone", 1));
+      // Curved horns.
+      const horn = rampColor("plaster", 4);
+      const hornShade = rampColor("plaster", 2);
+      for (const [x, y] of [
+        [7, 2],
+        [6, 1],
+        [5, 0],
+        [5, -1],
+        [5, -2],
+        [6, -3],
+      ] as const) {
+        P(x, y, horn);
+        P(23 - x, y, hornShade);
+      }
+      return;
+    }
+    case "wrap": {
+      // A turban wound in bands, with a jewel at the front and a tail at the back.
+      R(9, -1, 6, 1, tMid);
+      R(8, 0, 8, 4, tMid);
+      for (let y = -1; y < 4; y++)
+        for (let x = 8; x < 16; x++) if ((x - y + 20) % 3 === 0) P(x, y, tLight);
+      R(15, 0, 1, 4, tDark);
+      R(8, 4, 8, 1, tDark);
+      if (front) {
+        P(13, 1, rampColor("gold", 4));
+        P(13, 2, rampColor("gold", 2));
+      } else {
+        R(10, 5, 4, 5, tMid);
+        R(10, 5, 1, 5, tLight);
+        R(13, 5, 1, 5, tDark);
+      }
+      return;
+    }
+    case "hood": {
+      R(8, 0, 8, 4, tMid);
+      R(9, -1, 6, 1, tMid);
+      R(11, -3, 2, 2, tLight);
+      R(7, 1, 2, 11, tMid);
+      R(15, 1, 2, 11, tDark);
+      R(9, 0, 3, 1, tLight);
+      if (!front) R(8, 3, 8, 9, tMid);
+      return;
+    }
+    case "mushroom": {
+      // A broad spotted cap with glowing flecks and pale gills underneath.
+      const cap = rampColor("arcane", 3);
+      R(9, -4, 6, 1, cap);
+      R(7, -3, 10, 1, cap);
+      R(5, -2, 14, 1, cap);
+      R(4, -1, 16, 3, cap);
+      R(6, -3, 5, 2, rampColor("arcane", 4));
+      R(4, 1, 16, 1, rampColor("arcane", 2));
+      R(5, 2, 14, 1, rampColor("stalk", 3));
+      for (let x = 6; x < 18; x += 2) P(x, 2, rampColor("stalk", 5));
+      const glow = rampColor("glow", 4);
+      for (const [x, y] of [
+        [8, -2],
+        [13, -3],
+        [16, -1],
+        [6, 0],
+        [11, 0],
+      ] as const) {
+        P(x, y, glow);
+        P(x + 1, y, rampColor("glow", 5));
+      }
+      return;
+    }
+    case "bandana": {
+      const band = rampColor("berry", 2);
+      R(9, 1, 6, 1, band);
+      R(8, 2, 8, 3, band);
+      R(8, 2, 8, 1, rampColor("berry", 3));
+      for (const [x, y] of [
+        [10, 3],
+        [13, 2],
+        [15, 4],
+      ] as const)
+        P(x, y, rampColor("plaster", 4));
+      // The knot and its tails behind the head.
+      const kx = front ? 7 : 11;
+      R(kx - 1, 4, 2, 2, band);
+      P(kx - 2, 6, band);
+      P(kx - 2, 7, rampColor("berry", 1));
+      P(kx - 1, 7, band);
+      P(kx - 1, 8, rampColor("berry", 1));
+      return;
+    }
+    case "reed": {
+      // A wide conical hat of woven reeds.
+      const rows: [number, number][] = [
+        [-4, 2],
+        [-3, 4],
+        [-2, 6],
+        [-1, 8],
+        [0, 10],
+        [1, 12],
+        [2, 16],
+        [3, 20],
+      ];
+      for (const [y, w] of rows) {
+        const x0 = 12 - w / 2;
+        for (let x = x0; x < x0 + w; x++) {
+          const weave = (x + y) % 2 === 0 ? 3 : 4;
+          P(x, y, rampColor("thatch", x < 11 ? weave + 1 : weave));
+        }
+      }
+      R(2, 4, 20, 1, rampColor("thatch", 1));
+      return;
+    }
+    case "cap": {
+      // A flat craftsman's cap with its peak towards the facing side.
+      R(9, 0, 6, 1, tMid);
+      R(8, 1, 8, 3, tMid);
+      R(8, 1, 3, 1, tLight);
+      R(8, 3, 8, 1, tDark);
+      P(12, -1, tLight);
+      if (front) R(13, 4, 5, 1, tDark);
+      return;
+    }
+    case "cowl": {
+      // A soot-dark cowl edged with glowing embers.
+      const soot = rampColor("basalt", 2);
+      const sootLight = rampColor("basalt", 4);
+      R(9, -1, 6, 1, soot);
+      R(8, 0, 8, 4, soot);
+      R(7, 1, 2, 11, soot);
+      R(15, 1, 2, 11, rampColor("basalt", 1));
+      R(9, 0, 3, 1, sootLight);
+      R(11, -3, 2, 2, soot);
+      P(11, -3, rampColor("lava", 4));
+      if (front) {
+        // Embers glow along the brow and the edge of the cowl, not on the face.
+        R(9, 4, 6, 1, rampColor("lava", 3));
+        P(8, 6, rampColor("lava", 3));
+        P(8, 9, rampColor("lava", 2));
+      } else {
+        R(8, 3, 8, 9, soot);
+        R(11, 2, 2, 9, rampColor("lava", 2));
+      }
+      return;
     }
   }
-  outline(c, 0.3);
-  return c;
+}
+
+/** A tool held high (work0) or swung down in front (work1). */
+function drawTool(tool: Tool, pose: "work0" | "work1", P: Plot, R: Fill): void {
+  const handle = rampColor("timber", 3);
+  const handleDark = rampColor("timber", 2);
+  const metal = rampColor("stone", 4);
+  const shine = rampColor("stone", 5);
+  const metalDark = rampColor("stone", 2);
+  if (pose === "work0") {
+    // The handle rises from the hand at (19, 6) up and to the right.
+    for (const [x, y] of [
+      [20, 5],
+      [20, 4],
+      [21, 3],
+      [21, 2],
+      [22, 1],
+      [22, 0],
+    ] as const) {
+      P(x, y, handle);
+      P(x + 1, y, handleDark);
+    }
+    if (tool === "axe") {
+      R(23, -3, 3, 5, metal);
+      R(25, -4, 2, 7, metal);
+      R(26, -4, 1, 7, shine);
+      R(23, 1, 3, 1, metalDark);
+    }
+    if (tool === "pick") {
+      R(17, -1, 11, 2, metal);
+      R(17, -1, 11, 1, shine);
+      P(16, 0, metalDark);
+      P(28, 0, metalDark);
+    }
+    if (tool === "hammer") {
+      R(20, -3, 6, 4, metalDark);
+      R(20, -3, 6, 1, metal);
+      R(20, -3, 1, 4, shine);
+    }
+    if (tool === "hoe") {
+      R(22, -2, 5, 2, metal);
+      R(26, -2, 1, 4, metalDark);
+      R(22, -2, 5, 1, shine);
+    }
+  } else {
+    // The handle runs on from the hand at (23, 21) down and to the right.
+    for (const [x, y] of [
+      [24, 22],
+      [25, 23],
+      [25, 24],
+      [26, 25],
+    ] as const) {
+      P(x, y, handle);
+      P(x, y + 1, handleDark);
+    }
+    if (tool === "axe") {
+      R(25, 26, 3, 4, metal);
+      R(27, 25, 1, 6, shine);
+    }
+    if (tool === "pick") {
+      R(22, 26, 2, 4, metal);
+      R(26, 22, 2, 5, metal);
+      R(24, 25, 3, 2, metalDark);
+    }
+    if (tool === "hammer") {
+      R(25, 26, 4, 4, metalDark);
+      R(25, 26, 4, 1, metal);
+    }
+    if (tool === "hoe") {
+      R(26, 26, 2, 5, metal);
+      R(26, 30, 3, 1, metalDark);
+    }
+  }
 }
 
 function villagerSprites(): Sprite[] {
@@ -186,7 +499,7 @@ function villagerSprites(): Sprite[] {
           for (const tool of tools) {
             const name = `villager_${tribe}_${tunic}_${facing}_${pose}${tool ? `_${tool}` : ""}`;
             const canvas = villager(tribe, facing, pose, tunic, tool);
-            out.push({ name, canvas, anchorX: 8, anchorY: 22 });
+            out.push({ name, canvas, anchorX: 16, anchorY: 44, meta: { res: FIGURE_RES } });
           }
         }
       }
@@ -208,52 +521,110 @@ type CarriedKind =
   | "glowcap"
   | "hellstone";
 
-/** The ramp each carried mineral is drawn in. */
-const MINERAL_RAMP = {
-  ore: "rock",
-  gold: "gold",
-  crystal: "crystal",
-  sunstone: "sunflower",
-  rimeglass: "ice",
-  mirepearl: "glow",
-  glowcap: "glow",
-  hellstone: "lava",
-} as const;
+/** A shaded lump: lit from the upper left, darker to the lower right. */
+function lump(c: Canvas, cx: number, cy: number, rx: number, ry: number, ramp: RampName): void {
+  const n = RAMPS[ramp].length;
+  for (let y = Math.floor(cy - ry); y <= Math.ceil(cy + ry); y++)
+    for (let x = Math.floor(cx - rx); x <= Math.ceil(cx + rx); x++) {
+      const dx = (x + 0.5 - cx) / rx;
+      const dy = (y + 0.5 - cy) / ry;
+      if (dx * dx + dy * dy > 1) continue;
+      const light = -dx * 0.6 - dy * 0.8;
+      const k = light > 0.55 ? n - 1 : light > 0.1 ? n - 2 : light > -0.4 ? n - 3 : n - 4;
+      c.set(x, y, rampColor(ramp, Math.max(0, k)));
+    }
+}
 
-/** Items carried above the head while hauling. Anchor = top of the villager's head. */
+/**
+ * Items carried above the head while hauling, drawn at the villagers' double resolution.
+ * Anchor = top of the villager's head.
+ */
 function carried(kind: CarriedKind): Sprite {
-  const c = new Canvas(12, 8);
-  if (kind in MINERAL_RAMP) {
-    const ramp = MINERAL_RAMP[kind as keyof typeof MINERAL_RAMP];
-    c.fill(3, 3, 6, 4, rampColor(ramp, 2));
-    c.fill(3, 3, 4, 2, rampColor(ramp, 3));
-    c.set(4, 3, rampColor(ramp, 5));
-    if (kind === "ore") (c.set(6, 4, rampColor("fruit", 2)), c.set(7, 5, rampColor("fruit", 2)));
-    if (kind === "crystal")
-      (c.fill(5, 0, 2, 3, rampColor("crystal", 4)), c.set(5, 0, rampColor("crystal", 6)));
-    if (kind === "sunstone" || kind === "rimeglass") c.fill(5, 1, 2, 2, rampColor(ramp, 5));
-    if (kind === "mirepearl") c.fill(4, 2, 4, 4, rampColor("glow", 4));
-    if (kind === "hellstone")
-      (c.set(5, 4, rampColor("lava", 4)), c.set(7, 5, rampColor("lava", 3)));
-  } else if (kind === "wood") {
-    for (let i = 0; i < 3; i++) {
-      c.fill(1, 2 + i * 2, 10, 2, rampColor("timber", 2 + (i % 2)));
-      c.set(10, 2 + i * 2, rampColor("wheat", 3));
-      c.set(10, 3 + i * 2, rampColor("wheat", 2));
+  const c = new Canvas(24, 16);
+  if (kind === "wood") {
+    // Three logs, their cut ends showing rings.
+    for (const [i, y] of [4, 8, 11].entries()) {
+      const x0 = i === 2 ? 4 : 2;
+      c.fill(x0, y, 18, 4, rampColor("timber", 2));
+      c.fill(x0, y, 18, 1, rampColor("timber", 3));
+      c.fill(x0, y + 3, 18, 1, rampColor("timber", 1));
+      for (let x = x0 + 3; x < x0 + 17; x += 5) c.set(x, y + 1, rampColor("timber", 1));
+      c.fill(x0 + 17, y, 3, 4, rampColor("wheat", 2));
+      c.fill(x0 + 18, y + 1, 1, 2, rampColor("wheat", 4));
     }
   } else if (kind === "stone") {
-    c.fill(3, 2, 6, 5, rampColor("stone", 2));
-    c.fill(3, 2, 4, 3, rampColor("stone", 3));
-    c.fill(4, 2, 2, 1, rampColor("stone", 4));
+    // A cut block, its top face lit.
+    c.fill(5, 5, 14, 10, rampColor("stone", 2));
+    c.fill(5, 5, 14, 3, rampColor("stone", 4));
+    c.fill(5, 5, 3, 10, rampColor("stone", 3));
+    c.fill(6, 5, 6, 1, rampColor("stone", 5));
+    c.set(13, 10, rampColor("stone", 1));
+    c.set(9, 12, rampColor("stone", 1));
+  } else if (kind === "food") {
+    // A basket of wheat, apples and berries.
+    for (let x = 6; x < 18; x += 2) c.fill(x, 1, 1, 7, rampColor("wheat", 3));
+    for (let x = 6; x < 18; x += 2) c.fill(x - 1, 0, 2, 2, rampColor("wheat", 4));
+    lump(c, 9, 7, 3, 3, "fruit");
+    lump(c, 15, 7, 2.5, 2.5, "berry");
+    c.fill(3, 8, 18, 7, rampColor("plank", 3));
+    c.fill(3, 8, 18, 2, rampColor("plank", 4));
+    for (let x = 4; x < 21; x += 3) c.fill(x, 10, 1, 5, rampColor("plank", 2));
   } else {
-    c.fill(2, 4, 8, 4, rampColor("plank", 3));
-    c.fill(2, 4, 8, 1, rampColor("plank", 4));
-    c.fill(3, 1, 2, 3, rampColor("wheat", 4));
-    c.fill(5, 0, 2, 4, rampColor("wheat", 3));
-    c.fill(7, 1, 2, 3, rampColor("berry", 2));
+    const ramp = {
+      ore: "rock",
+      gold: "gold",
+      crystal: "crystalGround",
+      sunstone: "sunflower",
+      rimeglass: "ice",
+      mirepearl: "swampGround",
+      glowcap: "stalk",
+      hellstone: "basalt",
+    }[kind] as RampName;
+    lump(c, 12, 10, 7.5, 5.5, ramp);
+    if (kind === "ore") {
+      for (const [x, y] of [
+        [9, 8],
+        [14, 11],
+        [11, 13],
+      ])
+        c.fill(x!, y!, 2, 1, rampColor("fruit", 2));
+    }
+    if (kind === "gold")
+      (c.fill(8, 7, 2, 1, rampColor("gold", 5)), c.set(14, 9, rampColor("gold", 5)));
+    if (kind === "crystal")
+      for (const [x, h] of [
+        [8, 7],
+        [11, 10],
+        [14, 8],
+      ]) {
+        c.fill(x!, 11 - h!, 3, h!, rampColor("crystal", 4));
+        c.fill(x!, 11 - h!, 1, h!, rampColor("crystal", 6));
+      }
+    if (kind === "sunstone" || kind === "rimeglass") {
+      const gem = kind === "sunstone" ? "sunflower" : "ice";
+      c.fill(10, 5, 4, 5, rampColor(gem, 4));
+      c.fill(10, 5, 2, 2, rampColor(gem, 5));
+    }
+    if (kind === "mirepearl")
+      (lump(c, 12, 8, 3.5, 3.5, "glow"), c.set(11, 6, rampColor("glow", 5)));
+    if (kind === "glowcap")
+      for (const [x, y] of [
+        [8, 7],
+        [13, 5],
+        [16, 8],
+      ])
+        lump(c, x!, y!, 2.5, 2, "glow");
+    if (kind === "hellstone")
+      for (const [x, y] of [
+        [8, 9],
+        [10, 10],
+        [13, 12],
+        [15, 9],
+      ])
+        c.fill(x!, y!, 2, 1, rampColor("lava", 4));
   }
   outline(c, 0.35);
-  return { name: `carry_${kind}`, canvas: c, anchorX: 6, anchorY: 8 };
+  return { name: `carry_${kind}`, canvas: c, anchorX: 12, anchorY: 16, meta: { res: FIGURE_RES } };
 }
 
 /** Wooden crate with darker banding along its edges. */

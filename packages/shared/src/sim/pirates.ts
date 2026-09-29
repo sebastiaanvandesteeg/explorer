@@ -2,10 +2,12 @@
 import { hash2d } from "../rng";
 import {
   DIVE,
+  diveShare,
   GUNS,
   NIGHT,
   PATROL,
   PIRATE,
+  plunderFactor,
   RESOURCES,
   STORMCALLER,
   BUILDINGS,
@@ -114,6 +116,8 @@ function bounty(state: GameState, p: PirateEntity): Goods {
   add(loot, { gold: 10 + Math.floor(roll(1) * 18) });
   if (roll(2) < 0.35) add(loot, { relic: 1 });
   if (roll(3) < 0.5) add(loot, { tools: 1 + Math.floor(roll(4) * 3) });
+  const factor = plunderFactor(state.world.tribe);
+  for (const r of RESOURCES) if (loot[r]) loot[r] *= factor;
   return loot;
 }
 
@@ -518,7 +522,7 @@ function dive(state: GameState, s: ShipEntity, dt: number): void {
   markDirty(state, s.id);
   if (job.remaining > 0) return;
   s.dive = null;
-  const share = Math.min(1, DIVE.share * s.passengers.length);
+  const share = Math.min(1, diveShare(state.world.tribe) * s.passengers.length);
   const haul: Goods = {};
   for (const r of RESOURCES) {
     const have = site.loot[r] ?? 0;

@@ -15,6 +15,7 @@ import {
   pickTile,
   RESOURCES,
   tileIndex,
+  worldPath,
   type BiomeId,
   type BuildingKind,
   type Command,
@@ -137,7 +138,7 @@ export class Game {
       this.overlay.screen,
     );
 
-    const invite = session.worldId ? `${location.origin}/w/${session.worldId}` : null;
+    const invite = session.worldId ? location.origin + worldPath(session.worldId) : null;
     this.hud = new Hud(
       root,
       atlas,
