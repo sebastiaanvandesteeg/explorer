@@ -1,18 +1,24 @@
 // Serialisation: full snapshots (join + persistence) and incremental patches (every tick).
 import type { TribeId } from "../tribes";
 import type { WorldMap } from "../world/types";
-import { SHIP_HP, type Stock, type UpgradeId } from "./catalogue";
+import { isDifficulty, type Difficulty } from "./difficulty";
+import { SIGNATURE_NODES } from "../world/biomes";
+import { NODES, SHIP_HP, type Stock, type UpgradeId } from "./catalogue";
 import {
   emptyState,
+  addEntity,
   addSites,
+  emptyStats,
   emptyStock,
   rebuildOccupancy,
   stockOf,
   type Entity,
   type GameEvent,
   type GameState,
+  type NodeEntity,
   type PirateEntity,
   type ShipEntity,
+  type Stats,
   type VillagerEntity,
 } from "./state";
 
@@ -33,6 +39,7 @@ export interface Patch {
   entities: WireEntity[];
   removed: number[];
   stock?: Stock;
+  stats?: Stats;
   /** Changed outpost stockpiles, by island id. */
   outposts?: Record<number, Stock>;
   /** Every upgrade owned so far, sent when one is bought. */
@@ -46,12 +53,18 @@ export interface Snapshot {
   seed: string;
   /** Older saves predate tribes; they load as Islanders. */
   tribe?: TribeId;
+  /** Older saves predate difficulty; they load as Normal. */
+  difficulty?: Difficulty;
   tick: number;
   time: number;
   nextId: number;
   stock: Stock;
   /** Game time of the next pirate raid. */
   nextRaid?: number;
+  nextStorm?: number;
+  stats?: Stats;
+  /** Set once the signature deposits have been seeded (older saves get them when they load). */
+  depositsSeeded?: true;
   /** Goods waiting on other islands, by island id. Older saves have none. */
   outposts?: Record<number, Stock>;
   upgrades?: UpgradeId[];
@@ -145,6 +158,7 @@ export function toSnapshot(state: GameState): Snapshot {
     version: 1,
     seed: state.world.seed,
     tribe: state.world.tribe,
+    difficulty: state.difficulty,
     tick: state.tick,
     time: state.time,
     nextId: state.nextId,
@@ -152,6 +166,9 @@ export function toSnapshot(state: GameState): Snapshot {
     outposts: Object.fromEntries([...state.outposts].map(([id, st]) => [id, { ...st }])),
     upgrades: [...state.upgrades],
     nextRaid: state.nextRaid,
+    nextStorm: state.nextStorm,
+    stats: { ...state.stats },
+    depositsSeeded: true,
     entities: [...state.entities.values()].map(toWire),
     explored: encodeRuns(state.explored),
     discovered: [...state.discovered],
@@ -163,7 +180,7 @@ export function toSnapshot(state: GameState): Snapshot {
  * the server replans their routes (paths are never serialised).
  */
 export function fromSnapshot(world: WorldMap, snap: Snapshot, resume = false): GameState {
-  const state = emptyState(world);
+  const state = emptyState(world, isDifficulty(snap.difficulty) ? snap.difficulty : "normal");
   state.tick = snap.tick;
   state.time = snap.time;
   state.nextId = snap.nextId;
@@ -172,6 +189,8 @@ export function fromSnapshot(world: WorldMap, snap: Snapshot, resume = false): G
     state.outposts.set(Number(id), { ...emptyStock(), ...st });
   state.upgrades = new Set(snap.upgrades ?? []);
   if (snap.nextRaid !== undefined) state.nextRaid = snap.nextRaid;
+  if (snap.nextStorm !== undefined) state.nextStorm = snap.nextStorm;
+  state.stats = { ...emptyStats(), ...snap.stats };
   state.explored = decodeRuns(snap.explored, world.width * world.height);
   state.discovered = new Set(snap.discovered);
   for (const w of snap.entities) {
@@ -184,9 +203,36 @@ export function fromSnapshot(world: WorldMap, snap: Snapshot, resume = false): G
   rebuildOccupancy(state);
   // Saves from before sunken sites existed get them now.
   if (![...state.entities.values()].some((e) => e.type === "site")) addSites(state);
+  if (!snap.depositsSeeded) seedSignatureDeposits(state);
   state.dirty.clear();
   state.stockDirty = false;
   return state;
+}
+
+/**
+ * Saves from before the Great Work have none of the signature deposits: put the world's in, on
+ * ground that is still free. This runs once per save (`depositsSeeded` marks the ones done).
+ */
+function seedSignatureDeposits(state: GameState): void {
+  const w = state.world;
+  for (const n of w.nodes) {
+    if (!SIGNATURE_NODES.includes(n.kind)) continue;
+    const k = n.y * w.width + n.x;
+    if (state.occupancy[k] !== 0) continue;
+    addEntity(state, {
+      id: state.nextId++,
+      type: "node",
+      kind: n.kind,
+      x: n.x,
+      y: n.y,
+      variant: n.variant,
+      amount: NODES[n.kind].amount,
+      stage: "grown",
+      timer: 0,
+      marked: false,
+      claimedBy: null,
+    } satisfies NodeEntity);
+  }
 }
 
 /** Collect everything that changed since the last patch and reset the change trackers. */
@@ -202,6 +248,10 @@ export function takePatch(state: GameState): Patch {
     if (e) patch.entities.push(toWire(e));
   }
   if (state.stockDirty) patch.stock = { ...state.stock };
+  if (state.statsDirty) {
+    patch.stats = { ...state.stats };
+    state.statsDirty = false;
+  }
   if (state.upgradesDirty) {
     patch.upgrades = [...state.upgrades];
     state.upgradesDirty = false;
@@ -228,6 +278,7 @@ export function patchIsEmpty(p: Patch): boolean {
     !p.stock &&
     !p.outposts &&
     !p.upgrades &&
+    !p.stats &&
     !p.revealed &&
     !p.events
   );
@@ -254,6 +305,7 @@ export function applyPatch(state: GameState, patch: Patch): void {
   }
   if (patch.stock) state.stock = { ...emptyStock(), ...patch.stock };
   if (patch.upgrades) state.upgrades = new Set(patch.upgrades);
+  if (patch.stats) state.stats = { ...emptyStats(), ...patch.stats };
   for (const [id, st] of Object.entries(patch.outposts ?? {}))
     state.outposts.set(Number(id), { ...emptyStock(), ...st });
   if (patch.revealed) {

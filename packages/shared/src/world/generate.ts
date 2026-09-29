@@ -3,7 +3,15 @@
 import { fbm } from "../noise";
 import { createRng, hash2d, hashSeed, type Rng } from "../rng";
 import { TRIBE_DEFS, type TribeId } from "../tribes";
-import { BIOME_DEFS, BIOMES, biomeIndex, NO_BIOME, type BiomeDef, type BiomeId } from "./biomes";
+import {
+  BIOME_DEFS,
+  BIOMES,
+  biomeIndex,
+  NO_BIOME,
+  SIGNATURE,
+  type BiomeDef,
+  type BiomeId,
+} from "./biomes";
 import { canStep, inBounds, isLandTerrain, NEIGHBOURS_4, NEIGHBOURS_8, tileIndex } from "./grid";
 import { findPath } from "./pathfind";
 import {
@@ -85,9 +93,50 @@ function attemptWorld(
   }
   world.nodes = placeNodes(world, base, reserved);
   if (!ensureHomeResources(world, base, reserved)) return null;
+  placeSignatureNodes(world, base, reserved);
   world.decor = placeDecor(world, base, reserved);
   world.sites = placeSites(world, base);
   return world;
+}
+
+/**
+ * Make sure every far biome carries the deposits its signature good comes from, on its real
+ * islands (not islets). Natural deposits count towards the total; the rest are added on free
+ * ground. Uses its own hash stream, so the ordinary nodes of a world are not disturbed.
+ */
+function placeSignatureNodes(world: WorldMap, base: number, reserved: Set<number>): void {
+  const taken = new Set(world.nodes.map((n) => tileIndex(world, n.x, n.y)));
+  for (const [biome, sig] of Object.entries(SIGNATURE) as [
+    BiomeId,
+    { node: NodeKind; deposits: number },
+  ][]) {
+    const islands = world.islands.filter((i) => i.biome === biome && i.flavor !== "islet");
+    if (islands.length === 0) continue;
+    const ids = new Set(islands.map((i) => i.id));
+    const have = world.nodes.filter(
+      (n) => n.kind === sig.node && ids.has(world.island[tileIndex(world, n.x, n.y)]!),
+    ).length;
+    if (have >= sig.deposits) continue;
+    const salt = hashSeed(`signature:${sig.node}`);
+    const free: { k: number; r: number }[] = [];
+    for (let k = 0; k < world.terrain.length; k++) {
+      if (!ids.has(world.island[k]!) || !isLandTerrain(world.terrain[k]!)) continue;
+      if (reserved.has(k) || taken.has(k)) continue;
+      const x = k % world.width;
+      const y = Math.floor(k / world.width);
+      free.push({ k, r: hash2d(x, y, base ^ salt) });
+    }
+    free.sort((a, b) => a.r - b.r);
+    for (const { k } of free.slice(0, sig.deposits - have)) {
+      taken.add(k);
+      world.nodes.push({
+        kind: sig.node,
+        x: k % world.width,
+        y: Math.floor(k / world.width),
+        variant: 0,
+      });
+    }
+  }
 }
 
 /**
@@ -604,6 +653,10 @@ export const NODE_VARIANTS: Record<NodeKind, number> = {
   glowshroom: 1,
   silver_tree: 2,
   crystal: 2,
+  sunstone: 1,
+  rimeglass: 1,
+  mirepearl: 1,
+  glowcap: 1,
   autumn_tree: 3,
   pumpkin: 1,
   blossom_tree: 2,

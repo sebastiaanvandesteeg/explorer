@@ -1,5 +1,7 @@
 import { inBounds, isLandTerrain, tileIndex } from "../world/grid";
 import { hash2d } from "../rng";
+import { DIFFICULTY_DEFS, type Difficulty } from "./difficulty";
+import { sightFactor } from "./light";
 import type { BiomeId } from "../world/biomes";
 import { Terrain, type Dir, type NodeKind, type SiteKind, type WorldMap } from "../world/types";
 import {
@@ -12,6 +14,7 @@ import {
   SHIP_HP,
   START_STOCK,
   START_VILLAGERS,
+  WEATHER,
   type BuildingKind,
   type Resource,
   type ShipKind,
@@ -36,6 +39,8 @@ export interface BuildingEntity {
   queue: { what: "villager" | "ship" | "cargo" | "patrol"; remaining: number }[];
   /** Villager staffing a workplace (camps, quarry, mine, farm, blacksmith, church). */
   workerId: number | null;
+  /** The Great Work: how many of its stages are finished. */
+  stage?: number;
   /** Production timer in seconds (farm growth, forging, prayer). */
   growth: number;
 }
@@ -154,6 +159,45 @@ export interface WreckEntity {
   loot: Partial<Stock>;
 }
 
+/** How the expedition is going, for the chronicle shown when the Great Work is complete. */
+export interface Stats {
+  /** Pirate ships sunk, our ships lost, and raids that reached a settlement. */
+  pirates: number;
+  shipsLost: number;
+  raids: number;
+  /** Goods cargo ships have brought home. */
+  hauled: number;
+  /** Wrecks looted and sunken sites dived. */
+  salvaged: number;
+  storms: number;
+  /** Game time the Great Work was finished, or null. */
+  wonderAt: number | null;
+}
+
+export const emptyStats = (): Stats => ({
+  pirates: 0,
+  shipsLost: 0,
+  raids: 0,
+  hauled: 0,
+  salvaged: 0,
+  storms: 0,
+  wonderAt: null,
+});
+
+/** A storm front: it drifts across the sea and hurts ships outside harbour. */
+export interface StormEntity {
+  id: number;
+  type: "storm";
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  radius: number;
+  /** Seconds since it formed, and how long it lasts. */
+  age: number;
+  life: number;
+}
+
 /** Sunken ruins and fortresses: unseen until a ship sails over them. */
 export interface SiteEntity {
   id: number;
@@ -174,7 +218,8 @@ export type Entity =
   | ShipEntity
   | PirateEntity
   | WreckEntity
-  | SiteEntity;
+  | SiteEntity
+  | StormEntity;
 
 export type GameEvent =
   | { type: "built"; kind: BuildingKind; x: number; y: number }
@@ -193,11 +238,15 @@ export type GameEvent =
       from: { x: number; y: number };
       to: { x: number; y: number };
     }
+  | { type: "storm"; x: number; y: number }
+  | { type: "wonder"; stage: number; final: boolean }
   | { type: "found"; site: SiteKind; x: number; y: number }
   | { type: "salvaged"; what: string; goods: Partial<Stock>; x: number; y: number };
 
 export interface GameState {
   world: WorldMap;
+  /** How hostile the world is; fixed when it is created. */
+  difficulty: Difficulty;
   time: number;
   tick: number;
   nextId: number;
@@ -211,6 +260,10 @@ export interface GameState {
   /** Game time of the next pirate raid, and of the next lightning strike. */
   nextRaid: number;
   nextBolt: number;
+  /** Game time the next storm forms. */
+  nextStorm: number;
+  stats: Stats;
+  statsDirty: boolean;
   /** Outpost islands whose stockpile changed since the last patch. */
   outpostsDirty: Set<number>;
   entities: Map<number, Entity>;
@@ -273,10 +326,11 @@ export function rebuildOccupancy(state: GameState): void {
   for (const e of state.entities.values()) occupy(state, e, true);
 }
 
-export function emptyState(world: WorldMap): GameState {
+export function emptyState(world: WorldMap, difficulty: Difficulty = "normal"): GameState {
   const n = world.width * world.height;
   return {
     world,
+    difficulty,
     time: 0,
     tick: 0,
     nextId: 1,
@@ -285,8 +339,11 @@ export function emptyState(world: WorldMap): GameState {
     outpostsDirty: new Set(),
     upgrades: new Set(),
     upgradesDirty: false,
-    nextRaid: PIRATE.firstRaid,
+    nextRaid: DIFFICULTY_DEFS[difficulty].firstRaid,
     nextBolt: 0,
+    nextStorm: WEATHER.first,
+    stats: emptyStats(),
+    statsDirty: false,
     entities: new Map(),
     explored: new Uint8Array(n),
     discovered: new Set(),
@@ -324,6 +381,7 @@ export function newBuilding(
     queue: [],
     workerId: null,
     growth: 0,
+    ...(kind === "great_work" ? { stage: 0 } : {}),
   };
 }
 
@@ -332,6 +390,11 @@ export const hasUpgrade = (state: GameState, id: UpgradeId): boolean => state.up
 /** How far ships see around them, in tiles. */
 export function shipReveal(state: GameState): number {
   return SHIP.reveal * (hasUpgrade(state, "far_sight") ? 1.6 : 1);
+}
+
+/** Hull points of a pirate ship in this world. */
+export function pirateMaxHp(state: GameState): number {
+  return Math.round(PIRATE.hp * DIFFICULTY_DEFS[state.difficulty].pirateHp);
 }
 
 export function shipMaxHp(state: GameState, kind: ShipKind): number {
@@ -362,6 +425,12 @@ export function stockOf(state: GameState, islandId: number): Stock {
 }
 
 /** Record that an island's stockpile changed so it goes out with the next patch. */
+/** Count something for the chronicle. */
+export function tally(state: GameState, key: Exclude<keyof Stats, "wonderAt">, n = 1): void {
+  state.stats[key] += n;
+  state.statsDirty = true;
+}
+
 export function touchStock(state: GameState, islandId: number): void {
   if (islandId === state.world.start.islandId || islandId < 0) state.stockDirty = true;
   else state.outpostsDirty.add(islandId);
@@ -455,8 +524,11 @@ export function addSites(state: GameState): void {
   }
 }
 
-export function createInitialState(world: WorldMap): GameState {
-  const state = emptyState(world);
+export function createInitialState(
+  world: WorldMap,
+  opts: { difficulty?: Difficulty } = {},
+): GameState {
+  const state = emptyState(world, opts.difficulty);
   const s = world.start;
   addEntity(state, newBuilding(state, "town_hall", s.townHall.x, s.townHall.y, true));
   addEntity(state, newBuilding(state, "dock", s.dock.x, s.dock.y, true, s.dock.dir));
@@ -514,6 +586,11 @@ export function reveal(state: GameState, cx: number, cy: number, r: number): voi
       }
     }
   }
+}
+
+/** Look around from a spot: like `reveal`, but a villager or ship sees less of the sea at night. */
+export function lookAround(state: GameState, x: number, y: number, r: number): void {
+  reveal(state, x, y, r * sightFactor(state, x, y));
 }
 
 /** Mark the centre of every island as seen, so the whole archipelago shows on the map. */

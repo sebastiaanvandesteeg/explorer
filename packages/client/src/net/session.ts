@@ -8,6 +8,7 @@ import {
   TICK_SECONDS,
   type Command,
   type CommandResult,
+  type Difficulty,
   type GameState,
   type Patch,
   type PlayerInfo,
@@ -57,9 +58,14 @@ export class LocalSession extends Emitter implements Session {
   readonly players: PlayerInfo[];
   private timer: ReturnType<typeof setInterval>;
 
-  constructor(seed: string, name: string, tribe: TribeId = "islanders") {
+  constructor(
+    seed: string,
+    name: string,
+    tribe: TribeId = "islanders",
+    difficulty: Difficulty = "normal",
+  ) {
     super();
-    this.state = createInitialState(generateWorld(seed, tribe));
+    this.state = createInitialState(generateWorld(seed, tribe), { difficulty });
     this.players = [{ id: this.you, name, color: PLAYER_COLORS[0], online: true }];
     this.timer = setInterval(() => {
       tick(this.state);

@@ -1,7 +1,20 @@
 // Threats and treasure at sea: pirate raids, ship combat, wrecks, sunken sites and divers.
 import { hash2d } from "../rng";
-import { DIVE, GUNS, PATROL, PIRATE, RESOURCES, STORM, BUILDINGS, type Stock } from "./catalogue";
+import {
+  DIVE,
+  GUNS,
+  NIGHT,
+  PATROL,
+  PIRATE,
+  RESOURCES,
+  STORMCALLER,
+  BUILDINGS,
+  type Stock,
+} from "./catalogue";
+import { nightLevel } from "./daylight";
+import { DIFFICULTY_DEFS } from "./difficulty";
 import { dockSpawn } from "./ferry";
+import { watched } from "./light";
 import { sailable, seaPath } from "./navigation";
 import { nearestWater } from "./rules";
 import {
@@ -9,9 +22,11 @@ import {
   hasUpgrade,
   islandAt,
   markDirty,
+  pirateMaxHp,
   removeEntity,
   shipMaxHp,
   stockOf,
+  tally,
   touchStock,
   walkable,
   type BuildingEntity,
@@ -58,6 +73,7 @@ export function updateThreats(state: GameState, dt: number): void {
 /** Take everything a wreck holds into the treasury and remove it. */
 export function collectWreck(state: GameState, w: WreckEntity): void {
   addToTreasury(state, w.loot);
+  tally(state, "salvaged");
   state.events.push({
     type: "salvaged",
     what: w.kind === "skeleton" ? "the bones of a raider" : "a shipwreck",
@@ -104,7 +120,7 @@ function bounty(state: GameState, p: PirateEntity): Goods {
 // ---------------------------------------------------------------------------------------------
 // Damage
 
-function damageShip(state: GameState, s: ShipEntity, dmg: number): void {
+export function damageShip(state: GameState, s: ShipEntity, dmg: number): void {
   s.hp -= dmg;
   markDirty(state, s.id);
   if (s.hp > 0) return;
@@ -114,6 +130,7 @@ function damageShip(state: GameState, s: ShipEntity, dmg: number): void {
   add(loot, { gold: 4 });
   leaveWreck(state, "shipwreck", Math.floor(s.x), Math.floor(s.y), loot);
   state.events.push({ type: "sunk", kind: s.kind, x: s.x, y: s.y });
+  tally(state, "shipsLost");
   removeEntity(state, s.id);
 }
 
@@ -122,6 +139,7 @@ function sinkPirate(state: GameState, p: PirateEntity): void {
   const tile = tileOf(p);
   const loot = bounty(state, p);
   state.events.push({ type: "sunk", kind: "pirate", x: p.x, y: p.y });
+  tally(state, "pirates");
   removeEntity(state, p.id);
   if (raiding) {
     // The crew was ashore when the ship went down: they leave bones on the beach.
@@ -151,12 +169,15 @@ function nearestLand(
 // Pirates
 
 function spawnRaids(state: GameState): void {
-  if (state.time < state.nextRaid) return;
-  const [lo, hi] = PIRATE.interval;
+  const rules = DIFFICULTY_DEFS[state.difficulty];
+  if (!rules.raids || state.time < state.nextRaid) return;
+  // Raiders come with the dark: a raid that falls due by day waits for dusk.
+  if (nightLevel(state.time) < NIGHT.raid) return;
+  const [lo, hi] = rules.interval;
   state.nextRaid = state.time + lo + hash2d(state.tick, 1, 0x9b) * (hi - lo);
   const alive = all<PirateEntity>(state, "pirate").length;
   const day = Math.floor(state.time / 480);
-  const count = Math.min(PIRATE.maxAtOnce - alive, 1 + Math.floor(day / 3));
+  const count = Math.min(rules.maxAtOnce - alive, 1 + rules.extraRaiders + Math.floor(day / 3));
   let first: PirateEntity | null = null;
   for (let i = 0; i < count; i++) {
     const p = spawnPirate(state, i);
@@ -183,7 +204,7 @@ function spawnPirate(state: GameState, index: number): PirateEntity | null {
       x: x + 0.5,
       y: y + 0.5,
       heading: 0,
-      hp: PIRATE.hp,
+      hp: pirateMaxHp(state),
       path: [],
       phase: "hunt",
       target: null,
@@ -210,7 +231,7 @@ function updatePirate(state: GameState, p: PirateEntity, dt: number): void {
   const foe = shipsNear(state, p, PIRATE.range)[0];
   if (foe && p.cooldown === 0) {
     p.cooldown = PIRATE.cooldown;
-    damageShip(state, foe, PIRATE.damage);
+    damageShip(state, foe, PIRATE.damage * DIFFICULTY_DEFS[state.difficulty].pirateDamage);
     state.events.push({
       type: "shot",
       kind: "cannon",
@@ -312,7 +333,13 @@ function raid(state: GameState, p: PirateEntity, dt: number): void {
   let took = 0;
   for (const r of RESOURCES) {
     const n = pile[r];
-    const take = Math.min(n, Math.max(n >= 8 ? 1 : 0, Math.floor(n * PIRATE.stealShare)));
+    const take = Math.min(
+      n,
+      Math.max(
+        n >= 8 ? 1 : 0,
+        Math.floor(n * PIRATE.stealShare * DIFFICULTY_DEFS[state.difficulty].steal),
+      ),
+    );
     if (take <= 0) continue;
     pile[r] -= take;
     p.loot[r] = (p.loot[r] ?? 0) + take;
@@ -321,8 +348,10 @@ function raid(state: GameState, p: PirateEntity, dt: number): void {
   if (took === 0) return;
   touchStock(state, island);
   markDirty(state, p.id);
-  if (total(p.loot) === took)
+  if (total(p.loot) === took) {
+    tally(state, "raids");
     state.events.push({ type: "robbed", islandId: island, x: b.x, y: b.y });
+  }
 }
 
 /** Advance along a sea path (pirates and patrol boats share the ship's stepping). */
@@ -407,7 +436,7 @@ function repair(state: GameState, s: ShipEntity, dt: number): void {
 function patrol(state: GameState, s: ShipEntity): void {
   if (s.salvage || s.dive || state.time < s.waitUntil) return;
   const prey = all<PirateEntity>(state, "pirate")
-    .filter((p) => dist(p, s) <= PATROL.engage)
+    .filter((p) => dist(p, s) <= PATROL.engage && watched(state, p.x, p.y))
     .sort((a, b) => dist(a, s) - dist(b, s))[0];
   if (!prey) {
     if (s.hunt) {
@@ -499,6 +528,7 @@ function dive(state: GameState, s: ShipEntity, dt: number): void {
     site.loot[r] = have - take;
   }
   addToTreasury(state, haul);
+  tally(state, "salvaged");
   markDirty(state, site.id);
   state.events.push({
     type: "salvaged",
@@ -529,12 +559,12 @@ function stormBolt(state: GameState): void {
   ];
   let best: PirateEntity | null = null;
   for (const p of all<PirateEntity>(state, "pirate")) {
-    if (!guarded.some((g) => dist(g, p) <= STORM.range)) continue;
+    if (!guarded.some((g) => dist(g, p) <= STORMCALLER.range)) continue;
     if (!best || p.hp < best.hp) best = p;
   }
   if (!best) return;
-  state.nextBolt = state.time + STORM.interval;
-  best.hp -= STORM.damage;
+  state.nextBolt = state.time + STORMCALLER.interval;
+  best.hp -= STORMCALLER.damage;
   markDirty(state, best.id);
   state.events.push({
     type: "shot",

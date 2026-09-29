@@ -41,11 +41,13 @@ Pick a tribe, start an expedition, then use **Copy invite link** to bring up to 
 | Pan    | Drag the ground, right/middle-drag, or WASD / arrow keys                                                                                                                                        |
 | Zoom   | Mouse wheel, `+` / `-`                                                                                                                                                                          |
 | Gather | `H`, then click or drag a box across trees, rocks and bushes (Shift to unmark)                                                                                                                  |
-| Build  | `1`–`9`, `0`, `P` or the build menu, then click. Shift-click keeps placing. Paths can be dragged                                                                                                |
+| Build  | `1`–`9`, `0`, `B` (dock), `L` (lighthouse), `P` (path) or the build menu, then click. Shift-click keeps placing. Paths can be dragged                                                           |
 | Select | Click a villager, ship, building or resource                                                                                                                                                    |
 | Order  | With a villager selected, right-click a resource, building, ship, bones or the ground. With a ship selected, right-click the sea, an island, a dock (cargo ships), a shipwreck or a sunken site |
 | Cancel | `Esc` or right-click                                                                                                                                                                            |
 | Chat   | `Enter`                                                                                                                                                                                         |
+| Map    | `M` opens the chart of the archipelago (or use the Map button by the minimap). `M` or `Esc` closes it                                                                                           |
+| Sound  | `N` mutes or unmutes (or the Sound button in the expedition panel). Your choice is remembered                                                                                                   |
 | Home   | `C` centres on the town hall                                                                                                                                                                    |
 
 ### Tribes
@@ -76,6 +78,25 @@ Every island belongs to one of ten biomes, with its own ground, cliffs, plants, 
 | Infernal Isles  | Far away    | Charred trees, ember fruit, obsidian, hellstone | Dark red, embers, grit     |
 | Crystal Spires  | Far away    | Silverleaf trees, crystal clusters              | Indigo, sparkling motes    |
 
+### Sound
+
+All the sound is synthesised in the browser with the Web Audio API: oscillators and filtered noise, no audio files (the same idea as the art). Browsers only allow sound after you click or press a key, so it starts with your first one.
+
+- **Ambience** follows where the camera is and what the world is doing: the sea and wind, rain in storms, insects at night, birds by day and owls after dark, and each biome's own voice (frogs in Murkmire, bubbling in the Fungal Hollows, crackling embers, crystal sparkles, blossom wind chimes).
+- **Things you can hear happen**: hammering when a building goes up, chopping and picking as villagers work, coins when cargo comes home, a horn for a new ship, an arpeggio for a new island, bells for a spell, cannon fire, thunder, a ship going down, a sonar ping for a sunken site, an alarm when raiders are sighted or rob you, and a slow chord for the Great Work.
+- **Placed in the world**: sounds on screen play at full volume and pan left or right by where they are; those off screen fade with distance.
+
+### The map
+
+Press **M** for the chart of the archipelago. It is drawn in the same isometric view as the game, so north-east on the chart is north-east on screen. Every island you have found has a name (made up from the world seed, so all players see the same ones). The chart shows:
+
+- your settlements: gold rings, the town hall as a star, docks in teal
+- each **trade route** as a dashed line from the dock a cargo ship collects at to the home dock
+- your ships as arrows, pirates as red dots (on water you have explored), shipwrecks and bones as crosses, and sunken sites you have found as diamonds
+- the box the camera is looking at
+
+Hover anything for details and click it to go there. The side list gives each settlement's stockpile (with a warning when goods can't leave: no dock, or no cargo ship serving the island), the whole fleet with hull points and orders, and every wreck and sunken site with the treasure left and its bearing from home.
+
 ### Magic house upgrades
 
 Each is learned once, for the whole team, and paid from the shared treasury with faith (from churches), gold (from the market and gold veins) and crystal (only found in the Crystal Spires).
@@ -89,10 +110,19 @@ Each is learned once, for the whole team, and paid from the shared treasury with
 | Deep Holds   | 40 gold, 5 crystal          | Cargo ships carry 50% more                                                   |
 | Seer's Chart | 60 faith, 10 crystal        | Marks every island on the map                                                |
 | Stormcaller  | 60 faith, 40 gold, 3 relics | Lightning strikes pirates near your settlements and ships                    |
+| Calm Waters  | 40 faith, 30 gold           | Storms cannot hurt your ships                                                |
 
 ### Pirates, wrecks and hidden treasure
 
-**Pirates.** After the first seven minutes a raiding ship sails in from the edge of the map every few minutes (more of them as the days pass, up to three at once). It hunts the nearest ship of yours, or beaches beside a storehouse, camp or dock and robs a share of that island's stockpile for eight seconds before sailing off with the loot. You get a toast with the direction it came from.
+**Pirates.** How often they come is the **difficulty** you pick when creating a world (it is saved with the world and shown next to the expedition name):
+
+| Difficulty | Raids                                                                                                                                         |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Peaceful   | None: explore, settle and trade in peace                                                                                                      |
+| Normal     | First raid after seven minutes, then one every few minutes, up to three ships at once                                                         |
+| Hard       | From five minutes (at dusk), more often, one extra raider each time, 40% tougher hulls, 25% harder-hitting guns and half again as much stolen |
+
+A raiding ship sails in from the edge of the map. It hunts the nearest ship of yours, or beaches beside a storehouse, camp or dock and robs a share of that island's stockpile for eight seconds before sailing off with the loot (more raiders arrive as the days pass). A red alert appears at the top of the screen for as long as raiders are in sight (see night, below), with the direction they are in and a **Look** button that takes the camera to them.
 
 - **Ships have hull points** (scout 30, cargo 45, patrol boat 70) and mend slowly beside a dock. A ship that sinks takes its passengers with it and leaves a wreck.
 - **Defences**, from cheap to grand:
@@ -104,11 +134,45 @@ Each is learned once, for the whole team, and paid from the shared treasury with
 
 **Under the sea.** Sunken ruins and a few fortresses lie in deep water, far from home. They stay hidden until a ship sails within three tiles, then show as a faint shape under the waves. Load a scout ship with villagers (they are the divers), sail over the site and press **Send divers** (or right-click the site). After 15 seconds each diver has brought up 30% of what is left. Fortresses hold gold, crystal, tools and several relics. Relics are a new resource that only wrecks and sites give; they pay for Stormcaller.
 
+### Signature goods and the Great Work
+
+Six far biomes each yield a good found nowhere else. They are deposits on that biome's islands (every world has enough), gathered like ore: a mine worker takes any of them within its radius, and villagers can be sent to mark and mine them by hand.
+
+| Good      | Biome           | Deposit                                              |
+| --------- | --------------- | ---------------------------------------------------- |
+| Sunstone  | Sunscorch Dunes | amber gems in the sand                               |
+| Rimeglass | Frostreach      | tall shards of ice                                   |
+| Mirepearl | Murkmire        | pearl beds in the bog                                |
+| Glowcap   | Fungal Hollows  | glowing mushroom caps                                |
+| Hellstone | Infernal Isles  | black rock veined with lava (it no longer gives ore) |
+| Crystal   | Crystal Spires  | crystal clusters                                     |
+
+Goods gathered on another island wait in its pile until a cargo ship brings them home, which is what the trade routes are for.
+
+**The Great Work** is the monument the expedition is building towards. It takes 4×4 tiles on the home island, and only one can be built. Every stage is paid from the treasury when you press **Fund**, and then villagers raise it, so the monument grows through the game:
+
+1. **Foundation**: 120 wood, 160 stone, 15 tools (paid when you place it).
+2. **Pillars**: 120 stone, 40 gold, 15 tools and 40 each of sunstone, rimeglass, mirepearl and glowcap.
+3. **The Crown**: 40 faith, 100 gold, 20 tools, 6 relics, 60 hellstone and 60 crystal.
+
+Your own home biome's good is not asked for (Northfolk need no rimeglass, Sunfolk no sunstone). The panel shows what each stage needs, what the treasury holds and where to look for each good, including the islands you have found for it. When the last stage is done everyone sees the **chronicle**: days at sea, islands found and settled, goods hauled home, wrecks salvaged, pirates sunk, ships lost, raids, storms and upgrades. The game carries on afterwards, and the chronicle can be read again from the monument. A tiered top bar wraps onto a second row when you hold a lot of different goods.
+
 ### Day and night
 
-One day lasts eight minutes of game time and starts in the morning. The HUD clock under the expedition name shows the day, the part of the day and the time. Dawn is warm, dusk golden, and night deep blue with fireflies, while houses, churches, the town hall and forges light their windows. It changes how the world looks, not how it plays.
+One day lasts eight minutes of game time and starts in the morning. The HUD clock under the expedition name shows the day, the part of the day and the time. Dawn is warm, dusk golden, and night deep blue with fireflies, while houses, churches, the town hall and forges light their windows.
 
 ![Midday, dusk and night in the same settlement](docs/daynight.webp)
+
+Night is not only scenery:
+
+- **Raids come at dusk.** A raid that falls due by day waits for the sun to go down.
+- **Lookouts go blind.** By day your buildings keep watch over 14 tiles of sea and your ships over 10. After dark that shrinks to what their own lamps light: 6 and 4 tiles. Raiders outside that are unseen: they don't show on the screen, the minimap or the chart, don't raise the alert, and patrol boats won't chase them.
+- **Ships and villagers see less** of the sea at night (up to 40% less), so exploring in the dark reveals less.
+- **The lighthouse** (60 wood, 60 stone, 10 tools) fixes all three: its beam watches 24 tiles, day and night, sweeping over the sea after dark. Within its reach raiders are seen, patrol boats keep hunting and ships keep their full sight. Finishing one also reveals 16 tiles around it. Every tribe builds its own.
+
+### Storms
+
+A storm front forms at the edge of the map every few minutes and drifts across the sea for a couple of minutes, with rain and lightning over it. Any ship inside it, yours or a pirate's, loses hull points until it sails out, unless it is moored at a finished dock (within four tiles of the pier). A toast tells you when one forms, and an alert appears while one is closing on ships of yours that are out in the open. Cargo ships wait in port while a storm sits on their route. **Calm Waters** (magic house) makes your ships immune. In a Peaceful world storms are only weather; on Hard they hit half again as hard and come more often.
 
 ### How a settlement grows
 
@@ -117,7 +181,7 @@ One day lasts eight minutes of game time and starts in the morning. The HUD cloc
 - **Workplaces** take one worker each:
   - Lumber camps fell trees, quarries break rocks, and mines dig ore, gold and crystal, all within a radius.
   - Farms grow food. The blacksmith forges 2 ore into 1 set of tools. The church gathers faith.
-- **Advanced buildings** need tools: the market (sell lots of 10 goods for gold, or buy basics), the church and the magic house. The magic house sells upgrades (see below).
+- **Advanced buildings** need tools: the market (sell lots of 10 goods for gold, or buy basics), the church, the lighthouse and the magic house. The magic house sells upgrades (see below).
 - **Exploring:** the dock builds scout ships. Sailing clears the fog for everyone, and each newly found island is announced.
 - **Settling:** select a ship next to the shore (or at the pier) and press **Take a villager aboard**, or right-click the ship with a villager selected. Then right-click another island to sail there and put everyone ashore. Once your villagers stand on an island you can build there. Put up a storehouse first, so they have somewhere to drop off goods.
 - **Trade routes:** each island keeps its own stockpile. Goods gathered at home go into the shared treasury that pays for everything; goods gathered on another island wait in a pile on that island until a cargo ship brings them home.
@@ -130,13 +194,13 @@ One day lasts eight minutes of game time and starts in the morning. The HUD cloc
 ```
 packages/shared   @explorer/shared: deterministic core used by client and server
   iso.ts            2:1 isometric projection and elevation-aware picking
-  world/            seeded archipelago generation, A* pathfinding
-  sim/              catalogue, state, commands, 10 Hz tick, pirates and diving, snapshots and patches
+  world/            seeded archipelago generation, island names, A* pathfinding
+  sim/              catalogue, state, commands, 10 Hz tick, pirates, weather, lookouts and diving, snapshots and patches
   protocol.ts       WebSocket message types
 packages/art      @explorer/art: the colour palette and the per-pixel terrain painter
   terrain/          smooth fields from the tile data, ray-marched land, cliffs and water
 packages/server   @explorer/server: node:http + ws, world rooms, JSON persistence
-packages/client   @explorer/client: PixiJS v8 renderer, input, DOM HUD, sessions
+packages/client   @explorer/client: PixiJS v8 renderer, input, DOM HUD, map screen, synthesised sound, sessions
 tools/sprites     palette extraction and the sprite generator → client/public/assets
 ```
 
@@ -199,6 +263,5 @@ Server environment variables: `PORT` (8787), `HOST`, `DATA_DIR` (`data/worlds`),
 
 ## Not built yet
 
-- Sound
 - Accounts beyond name + token
 - Deployment

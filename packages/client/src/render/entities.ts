@@ -1,10 +1,12 @@
 import {
   PATROL,
-  PIRATE,
   CARGO,
+  pirateMaxHp,
   SHIP,
   shipMaxHp,
+  stormStrength,
   VILLAGER,
+  watched,
   HALF_H,
   HALF_W,
   isLandTerrain,
@@ -18,6 +20,7 @@ import {
   type PirateEntity,
   type ShipEntity,
   type SiteEntity,
+  type StormEntity,
   type WreckEntity,
   type VillagerEntity,
   type WorldMap,
@@ -72,6 +75,30 @@ function glowTexture(): Texture {
   return glow;
 }
 
+let beamTex: Texture | null = null;
+
+/** A lighthouse beam: a wedge of warm light fading with distance, pointing along +x. */
+function beamTexture(): Texture {
+  if (beamTex) return beamTex;
+  const c = document.createElement("canvas");
+  c.width = 360;
+  c.height = 48;
+  const ctx = c.getContext("2d")!;
+  const g = ctx.createLinearGradient(0, 0, 360, 0);
+  g.addColorStop(0, "rgba(255, 236, 170, 0.85)");
+  g.addColorStop(0.35, "rgba(255, 214, 120, 0.32)");
+  g.addColorStop(1, "rgba(255, 200, 100, 0)");
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.moveTo(0, 24);
+  ctx.lineTo(360, 9);
+  ctx.lineTo(360, 39);
+  ctx.closePath();
+  ctx.fill();
+  beamTex = Texture.from(c);
+  return beamTex;
+}
+
 interface Smoke {
   sprite: Sprite;
   age: number;
@@ -84,6 +111,8 @@ abstract class View {
   abstract readonly root: Container;
   /** Flat things sit in the ground layer, under everything that stands up. */
   readonly flat: boolean = false;
+  /** Weather and the like sit above everything in the world. */
+  readonly overhead: boolean = false;
   abstract update(e: Entity, now: number): void;
   frame(_now: number, _dt: number): void {}
   destroy(): void {
@@ -103,6 +132,10 @@ class BuildingView extends View {
   sparkleAt: { x: number; y: number }[] = [];
   private lightAt: { x: number; y: number; r: number }[] = [];
   private lights: Sprite[] = [];
+  /** A lighthouse's sweeping beam: two opposite wedges, squashed into the isometric view. */
+  private beam: Container | null = null;
+  private beamSweep: Container | null = null;
+  private beamAt: { x: number; y: number } | null = null;
   private smokeTimer = 0;
   private sparkleTimer = 0;
 
@@ -149,6 +182,7 @@ class BuildingView extends View {
         this.smokeAt = b.complete && meta?.smoke ? meta.smoke : [];
         this.sparkleAt = b.complete && meta?.sparkle ? meta.sparkle : [];
         this.setLights(b.complete && meta?.lights ? meta.lights : []);
+        this.setBeam(b.complete && meta?.beam ? (meta.beam[0] ?? null) : null);
       }
     }
     this.root.position.set(screenX(b.x, b.y), screenY(b.x, b.y) - h);
@@ -192,21 +226,53 @@ class BuildingView extends View {
     });
   }
 
+  private setBeam(at: { x: number; y: number } | null): void {
+    this.beam?.destroy({ children: true });
+    this.beam = null;
+    this.beamSweep = null;
+    this.beamAt = at;
+    if (!at) return;
+    const sweep = new Container();
+    for (const angle of [0, Math.PI]) {
+      const wedge = new Sprite(beamTexture());
+      wedge.anchor.set(0, 0.5);
+      wedge.rotation = angle;
+      wedge.blendMode = "add";
+      sweep.addChild(wedge);
+    }
+    const beam = new Container();
+    // A beam sweeping level around a tower looks like an ellipse from the isometric camera.
+    beam.scale.y = 0.5;
+    beam.addChild(sweep);
+    this.layer.lights.addChild(beam);
+    this.beam = beam;
+    this.beamSweep = sweep;
+  }
+
   override destroy(): void {
     for (const l of this.lights) l.destroy();
+    this.beam?.destroy({ children: true });
     super.destroy();
   }
 
   private shine(now: number): void {
     const night = this.layer.night;
+    if (this.beam && this.beamSweep && this.beamAt) {
+      this.beam.visible = night > 0.02 && this.root.visible;
+      this.beam.position.set(this.root.x + this.beamAt.x, this.root.y + this.beamAt.y);
+      this.beamSweep.rotation = now / 2400;
+      this.beam.alpha = Math.min(1, night * 1.1);
+    }
     this.lights.forEach((s, i) => {
       const at = this.lightAt[i]!;
       s.visible = night > 0.02 && this.root.visible;
       if (!s.visible) return;
       s.position.set(this.root.x + at.x, this.root.y + at.y);
-      s.scale.set((at.r * 2.4) / 64);
+      s.scale.set((at.r * (this.kind === "lighthouse" ? 3 : 2.4)) / 64);
       // A gentle flicker, out of step from window to window.
-      s.alpha = night * (0.62 + 0.14 * Math.sin(now / 230 + i * 2.1 + this.root.x));
+      // The lantern room is six overlapping glows: keep them gentler than a window's.
+      const gain = this.kind === "lighthouse" ? 0.4 : 1;
+      s.alpha = night * gain * (0.62 + 0.14 * Math.sin(now / 230 + i * 2.1 + this.root.x));
     });
   }
 
@@ -227,7 +293,7 @@ class BuildingView extends View {
   }
 
   override frame(now: number, dt: number): void {
-    if (this.lights.length > 0) this.shine(now);
+    if (this.lights.length > 0 || this.beam) this.shine(now);
     if (!this.root.visible) return;
     if (this.smokeAt.length > 0) {
       this.smokeTimer -= dt;
@@ -436,7 +502,7 @@ class PirateView extends MovingView {
     const name = `pirate_${p.heading % 8}`;
     this.sprite.texture = this.layer.atlas.texture(name);
     this.layer.atlas.anchor(this.sprite, name);
-    hullBar(this.bar, p.hp, PIRATE.hp);
+    hullBar(this.bar, p.hp, pirateMaxHp(this.layer.state));
   }
 
   override frame(now: number, dt: number): void {
@@ -444,9 +510,11 @@ class PirateView extends MovingView {
     if (!p) return;
     this.interpolate(now);
     const world = this.layer.state.world;
-    // Raiders in the fog stay unseen until someone explores the water they sail on.
+    // Raiders are only seen on water someone has explored, and after dark only where a lamp or a
+    // lighthouse's beam reaches.
     this.root.visible =
-      this.layer.state.explored[tileIndex(world, Math.floor(this.x), Math.floor(this.y))] === 1;
+      this.layer.state.explored[tileIndex(world, Math.floor(this.x), Math.floor(this.y))] === 1 &&
+      watched(this.layer.state, this.x, this.y);
     const bob = Math.round(Math.sin(now / 480 + p.id) * 1);
     this.root.position.set(
       Math.round(screenX(this.x, this.y)),
@@ -465,6 +533,113 @@ class PirateView extends MovingView {
         );
       }
     }
+  }
+}
+
+/** A storm front: dark swirling cloud over the sea, rain and the odd flash of lightning. */
+class StormView extends MovingView {
+  readonly root = new Container();
+  override readonly overhead = true;
+  private readonly cloud = new Graphics();
+  private readonly rain = new Graphics();
+  private readonly flash = new Graphics();
+  private s: StormEntity | null = null;
+  private flashLeft = 0;
+  private nextFlash = 2;
+  /** Fixed random offsets inside the storm's disc, so the cloud and rain do not jitter. */
+  private readonly blobs: { u: number; v: number; r: number }[] = [];
+  private readonly drops: { u: number; v: number; speed: number }[] = [];
+
+  constructor(private readonly layer: EntityLayer) {
+    super();
+    this.root.addChild(this.cloud, this.rain, this.flash);
+    let seed = 7;
+    const rand = () => {
+      seed = (seed * 16807) % 2147483647;
+      return seed / 2147483647;
+    };
+    for (let i = 0; i < 18; i++) {
+      const a = rand() * Math.PI * 2;
+      const d = Math.sqrt(rand()) * 0.85;
+      this.blobs.push({ u: Math.cos(a) * d, v: Math.sin(a) * d, r: 0.28 + rand() * 0.3 });
+    }
+    for (let i = 0; i < 110; i++) {
+      const a = rand() * Math.PI * 2;
+      const d = Math.sqrt(rand());
+      this.drops.push({ u: Math.cos(a) * d, v: Math.sin(a) * d, speed: 0.7 + rand() * 0.6 });
+    }
+  }
+
+  update(e: Entity, now: number): void {
+    const s = e as StormEntity;
+    this.track(s.x, s.y, now, this.s === null);
+    this.s = s;
+  }
+
+  override frame(now: number, dt: number): void {
+    const s = this.s;
+    if (!s) return;
+    this.interpolate(now);
+    const state = this.layer.state;
+    const w = state.world;
+    const cx = Math.floor(this.x);
+    const cy = Math.floor(this.y);
+    const seen =
+      cx >= 0 &&
+      cy >= 0 &&
+      cx < w.width &&
+      cy < w.height &&
+      state.explored[tileIndex(w, cx, cy)] === 1;
+    this.root.visible = seen;
+    if (!seen) return;
+    const strength = stormStrength(s);
+    this.root.position.set(screenX(this.x, this.y), screenY(this.x, this.y));
+    // A world circle is an ellipse in the isometric view.
+    const rx = s.radius * Math.SQRT2 * HALF_W;
+    const ry = s.radius * Math.SQRT2 * HALF_H;
+    const t = now / 1000;
+
+    this.cloud.clear();
+    // Soft edges: nested discs, darkest at the eye.
+    for (const k of [1, 0.85, 0.7, 0.55, 0.4, 0.25])
+      this.cloud.ellipse(0, 0, rx * k, ry * k).fill({ color: 0x0b1a26, alpha: 0.1 * strength });
+    for (const [i, b] of this.blobs.entries()) {
+      // The blobs circle the eye slowly, so the cloud seems to churn.
+      const a = t * (0.12 + (i % 3) * 0.03) * (i % 2 ? 1 : -1);
+      const u = b.u * Math.cos(a) - b.v * Math.sin(a);
+      const v = b.u * Math.sin(a) + b.v * Math.cos(a);
+      this.cloud
+        .ellipse(u * rx, v * ry, b.r * rx, b.r * ry)
+        .fill({ color: i % 4 === 0 ? 0x1c2c3c : 0x0e1c28, alpha: 0.11 * strength });
+    }
+
+    this.rain.clear();
+    for (const d of this.drops) {
+      const fall = (t * d.speed * 1.6 + d.u * 3.1) % 1;
+      const px = d.u * rx * 0.95 - fall * 14;
+      const py = d.v * ry * 0.95 + (fall - 0.5) * 60;
+      this.rain.moveTo(px, py).lineTo(px - 3, py + 8);
+    }
+    this.rain.stroke({ color: 0xbcd4e8, width: 1, alpha: 0.5 * strength });
+
+    this.nextFlash -= dt;
+    if (this.nextFlash <= 0 && strength > 0.4) {
+      this.nextFlash = 2.5 + Math.random() * 5;
+      this.flashLeft = 0.28;
+      const a = Math.random() * Math.PI * 2;
+      const d = Math.sqrt(Math.random()) * s.radius * 0.8;
+      this.layer.shot(
+        "bolt",
+        { x: this.x + Math.cos(a) * d, y: this.y + Math.sin(a) * d },
+        { x: this.x + Math.cos(a) * d, y: this.y + Math.sin(a) * d },
+      );
+    }
+    this.flashLeft = Math.max(0, this.flashLeft - dt);
+    this.flash.clear();
+    if (this.flashLeft > 0)
+      this.flash
+        .ellipse(0, 0, rx, ry)
+        .fill({ color: 0xe8f0ff, alpha: (this.flashLeft / 0.28) * 0.28 });
   }
 }
 
@@ -661,7 +836,7 @@ export class EntityLayer {
       if (!v) {
         v = this.create(e);
         this.views.set(id, v);
-        (v.flat ? this.ground : this.container).addChild(v.root);
+        (v.overhead ? this.effects : v.flat ? this.ground : this.container).addChild(v.root);
       }
       v.update(e, now);
       if (e.type === "building" && isNew) this.onFootprintChange(e);
@@ -696,6 +871,8 @@ export class EntityLayer {
         return new WreckView(this);
       case "site":
         return new SiteView(this);
+      case "storm":
+        return new StormView(this);
     }
   }
 
@@ -707,7 +884,14 @@ export class EntityLayer {
         r.x < view.right + 64 &&
         r.y > view.top - 32 &&
         r.y < view.bottom + 96;
-      if (v instanceof VillagerView || v instanceof ShipView || v instanceof PirateView || onScreen)
+      // Big or fast things are always kept up to date; the rest only while they are on screen.
+      if (
+        v instanceof VillagerView ||
+        v instanceof ShipView ||
+        v instanceof PirateView ||
+        v instanceof StormView ||
+        onScreen
+      )
         v.frame(now, dt);
     }
     // Chimney smoke rises, drifts and fades.

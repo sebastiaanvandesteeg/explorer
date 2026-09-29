@@ -1,23 +1,17 @@
 import {
-  BIOMES,
   BUILDINGS,
   canAfford,
+  DIFFICULTY_DEFS,
   CARGO,
   cargoCost,
-  cargoCapacity,
-  cargoLoad,
   DIVE,
   PATROL,
-  PIRATE,
-  shipMaxHp,
-  type PirateEntity,
-  type SiteEntity,
-  type WreckEntity,
   CHURCH,
   clockText,
   dayPeriod,
   discoveryName,
   FARM,
+  greatWorkStages,
   islandAt,
   MARKET_BUYABLE,
   MARKET_LOT,
@@ -30,16 +24,18 @@ import {
   shipCost,
   SMITH,
   stockOf,
-  Terrain,
+  stormStrength,
   tileIndex,
   TRIBE_DEFS,
   UPGRADE_IDS,
   UPGRADES,
   VILLAGER,
+  WATCH,
   type BiomeId,
   type BuildingEntity,
   type BuildingKind,
   type Command,
+  type Difficulty,
   type Entity,
   type GameState,
   type NodeEntity,
@@ -53,9 +49,14 @@ import {
 } from "@explorer/shared";
 import type { Atlas } from "../assets";
 import type { SessionStatus } from "../net/session";
-import { ATMOSPHERE, OCEAN } from "../render/biomeStyle";
 import { buildingThumb, villagerSprite } from "../render/names";
+import { describeIsland, describePirate, describeShip, goodsText, nearestSite } from "./describe";
+import { chronicleRows, stageRows } from "./greatWork";
 import { h } from "./dom";
+import { currentStorm, currentThreat, pirateSpotted } from "./mapData";
+import { MapScreen } from "./mapscreen";
+import { abgr, mapColours } from "./mapColours";
+import { ICON, LABEL, RARE } from "./resources";
 
 export type Tool =
   { kind: "select" } | { kind: "build"; building: BuildingKind } | { kind: "harvest" };
@@ -65,35 +66,17 @@ export interface HudActions {
   command(cmd: Command): void;
   chat(text: string): void;
   focusTile(x: number, y: number): void;
+  select(id: number): void;
   deselect(): void;
+  state(): GameState;
+  /** The four corners of what the camera shows, in tile coordinates. */
+  view(): { x: number; y: number }[];
+  /** Mute or unmute the sound; returns whether it is muted now. */
+  toggleSound(): boolean;
 }
 
-const ICON: Record<Resource, string> = {
-  wood: "icon_wood",
-  stone: "icon_stone",
-  food: "icon_food",
-  ore: "icon_ore",
-  tools: "icon_tools",
-  gold: "icon_gold",
-  faith: "icon_faith",
-  crystal: "icon_crystal",
-  relic: "icon_relic",
-};
-
-const LABEL: Record<Resource, string> = {
-  wood: "Wood",
-  stone: "Stone",
-  food: "Food",
-  ore: "Ore",
-  tools: "Tools",
-  gold: "Gold",
-  faith: "Faith",
-  crystal: "Crystal",
-  relic: "Relic",
-};
-
-export function discoveryText(biome: BiomeId): string {
-  return `Discovered ${discoveryName(biome)}!`;
+export function discoveryText(name: string, biome: BiomeId): string {
+  return `Discovered ${name} (${discoveryName(biome)})!`;
 }
 
 export class Hud {
@@ -109,6 +92,10 @@ export class Hud {
     extra?: HTMLElement;
     /** Magic house: one row per upgrade, restyled when it is learned. */
     upgrades?: { id: UpgradeId; row: HTMLElement; btn: HTMLButtonElement }[];
+    /** The Great Work: the stage list, redrawn when it changes, and its own buttons. */
+    great?: HTMLElement;
+    greatKey?: string;
+    greatButtons?: { el: HTMLButtonElement; enabled: () => boolean }[];
     bar?: HTMLElement;
     buttons: { el: HTMLButtonElement; enabled: () => boolean }[];
   } = { buttons: [] };
@@ -124,6 +111,11 @@ export class Hud {
   private biomeEl: HTMLElement;
   private biomeTimer: ReturnType<typeof setTimeout> | null = null;
   readonly minimap: Minimap;
+  readonly map: MapScreen;
+  private alertEl: HTMLElement;
+  private titleEl: HTMLElement;
+  private soundBtn: HTMLButtonElement;
+  private alertKey = "";
 
   constructor(
     parent: HTMLElement,
@@ -208,15 +200,24 @@ export class Hud {
     this.playersEl = h("div");
     this.clockEl = h("div.clock", { title: "Time of day: the same for everyone in the world" });
     const tribeDef = TRIBE_DEFS[tribe];
+    this.soundBtn = h(
+      "button.btn.mini.sound",
+      {
+        title: "Turn the sound on or off (N)",
+        onclick: () => this.setSound(actions.toggleSound()),
+      },
+      "Sound: on",
+    ) as HTMLButtonElement;
+    this.titleEl = h(
+      "h3",
+      { title: `${tribeDef.description} ${tribeDef.bonusText}.` },
+      h("span.dot", { style: { background: tribeDef.banner } }),
+      `Expedition · ${tribeDef.name}`,
+    );
     const players = h(
       "div.players.panel",
       {},
-      h(
-        "h3",
-        { title: `${tribeDef.description} ${tribeDef.bonusText}.` },
-        h("span.dot", { style: { background: tribeDef.banner } }),
-        `Expedition · ${tribeDef.name}`,
-      ),
+      this.titleEl,
       this.clockEl,
       this.playersEl,
       inviteUrl
@@ -237,10 +238,22 @@ export class Hud {
           )
         : null,
       this.statusEl,
+      this.soundBtn,
     );
 
     this.minimap = new Minimap((x, y) => actions.focusTile(x, y));
-    const minimap = h("div.minimap.panel", {}, this.minimap.canvas);
+    this.map = new MapScreen(atlas, actions);
+    const minimap = h(
+      "div.minimap.panel",
+      {},
+      this.minimap.canvas,
+      h(
+        "button.btn.mini.map-btn",
+        { title: "Open the chart of the archipelago (M)", onclick: () => this.map.toggle() },
+        "Map",
+        h("span.kbd", {}, "M"),
+      ),
+    );
 
     this.chatLog = h("div.chat-log");
     this.chatInput = h("input.field", {
@@ -259,6 +272,8 @@ export class Hud {
     const chat = h("div.chat", {}, this.chatLog, this.chatInput);
 
     this.toastsEl = h("div.toasts");
+    this.alertEl = h("div.alerts");
+    const notices = h("div.notices", {}, this.alertEl, this.toastsEl);
     this.helpEl = h("div.help.panel");
     this.bannerEl = h("div.banner.panel", { style: { display: "none" } });
     this.biomeEl = h("div.biome-label");
@@ -271,12 +286,30 @@ export class Hud {
       players,
       minimap,
       chat,
-      this.toastsEl,
+      notices,
       this.helpEl,
       this.bannerEl,
       this.biomeEl,
+      this.map.root,
     );
     parent.append(this.root);
+    // Everything under the resource bar makes room when the bar wraps onto a second row.
+    const fit = () => this.root.style.setProperty("--hud-top", `${resources.offsetHeight + 24}px`);
+    fit();
+    if (typeof ResizeObserver !== "undefined") new ResizeObserver(fit).observe(resources);
+  }
+
+  /** Show whether the sound is muted. */
+  setSound(muted: boolean): void {
+    this.soundBtn.textContent = muted ? "Sound: off" : "Sound: on";
+    this.soundBtn.classList.toggle("off", muted);
+  }
+
+  /** Note the world's difficulty in the expedition title, unless it is the ordinary one. */
+  setDifficulty(difficulty: Difficulty): void {
+    if (difficulty === "normal") return;
+    const def = DIFFICULTY_DEFS[difficulty];
+    this.titleEl.append(h("span.tag", { title: def.description }, def.name));
   }
 
   focusChat(): void {
@@ -300,7 +333,7 @@ export class Hud {
       const el = this.resEls.get(r)!;
       el.textContent = String(stock[r]);
       // Advanced resources stay hidden until the settlement has some.
-      if (["ore", "tools", "gold", "faith", "crystal", "relic"].includes(r)) {
+      if (RARE.includes(r as Resource)) {
         el.parentElement!.classList.toggle(
           "empty",
           stock[r] === 0 && !(this.lastStock && this.lastStock[r] > 0),
@@ -351,6 +384,68 @@ export class Hud {
   banner(text: string | null): void {
     this.bannerEl.style.display = text ? "" : "none";
     this.bannerEl.textContent = text ?? "";
+  }
+
+  /**
+   * The alerts: pirates in sight and storms closing on ships, each with a button to go and look.
+   * They stay up for as long as the danger does.
+   */
+  setAlerts(state: GameState): void {
+    // `locate` is asked again when the button is pressed: the raiders and the storm keep moving.
+    const rows: {
+      key: string;
+      text: string;
+      look: string;
+      locate: () => { x: number; y: number } | undefined;
+    }[] = [];
+    const threat = currentThreat(state);
+    if (threat) {
+      const where = threat.target
+        ? describeIsland(state, islandAt(state, threat.target.x, threat.target.y))
+        : null;
+      rows.push({
+        key: "pirates",
+        text:
+          threat.raiding > 0 && where
+            ? `Pirates are robbing ${where}!`
+            : `${threat.pirates} pirate ship${threat.pirates === 1 ? "" : "s"} in sight to the ${threat.direction}`,
+        look: "Go to the nearest pirate ship",
+        locate: () => currentThreat(this.actions.state())?.nearest,
+      });
+    }
+    const storm = currentStorm(state);
+    if (storm) {
+      rows.push({
+        key: "storm",
+        text: `A storm from the ${storm.direction} is closing on ${storm.ships} of your ships: bring them into harbour`,
+        look: "Go to the storm",
+        locate: () => currentStorm(this.actions.state())?.storm,
+      });
+    }
+    const key = rows.map((r) => r.text).join("|");
+    if (key === this.alertKey) return;
+    this.alertKey = key;
+    this.alertEl.replaceChildren(
+      ...rows.map((r) =>
+        h(
+          `div.alert.panel${r.key === "storm" ? ".storm" : ""}`,
+          {},
+          h("span.siren", {}, r.key === "storm" ? "~" : "!"),
+          h("span", {}, r.text),
+          h(
+            "button.btn.mini",
+            {
+              title: r.look,
+              onclick: () => {
+                const at = r.locate();
+                if (at) this.actions.focusTile(at.x + 0.5, at.y + 0.5);
+              },
+            },
+            "Look",
+          ),
+        ),
+      ),
+    );
   }
 
   toast(text: string, kind: "info" | "error" = "info"): void {
@@ -422,8 +517,125 @@ export class Hud {
     this.updateSelection(state, e);
   }
 
+  /** The Great Work's stage list: what each stage needs, what the treasury holds, and Fund. */
+  private renderGreatWork(
+    state: GameState,
+    gw: BuildingEntity,
+    refs: typeof this.selectionRefs,
+  ): void {
+    const rows = stageRows(state, gw);
+    const key = JSON.stringify([
+      gw.stage,
+      gw.complete,
+      rows.map((r) => r.cost.map((c) => c.have)),
+      state.discovered.size,
+    ]);
+    if (key === refs.greatKey || !refs.great) return;
+    refs.greatKey = key;
+    refs.greatButtons = [];
+    const icon = (res: Resource) => {
+      const el = h("span.icon");
+      if (this.atlas.has(ICON[res])) Object.assign(el.style, this.atlas.iconStyle(ICON[res], 1));
+      return el;
+    };
+    const stateLabel = { done: "Complete", building: "Being built…", next: "", later: "" } as const;
+    const nodes: HTMLElement[] = rows.map((r) => {
+      const head = h(
+        "div.gw-head",
+        {},
+        h("strong", {}, `${r.index + 1}. ${r.name}`),
+        h("small", {}, stateLabel[r.state]),
+      );
+      if (r.state === "done") return h("div.gw-stage.done", {}, head);
+      const goods = h(
+        "div.gw-goods",
+        {},
+        ...r.cost.map((c) =>
+          h(
+            `div.gw-good${c.have >= c.need ? ".ok" : ""}`,
+            { title: LABEL[c.res] },
+            icon(c.res),
+            h("span.n", {}, `${Math.min(c.have, c.need)}/${c.need}`),
+            c.hint ? h("small", {}, c.hint) : null,
+          ),
+        ),
+      );
+      const fund =
+        r.state === "next" && gw.complete
+          ? (() => {
+              const el = h(
+                "button.btn.primary",
+                {
+                  title: "Spends these goods from the treasury; villagers then raise the stage",
+                  onclick: () =>
+                    this.actions.command({ kind: "fund-great-work", buildingId: gw.id }),
+                },
+                `Fund ${r.name}`,
+              ) as HTMLButtonElement;
+              refs.greatButtons!.push({
+                el,
+                enabled: () => {
+                  const live = stageRows(this.actions.state(), gw).find((x) => x.index === r.index);
+                  return !!live?.ready;
+                },
+              });
+              return el;
+            })()
+          : null;
+      return h(`div.gw-stage.${r.state}`, {}, head, h("small.gw-blurb", {}, r.blurb), goods, fund);
+    });
+    const finished = (gw.stage ?? 0) >= rows.length && gw.complete;
+    if (finished) {
+      const el = h(
+        "button.btn",
+        { onclick: () => this.showChronicle(this.actions.state()) },
+        "Read the chronicle",
+      ) as HTMLButtonElement;
+      nodes.push(el);
+    }
+    refs.great.replaceChildren(...nodes);
+  }
+
+  /** The end-of-expedition screen: the story of the voyage in numbers. */
+  showChronicle(state: GameState): void {
+    this.root.querySelector(".chronicle")?.remove();
+    const close = () => this.root.querySelector(".chronicle")?.remove();
+    const thumb = buildingThumb("great_work", this.tribe);
+    const pic = h("span.icon");
+    if (this.atlas.has(thumb)) Object.assign(pic.style, this.atlas.iconStyle(thumb, 1.4));
+    const done = state.stats.wonderAt !== null;
+    this.root.append(
+      h(
+        "div.chronicle",
+        { onclick: close },
+        h(
+          "div.chronicle-card.panel",
+          { onclick: (e: Event) => e.stopPropagation() },
+          pic,
+          h("h2", {}, done ? "The Great Work is complete" : "Chronicle of the expedition"),
+          h(
+            "p",
+            {},
+            done
+              ? "The archipelago will remember this expedition. Here is how it went:"
+              : "How the expedition has gone so far:",
+          ),
+          h(
+            "div.chronicle-rows",
+            {},
+            ...chronicleRows(state).map((r) =>
+              h("div.row", {}, h("span", {}, r.label), h("strong", {}, r.value)),
+            ),
+          ),
+          h("button.btn.primary", { onclick: close }, "Keep exploring"),
+        ),
+      ),
+    );
+  }
+
   private refreshSelectionButtons(): void {
     for (const b of this.selectionRefs.buttons) b.el.disabled = !b.enabled();
+    for (const b of this.selectionRefs.greatButtons ?? []) b.el.disabled = !b.enabled();
   }
 
   private buildSelection(state: GameState, e: Entity): void {
@@ -496,6 +708,10 @@ export class Hud {
       }
       if (e.kind === "market" && e.complete)
         parts.push(this.marketPanel(state, button, small, cmd));
+      if (e.kind === "great_work") {
+        refs.great = h("div.great");
+        parts.push(refs.great);
+      }
       if ((e.kind === "magic_house" || e.kind === "dock") && e.complete) {
         refs.upgrades = [];
         const list = h("div.upgrades", {});
@@ -523,7 +739,8 @@ export class Hud {
         }
         parts.push(list);
       }
-      if (def.buildable) {
+      // Once a stage of the Great Work stands, it stays.
+      if (def.buildable && !(e.kind === "great_work" && (e.stage ?? 0) >= 1)) {
         actions.append(
           button(
             e.complete ? "Demolish" : "Cancel",
@@ -782,6 +999,14 @@ export class Hud {
         status = "Staffed by a villager";
       } else if (e.kind === "town_hall") {
         status = `Population ${population(state)}/${populationCap(state)}`;
+      } else if (e.kind === "great_work") {
+        const stages = greatWorkStages(state.world).length;
+        status =
+          (e.stage ?? 0) >= stages
+            ? "The Great Work is complete"
+            : `Stage ${e.stage ?? 0} of ${stages} complete`;
+      } else if (e.kind === "lighthouse") {
+        status = `Its beam watches ${WATCH.lighthouse} tiles of sea, day and night`;
       } else if (e.kind === "magic_house") {
         status = `Treasury: ${state.stock.gold} gold · ${state.stock.faith} faith · ${state.stock.crystal} crystal · ${state.stock.relic} relics`;
       } else {
@@ -789,6 +1014,7 @@ export class Hud {
       }
       if (refs.status) refs.status.textContent = status;
       if (refs.extra) refs.extra.textContent = stockpileText(state, e);
+      if (refs.great) this.renderGreatWork(state, e, refs);
       for (const u of refs.upgrades ?? []) {
         const owned = state.upgrades.has(u.id);
         u.row.classList.toggle("owned", owned);
@@ -810,7 +1036,7 @@ export class Hud {
     } else if (e.type === "villager") {
       if (refs.status) refs.status.textContent = describeVillager(state, e);
     } else if (e.type === "pirate") {
-      if (refs.status) refs.status.textContent = describePirate(e);
+      if (refs.status) refs.status.textContent = describePirate(state, e);
     } else if (e.type === "wreck") {
       if (refs.status) refs.status.textContent = `Holds ${goodsText(e.loot)}`;
     } else if (e.type === "site") {
@@ -819,71 +1045,14 @@ export class Hud {
           ? `Treasure left: ${goodsText(e.loot)}`
           : "Something lies below…";
     } else if (refs.status) {
-      const ship = e as ShipEntity;
-      const hull = `Hull ${Math.ceil(ship.hp)}/${shipMaxHp(state, ship.kind)}`;
-      if (ship.kind === "patrol") {
-        refs.status.textContent = `${ship.hunt ? "Chasing pirates" : ship.dest ? "Sailing…" : "On patrol"} · ${hull}`;
-      } else if (ship.kind === "cargo") {
-        const dock = ship.route === null ? undefined : state.entities.get(ship.route);
-        const where =
-          dock?.type === "building"
-            ? `Route: ${describeIsland(state, islandAt(state, dock.x, dock.y))}`
-            : "No trade route";
-        const doing =
-          ship.route === null
-            ? "Idle"
-            : ship.dest
-              ? ship.leg === "drop"
-                ? "Sailing home"
-                : "Sailing to collect"
-              : ship.leg === "pickup"
-                ? "Waiting for goods"
-                : "In port";
-        refs.status.textContent = `${doing} · ${cargoLoad(ship)}/${cargoCapacity(state)} goods · ${hull}`;
-        if (refs.extra) refs.extra.textContent = where;
-      } else {
-        const aboard = `${ship.passengers.length}/${SHIP.capacity} aboard`;
-        const doing = ship.dive
-          ? "Divers below…"
-          : ship.salvage
-            ? "Salvaging…"
-            : ship.dest
-              ? "Sailing…"
-              : "Anchored";
-        refs.status.textContent = `${doing} · ${aboard} · ${hull}`;
-      }
+      const report = describeShip(state, e as ShipEntity);
+      refs.status.textContent = [report.doing, report.extra, report.hull]
+        .filter((part): part is string => part !== null)
+        .join(" · ");
+      if (refs.extra && report.route) refs.extra.textContent = report.route;
     }
     this.refreshSelectionButtons();
   }
-}
-
-function goodsText(goods: Partial<Stock>): string {
-  const items = RESOURCES.filter((r) => (goods[r] ?? 0) > 0).map((r) => `${goods[r]} ${r}`);
-  return items.length > 0 ? items.join(", ") : "nothing";
-}
-
-function describePirate(p: PirateEntity): string {
-  const what =
-    p.phase === "raid" ? "Robbing a settlement" : p.phase === "flee" ? "Fleeing" : "Hunting";
-  const loot = Object.values(p.loot).reduce((n, v) => n + (v ?? 0), 0);
-  return `${what} · Hull ${Math.ceil(p.hp)}/${PIRATE.hp}${loot > 0 ? ` · ${loot} goods stolen` : ""}`;
-}
-
-/** The closest uncleared sunken site within reach of a ship. */
-export function nearestSite(state: GameState, ship: ShipEntity): SiteEntity | null {
-  let best: SiteEntity | null = null;
-  for (const e of state.entities.values()) {
-    if (e.type !== "site" || !e.found) continue;
-    if (!Object.values(e.loot).some((n) => (n ?? 0) > 0)) continue;
-    const d = Math.hypot(e.x - ship.x, e.y - ship.y);
-    if (d <= 14 && (!best || d < Math.hypot(best.x - ship.x, best.y - ship.y))) best = e;
-  }
-  return best;
-}
-
-function describeIsland(state: GameState, islandId: number): string {
-  const island = state.world.islands[islandId];
-  return island ? discoveryName(island.biome).replace(/^the /, "The ") : "another island";
 }
 
 /** What a dock or storehouse holds on its island, and whether it still needs collecting. */
@@ -932,11 +1101,6 @@ export function describeVillager(state: GameState, v: VillagerEntity): string {
 
 // ---------------------------------------------------------------------------- minimap
 
-function abgr(hex: string): number {
-  const v = Number.parseInt(hex.slice(1), 16);
-  return (0xff << 24) | ((v & 0xff) << 16) | (v & 0xff00) | ((v >> 16) & 0xff);
-}
-
 export class Minimap {
   readonly canvas = document.createElement("canvas");
   private ctx: CanvasRenderingContext2D;
@@ -960,32 +1124,9 @@ export class Minimap {
     this.canvas.width = w.width;
     this.canvas.height = w.height;
     this.image = this.ctx.createImageData(w.width, w.height);
-    const n = w.width * w.height;
-    this.base = new Uint32Array(n);
-    this.fog = new Uint32Array(n);
-    const deep = abgr("#1b5866");
-    const shallow = abgr("#349f98");
-    const dirt = abgr("#a07650");
-    for (let k = 0; k < n; k++) {
-      const biome = BIOMES[w.biome[k]!];
-      const style = biome ? ATMOSPHERE[biome] : OCEAN;
-      this.fog[k] = abgr(style.fog);
-      const t = w.terrain[k]!;
-      this.base[k] =
-        t === Terrain.Deep
-          ? deep
-          : t === Terrain.Shallow
-            ? shallow
-            : t === Terrain.Dirt
-              ? dirt
-              : abgr(
-                  t === Terrain.Sand
-                    ? style.map.beach
-                    : t === Terrain.Rock
-                      ? style.map.rock
-                      : style.map.ground,
-                );
-    }
+    const colours = mapColours(w);
+    this.base = colours.base;
+    this.fog = colours.fog;
   }
 
   draw(state: GameState, view: { x: number; y: number }[]): void {
@@ -1011,12 +1152,18 @@ export class Minimap {
           for (let x = e.x; x < e.x + e.w; x++) dot(x, y, abgr("#5b4028"));
       } else if (e.type === "villager" && e.aboard === null) dot(e.x, e.y, abgr("#fbf0cf"));
       else if (e.type === "ship") dot(e.x, e.y, abgr("#e98a3a"), 2);
+      else if (e.type === "pirate" && pirateSpotted(state, e)) dot(e.x, e.y, abgr("#d9486a"), 2);
       else if (
-        e.type === "pirate" &&
+        e.type === "storm" &&
+        stormStrength(e) > 0 &&
         state.explored[tileIndex(w, Math.floor(e.x), Math.floor(e.y))]
-      )
-        dot(e.x, e.y, abgr("#d9486a"), 2);
-      else if (e.type === "site" && e.found) dot(e.x, e.y, abgr("#6cb9a8"), 1);
+      ) {
+        // A storm is a ring of pale pixels round its eye.
+        for (let a = 0; a < 64; a++) {
+          const t = (a / 64) * Math.PI * 2;
+          dot(e.x + Math.cos(t) * e.radius, e.y + Math.sin(t) * e.radius, abgr("#c4d4e0"));
+        }
+      } else if (e.type === "site" && e.found) dot(e.x, e.y, abgr("#6cb9a8"), 1);
     }
     this.ctx.putImageData(img, 0, 0);
     if (view.length === 4) {

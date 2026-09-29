@@ -1,5 +1,5 @@
 import "./styles.css";
-import { isTribe, type TribeId } from "@explorer/shared";
+import { isDifficulty, isTribe, type Difficulty, type TribeId } from "@explorer/shared";
 import { loadAtlas, type Atlas } from "./assets";
 import { Game } from "./game/game";
 import { playerName, playerToken } from "./net/identity";
@@ -38,17 +38,22 @@ async function startOnline(worldId: string, name: string): Promise<void> {
   }
 }
 
-async function startOffline(name: string, seed: string, tribe: TribeId): Promise<void> {
+async function startOffline(
+  name: string,
+  seed: string,
+  tribe: TribeId,
+  difficulty: Difficulty,
+): Promise<void> {
   const reveal = params.has("reveal") ? "&reveal" : "";
   const phase = params.has("phase") ? `&phase=${encodeURIComponent(params.get("phase")!)}` : "";
   history.replaceState(
     null,
     "",
-    `/?offline&seed=${encodeURIComponent(seed)}&tribe=${tribe}${reveal}${phase}`,
+    `/?offline&seed=${encodeURIComponent(seed)}&tribe=${tribe}&difficulty=${difficulty}${reveal}${phase}`,
   );
   const done = loading("Generating islands…");
   const assets = await atlas();
-  const session = new LocalSession(seed, name, tribe);
+  const session = new LocalSession(seed, name, tribe, difficulty);
   // Dev aids for reviewing art: `&reveal` lifts the fog in offline games, and `&phase=0.8` freezes
   // the time of day (0 is sunrise, 0.25 noon, 0.5 sunset, 0.8 night).
   if (params.has("reveal")) session.state.explored.fill(1);
@@ -64,9 +69,9 @@ function lobby(opts: { joinId?: string; error?: string } = {}): void {
       close();
       void startOnline(id, name);
     },
-    onOffline: (name, seed, tribe) => {
+    onOffline: (name, seed, tribe, difficulty) => {
       close();
-      void startOffline(name, seed, tribe);
+      void startOffline(name, seed, tribe, difficulty);
     },
   });
 }
@@ -76,10 +81,12 @@ const join = location.pathname.match(/^\/w\/([a-z0-9]{4,32})\/?$/i);
 void atlas();
 if (params.has("offline")) {
   const tribe = params.get("tribe");
+  const difficulty = params.get("difficulty");
   void startOffline(
     playerName() || "Explorer",
     params.get("seed") || "offline",
     isTribe(tribe) ? tribe : "islanders",
+    isDifficulty(difficulty) ? difficulty : "normal",
   );
 } else if (join && playerName()) {
   void startOnline(join[1]!.toLowerCase(), playerName());

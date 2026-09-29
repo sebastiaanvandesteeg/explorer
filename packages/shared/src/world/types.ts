@@ -65,6 +65,11 @@ export const NODE_KINDS = [
   // Petal Isles
   "blossom_tree",
   "flower_bush",
+  // Signature deposits: the good each far biome is known for (see SIGNATURE in biomes.ts).
+  "sunstone",
+  "rimeglass",
+  "mirepearl",
+  "glowcap",
 ] as const;
 
 /** Harvestable things placed by world generation. */

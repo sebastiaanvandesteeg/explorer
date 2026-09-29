@@ -11,6 +11,12 @@ export const RESOURCES = [
   "faith",
   "crystal",
   "relic",
+  // Signature goods: each comes from one far biome only, and the Great Work asks for them.
+  "sunstone",
+  "rimeglass",
+  "mirepearl",
+  "glowcap",
+  "hellstone",
 ] as const;
 export type Resource = (typeof RESOURCES)[number];
 export type Stock = Record<Resource, number>;
@@ -28,6 +34,8 @@ export type BuildingKind =
   | "market"
   | "church"
   | "magic_house"
+  | "lighthouse"
+  | "great_work"
   | "path";
 
 /** Gatherers roam a radius around their workplace; the others work at the building itself. */
@@ -35,7 +43,7 @@ export type WorkerJob = "lumber" | "quarry" | "mine" | "farm" | "smith" | "pries
 export const GATHER_JOBS: Partial<Record<WorkerJob, readonly Resource[]>> = {
   lumber: ["wood"],
   quarry: ["stone"],
-  mine: ["ore", "gold", "crystal"],
+  mine: ["ore", "gold", "crystal", "sunstone", "rimeglass", "mirepearl", "glowcap", "hellstone"],
 };
 
 export interface BuildingDef {
@@ -55,6 +63,12 @@ export interface BuildingDef {
   walkable?: boolean;
   hotkey?: string;
 }
+
+/** The Great Work's first stage: the only one that asks for nothing but home goods. */
+export const GREAT_WORK_FOUNDATION = {
+  cost: { wood: 120, stone: 160, tools: 15 } as Partial<Stock>,
+  work: 40,
+};
 
 export const BUILDINGS: Record<BuildingKind, BuildingDef> = {
   town_hall: {
@@ -192,6 +206,27 @@ export const BUILDINGS: Record<BuildingKind, BuildingDef> = {
     buildable: true,
     hotkey: "0",
   },
+  lighthouse: {
+    kind: "lighthouse",
+    name: "Lighthouse",
+    description:
+      "Its beam lights the sea at night for miles: raiders can be seen coming, ships keep their sight and patrol boats keep hunting in the dark.",
+    size: [2, 2],
+    cost: { wood: 60, stone: 60, tools: 10 },
+    work: 22,
+    buildable: true,
+    hotkey: "l",
+  },
+  great_work: {
+    kind: "great_work",
+    name: "The Great Work",
+    description:
+      "A monument raised in three stages from the treasures of every corner of the archipelago. Only one can be built, on the home island.",
+    size: [4, 4],
+    cost: GREAT_WORK_FOUNDATION.cost,
+    work: GREAT_WORK_FOUNDATION.work,
+    buildable: true,
+  },
   path: {
     kind: "path",
     name: "Path",
@@ -261,7 +296,7 @@ export const NODES: Record<NodeKind, NodeDef> = {
   charred_tree: tree("Charred tree", 6, 0.9),
   ember_fruit: food("Ember fruit", 6, 1.2),
   obsidian: rock("Obsidian", "stone", 16, 1.8),
-  hellstone: rock("Hellstone ore", "ore", 24, 1.8),
+  hellstone: rock("Hellstone", "hellstone", 24, 2.0),
   snow_pine: tree("Snowy pine", 8, 1.0),
   frost_berry: food("Frost berries", 6),
   ice_rock: rock("Ice rock", "stone", 12, 1.4),
@@ -278,6 +313,10 @@ export const NODES: Record<NodeKind, NodeDef> = {
   pumpkin: food("Pumpkin patch", 10, 1.2),
   blossom_tree: tree("Blossom tree", 10, 1.2),
   flower_bush: food("Honey blossoms", 6),
+  sunstone: rock("Sunstone outcrop", "sunstone", 16, 2.2),
+  rimeglass: rock("Rimeglass shards", "rimeglass", 16, 2.2),
+  mirepearl: rock("Mirepearl bed", "mirepearl", 14, 2.0),
+  glowcap: rock("Glowcap cluster", "glowcap", 14, 2.0),
 };
 
 export const START_STOCK: Stock = {
@@ -290,6 +329,11 @@ export const START_STOCK: Stock = {
   faith: 0,
   crystal: 0,
   relic: 0,
+  sunstone: 0,
+  rimeglass: 0,
+  mirepearl: 0,
+  glowcap: 0,
+  hellstone: 0,
 };
 export const START_VILLAGERS = 3;
 
@@ -354,18 +398,45 @@ export const PIRATE = {
   range: 4.5,
   cooldown: 2.5,
   speed: 3.2,
-  /** Seconds of game time before the first raid, then between raids. */
-  firstRaid: 420,
-  interval: [200, 320] as const,
   /** Seconds spent looting a beached settlement, and the share of each pile taken per second. */
   raidSeconds: 8,
   stealShare: 0.04,
-  /** A raider never comes closer than this to the town it is heading for, and only spawns this far out. */
+  /** A raider only spawns this far from the town hall. See DIFFICULTY_DEFS for the timings. */
   spawnDistance: 45,
-  maxAtOnce: 3,
 };
 
-export const STORM = { interval: 6, damage: 14, range: 16 };
+/** The Stormcaller spell: lightning at pirates near your ships and buildings. */
+export const STORMCALLER = { interval: 6, damage: 14, range: 16 };
+
+/** What night does. Darkness at or above `dark` hides things outside the light; raids wait for `raid`. */
+export const NIGHT = { dark: 0.5, raid: 0.3, sightLoss: 0.4 };
+
+/** How far, in tiles, each thing keeps watch around itself: by day, and after dark. */
+export const WATCH = {
+  building: 14,
+  ship: 10,
+  litBuilding: 6,
+  litShip: 4,
+  /** The lighthouse's beam: day and night alike. */
+  lighthouse: 24,
+};
+
+export const LIGHTHOUSE = { reveal: 16 };
+
+/** Storms: they roll across the sea and batter any ship caught outside a harbour. */
+export const WEATHER = {
+  first: 240,
+  interval: [200, 320] as const,
+  radius: [7, 11] as const,
+  life: [110, 170] as const,
+  speed: 1.4,
+  /** Hull points lost per second at full strength. */
+  damage: 1.6,
+  /** A ship this close to a finished dock is in harbour and safe. */
+  harbour: 4,
+  /** Seconds a storm takes to build up and to blow out. */
+  ramp: 15,
+};
 
 export const DIVE = {
   seconds: 15,
@@ -386,6 +457,7 @@ export type UpgradeId =
   | "ember_ward"
   | "prism_ward"
   | "storm_bolt"
+  | "calm_waters"
   | "cannons"
   | "iron_hulls";
 
@@ -448,6 +520,13 @@ export const UPGRADES: Record<UpgradeId, UpgradeDef> = {
     name: "Stormcaller",
     description: "Lightning strikes pirates that come near your settlements and ships",
     cost: { faith: 60, gold: 40, relic: 3 },
+    at: "magic_house",
+  },
+  calm_waters: {
+    id: "calm_waters",
+    name: "Calm Waters",
+    description: "Storms cannot hurt your ships",
+    cost: { faith: 40, gold: 30 },
     at: "magic_house",
   },
   cannons: {

@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import type { AddressInfo } from "node:net";
-import { isTribe, type TribeId } from "@explorer/shared";
+import { isDifficulty, isTribe, type Difficulty, type TribeId } from "@explorer/shared";
 import sirv from "sirv";
 import { WebSocketServer, type WebSocket } from "ws";
 import { RoomManager, type WorldRoom } from "./rooms";
@@ -57,20 +57,31 @@ export async function startApp(opts: AppOptions): Promise<App> {
       if (url.pathname === "/api/worlds" && req.method === "POST") {
         let seed = "";
         let tribe: TribeId = "islanders";
+        let difficulty: Difficulty = "normal";
         try {
           const body = JSON.parse((await readBody(req)) || "{}") as {
             seed?: unknown;
             tribe?: unknown;
+            difficulty?: unknown;
           };
           if (typeof body.seed === "string") seed = body.seed.trim().slice(0, MAX_SEED_LENGTH);
           if (body.tribe !== undefined) {
             if (!isTribe(body.tribe)) return json(res, 400, { error: "Unknown tribe" });
             tribe = body.tribe;
           }
+          if (body.difficulty !== undefined) {
+            if (!isDifficulty(body.difficulty))
+              return json(res, 400, { error: "Unknown difficulty" });
+            difficulty = body.difficulty;
+          }
         } catch {
           return json(res, 400, { error: "Invalid JSON" });
         }
-        const room = await rooms.create(seed || Math.random().toString(36).slice(2, 10), tribe);
+        const room = await rooms.create(
+          seed || Math.random().toString(36).slice(2, 10),
+          tribe,
+          difficulty,
+        );
         return json(res, 201, room.info());
       }
       const match = url.pathname.match(/^\/api\/worlds\/([^/]+)$/);

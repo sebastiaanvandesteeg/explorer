@@ -8,6 +8,7 @@ import {
   canPlaceBuilding,
   fromSnapshot,
   generateWorld,
+  tally,
   type GameState,
   type ServerMessage,
   type WorldInfo,
@@ -31,11 +32,15 @@ afterEach(async () => {
 
 const base = () => `http://127.0.0.1:${app.port}`;
 
-async function createWorld(seed = "server-test", tribe?: string): Promise<WorldInfo> {
+async function createWorld(
+  seed = "server-test",
+  tribe?: string,
+  difficulty?: string,
+): Promise<WorldInfo> {
   const res = await fetch(`${base()}/api/worlds`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ seed, tribe }),
+    body: JSON.stringify({ seed, tribe, difficulty }),
   });
   expect(res.status).toBe(201);
   return (await res.json()) as WorldInfo;
@@ -133,6 +138,59 @@ describe("HTTP API", () => {
       body: JSON.stringify({ tribe: "vikings" }),
     });
     expect(bad.status).toBe(400);
+  });
+});
+
+describe("difficulty", () => {
+  it("creates worlds at a chosen difficulty and remembers it", async () => {
+    expect((await createWorld("diff-default")).difficulty).toBe("normal");
+    const info = await createWorld("diff-hard", undefined, "hard");
+    expect(info.difficulty).toBe("hard");
+    const p = new Player();
+    const welcome = await p.join(info.id, "Dana", token(4));
+    expect(welcome.t === "welcome" && welcome.snapshot.difficulty).toBe("hard");
+    expect(mirror(welcome).difficulty).toBe("hard");
+    const bad = await fetch(`${base()}/api/worlds`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ difficulty: "nightmare" }),
+    });
+    expect(bad.status).toBe(400);
+  });
+});
+
+describe("world events reach players", () => {
+  it("mirrors storms, raiders and the expedition's stats through patches", async () => {
+    const { id } = await createWorld("net-weather", "northfolk", "hard");
+    const anna = new Player();
+    const welcome = await anna.join(id, "Anna", token(7));
+    const mirrorState = mirror(welcome);
+    const room = (await app.rooms.get(id))!;
+    // Make it dusk, and let a storm form and a raid sail at once.
+    room.state.time = (0.75 - 0.1) * 480;
+    room.state.nextStorm = 0;
+    room.state.nextRaid = 0;
+    tally(room.state, "hauled", 5);
+    const patches: Extract<ServerMessage, { t: "patch" }>[] = [];
+    const seen = { storm: false, pirate: false, stats: false };
+    for (let i = 0; i < 30 && !(seen.storm && seen.pirate && seen.stats); i++) {
+      const patch = await anna.next<Extract<ServerMessage, { t: "patch" }>>((m) => m.t === "patch");
+      patches.push(patch);
+      applyPatch(mirrorState, patch.patch);
+      seen.storm ||= patch.patch.entities.some((e) => e.type === "storm");
+      seen.pirate ||= patch.patch.entities.some((e) => e.type === "pirate");
+      seen.stats ||= patch.patch.stats?.hauled === 5;
+    }
+    expect(seen).toEqual({ storm: true, pirate: true, stats: true });
+    expect(mirrorState.stats.hauled).toBe(5);
+    expect(mirrorState.difficulty).toBe("hard");
+    const stormIds = [...room.state.entities.values()]
+      .filter((e) => e.type === "storm")
+      .map((e) => e.id);
+    expect(stormIds.length).toBeGreaterThan(0);
+    for (const sid of stormIds) expect(mirrorState.entities.get(sid)?.type).toBe("storm");
+    // Everything a client mirrors survives a JSON round trip, as the wire demands.
+    expect(() => JSON.stringify(patches)).not.toThrow();
   });
 });
 

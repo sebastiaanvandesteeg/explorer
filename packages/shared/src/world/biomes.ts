@@ -182,3 +182,18 @@ export function discoveryName(id: BiomeId): string {
   const d = BIOME_DEFS[id];
   return d.article ? `${d.article} ${d.name}` : d.name;
 }
+
+/**
+ * The good each far biome is known for: a deposit only found there, which the Great Work asks
+ * for. `deposits` is how many islands of that biome are guaranteed to carry between them.
+ */
+export const SIGNATURE: Partial<Record<BiomeId, { node: NodeKind; deposits: number }>> = {
+  desert: { node: "sunstone", deposits: 9 },
+  tundra: { node: "rimeglass", deposits: 9 },
+  swamp: { node: "mirepearl", deposits: 10 },
+  fungal: { node: "glowcap", deposits: 10 },
+  infernal: { node: "hellstone", deposits: 7 },
+  crystal: { node: "crystal", deposits: 18 },
+};
+
+export const SIGNATURE_NODES: readonly NodeKind[] = Object.values(SIGNATURE).map((s) => s.node);

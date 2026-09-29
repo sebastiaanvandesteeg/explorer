@@ -79,6 +79,11 @@ export function canPlaceBuilding(
   if (!def.buildable) return { ok: false, reason: "That can't be built" };
   const w = state.world;
   if (kind === "dock") return canPlaceDock(state, x, y, opts);
+  if (kind === "great_work") {
+    for (const e of state.entities.values())
+      if (e.type === "building" && e.kind === "great_work")
+        return { ok: false, reason: "Only one Great Work can be raised" };
+  }
   const [fw, fh] = def.size;
   let elevation = -1;
   const settled = settledIslands(state);
@@ -91,6 +96,8 @@ export function canPlaceBuilding(
       if (!isLandTerrain(t)) return { ok: false, reason: "Needs dry land" };
       if (!settled.has(w.island[k]!))
         return { ok: false, reason: "Ferry villagers to this island by ship first" };
+      if (kind === "great_work" && w.island[k] !== w.start.islandId)
+        return { ok: false, reason: "The Great Work belongs on the home island" };
       if (kind === "farm" && t !== Terrain.Grass && t !== Terrain.Dirt)
         return { ok: false, reason: "Farms need grass" };
       const e = w.elevation[k]!;

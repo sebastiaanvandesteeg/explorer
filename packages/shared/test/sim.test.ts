@@ -6,27 +6,53 @@ import {
   applyPatch,
   BUILDINGS,
   canPlaceBuilding,
+  completeBuilding,
   createInitialState,
+  DIFFICULTY_DEFS,
   dockSpawn,
+  fetchedGoods,
   fromSnapshot,
+  GATHER_JOBS,
   generateWorld,
+  greatWorkStages,
   harvestSeconds,
+  isDifficulty,
   isLandTerrain,
+  islandName,
+  islandNames,
+  newBuilding,
+  NODES,
   newShip,
+  nightAtPhase,
+  nightLevel,
   PIRATE,
+  pirateMaxHp,
   landingBlock,
+  lookAround,
   population,
   populationCap,
   sailable,
+  removeEntity,
+  RESOURCES,
   sailSpeedFactor,
+  sightFactor,
   shipCost,
+  shipMaxHp,
   shipReveal,
-  STORM,
+  SIGNATURE,
+  SIGNATURE_NODES,
+  signatureGoods,
+  stormAt,
+  STORMCALLER,
+  stormOnRoute,
+  stormStrength,
   stockOf,
   takePatch,
+  tally,
   tick,
   toSnapshot,
   toWire,
+  TRIBES,
   type BuildingEntity,
   type BuildingKind,
   type GameState,
@@ -34,7 +60,9 @@ import {
   type PirateEntity,
   type ShipEntity,
   type SiteEntity,
+  type StormEntity,
   UPGRADES,
+  watched,
   type VillagerEntity,
   type WreckEntity,
 } from "../src";
@@ -99,6 +127,11 @@ describe("initial state", () => {
       faith: 0,
       crystal: 0,
       relic: 0,
+      sunstone: 0,
+      rimeglass: 0,
+      mirepearl: 0,
+      glowcap: 0,
+      hellstone: 0,
     });
     expect(of(s, "node").length).toBe(world.nodes.length);
     const th = world.start.townHall;
@@ -538,6 +571,45 @@ describe("trade routes", () => {
     expect(s.stock.wood).toBe(before + 60);
   });
 
+  it("keeps a cargo ship in port while a storm sits on its way", () => {
+    const s = fresh();
+    s.nextStorm = 1e9;
+    const { at } = settleOutpost(s);
+    s.stock.wood = s.stock.stone = 500;
+    applyCommand(s, { kind: "place-building", building: "dock", ...at });
+    const outDock = of<BuildingEntity>(s, "building").find(
+      (b) => b.kind === "dock" && !b.complete,
+    )!;
+    outDock.complete = true;
+    outDock.progress = 1;
+    const island = world.island[outDock.y * world.width + outDock.x]!;
+    addGoods(s, island, "wood", 30);
+    const homeDock = of<BuildingEntity>(s, "building").find(
+      (b) => b.kind === "dock" && b !== outDock,
+    )!;
+    const spot = dockSpawn(homeDock);
+    const ship = addEntity(s, newShip(s, "cargo", spot.x, spot.y, 0));
+    applyCommand(s, { kind: "set-route", shipId: ship.id, dockId: outDock.id });
+    const out = dockSpawn(outDock);
+    const storm = addEntity(s, {
+      id: s.nextId++,
+      type: "storm",
+      x: (spot.x + out.x) / 2,
+      y: (spot.y + out.y) / 2,
+      vx: 0,
+      vy: 0,
+      radius: 8,
+      age: 40,
+      life: 10_000,
+    });
+    run(s, 20);
+    expect(ship.path).toHaveLength(0);
+    expect(Math.hypot(ship.x - spot.x, ship.y - spot.y)).toBeLessThan(0.5);
+    removeEntity(s, storm.id);
+    run(s, 10);
+    expect(ship.dest ?? ship.path[0]).toBeTruthy();
+  });
+
   it("survives snapshots and patches", () => {
     const s = fresh();
     const { islandId } = settleOutpost(s);
@@ -664,6 +736,7 @@ describe("pirates, wrecks and sunken sites", () => {
 
   it("sends raiders that rob a settlement and sail off", () => {
     const s = fresh();
+    s.time = 250; // dusk on the first day: raids come after dark
     s.nextRaid = 0;
     s.stock.wood = 400;
     let robbed = false;
@@ -732,8 +805,8 @@ describe("pirates, wrecks and sunken sites", () => {
     s.upgrades.add("storm_bolt");
     const at = nearDock(s, 8);
     const p = pirate(s, at.x, at.y);
-    p.hp = STORM.damage * 2;
-    run(s, STORM.interval * 3);
+    p.hp = STORMCALLER.damage * 2;
+    run(s, STORMCALLER.interval * 3);
     expect(s.entities.has(p.id)).toBe(false);
   });
 
@@ -792,5 +865,587 @@ describe("pirates, wrecks and sunken sites", () => {
     const restored = fromSnapshot(world, JSON.parse(JSON.stringify(toSnapshot(s))), true);
     expect(restored.nextRaid).toBe(777);
     expect(of(restored, "site")).toHaveLength(world.sites.length);
+  });
+});
+
+describe("difficulty", () => {
+  it("starts the first raid on the difficulty's schedule", () => {
+    expect(createInitialState(world).nextRaid).toBe(DIFFICULTY_DEFS.normal.firstRaid);
+    expect(createInitialState(world, { difficulty: "hard" }).nextRaid).toBe(
+      DIFFICULTY_DEFS.hard.firstRaid,
+    );
+    expect(DIFFICULTY_DEFS.hard.firstRaid).toBeLessThan(DIFFICULTY_DEFS.normal.firstRaid);
+  });
+
+  it("never sends pirates in a peaceful world", () => {
+    const s = createInitialState(world, { difficulty: "peaceful" });
+    s.nextRaid = 0;
+    run(s, 900);
+    expect(of(s, "pirate")).toHaveLength(0);
+    expect(s.events.some((e) => e.type === "pirates")).toBe(false);
+  });
+
+  it("makes hard raids bigger and tougher than normal ones", () => {
+    const raid = (difficulty: "normal" | "hard") => {
+      const s = createInitialState(world, { difficulty });
+      s.time = 3 * 480 + 288; // the evening of day 4: raids come at dusk and grow with the days
+      s.nextRaid = 0;
+      tick(s);
+      return { s, pirates: of<PirateEntity>(s, "pirate") };
+    };
+    const normal = raid("normal");
+    const hard = raid("hard");
+    expect(hard.pirates.length).toBeGreaterThan(normal.pirates.length);
+    expect(hard.pirates[0]!.hp).toBeGreaterThan(normal.pirates[0]!.hp);
+    expect(hard.pirates[0]!.hp).toBe(pirateMaxHp(hard.s));
+  });
+
+  it("is saved with the world, and old saves count as normal", () => {
+    const hard = createInitialState(world, { difficulty: "hard" });
+    const snap = JSON.parse(JSON.stringify(toSnapshot(hard)));
+    expect(fromSnapshot(world, snap, true).difficulty).toBe("hard");
+    delete snap.difficulty;
+    expect(fromSnapshot(world, snap, true).difficulty).toBe("normal");
+    expect(isDifficulty("hard")).toBe(true);
+    expect(isDifficulty("nightmare")).toBe(false);
+  });
+});
+
+describe("island names", () => {
+  it("names every island, uniquely and the same way every time", () => {
+    const names = islandNames(world);
+    expect(names).toHaveLength(world.islands.length);
+    expect(new Set(names).size).toBe(names.length);
+    expect(names.every((n) => n.length > 3)).toBe(true);
+    expect(islandNames(generateWorld("sim-tests"))).toEqual(names);
+    expect(islandNames(generateWorld("another-seed"))).not.toEqual(names);
+    expect(islandName(world, world.start.islandId)).toBe(names[world.start.islandId]);
+    expect(islandName(world, 9999)).toBe("Uncharted waters");
+  });
+});
+
+const timeAtPhase = (phase: number) => ((((phase - 0.1) % 1) + 1) % 1) * 480;
+
+describe("night, light and lookouts", () => {
+  it("follows the clock: dark at midnight, bright at noon", () => {
+    expect(nightLevel(timeAtPhase(0.25))).toBe(0);
+    expect(nightLevel(timeAtPhase(0.8))).toBe(1);
+    expect(nightLevel(timeAtPhase(0.62))).toBeGreaterThan(0.3);
+    expect(nightLevel(timeAtPhase(0.62))).toBeLessThan(0.8);
+    expect(nightAtPhase(0.8)).toBe(nightLevel(timeAtPhase(0.8)));
+  });
+
+  /** A spot a few tiles from the town hall, far from the dock. */
+  function nearHallFarFromDock(s: GameState): { x: number; y: number } {
+    const hall = hallOf(s);
+    const cx = hall.x + hall.w / 2;
+    const cy = hall.y + hall.h / 2;
+    const dock = of<BuildingEntity>(s, "building").find((b) => b.kind === "dock")!;
+    for (let dy = -13; dy <= 13; dy++)
+      for (let dx = -13; dx <= 13; dx++) {
+        const d = Math.hypot(dx, dy);
+        const away = Math.hypot(cx + dx - (dock.x + dock.w / 2), cy + dy - (dock.y + dock.h / 2));
+        if (d >= 8 && d <= 12 && away > 16) return { x: cx + dx, y: cy + dy };
+      }
+    throw new Error("no such spot");
+  }
+
+  const hallOf = (s: GameState) =>
+    of<BuildingEntity>(s, "building").find((b) => b.kind === "town_hall")!;
+
+  it("keeps watch farther by day than after dark", () => {
+    const s = fresh();
+    const spot = nearHallFarFromDock(s);
+    s.time = timeAtPhase(0.25);
+    expect(watched(s, spot.x, spot.y)).toBe(true);
+    s.time = timeAtPhase(0.8);
+    expect(watched(s, spot.x, spot.y)).toBe(false);
+    // Lamps at the settlement's own edge still show.
+    const hall = hallOf(s);
+    expect(watched(s, hall.x + hall.w / 2 + 4, hall.y + hall.h / 2)).toBe(true);
+  });
+
+  it("lets a lighthouse's beam watch far out, day and night", () => {
+    const s = fresh();
+    const spot = nearHallFarFromDock(s);
+    s.time = timeAtPhase(0.8);
+    expect(watched(s, spot.x, spot.y)).toBe(false);
+    const light = addEntity(
+      s,
+      newBuilding(s, "lighthouse", Math.floor(spot.x) - 16, Math.floor(spot.y), true),
+    );
+    expect(watched(s, spot.x, spot.y)).toBe(true);
+    expect(sightFactor(s, spot.x, spot.y)).toBe(1);
+    // Far beyond its reach the sea is dark again.
+    expect(watched(s, spot.x + 60, spot.y + 60)).toBe(false);
+    removeEntity(s, light.id);
+    expect(sightFactor(s, spot.x, spot.y)).toBeLessThan(1);
+    s.time = timeAtPhase(0.25);
+    expect(sightFactor(s, spot.x, spot.y)).toBe(1);
+  });
+
+  it("sees less of the sea from a ship at night", () => {
+    const explored = (time: number) => {
+      const s = fresh();
+      s.time = time;
+      const site = world.sites[0]!;
+      s.explored.fill(0);
+      lookAround(s, site.x + 0.5, site.y + 0.5, 8);
+      return s.explored.reduce((a, b) => a + b, 0);
+    };
+    expect(explored(timeAtPhase(0.8))).toBeLessThan(explored(timeAtPhase(0.25)));
+  });
+
+  it("makes raids wait for dusk", () => {
+    const s = fresh();
+    s.nextRaid = 0;
+    s.time = timeAtPhase(0.25);
+    run(s, 5);
+    expect(of(s, "pirate")).toHaveLength(0);
+    s.time = timeAtPhase(0.75);
+    run(s, 1);
+    expect(of(s, "pirate").length).toBeGreaterThan(0);
+  });
+
+  /** Open water far from everything, with room for a boat and a pirate 8 tiles apart. */
+  function farWater(): { boat: { x: number; y: number }; foe: { x: number; y: number } } {
+    const s = fresh();
+    for (const site of world.sites) {
+      for (const [dx, dy] of [
+        [8, 0],
+        [-8, 0],
+        [0, 8],
+        [0, -8],
+      ] as const) {
+        if (sailable(s, site.x, site.y) && sailable(s, site.x + dx, site.y + dy))
+          return {
+            boat: { x: site.x + 0.5, y: site.y + 0.5 },
+            foe: { x: site.x + dx + 0.5, y: site.y + dy + 0.5 },
+          };
+      }
+    }
+    throw new Error("no open water");
+  }
+
+  function patrolAgainstPirate(phase: number, lighthouse: boolean): ShipEntity {
+    const s = fresh();
+    s.nextRaid = 1e9;
+    s.time = timeAtPhase(phase);
+    const { boat, foe } = farWater();
+    const patrol = addEntity(s, newShip(s, "patrol", boat.x, boat.y, 0));
+    addEntity(s, {
+      id: s.nextId++,
+      type: "pirate",
+      x: foe.x,
+      y: foe.y,
+      heading: 0,
+      hp: 1000,
+      path: [],
+      phase: "hunt",
+      target: null,
+      timer: 0,
+      cooldown: 0,
+      loot: {},
+      home: { x: 0, y: 0 },
+    });
+    if (lighthouse)
+      addEntity(
+        s,
+        newBuilding(s, "lighthouse", Math.floor(boat.x) + 1, Math.floor(boat.y) + 1, true),
+      );
+    // The raider heads for the boat, so look before it closes the distance.
+    run(s, 0.3);
+    return patrol;
+  }
+
+  it("has patrol boats chase only the raiders they can see", () => {
+    expect(patrolAgainstPirate(0.25, false).hunt).toBe(true);
+    expect(patrolAgainstPirate(0.8, false).hunt).toBe(false);
+    expect(patrolAgainstPirate(0.8, true).hunt).toBe(true);
+  });
+
+  it("puts up a lighthouse that reveals a wide circle when finished", () => {
+    const s = fresh();
+    s.stock = { ...s.stock, wood: 500, stone: 500, tools: 50 };
+    const at = spotFor(s, "lighthouse");
+    expect(applyCommand(s, { kind: "place-building", building: "lighthouse", ...at })).toEqual({
+      ok: true,
+    });
+    const site = of<BuildingEntity>(s, "building").find((b) => b.kind === "lighthouse")!;
+    s.explored.fill(0);
+    completeBuilding(s, site);
+    const lighthouseSeen = s.explored.reduce((a, b) => a + b, 0);
+    s.explored.fill(0);
+    const house = addEntity(s, newBuilding(s, "house", at.x + 4, at.y, false));
+    completeBuilding(s, house);
+    expect(lighthouseSeen).toBeGreaterThan(s.explored.reduce((a, b) => a + b, 0) * 3);
+  });
+});
+
+describe("storms", () => {
+  /** A full-strength storm sitting still over a point. */
+  const stormOver = (s: GameState, x: number, y: number, radius = 8): StormEntity =>
+    addEntity(s, {
+      id: s.nextId++,
+      type: "storm",
+      x,
+      y,
+      vx: 0,
+      vy: 0,
+      radius,
+      age: 40,
+      life: 10_000,
+    });
+
+  const scoutAt = (s: GameState) => {
+    const site = world.sites[0]!;
+    return addEntity(s, newShip(s, "scout", site.x + 0.5, site.y + 0.5, 0));
+  };
+
+  it("forms on schedule, from the same seed and moment everywhere", () => {
+    const a = fresh();
+    const b = fresh();
+    a.nextStorm = b.nextStorm = 0;
+    tick(a);
+    tick(b);
+    const [sa] = of<StormEntity>(a, "storm");
+    const [sb] = of<StormEntity>(b, "storm");
+    expect(sa).toBeDefined();
+    expect(sa).toEqual({ ...sb, id: sa!.id });
+    expect(a.events.some((e) => e.type === "storm")).toBe(true);
+    expect(a.nextStorm).toBeGreaterThan(a.time + 100);
+  });
+
+  it("drifts, builds up, blows out and is removed", () => {
+    const s = fresh();
+    s.nextStorm = 1e9;
+    const storm = addEntity(s, {
+      id: s.nextId++,
+      type: "storm",
+      x: 50,
+      y: 50,
+      vx: 1,
+      vy: 0,
+      radius: 8,
+      age: 0,
+      life: 60,
+    });
+    expect(stormStrength(storm)).toBe(0);
+    run(s, 20);
+    expect(storm.x).toBeCloseTo(70, 0);
+    expect(stormStrength(storm)).toBe(1);
+    run(s, 42);
+    expect(s.entities.has(storm.id)).toBe(false);
+  });
+
+  it("damages ships caught in the open, but not in harbour", () => {
+    const s = createInitialState(world, { difficulty: "hard" });
+    s.nextRaid = s.nextStorm = 1e9;
+    const ship = scoutAt(s);
+    stormOver(s, ship.x, ship.y);
+    run(s, 5);
+    expect(ship.hp).toBeLessThan(shipMaxHp(s, "scout") - 5);
+
+    const safe = createInitialState(world, { difficulty: "hard" });
+    safe.nextRaid = safe.nextStorm = 1e9;
+    const dock = of<BuildingEntity>(safe, "building").find((b) => b.kind === "dock")!;
+    const moored = addEntity(safe, newShip(safe, "scout", dockSpawn(dock).x, dockSpawn(dock).y, 0));
+    stormOver(safe, moored.x, moored.y);
+    run(safe, 5);
+    expect(moored.hp).toBe(shipMaxHp(safe, "scout"));
+  });
+
+  it("is shrugged off with Calm Waters, and harmless in a peaceful world", () => {
+    const calm = fresh();
+    calm.nextRaid = calm.nextStorm = 1e9;
+    calm.upgrades.add("calm_waters");
+    const a = scoutAt(calm);
+    stormOver(calm, a.x, a.y);
+    run(calm, 5);
+    expect(a.hp).toBe(shipMaxHp(calm, "scout"));
+
+    const peaceful = createInitialState(world, { difficulty: "peaceful" });
+    peaceful.nextStorm = 1e9;
+    const b = scoutAt(peaceful);
+    stormOver(peaceful, b.x, b.y);
+    run(peaceful, 5);
+    expect(b.hp).toBe(shipMaxHp(peaceful, "scout"));
+  });
+
+  it("sinks a ship that stays in the storm, leaving a wreck", () => {
+    const s = createInitialState(world, { difficulty: "hard" });
+    s.nextRaid = s.nextStorm = 1e9;
+    const ship = scoutAt(s);
+    stormOver(s, ship.x, ship.y);
+    run(s, 40);
+    expect(s.entities.has(ship.id)).toBe(false);
+    expect(of<WreckEntity>(s, "wreck")).toHaveLength(1);
+  });
+
+  it("batters pirates too", () => {
+    const s = fresh();
+    s.nextRaid = s.nextStorm = 1e9;
+    const site = world.sites[0]!;
+    const p = addEntity(s, {
+      id: s.nextId++,
+      type: "pirate",
+      x: site.x + 0.5,
+      y: site.y + 0.5,
+      heading: 0,
+      hp: 30,
+      path: [],
+      phase: "flee",
+      target: null,
+      timer: 0,
+      cooldown: 0,
+      loot: {},
+      home: { x: 5, y: 5 },
+    });
+    stormOver(s, p.x, p.y);
+    run(s, 4);
+    expect(p.hp).toBeLessThan(30);
+  });
+
+  it("finds storms in a ship's way", () => {
+    const s = fresh();
+    s.nextStorm = 1e9;
+    stormOver(s, 50, 50, 6);
+    expect(stormOnRoute(s, { x: 30, y: 50 }, { x: 70, y: 50 })).toBe(true);
+    expect(stormOnRoute(s, { x: 30, y: 80 }, { x: 70, y: 80 })).toBe(false);
+    expect(stormAt(s, 52, 50)).not.toBeNull();
+    expect(stormAt(s, 80, 80)).toBeNull();
+  });
+
+  it("travels through snapshots and patches", () => {
+    const s = fresh();
+    s.nextStorm = 0;
+    const client = fromSnapshot(world, JSON.parse(JSON.stringify(toSnapshot(s))));
+    tick(s);
+    applyPatch(client, JSON.parse(JSON.stringify(takePatch(s))));
+    expect(of(client, "storm")).toHaveLength(1);
+    const restored = fromSnapshot(world, JSON.parse(JSON.stringify(toSnapshot(s))), true);
+    expect(restored.nextStorm).toBe(s.nextStorm);
+    expect(of(restored, "storm")).toHaveLength(1);
+  });
+});
+
+describe("signature goods", () => {
+  it("puts enough of every far biome's good on its islands, in every world", () => {
+    for (const tribe of TRIBES) {
+      for (const seed of ["goods-a", "goods-b", "sim-tests"]) {
+        const w = generateWorld(seed, tribe);
+        for (const [biome, sig] of Object.entries(SIGNATURE)) {
+          const islands = w.islands.filter((i) => i.biome === biome && i.flavor !== "islet");
+          if (islands.length === 0) continue;
+          const ids = new Set(islands.map((i) => i.id));
+          const deposits = w.nodes.filter(
+            (n) => n.kind === sig.node && ids.has(w.island[n.y * w.width + n.x]!),
+          );
+          expect(deposits.length, `${tribe}/${seed}: ${sig.node}`).toBeGreaterThanOrEqual(
+            sig.deposits,
+          );
+          const units = deposits.length * NODES[sig.node].amount;
+          expect(units, `${tribe}/${seed}: ${sig.node}`).toBeGreaterThanOrEqual(130);
+        }
+        const tiles = w.nodes.map((n) => n.y * w.width + n.x);
+        expect(new Set(tiles).size).toBe(tiles.length);
+      }
+    }
+  });
+
+  it("gives each far biome a good only it can yield", () => {
+    const goods = signatureGoods();
+    expect(goods).toHaveLength(6);
+    expect(new Set(goods.map((g) => g.resource)).size).toBe(6);
+    expect(NODES.hellstone.resource).toBe("hellstone");
+    for (const g of goods) expect(GATHER_JOBS.mine).toContain(g.resource);
+    // Only that biome's node kind yields each good.
+    for (const g of goods) {
+      const yielding = Object.entries(NODES).filter(([, def]) => def.resource === g.resource);
+      expect(yielding.map(([kind]) => kind)).toEqual([SIGNATURE[g.biome]!.node]);
+    }
+  });
+});
+
+describe("the Great Work", () => {
+  const rich = (s: GameState) => {
+    s.stock = {
+      ...s.stock,
+      wood: 9999,
+      stone: 9999,
+      tools: 999,
+      gold: 999,
+      faith: 999,
+      relic: 99,
+      sunstone: 99,
+      rimeglass: 99,
+      mirepearl: 99,
+      glowcap: 99,
+      hellstone: 99,
+      crystal: 99,
+    };
+  };
+
+  it("asks for the goods of the far biomes, except the home biome's own", () => {
+    const stages = greatWorkStages(world);
+    expect(stages).toHaveLength(3);
+    expect(stages[0]!.cost).toEqual(BUILDINGS.great_work.cost);
+    const homeBiome = world.islands[world.start.islandId]!.biome;
+    expect(homeBiome).toBe("temperate");
+    expect(stages[1]!.cost).toMatchObject({
+      sunstone: 40,
+      rimeglass: 40,
+      mirepearl: 40,
+      glowcap: 40,
+    });
+    expect(stages[2]!.cost).toMatchObject({ hellstone: 60, crystal: 60, relic: 6 });
+    // Northfolk live among the frost: they need no rimeglass.
+    const north = greatWorkStages(generateWorld("sim-tests", "northfolk"));
+    expect(north[1]!.cost.rimeglass).toBeUndefined();
+    expect(north[1]!.cost.sunstone).toBe(40);
+    expect(
+      fetchedGoods(generateWorld("sim-tests", "sunfolk")).map((g) => g.resource),
+    ).not.toContain("sunstone");
+  });
+
+  it("can be raised once, on the home island only", () => {
+    const s = fresh();
+    rich(s);
+    const at = spotFor(s, "great_work");
+    expect(world.island[at.y * world.width + at.x]).toBe(world.start.islandId);
+    expect(applyCommand(s, { kind: "place-building", building: "great_work", ...at })).toEqual({
+      ok: true,
+    });
+    expect(applyCommand(s, { kind: "place-building", building: "great_work", ...at }).ok).toBe(
+      false,
+    );
+    const elsewhere = fresh();
+    rich(elsewhere);
+    const { islandId, at: shore } = (() => {
+      const island = world.islands.find(
+        (i) => i.id !== world.start.islandId && i.flavor !== "islet",
+      )!;
+      const k = Array.from(world.island).findIndex(
+        (id, i) => id === island.id && isLandTerrain(world.terrain[i]!),
+      );
+      return { islandId: island.id, at: { x: k % world.width, y: Math.floor(k / world.width) } };
+    })();
+    elsewhere.explored.fill(1);
+    addEntity(elsewhere, {
+      ...of<VillagerEntity>(elsewhere, "villager")[0]!,
+      id: elsewhere.nextId++,
+      x: shore.x + 0.5,
+      y: shore.y + 0.5,
+    });
+    const check = canPlaceBuilding(elsewhere, "great_work", shore.x, shore.y);
+    expect(check.ok).toBe(false);
+    expect(islandId).not.toBe(world.start.islandId);
+  });
+
+  it("is founded by villagers, funded stage by stage and finished with a chronicle", () => {
+    const s = fresh();
+    rich(s);
+    s.nextRaid = s.nextStorm = 1e9;
+    const at = spotFor(s, "great_work");
+    applyCommand(s, { kind: "place-building", building: "great_work", ...at });
+    const gw = of<BuildingEntity>(s, "building").find((b) => b.kind === "great_work")!;
+    expect(gw.stage).toBe(0);
+    expect(applyCommand(s, { kind: "fund-great-work", buildingId: gw.id }).ok).toBe(false);
+    // The villagers found it on their own.
+    run(s, 90);
+    expect(gw.complete).toBe(true);
+    expect(gw.stage).toBe(1);
+    expect(s.events.some((e) => e.type === "wonder" && e.stage === 1 && !e.final)).toBe(true);
+    expect(applyCommand(s, { kind: "remove-building", buildingId: gw.id }).ok).toBe(false);
+
+    // Stage two needs its goods first.
+    const kept = { ...s.stock };
+    s.stock.sunstone = 0;
+    expect(applyCommand(s, { kind: "fund-great-work", buildingId: gw.id }).ok).toBe(false);
+    s.stock = kept;
+    const before = s.stock.rimeglass;
+    expect(applyCommand(s, { kind: "fund-great-work", buildingId: gw.id })).toEqual({ ok: true });
+    expect(s.stock.rimeglass).toBe(before - 40);
+    expect(gw.complete).toBe(false);
+    expect(applyCommand(s, { kind: "fund-great-work", buildingId: gw.id }).ok).toBe(false);
+    run(s, 120);
+    expect(gw.stage).toBe(2);
+
+    expect(applyCommand(s, { kind: "fund-great-work", buildingId: gw.id })).toEqual({ ok: true });
+    run(s, 150);
+    expect(gw.stage).toBe(3);
+    expect(gw.complete).toBe(true);
+    expect(s.stats.wonderAt).not.toBeNull();
+    expect(s.events.some((e) => e.type === "wonder" && e.final)).toBe(true);
+    expect(applyCommand(s, { kind: "fund-great-work", buildingId: gw.id }).ok).toBe(false);
+    expect(applyCommand(s, { kind: "remove-building", buildingId: gw.id }).ok).toBe(false);
+  });
+
+  it("tallies the expedition's story for the chronicle", () => {
+    const s = fresh();
+    s.nextRaid = s.nextStorm = 1e9;
+    const dockSpot = dockSpawn(of<BuildingEntity>(s, "building").find((b) => b.kind === "dock")!);
+    const patrol = addEntity(s, newShip(s, "patrol", dockSpot.x + 6, dockSpot.y, 0));
+    addEntity(s, {
+      id: s.nextId++,
+      type: "pirate",
+      x: dockSpot.x + 12,
+      y: dockSpot.y,
+      heading: 0,
+      hp: 20,
+      path: [],
+      phase: "hunt",
+      target: null,
+      timer: 0,
+      cooldown: 0,
+      loot: {},
+      home: { x: 0, y: 0 },
+    });
+    run(s, 60);
+    expect(s.stats.pirates).toBe(1);
+    expect(s.entities.has(patrol.id)).toBe(true);
+    const wreck = of<WreckEntity>(s, "wreck")[0]!;
+    const scout = addEntity(s, newShip(s, "scout", wreck.x + 0.5, wreck.y + 0.5, 0));
+    applyCommand(s, { kind: "salvage", shipId: scout.id, wreckId: wreck.id });
+    run(s, 20);
+    expect(s.stats.salvaged).toBe(1);
+    expect(s.statsDirty).toBe(true);
+  });
+
+  it("travels through snapshots and patches, and seeds deposits into old saves once", () => {
+    const s = fresh();
+    tally(s, "hauled", 42);
+    s.stats.wonderAt = 1234;
+    const client = fromSnapshot(world, JSON.parse(JSON.stringify(toSnapshot(s))));
+    expect(client.stats).toEqual(s.stats);
+    takePatch(s);
+    tally(s, "raids", 2);
+    applyPatch(client, JSON.parse(JSON.stringify(takePatch(s))));
+    expect(client.stats.raids).toBe(2);
+
+    const signatures = (state: GameState) =>
+      of<NodeEntity>(state, "node").filter((n) => SIGNATURE_NODES.includes(n.kind));
+    expect(signatures(s).length).toBeGreaterThan(20);
+    // A save from before signature deposits existed: no deposits, no flag.
+    const old = JSON.parse(JSON.stringify(toSnapshot(s)));
+    delete old.depositsSeeded;
+    old.entities = old.entities.filter(
+      (e: { type: string; kind: string }) =>
+        !(e.type === "node" && ["sunstone", "rimeglass", "mirepearl", "glowcap"].includes(e.kind)),
+    );
+    const migrated = fromSnapshot(world, old, true);
+    expect(
+      signatures(migrated)
+        .map((n) => n.kind)
+        .filter((k) => k === "sunstone").length,
+    ).toBeGreaterThan(5);
+    // A current save whose deposits were mined out stays mined out.
+    const mined = JSON.parse(JSON.stringify(toSnapshot(s)));
+    mined.entities = mined.entities.filter(
+      (e: { type: string; kind: string }) => !(e.type === "node" && e.kind === "sunstone"),
+    );
+    expect(signatures(fromSnapshot(world, mined, true)).some((n) => n.kind === "sunstone")).toBe(
+      false,
+    );
   });
 });

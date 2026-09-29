@@ -39,6 +39,7 @@ export function parseCommand(v: unknown): Command | null {
       return { kind: "place-building", building: v.building as BuildingKind, x: v.x, y: v.y };
     case "remove-building":
     case "train-villager":
+    case "fund-great-work":
       if (!isInt(v.buildingId)) return null;
       return { kind: v.kind, buildingId: v.buildingId };
     case "build-ship":

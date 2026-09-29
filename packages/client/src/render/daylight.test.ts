@@ -1,7 +1,15 @@
 import { describe, expect, it } from "vitest";
+import { nightAtPhase } from "@explorer/shared";
 import { daylight } from "./daylight";
 
 describe("daylight grade", () => {
+  it("darkens the world exactly as fast as the simulation says it is dark", () => {
+    // The sim uses the night level for raids and sight; the screen must agree with it.
+    for (let p = 0; p < 1; p += 0.005) {
+      expect(daylight(p).night).toBeCloseTo(nightAtPhase(p), 9);
+    }
+  });
+
   it("is plain daylight at midday and dark blue in the dead of night", () => {
     const noon = daylight(0.25);
     expect(noon.night).toBe(0);

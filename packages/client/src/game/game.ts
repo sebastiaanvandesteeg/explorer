@@ -5,11 +5,12 @@ import {
   dockSite,
   dayNumber,
   dayPhase,
-  discoveryName,
   UPGRADES,
   HALF_H,
   HALF_W,
+  greatWorkStages,
   inBounds,
+  islandName,
   isLand,
   pickTile,
   RESOURCES,
@@ -19,9 +20,12 @@ import {
   type Command,
   type Entity,
   type GameEvent,
+  type GameState,
   type Patch,
   type PlayerInfo,
   type Resource,
+  type StormEntity,
+  type VillagerEntity,
 } from "@explorer/shared";
 import { Application, Container, Rectangle } from "pixi.js";
 import type { Atlas } from "../assets";
@@ -34,6 +38,9 @@ import { FogLayer } from "../render/masks";
 import { Overlay, type Footprint } from "../render/overlay";
 import { TerrainLayer, visibleHeight } from "../render/terrain";
 import { discoveryText, Hud, type Tool } from "../ui/hud";
+import { compassFrom, currentThreat } from "../ui/mapData";
+import { spatialMix, stormLevel, type Mood } from "../audio/mix";
+import { SoundSystem } from "../audio/system";
 
 interface Drag {
   button: number;
@@ -79,6 +86,10 @@ export class Game {
   private keys = new Set<string>();
   private status: SessionStatus = "connecting";
   private minimapTimer = 0;
+  private raidersSeen = false;
+  private readonly sound: SoundSystem;
+  private workTimer = 0;
+  private moodTimer = 0;
   private selectionDirty = true;
   private disposers: (() => void)[] = [];
   /** `?phase=` freezes the time of day, for reviewing art. */
@@ -135,12 +146,20 @@ export class Game {
         command: (cmd) => void this.send(cmd),
         chat: (text) => session.chat(text),
         focusTile: (x, y) => this.centerOnTile(x, y),
+        select: (id) => this.select(id),
         deselect: () => this.select(null),
+        state: () => this.session.state,
+        view: () => this.viewCorners(),
+        toggleSound: () => this.sound.toggle(),
       },
       invite,
       state.world.tribe,
     );
 
+    this.sound = new SoundSystem((x, y) => this.heard(x, y));
+    this.hud.setSound(this.sound.isMuted);
+    this.disposers.push(() => this.sound.dispose());
+    this.hud.setDifficulty(state.difficulty);
     this.entities.rebuild(state);
     this.hud.setStock(state);
     const th = state.world.start.townHall;
@@ -242,6 +261,7 @@ export class Game {
   }
 
   private onEvent(ev: GameEvent): void {
+    this.sound.event(ev);
     switch (ev.type) {
       case "built":
         this.hud.toast(`${BUILDINGS[ev.kind].name} built`);
@@ -256,28 +276,25 @@ export class Game {
             : "A scout ship is ready at the dock",
         );
         break;
-      case "pirates": {
-        const hall = this.session.state.world.start.townHall;
-        // The map is drawn isometrically, so compass points follow the screen, not the grid.
-        const sx = ev.x - ev.y - (hall.x - hall.y);
-        const sy = ev.x + ev.y - (hall.x + hall.y);
-        const names = [
-          "east",
-          "south-east",
-          "south",
-          "south-west",
-          "west",
-          "north-west",
-          "north",
-          "north-east",
-        ];
-        const dir = names[(Math.round(Math.atan2(sy, sx) / (Math.PI / 4)) + 8) % 8]!;
+      case "pirates":
+        // Raiders are announced when the lookouts first sight them, not when they set sail.
+        break;
+      case "wonder": {
+        const stages = greatWorkStages(this.session.state.world);
+        const name = stages[ev.stage - 1]?.name ?? "stage";
         this.hud.toast(
-          `Pirates! ${ev.count === 1 ? "A raiding ship approaches" : `${ev.count} raiding ships approach`} from the ${dir}`,
-          "error",
+          ev.final
+            ? "The Great Work is complete!"
+            : `The Great Work: stage ${ev.stage}, ${name}, is done`,
         );
+        if (ev.final) this.hud.showChronicle(this.session.state);
         break;
       }
+      case "storm":
+        this.hud.toast(
+          `A storm is rolling in from the ${compassFrom(this.session.state.world.start.townHall, ev)}`,
+        );
+        break;
       case "robbed":
         this.hud.toast("Pirates are looting a storehouse!", "error");
         break;
@@ -309,11 +326,11 @@ export class Game {
         this.hud.toast(`A cargo ship brought ${ev.amount} goods home`);
         break;
       case "discovered":
-        this.hud.toast(discoveryText(ev.biome));
+        this.hud.toast(discoveryText(islandName(this.session.state.world, ev.islandId), ev.biome));
         break;
       case "landed": {
-        const island = this.session.state.world.islands[ev.islandId];
-        const where = island ? discoveryName(island.biome) : "the shore";
+        const world = this.session.state.world;
+        const where = world.islands[ev.islandId] ? islandName(world, ev.islandId) : "the shore";
         this.hud.toast(
           `${ev.count === 1 ? "A villager" : `${ev.count} villagers`} landed on ${where}`,
         );
@@ -333,6 +350,7 @@ export class Game {
 
   private async send(cmd: Command): Promise<boolean> {
     const res = await this.session.command(cmd);
+    this.sound.ui(res.ok ? "click" : "error");
     if (!res.ok) this.hud.toast(res.reason, "error");
     this.selectionDirty = true;
     return res.ok;
@@ -352,6 +370,7 @@ export class Game {
   }
 
   private select(id: number | null): void {
+    if (id !== null && id !== this.selected) this.sound.ui("select");
     this.selected = id;
     this.selectionDirty = true;
   }
@@ -416,6 +435,8 @@ export class Game {
     const tile = this.tileAt(sx, sy);
     let best: { e: Entity; z: number } | null = null;
     for (const e of state.entities.values()) {
+      // Weather is not something to click on.
+      if (e.type === "storm") continue;
       if (
         tile &&
         e.type !== "ship" &&
@@ -553,8 +574,15 @@ export class Game {
     on(window, "keydown", (e) => {
       if (e.target instanceof HTMLInputElement) return;
       const k = e.key.toLowerCase();
+      if (this.hud.map.isOpen) {
+        // The map covers the game: only its own keys work while it is open.
+        if (k === "escape" || k === "m") this.hud.map.close();
+        return;
+      }
       this.keys.add(k);
-      if (k === "escape") {
+      if (k === "m") this.hud.map.open();
+      else if (k === "n") this.hud.setSound(this.sound.toggle());
+      else if (k === "escape") {
         if (this.tool.kind !== "select") this.setTool({ kind: "select" });
         else this.select(null);
       } else if (k === "h" || k === "g") this.setTool({ kind: "harvest" });
@@ -704,20 +732,77 @@ export class Game {
       this.selectionDirty = false;
       this.hud.setSelection(state, this.selected);
     }
+    this.moodTimer -= dt;
+    if (this.moodTimer <= 0) {
+      this.sound.update(this.mood(), 0.5 - this.moodTimer);
+      this.moodTimer = 0.5;
+    }
+    this.workTimer -= dt;
+    if (this.workTimer <= 0) {
+      this.workTimer = 0.4;
+      this.workSounds(state);
+    }
     this.minimapTimer -= dt;
     if (this.minimapTimer <= 0) {
       this.minimapTimer = 0.4;
-      const corners = [
-        [0, 0],
-        [this.camera.width, 0],
-        [this.camera.width, this.camera.height],
-        [0, this.camera.height],
-      ].map(([x, y]) => {
-        const p = this.camera.screenToWorld(x!, y!);
-        return { x: (p.x / HALF_W + p.y / HALF_H) / 2, y: (p.y / HALF_H - p.x / HALF_W) / 2 };
-      });
-      this.hud.minimap.draw(state, corners);
+      this.hud.minimap.draw(state, this.viewCorners());
+      this.hud.setAlerts(state);
+      this.watchForRaiders(state);
     }
+  }
+
+  /** Where a sound at a place in the world seems to come from, for the player looking at the screen. */
+  private heard(x: number, y: number): { gain: number; pan: number } {
+    const p = this.camera.worldToScreen((x - y) * HALF_W, (x + y) * HALF_H);
+    return spatialMix(p.x, p.y, this.camera.width, this.camera.height);
+  }
+
+  /** What the ambience should sound like now: the time of day, any storm about, the place. */
+  private mood(): Mood {
+    const state = this.session.state;
+    const c = this.camera.screenToWorld(this.camera.width / 2, this.camera.height / 2);
+    const tx = (c.x / HALF_W + c.y / HALF_H) / 2;
+    const ty = (c.y / HALF_H - c.x / HALF_W) / 2;
+    const storms = [...state.entities.values()].filter((e) => e.type === "storm");
+    return {
+      night: this.entities.night,
+      storm: stormLevel(storms as StormEntity[], tx, ty),
+      biome: this.biome,
+    };
+  }
+
+  /** One villager on screen at random gets to be heard chopping, mining or hammering. */
+  private workSounds(state: GameState): void {
+    const heard: VillagerEntity[] = [];
+    for (const e of state.entities.values()) {
+      if (e.type !== "villager" || e.action !== "work" || e.aboard !== null) continue;
+      if (this.heard(e.x, e.y).gain >= 1) heard.push(e);
+    }
+    const v = heard[Math.floor(Math.random() * heard.length)];
+    if (v) this.sound.work(v.tool, v.x, v.y);
+  }
+
+  /** Say so once when pirates first come into sight, and again after the seas have been quiet. */
+  private watchForRaiders(state: GameState): void {
+    const threat = currentThreat(state);
+    if (threat && !this.raidersSeen) {
+      this.hud.toast(`Pirates sighted to the ${threat.direction}!`, "error");
+      this.sound.cue({ sound: "alarm" });
+    }
+    this.raidersSeen = threat !== null;
+  }
+
+  /** The four corners of the screen as tile coordinates, for the minimap and the map. */
+  private viewCorners(): { x: number; y: number }[] {
+    return [
+      [0, 0],
+      [this.camera.width, 0],
+      [this.camera.width, this.camera.height],
+      [0, this.camera.height],
+    ].map(([x, y]) => {
+      const p = this.camera.screenToWorld(x!, y!);
+      return { x: (p.x / HALF_W + p.y / HALF_H) / 2, y: (p.y / HALF_H - p.x / HALF_W) / 2 };
+    });
   }
 
   /** Where in the day the world is: the same for every player, from the simulation clock. */

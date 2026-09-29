@@ -6,6 +6,7 @@ import {
   BUILDING_REVEAL,
   BUILDINGS,
   CARGO,
+  LIGHTHOUSE,
   CHURCH,
   FARM,
   farmRate,
@@ -22,7 +23,9 @@ import {
   type WorkerJob,
 } from "./catalogue";
 import { releaseTask } from "./commands";
+import { greatWorkStages } from "./greatwork";
 import { collectWreck, updateThreats } from "./pirates";
+import { stormOnRoute, updateWeather } from "./weather";
 import { disembark, dockSpawn, embark, hasRoom, shipMoving, shoreBeside } from "./ferry";
 import { landPath, sailable, seaPath } from "./navigation";
 import { buildingAround, isAdjacentTo, tilesAround } from "./rules";
@@ -31,6 +34,7 @@ import {
   addGoods,
   islandAt,
   isPathTile,
+  lookAround,
   markDirty,
   newShip,
   newVillager,
@@ -42,6 +46,7 @@ import {
   shipReveal,
   cargoCapacity,
   stockOf,
+  tally,
   touchStock,
   walkable,
   type BuildingEntity,
@@ -67,6 +72,7 @@ export function tick(state: GameState, dt = TICK_SECONDS): void {
     else if (e.type === "ship") updateShip(state, e, dt);
   }
   updateThreats(state, dt);
+  updateWeather(state, dt);
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -83,7 +89,7 @@ function updateBuilding(state: GameState, b: BuildingEntity, dt: number): void {
         const spot = buildingAround(state, b).sort((p, q) => q.y + q.x - (p.y + p.x))[0];
         if (spot) {
           const v = addEntity(state, newVillager(state, spot.x, spot.y));
-          reveal(state, v.x, v.y, VILLAGER.reveal);
+          lookAround(state, v.x, v.y, VILLAGER.reveal);
           state.events.push({ type: "villager", x: spot.x, y: spot.y });
           b.queue.shift();
         }
@@ -98,7 +104,7 @@ function updateBuilding(state: GameState, b: BuildingEntity, dt: number): void {
             { "+x": 0, "+y": 2, "-x": 4, "-y": 6 }[b.dir ?? "+x"],
           );
           addEntity(state, ship);
-          reveal(state, ship.x, ship.y, shipReveal(state));
+          lookAround(state, ship.x, ship.y, shipReveal(state));
           state.events.push({ type: "ship", kind: ship.kind, x: ship.x, y: ship.y });
           b.queue.shift();
         }
@@ -180,12 +186,33 @@ function depleteNode(state: GameState, n: NodeEntity): void {
   markDirty(state, n.id);
 }
 
-function completeBuilding(state: GameState, b: BuildingEntity): void {
+/** Builder-seconds the current construction of a building needs. */
+export function workFor(state: GameState, b: BuildingEntity): number {
+  if (b.kind !== "great_work") return BUILDINGS[b.kind].work;
+  return greatWorkStages(state.world)[b.stage ?? 0]?.work ?? BUILDINGS[b.kind].work;
+}
+
+export function completeBuilding(state: GameState, b: BuildingEntity): void {
   b.complete = true;
   b.progress = 1;
   markDirty(state, b.id);
-  reveal(state, b.x + b.w / 2, b.y + b.h / 2, BUILDING_REVEAL);
-  state.events.push({ type: "built", kind: b.kind, x: b.x, y: b.y });
+  reveal(
+    state,
+    b.x + b.w / 2,
+    b.y + b.h / 2,
+    b.kind === "lighthouse" ? LIGHTHOUSE.reveal : BUILDING_REVEAL,
+  );
+  if (b.kind !== "great_work") {
+    state.events.push({ type: "built", kind: b.kind, x: b.x, y: b.y });
+    return;
+  }
+  b.stage = (b.stage ?? 0) + 1;
+  const final = b.stage >= greatWorkStages(state.world).length;
+  state.events.push({ type: "wonder", stage: b.stage, final });
+  if (final) {
+    state.stats.wonderAt = state.time;
+    state.statsDirty = true;
+  }
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -316,7 +343,7 @@ function stepAlong(state: GameState, v: VillagerEntity, dt: number): boolean {
       v.y = ty;
       budget -= dist;
       v.path.shift();
-      reveal(state, v.x, v.y, VILLAGER.reveal);
+      lookAround(state, v.x, v.y, VILLAGER.reveal);
     } else {
       v.x += (dx / dist) * budget;
       v.y += (dy / dist) * budget;
@@ -415,7 +442,7 @@ function work(state: GameState, v: VillagerEntity, dt: number): void {
   }
   if (t.kind === "build") {
     const b = state.entities.get(t.buildingId) as BuildingEntity;
-    b.progress = Math.min(1, b.progress + dt / Math.max(0.5, BUILDINGS[b.kind].work));
+    b.progress = Math.min(1, b.progress + dt / Math.max(0.5, workFor(state, b)));
     markDirty(state, b.id);
     if (b.progress >= 1) {
       completeBuilding(state, b);
@@ -638,7 +665,7 @@ function updateShip(state: GameState, s: ShipEntity, dt: number): void {
       s.y = ty;
       budget -= dist;
       s.path.shift();
-      reveal(state, s.x, s.y, shipReveal(state));
+      lookAround(state, s.x, s.y, shipReveal(state));
     } else {
       s.x += (dx / dist) * budget;
       s.y += (dy / dist) * budget;
@@ -710,6 +737,8 @@ function runRoute(state: GameState, s: ShipEntity): void {
   const spot = dockSpawn(dock);
   const tile = { x: Math.floor(spot.x), y: Math.floor(spot.y) };
   if (Math.hypot(s.x - spot.x, s.y - spot.y) > 1.5) {
+    // Wait in port while a storm sits on the way.
+    if (stormOnRoute(state, s, spot)) return rest(4);
     const path = sailable(state, tile.x, tile.y)
       ? seaPath(state, { x: Math.floor(s.x), y: Math.floor(s.y) }, tile)
       : null;
@@ -745,6 +774,9 @@ function runRoute(state: GameState, s: ShipEntity): void {
   }
   s.cargo = {};
   s.leg = "pickup";
-  if (delivered > 0) state.events.push({ type: "cargo", amount: delivered, x: spot.x, y: spot.y });
+  if (delivered > 0) {
+    tally(state, "hauled", delivered);
+    state.events.push({ type: "cargo", amount: delivered, x: spot.x, y: spot.y });
+  }
   rest(1);
 }

@@ -303,6 +303,242 @@
    "anchorX": 45,
    "anchorY": 16
   },
+  "b_great_work_1_islanders": {
+   "page": 0,
+   "anchorX": 61,
+   "anchorY": 14
+  },
+  "b_great_work_1_northfolk": {
+   "page": 0,
+   "anchorX": 61,
+   "anchorY": 14
+  },
+  "b_great_work_1_sunfolk": {
+   "page": 0,
+   "anchorX": 61,
+   "anchorY": 14
+  },
+  "b_great_work_1_sylvan": {
+   "page": 0,
+   "anchorX": 61,
+   "anchorY": 14
+  },
+  "b_great_work_2_islanders": {
+   "page": 0,
+   "anchorX": 61,
+   "anchorY": 41,
+   "sparkle": [
+    {
+     "x": 0,
+     "y": -8
+    }
+   ]
+  },
+  "b_great_work_2_northfolk": {
+   "page": 0,
+   "anchorX": 61,
+   "anchorY": 41,
+   "sparkle": [
+    {
+     "x": 0,
+     "y": -8
+    }
+   ]
+  },
+  "b_great_work_2_sunfolk": {
+   "page": 0,
+   "anchorX": 61,
+   "anchorY": 41,
+   "sparkle": [
+    {
+     "x": 0,
+     "y": -8
+    }
+   ]
+  },
+  "b_great_work_2_sylvan": {
+   "page": 0,
+   "anchorX": 61,
+   "anchorY": 41,
+   "sparkle": [
+    {
+     "x": 0,
+     "y": -8
+    }
+   ]
+  },
+  "b_great_work_3_islanders": {
+   "page": 0,
+   "anchorX": 61,
+   "anchorY": 69,
+   "sparkle": [
+    {
+     "x": 0,
+     "y": -64
+    }
+   ],
+   "lights": [
+    {
+     "x": 0,
+     "y": -66,
+     "r": 17
+    },
+    {
+     "x": 31,
+     "y": -24,
+     "r": 16
+    },
+    {
+     "x": 13,
+     "y": -47,
+     "r": 16
+    },
+    {
+     "x": 31,
+     "y": -37,
+     "r": 16
+    },
+    {
+     "x": 0,
+     "y": -62,
+     "r": 15
+    },
+    {
+     "x": -32,
+     "y": -25,
+     "r": 15
+    }
+   ]
+  },
+  "b_great_work_3_northfolk": {
+   "page": 0,
+   "anchorX": 61,
+   "anchorY": 69,
+   "sparkle": [
+    {
+     "x": 0,
+     "y": -64
+    }
+   ],
+   "lights": [
+    {
+     "x": 0,
+     "y": -66,
+     "r": 17
+    },
+    {
+     "x": 31,
+     "y": -24,
+     "r": 16
+    },
+    {
+     "x": 13,
+     "y": -47,
+     "r": 16
+    },
+    {
+     "x": 31,
+     "y": -37,
+     "r": 16
+    },
+    {
+     "x": 0,
+     "y": -62,
+     "r": 15
+    },
+    {
+     "x": -32,
+     "y": -25,
+     "r": 15
+    }
+   ]
+  },
+  "b_great_work_3_sunfolk": {
+   "page": 0,
+   "anchorX": 61,
+   "anchorY": 69,
+   "sparkle": [
+    {
+     "x": 0,
+     "y": -64
+    }
+   ],
+   "lights": [
+    {
+     "x": 0,
+     "y": -66,
+     "r": 17
+    },
+    {
+     "x": 31,
+     "y": -24,
+     "r": 16
+    },
+    {
+     "x": 13,
+     "y": -47,
+     "r": 16
+    },
+    {
+     "x": 31,
+     "y": -37,
+     "r": 16
+    },
+    {
+     "x": 0,
+     "y": -62,
+     "r": 15
+    },
+    {
+     "x": -32,
+     "y": -25,
+     "r": 15
+    }
+   ]
+  },
+  "b_great_work_3_sylvan": {
+   "page": 0,
+   "anchorX": 61,
+   "anchorY": 69,
+   "sparkle": [
+    {
+     "x": 0,
+     "y": -64
+    }
+   ],
+   "lights": [
+    {
+     "x": 0,
+     "y": -66,
+     "r": 17
+    },
+    {
+     "x": 31,
+     "y": -24,
+     "r": 16
+    },
+    {
+     "x": 13,
+     "y": -47,
+     "r": 16
+    },
+    {
+     "x": 31,
+     "y": -37,
+     "r": 16
+    },
+    {
+     "x": 0,
+     "y": -62,
+     "r": 15
+    },
+    {
+     "x": -32,
+     "y": -25,
+     "r": 15
+    }
+   ]
+  },
   "b_house_islanders": {
    "page": 0,
    "anchorX": 26,
@@ -420,6 +656,178 @@
      "x": 5,
      "y": 13,
      "r": 11
+    }
+   ]
+  },
+  "b_lighthouse_islanders": {
+   "page": 0,
+   "anchorX": 15,
+   "anchorY": 90,
+   "beam": [
+    {
+     "x": 0,
+     "y": -62
+    }
+   ],
+   "lights": [
+    {
+     "x": 0,
+     "y": -57,
+     "r": 20
+    },
+    {
+     "x": 0,
+     "y": -62,
+     "r": 17
+    },
+    {
+     "x": -5,
+     "y": -58,
+     "r": 16
+    },
+    {
+     "x": 4,
+     "y": -58,
+     "r": 16
+    },
+    {
+     "x": -5,
+     "y": -62,
+     "r": 15
+    },
+    {
+     "x": 4,
+     "y": -62,
+     "r": 15
+    }
+   ]
+  },
+  "b_lighthouse_northfolk": {
+   "page": 0,
+   "anchorX": 15,
+   "anchorY": 96,
+   "beam": [
+    {
+     "x": 0,
+     "y": -62
+    }
+   ],
+   "lights": [
+    {
+     "x": 0,
+     "y": -57,
+     "r": 20
+    },
+    {
+     "x": 0,
+     "y": -62,
+     "r": 17
+    },
+    {
+     "x": -5,
+     "y": -58,
+     "r": 16
+    },
+    {
+     "x": 4,
+     "y": -58,
+     "r": 16
+    },
+    {
+     "x": -5,
+     "y": -62,
+     "r": 15
+    },
+    {
+     "x": 4,
+     "y": -62,
+     "r": 15
+    }
+   ]
+  },
+  "b_lighthouse_sunfolk": {
+   "page": 0,
+   "anchorX": 15,
+   "anchorY": 83,
+   "beam": [
+    {
+     "x": 0,
+     "y": -62
+    }
+   ],
+   "lights": [
+    {
+     "x": 0,
+     "y": -57,
+     "r": 19
+    },
+    {
+     "x": 0,
+     "y": -60,
+     "r": 15
+    },
+    {
+     "x": -5,
+     "y": -57,
+     "r": 15
+    },
+    {
+     "x": 4,
+     "y": -57,
+     "r": 15
+    },
+    {
+     "x": -5,
+     "y": -61,
+     "r": 14
+    },
+    {
+     "x": 4,
+     "y": -61,
+     "r": 14
+    }
+   ]
+  },
+  "b_lighthouse_sylvan": {
+   "page": 0,
+   "anchorX": 15,
+   "anchorY": 90,
+   "beam": [
+    {
+     "x": 0,
+     "y": -62
+    }
+   ],
+   "lights": [
+    {
+     "x": 0,
+     "y": -57,
+     "r": 20
+    },
+    {
+     "x": 0,
+     "y": -62,
+     "r": 17
+    },
+    {
+     "x": -5,
+     "y": -58,
+     "r": 16
+    },
+    {
+     "x": 4,
+     "y": -58,
+     "r": 16
+    },
+    {
+     "x": -5,
+     "y": -62,
+     "r": 15
+    },
+    {
+     "x": 4,
+     "y": -62,
+     "r": 15
     }
    ]
   },
@@ -923,20 +1331,45 @@
    "anchorX": 4,
    "anchorY": 8
   },
+  "carry_glowcap": {
+   "page": 0,
+   "anchorX": 3,
+   "anchorY": 5
+  },
   "carry_gold": {
    "page": 0,
    "anchorX": 3,
    "anchorY": 5
+  },
+  "carry_hellstone": {
+   "page": 0,
+   "anchorX": 3,
+   "anchorY": 5
+  },
+  "carry_mirepearl": {
+   "page": 0,
+   "anchorX": 3,
+   "anchorY": 6
   },
   "carry_ore": {
    "page": 0,
    "anchorX": 3,
    "anchorY": 5
   },
+  "carry_rimeglass": {
+   "page": 0,
+   "anchorX": 3,
+   "anchorY": 7
+  },
   "carry_stone": {
    "page": 0,
    "anchorX": 3,
    "anchorY": 6
+  },
+  "carry_sunstone": {
+   "page": 0,
+   "anchorX": 3,
+   "anchorY": 7
   },
   "carry_wood": {
    "page": 0,
@@ -1143,6 +1576,11 @@
    "anchorX": 5,
    "anchorY": 5
   },
+  "icon_glowcap": {
+   "page": 0,
+   "anchorX": 5,
+   "anchorY": 6
+  },
   "icon_gold": {
    "page": 0,
    "anchorX": 5,
@@ -1152,6 +1590,16 @@
    "page": 0,
    "anchorX": 4,
    "anchorY": 6
+  },
+  "icon_hellstone": {
+   "page": 0,
+   "anchorX": 5,
+   "anchorY": 5
+  },
+  "icon_mirepearl": {
+   "page": 0,
+   "anchorX": 4,
+   "anchorY": 5
   },
   "icon_ore": {
    "page": 0,
@@ -1168,6 +1616,11 @@
    "anchorX": 4,
    "anchorY": 6
   },
+  "icon_rimeglass": {
+   "page": 0,
+   "anchorX": 2,
+   "anchorY": 6
+  },
   "icon_ship": {
    "page": 0,
    "anchorX": 6,
@@ -1176,6 +1629,11 @@
   "icon_stone": {
    "page": 0,
    "anchorX": 6,
+   "anchorY": 6
+  },
+  "icon_sunstone": {
+   "page": 0,
+   "anchorX": 5,
    "anchorY": 6
   },
   "icon_tools": {
@@ -1353,6 +1811,11 @@
    "anchorX": 11,
    "anchorY": 17
   },
+  "n_glowcap_0": {
+   "page": 0,
+   "anchorX": 7,
+   "anchorY": 15
+  },
   "n_glowshroom_0": {
    "page": 0,
    "anchorX": 1,
@@ -1392,6 +1855,11 @@
    "page": 0,
    "anchorX": 19,
    "anchorY": 43
+  },
+  "n_mirepearl_0": {
+   "page": 0,
+   "anchorX": 9,
+   "anchorY": 2
   },
   "n_oak_0": {
    "page": 0,
@@ -1457,6 +1925,11 @@
    "page": 0,
    "anchorX": 9,
    "anchorY": -3
+  },
+  "n_rimeglass_0": {
+   "page": 0,
+   "anchorX": 8,
+   "anchorY": 27
   },
   "n_sandstone_0": {
    "page": 0,
@@ -1527,6 +2000,11 @@
    "page": 0,
    "anchorX": 5,
    "anchorY": -3
+  },
+  "n_sunstone_0": {
+   "page": 0,
+   "anchorX": 7,
+   "anchorY": 16
   },
   "n_swamp_shroom_0": {
    "page": 0,
@@ -1742,6 +2220,11 @@
    "page": 0,
    "anchorX": 42,
    "anchorY": 24
+  },
+  "scaffold_4x4": {
+   "page": 0,
+   "anchorX": 58,
+   "anchorY": 29
   },
   "sea_arch_0": {
    "page": 0,

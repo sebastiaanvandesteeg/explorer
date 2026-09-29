@@ -6,6 +6,7 @@ import {
   generateWorld,
   NODES,
   NO_BIOME,
+  SIGNATURE,
   TRIBE_DEFS,
   TRIBES,
   tileIndex,
@@ -56,7 +57,13 @@ describe("biomes", () => {
     for (const n of w.nodes) {
       const is = w.islands[w.island[tileIndex(w, n.x, n.y)]!]!;
       const def = BIOME_DEFS[is.biome];
-      const allowed = new Set([...def.trees, ...def.food, def.stone, ...def.deposits]);
+      const allowed = new Set([
+        ...def.trees,
+        ...def.food,
+        def.stone,
+        ...def.deposits,
+        ...(SIGNATURE[is.biome] ? [SIGNATURE[is.biome]!.node] : []),
+      ]);
       expect(allowed.has(n.kind), `${n.kind} on ${is.biome}`).toBe(true);
     }
   });

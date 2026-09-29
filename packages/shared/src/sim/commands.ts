@@ -23,6 +23,7 @@ import {
 } from "./catalogue";
 import { disembark, hasRoom, landingBlock, shipMoving, shoreBeside } from "./ferry";
 import { seaPath, sailable } from "./navigation";
+import { greatWorkStages } from "./greatwork";
 import { canPlaceBuilding, nearestWater } from "./rules";
 import {
   addEntity,
@@ -60,6 +61,7 @@ export type Command =
   | { kind: "call-aboard"; shipId: number }
   | { kind: "unload"; shipId: number }
   | { kind: "buy-upgrade"; upgrade: UpgradeId }
+  | { kind: "fund-great-work"; buildingId: number }
   | { kind: "trade"; resource: Resource; action: "sell" | "buy" };
 
 export type CommandResult = { ok: true } | { ok: false; reason: string };
@@ -130,6 +132,8 @@ export function applyCommand(state: GameState, cmd: Command): CommandResult {
       const b = state.entities.get(cmd.buildingId);
       if (b?.type !== "building") return fail("No such building");
       if (!BUILDINGS[b.kind].buildable) return fail("That can't be removed");
+      if (b.kind === "great_work" && (b.stage ?? 0) >= 1)
+        return fail("The Great Work can't be torn down");
       const startDock = state.world.start.dock;
       if (b.kind === "dock" && b.x === startDock.x && b.y === startDock.y)
         return fail("The home dock can't be removed");
@@ -333,6 +337,25 @@ export function applyCommand(state: GameState, cmd: Command): CommandResult {
       const blocked = here && landingBlock(state, islandAt(state, here.x, here.y));
       if (blocked) return fail(blocked);
       return disembark(state, ship) > 0 ? OK : fail("Sail next to the shore to land");
+    }
+    case "fund-great-work": {
+      const b = state.entities.get(cmd.buildingId);
+      if (b?.type !== "building" || b.kind !== "great_work") return fail("No Great Work there");
+      const stages = greatWorkStages(state.world);
+      const stage = b.stage ?? 0;
+      if (stage >= stages.length) return fail("The Great Work is complete");
+      if (!b.complete)
+        return fail(
+          stage === 0 ? "The foundations are still being laid" : "The builders are still at work",
+        );
+      const cost = stages[stage]!.cost;
+      if (!canAfford(state.stock, cost)) return fail("Not enough for the next stage");
+      spend(state.stock, cost);
+      state.stockDirty = true;
+      b.complete = false;
+      b.progress = 0;
+      markDirty(state, b.id);
+      return OK;
     }
     case "buy-upgrade": {
       const def = UPGRADES[cmd.upgrade];
