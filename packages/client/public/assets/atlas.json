@@ -1163,6 +1163,11 @@
    "anchorX": 4,
    "anchorY": 7
   },
+  "icon_relic": {
+   "page": 0,
+   "anchorX": 4,
+   "anchorY": 6
+  },
   "icon_ship": {
    "page": 0,
    "anchorX": 6,
@@ -1633,6 +1638,86 @@
    "anchorX": 0,
    "anchorY": 0
   },
+  "patrol_0": {
+   "page": 0,
+   "anchorX": 20,
+   "anchorY": 56
+  },
+  "patrol_1": {
+   "page": 0,
+   "anchorX": 10,
+   "anchorY": 52
+  },
+  "patrol_2": {
+   "page": 0,
+   "anchorX": 15,
+   "anchorY": 56
+  },
+  "patrol_3": {
+   "page": 0,
+   "anchorX": 21,
+   "anchorY": 55
+  },
+  "patrol_4": {
+   "page": 0,
+   "anchorX": 15,
+   "anchorY": 55
+  },
+  "patrol_5": {
+   "page": 0,
+   "anchorX": 10,
+   "anchorY": 53
+  },
+  "patrol_6": {
+   "page": 0,
+   "anchorX": 20,
+   "anchorY": 55
+  },
+  "patrol_7": {
+   "page": 0,
+   "anchorX": 20,
+   "anchorY": 55
+  },
+  "pirate_0": {
+   "page": 0,
+   "anchorX": 20,
+   "anchorY": 56
+  },
+  "pirate_1": {
+   "page": 0,
+   "anchorX": 10,
+   "anchorY": 52
+  },
+  "pirate_2": {
+   "page": 0,
+   "anchorX": 15,
+   "anchorY": 56
+  },
+  "pirate_3": {
+   "page": 0,
+   "anchorX": 21,
+   "anchorY": 55
+  },
+  "pirate_4": {
+   "page": 0,
+   "anchorX": 15,
+   "anchorY": 55
+  },
+  "pirate_5": {
+   "page": 0,
+   "anchorX": 10,
+   "anchorY": 53
+  },
+  "pirate_6": {
+   "page": 0,
+   "anchorX": 20,
+   "anchorY": 55
+  },
+  "pirate_7": {
+   "page": 0,
+   "anchorX": 20,
+   "anchorY": 55
+  },
   "scaffold_1x1": {
    "page": 0,
    "anchorX": 10,
@@ -1747,6 +1832,16 @@
    "page": 0,
    "anchorX": 5,
    "anchorY": -1
+  },
+  "site_fortress": {
+   "page": 0,
+   "anchorX": 30,
+   "anchorY": 26
+  },
+  "site_ruin": {
+   "page": 0,
+   "anchorX": 16,
+   "anchorY": 12
   },
   "smoke_0": {
    "page": 0,
@@ -3107,6 +3202,21 @@
    "page": 0,
    "anchorX": 4,
    "anchorY": 19
+  },
+  "wreck_bones": {
+   "page": 0,
+   "anchorX": 9,
+   "anchorY": -2
+  },
+  "wreck_ship_0": {
+   "page": 0,
+   "anchorX": 11,
+   "anchorY": 20
+  },
+  "wreck_ship_1": {
+   "page": 0,
+   "anchorX": 18,
+   "anchorY": 21
   }
  }
 }

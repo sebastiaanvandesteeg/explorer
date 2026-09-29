@@ -4,7 +4,15 @@ import {
   canAfford,
   CARGO,
   cargoCost,
+  cargoCapacity,
   cargoLoad,
+  DIVE,
+  PATROL,
+  PIRATE,
+  shipMaxHp,
+  type PirateEntity,
+  type SiteEntity,
+  type WreckEntity,
   CHURCH,
   clockText,
   dayPeriod,
@@ -69,6 +77,7 @@ const ICON: Record<Resource, string> = {
   gold: "icon_gold",
   faith: "icon_faith",
   crystal: "icon_crystal",
+  relic: "icon_relic",
 };
 
 const LABEL: Record<Resource, string> = {
@@ -80,6 +89,7 @@ const LABEL: Record<Resource, string> = {
   gold: "Gold",
   faith: "Faith",
   crystal: "Crystal",
+  relic: "Relic",
 };
 
 export function discoveryText(biome: BiomeId): string {
@@ -290,7 +300,7 @@ export class Hud {
       const el = this.resEls.get(r)!;
       el.textContent = String(stock[r]);
       // Advanced resources stay hidden until the settlement has some.
-      if (["ore", "tools", "gold", "faith", "crystal"].includes(r)) {
+      if (["ore", "tools", "gold", "faith", "crystal", "relic"].includes(r)) {
         el.parentElement!.classList.toggle(
           "empty",
           stock[r] === 0 && !(this.lastStock && this.lastStock[r] > 0),
@@ -472,6 +482,12 @@ export class Hud {
             () => canAfford(state.stock, cargo),
             "Carries an island's stockpile home along a trade route",
           ),
+          button(
+            `Build patrol boat (${PATROL.cost.wood} wood, ${PATROL.cost.tools} tools)`,
+            cmd({ kind: "build-ship", buildingId: e.id, ship: "patrol" }),
+            () => canAfford(state.stock, PATROL.cost),
+            "An armed ship that hunts pirates on its own",
+          ),
         );
       }
       if (e.complete && (e.kind === "dock" || BUILDINGS[e.kind].dropOff)) {
@@ -480,11 +496,12 @@ export class Hud {
       }
       if (e.kind === "market" && e.complete)
         parts.push(this.marketPanel(state, button, small, cmd));
-      if (e.kind === "magic_house" && e.complete) {
+      if ((e.kind === "magic_house" || e.kind === "dock") && e.complete) {
         refs.upgrades = [];
         const list = h("div.upgrades", {});
         for (const id of UPGRADE_IDS) {
           const up = UPGRADES[id];
+          if (up.at !== e.kind) continue;
           const cost = h("span.cost");
           for (const [res, n] of Object.entries(up.cost))
             cost.append(small(res as Resource, n ?? 0));
@@ -551,8 +568,72 @@ export class Hud {
           "Right-click a tree, rock, building or the ground to give orders. Right-click a ship to board it.",
         ),
       );
+    } else if (e.type === "pirate") {
+      parts.push(h("div.title", {}, icon("icon_ship"), "Pirate ship"));
+      refs.status = h("div.desc");
+      parts.push(
+        refs.status,
+        h(
+          "div.desc",
+          {},
+          "Raiders hunt your ships and rob your storehouses. Sink them with patrol boats, cannons or Stormcaller, then salvage the wreck.",
+        ),
+      );
+    } else if (e.type === "wreck") {
+      parts.push(
+        h(
+          "div.title",
+          {},
+          icon("icon_ship"),
+          e.kind === "skeleton" ? "Bones of a raider" : "Shipwreck",
+        ),
+      );
+      refs.status = h("div.desc");
+      parts.push(
+        refs.status,
+        h(
+          "div.desc",
+          {},
+          e.kind === "skeleton"
+            ? "Right-click with a villager selected to pick through what the raider left behind."
+            : "Right-click with a scout ship or patrol boat selected to salvage it.",
+        ),
+      );
+    } else if (e.type === "site") {
+      parts.push(
+        h(
+          "div.title",
+          {},
+          icon("icon_relic"),
+          e.kind === "fortress" ? "Sunken fortress" : "Sunken ruins",
+        ),
+      );
+      refs.status = h("div.desc");
+      parts.push(
+        refs.status,
+        h(
+          "div.desc",
+          {},
+          "Sail a scout ship with villagers aboard over the site and right-click it to send them diving. They are the divers.",
+        ),
+      );
     } else {
       const ship = e as ShipEntity;
+      if (ship.kind === "patrol") {
+        parts.push(h("div.title", {}, icon("icon_ship"), "Patrol boat"));
+        refs.status = h("div.desc");
+        parts.push(
+          refs.status,
+          h(
+            "div.desc",
+            {},
+            `An armed ship. It hunts pirates within ${PATROL.engage} tiles by itself; right-click the sea to send it elsewhere, or a shipwreck to salvage it. It mends at a dock.`,
+          ),
+        );
+        this.selectionRefs = refs;
+        this.selectionEl.replaceChildren(...parts.filter((p): p is HTMLElement => !!p));
+        return;
+      }
       if (ship.kind === "cargo") {
         parts.push(h("div.title", {}, icon("icon_ship"), "Cargo ship"));
         refs.status = h("div.desc");
@@ -586,11 +667,23 @@ export class Hud {
         h(
           "div.desc",
           {},
-          "Right-click the sea to sail, or an island to sail there and put your passengers ashore.",
+          "Right-click the sea to sail, or an island to sail there and put your passengers ashore. Right-click a sunken site to send them diving, or a shipwreck to salvage it.",
         ),
         h(
           "div.actions",
           {},
+          button(
+            "Send divers",
+            () => {
+              const site = nearestSite(state, ship);
+              if (site) this.actions.command({ kind: "dive", shipId: ship.id, siteId: site.id });
+            },
+            () => {
+              const live = state.entities.get(ship.id) as ShipEntity | undefined;
+              return !!live && live.passengers.length > 0 && !!nearestSite(state, live);
+            },
+            `Villagers aboard dive for ${DIVE.seconds} seconds and bring up part of the treasure`,
+          ),
           button(
             "Take a villager aboard",
             cmd({ kind: "call-aboard", shipId: ship.id }),
@@ -690,7 +783,7 @@ export class Hud {
       } else if (e.kind === "town_hall") {
         status = `Population ${population(state)}/${populationCap(state)}`;
       } else if (e.kind === "magic_house") {
-        status = `Treasury: ${state.stock.gold} gold · ${state.stock.faith} faith · ${state.stock.crystal} crystal`;
+        status = `Treasury: ${state.stock.gold} gold · ${state.stock.faith} faith · ${state.stock.crystal} crystal · ${state.stock.relic} relics`;
       } else {
         status = "Ready";
       }
@@ -716,9 +809,21 @@ export class Hud {
                 : "A sapling growing into a tree";
     } else if (e.type === "villager") {
       if (refs.status) refs.status.textContent = describeVillager(state, e);
+    } else if (e.type === "pirate") {
+      if (refs.status) refs.status.textContent = describePirate(e);
+    } else if (e.type === "wreck") {
+      if (refs.status) refs.status.textContent = `Holds ${goodsText(e.loot)}`;
+    } else if (e.type === "site") {
+      if (refs.status)
+        refs.status.textContent = e.found
+          ? `Treasure left: ${goodsText(e.loot)}`
+          : "Something lies below…";
     } else if (refs.status) {
       const ship = e as ShipEntity;
-      if (ship.kind === "cargo") {
+      const hull = `Hull ${Math.ceil(ship.hp)}/${shipMaxHp(state, ship.kind)}`;
+      if (ship.kind === "patrol") {
+        refs.status.textContent = `${ship.hunt ? "Chasing pirates" : ship.dest ? "Sailing…" : "On patrol"} · ${hull}`;
+      } else if (ship.kind === "cargo") {
         const dock = ship.route === null ? undefined : state.entities.get(ship.route);
         const where =
           dock?.type === "building"
@@ -734,15 +839,46 @@ export class Hud {
               : ship.leg === "pickup"
                 ? "Waiting for goods"
                 : "In port";
-        refs.status.textContent = `${doing} · ${cargoLoad(ship)}/${CARGO.capacity} goods`;
+        refs.status.textContent = `${doing} · ${cargoLoad(ship)}/${cargoCapacity(state)} goods · ${hull}`;
         if (refs.extra) refs.extra.textContent = where;
       } else {
         const aboard = `${ship.passengers.length}/${SHIP.capacity} aboard`;
-        refs.status.textContent = `${ship.dest ? "Sailing…" : "Anchored"} · ${aboard}`;
+        const doing = ship.dive
+          ? "Divers below…"
+          : ship.salvage
+            ? "Salvaging…"
+            : ship.dest
+              ? "Sailing…"
+              : "Anchored";
+        refs.status.textContent = `${doing} · ${aboard} · ${hull}`;
       }
     }
     this.refreshSelectionButtons();
   }
+}
+
+function goodsText(goods: Partial<Stock>): string {
+  const items = RESOURCES.filter((r) => (goods[r] ?? 0) > 0).map((r) => `${goods[r]} ${r}`);
+  return items.length > 0 ? items.join(", ") : "nothing";
+}
+
+function describePirate(p: PirateEntity): string {
+  const what =
+    p.phase === "raid" ? "Robbing a settlement" : p.phase === "flee" ? "Fleeing" : "Hunting";
+  const loot = Object.values(p.loot).reduce((n, v) => n + (v ?? 0), 0);
+  return `${what} · Hull ${Math.ceil(p.hp)}/${PIRATE.hp}${loot > 0 ? ` · ${loot} goods stolen` : ""}`;
+}
+
+/** The closest uncleared sunken site within reach of a ship. */
+export function nearestSite(state: GameState, ship: ShipEntity): SiteEntity | null {
+  let best: SiteEntity | null = null;
+  for (const e of state.entities.values()) {
+    if (e.type !== "site" || !e.found) continue;
+    if (!Object.values(e.loot).some((n) => (n ?? 0) > 0)) continue;
+    const d = Math.hypot(e.x - ship.x, e.y - ship.y);
+    if (d <= 14 && (!best || d < Math.hypot(best.x - ship.x, best.y - ship.y))) best = e;
+  }
+  return best;
 }
 
 function describeIsland(state: GameState, islandId: number): string {
@@ -776,6 +912,7 @@ export function describeVillager(state: GameState, v: VillagerEntity): string {
   if (!t) return `Idle${carrying}`;
   if (t.kind === "move") return `Walking${carrying}`;
   if (t.kind === "board") return "Heading to the ship";
+  if (t.kind === "loot") return `${v.action === "work" ? "Searching" : "Heading to"} the bones`;
   if (t.kind === "harvest") {
     const n = state.entities.get(t.nodeId) as NodeEntity | undefined;
     const what = n ? NODES[n.kind].name.toLowerCase() : "resources";
@@ -874,6 +1011,12 @@ export class Minimap {
           for (let x = e.x; x < e.x + e.w; x++) dot(x, y, abgr("#5b4028"));
       } else if (e.type === "villager" && e.aboard === null) dot(e.x, e.y, abgr("#fbf0cf"));
       else if (e.type === "ship") dot(e.x, e.y, abgr("#e98a3a"), 2);
+      else if (
+        e.type === "pirate" &&
+        state.explored[tileIndex(w, Math.floor(e.x), Math.floor(e.y))]
+      )
+        dot(e.x, e.y, abgr("#d9486a"), 2);
+      else if (e.type === "site" && e.found) dot(e.x, e.y, abgr("#6cb9a8"), 1);
     }
     this.ctx.putImageData(img, 0, 0);
     if (view.length === 4) {

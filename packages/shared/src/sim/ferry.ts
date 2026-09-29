@@ -54,7 +54,7 @@ export function shipMoving(ship: ShipEntity): boolean {
 }
 
 export function hasRoom(ship: ShipEntity): boolean {
-  return ship.kind !== "cargo" && ship.passengers.length < SHIP.capacity;
+  return ship.kind === "scout" && ship.passengers.length < SHIP.capacity;
 }
 
 /** A villager standing beside the ship climbs aboard. */

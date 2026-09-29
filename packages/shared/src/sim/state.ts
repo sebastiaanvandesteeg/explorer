@@ -1,12 +1,15 @@
 import { inBounds, isLandTerrain, tileIndex } from "../world/grid";
+import { hash2d } from "../rng";
 import type { BiomeId } from "../world/biomes";
-import { Terrain, type Dir, type NodeKind, type WorldMap } from "../world/types";
+import { Terrain, type Dir, type NodeKind, type SiteKind, type WorldMap } from "../world/types";
 import {
   BUILDINGS,
   CARGO,
   NODES,
+  PIRATE,
   RESOURCES,
   SHIP,
+  SHIP_HP,
   START_STOCK,
   START_VILLAGERS,
   type BuildingKind,
@@ -30,7 +33,7 @@ export interface BuildingEntity {
   complete: boolean;
   dir?: Dir;
   /** Production queue (town hall trains villagers, docks build ships). */
-  queue: { what: "villager" | "ship" | "cargo"; remaining: number }[];
+  queue: { what: "villager" | "ship" | "cargo" | "patrol"; remaining: number }[];
   /** Villager staffing a workplace (camps, quarry, mine, farm, blacksmith, church). */
   workerId: number | null;
   /** Production timer in seconds (farm growth, forging, prayer). */
@@ -59,7 +62,8 @@ export type Task =
   | { kind: "build"; buildingId: number }
   | { kind: "staff"; buildingId: number }
   | { kind: "move"; x: number; y: number }
-  | { kind: "board"; shipId: number };
+  | { kind: "board"; shipId: number }
+  | { kind: "loot"; wreckId: number };
 
 export type VillagerAction = "idle" | "walk" | "deliver" | "work";
 
@@ -105,9 +109,72 @@ export interface ShipEntity {
   cargo: Partial<Stock>;
   /** Cargo ships wait at a dock until this time before trying again. */
   waitUntil: number;
+  hp: number;
+  /** Seconds until the guns can fire again. */
+  cooldown: number;
+  /** Patrol boats: chasing a pirate on their own rather than following an order. */
+  hunt: boolean;
+  /** Salvaging a shipwreck: the wreck and the seconds of work left. */
+  salvage: { wreckId: number; remaining: number } | null;
+  /** Divers over a sunken site: the site and the seconds left in the water. */
+  dive: { siteId: number; remaining: number } | null;
 }
 
-export type Entity = BuildingEntity | NodeEntity | VillagerEntity | ShipEntity;
+export type PiratePhase = "hunt" | "raid" | "flee";
+
+/** A raiding ship: it hunts your fleet or beaches at a settlement to rob its stockpile. */
+export interface PirateEntity {
+  id: number;
+  type: "pirate";
+  x: number;
+  y: number;
+  heading: number;
+  hp: number;
+  path: { x: number; y: number }[];
+  phase: PiratePhase;
+  /** The ship being hunted, or the building being raided. */
+  target: number | null;
+  /** Seconds left in the current phase (looting) or until the next replan. */
+  timer: number;
+  cooldown: number;
+  /** Goods stolen so far. */
+  loot: Partial<Stock>;
+  /** Where it came from and where it flees to. */
+  home: { x: number; y: number };
+}
+
+/** What a sunk ship or defeated pirate leaves behind: a shipwreck at sea or bones ashore. */
+export interface WreckEntity {
+  id: number;
+  type: "wreck";
+  kind: "shipwreck" | "skeleton";
+  x: number;
+  y: number;
+  variant: number;
+  loot: Partial<Stock>;
+}
+
+/** Sunken ruins and fortresses: unseen until a ship sails over them. */
+export interface SiteEntity {
+  id: number;
+  type: "site";
+  kind: SiteKind;
+  x: number;
+  y: number;
+  variant: number;
+  found: boolean;
+  /** Treasure still on the sea floor. */
+  loot: Partial<Stock>;
+}
+
+export type Entity =
+  | BuildingEntity
+  | NodeEntity
+  | VillagerEntity
+  | ShipEntity
+  | PirateEntity
+  | WreckEntity
+  | SiteEntity;
 
 export type GameEvent =
   | { type: "built"; kind: BuildingKind; x: number; y: number }
@@ -116,7 +183,18 @@ export type GameEvent =
   | { type: "discovered"; islandId: number; biome: BiomeId; x: number; y: number }
   | { type: "landed"; count: number; islandId: number; x: number; y: number }
   | { type: "cargo"; amount: number; x: number; y: number }
-  | { type: "upgrade"; upgrade: UpgradeId };
+  | { type: "upgrade"; upgrade: UpgradeId }
+  | { type: "pirates"; count: number; x: number; y: number }
+  | { type: "robbed"; islandId: number; x: number; y: number }
+  | { type: "sunk"; kind: ShipKind | "pirate"; x: number; y: number }
+  | {
+      type: "shot";
+      kind: "cannon" | "bolt";
+      from: { x: number; y: number };
+      to: { x: number; y: number };
+    }
+  | { type: "found"; site: SiteKind; x: number; y: number }
+  | { type: "salvaged"; what: string; goods: Partial<Stock>; x: number; y: number };
 
 export interface GameState {
   world: WorldMap;
@@ -130,6 +208,9 @@ export interface GameState {
   /** Magical upgrades bought at the magic house. */
   upgrades: Set<UpgradeId>;
   upgradesDirty: boolean;
+  /** Game time of the next pirate raid, and of the next lightning strike. */
+  nextRaid: number;
+  nextBolt: number;
   /** Outpost islands whose stockpile changed since the last patch. */
   outpostsDirty: Set<number>;
   entities: Map<number, Entity>;
@@ -204,6 +285,8 @@ export function emptyState(world: WorldMap): GameState {
     outpostsDirty: new Set(),
     upgrades: new Set(),
     upgradesDirty: false,
+    nextRaid: PIRATE.firstRaid,
+    nextBolt: 0,
     entities: new Map(),
     explored: new Uint8Array(n),
     discovered: new Set(),
@@ -249,6 +332,10 @@ export const hasUpgrade = (state: GameState, id: UpgradeId): boolean => state.up
 /** How far ships see around them, in tiles. */
 export function shipReveal(state: GameState): number {
   return SHIP.reveal * (hasUpgrade(state, "far_sight") ? 1.6 : 1);
+}
+
+export function shipMaxHp(state: GameState, kind: ShipKind): number {
+  return Math.round(SHIP_HP[kind] * (hasUpgrade(state, "iron_hulls") ? 1.5 : 1));
 }
 
 export function sailSpeedFactor(state: GameState): number {
@@ -305,6 +392,69 @@ export function newVillager(state: GameState, x: number, y: number): VillagerEnt
   };
 }
 
+export function newShip(
+  state: GameState,
+  kind: ShipKind,
+  x: number,
+  y: number,
+  heading: number,
+): ShipEntity {
+  return {
+    id: state.nextId++,
+    type: "ship",
+    x,
+    y,
+    heading,
+    path: [],
+    dest: null,
+    passengers: [],
+    unload: false,
+    kind,
+    route: null,
+    leg: null,
+    cargo: {},
+    waitUntil: 0,
+    hp: shipMaxHp(state, kind),
+    cooldown: 0,
+    hunt: false,
+    salvage: null,
+    dive: null,
+  };
+}
+
+/** What lies on the sea floor: pre-rolled from the site's position so it is the same everywhere. */
+export function siteLoot(kind: SiteKind, x: number, y: number): Partial<Stock> {
+  const roll = (salt: number) => hash2d(x, y, salt);
+  if (kind === "fortress") {
+    return {
+      gold: 90 + Math.floor(roll(1) * 60),
+      crystal: 6 + Math.floor(roll(2) * 8),
+      relic: 3 + Math.floor(roll(3) * 3),
+      tools: 6 + Math.floor(roll(4) * 8),
+    };
+  }
+  return {
+    gold: 25 + Math.floor(roll(1) * 30),
+    stone: 10 + Math.floor(roll(2) * 15),
+    ...(roll(3) < 0.4 ? { relic: 1 } : {}),
+  };
+}
+
+export function addSites(state: GameState): void {
+  for (const site of state.world.sites) {
+    addEntity(state, {
+      id: state.nextId++,
+      type: "site",
+      kind: site.kind,
+      x: site.x,
+      y: site.y,
+      variant: site.variant,
+      found: false,
+      loot: siteLoot(site.kind, site.x, site.y),
+    } satisfies SiteEntity);
+  }
+}
+
 export function createInitialState(world: WorldMap): GameState {
   const state = emptyState(world);
   const s = world.start;
@@ -329,6 +479,7 @@ export function createInitialState(world: WorldMap): GameState {
     const t = s.spawn[i % s.spawn.length]!;
     addEntity(state, newVillager(state, t.x, t.y));
   }
+  addSites(state);
   // The home island and the water around it start explored.
   for (let k = 0; k < state.explored.length; k++) {
     if (world.island[k] === s.islandId && world.shore[k]! <= 4) state.explored[k] = 1;

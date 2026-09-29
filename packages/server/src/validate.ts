@@ -43,8 +43,15 @@ export function parseCommand(v: unknown): Command | null {
       return { kind: v.kind, buildingId: v.buildingId };
     case "build-ship":
       if (!isInt(v.buildingId)) return null;
-      if (v.ship !== undefined && v.ship !== "scout" && v.ship !== "cargo") return null;
+      if (v.ship !== undefined && v.ship !== "scout" && v.ship !== "cargo" && v.ship !== "patrol")
+        return null;
       return { kind: "build-ship", buildingId: v.buildingId, ship: v.ship ?? "scout" };
+    case "salvage":
+      if (!isInt(v.shipId) || !isInt(v.wreckId)) return null;
+      return { kind: "salvage", shipId: v.shipId, wreckId: v.wreckId };
+    case "dive":
+      if (!isInt(v.shipId) || !isInt(v.siteId)) return null;
+      return { kind: "dive", shipId: v.shipId, siteId: v.siteId };
     case "set-route":
       if (!isInt(v.shipId) || !isIntOrNull(v.dockId)) return null;
       return { kind: "set-route", shipId: v.shipId, dockId: v.dockId };
@@ -76,6 +83,8 @@ export function parseCommand(v: unknown): Command | null {
         return { kind: "assign", villagerId: v.villagerId, target: { node: t.node } };
       if ("building" in t && isInt(t.building))
         return { kind: "assign", villagerId: v.villagerId, target: { building: t.building } };
+      if ("wreck" in t && isInt(t.wreck))
+        return { kind: "assign", villagerId: v.villagerId, target: { wreck: t.wreck } };
       if ("ship" in t && isInt(t.ship))
         return { kind: "assign", villagerId: v.villagerId, target: { ship: t.ship } };
       if (isInt(t.x) && isInt(t.y))

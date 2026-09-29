@@ -13,6 +13,7 @@ import {
   harvestSeconds,
   NODES,
   REGROW,
+  SALVAGE_SECONDS,
   SHIP,
   shipSpeed,
   SMITH,
@@ -21,6 +22,7 @@ import {
   type WorkerJob,
 } from "./catalogue";
 import { releaseTask } from "./commands";
+import { collectWreck, updateThreats } from "./pirates";
 import { disembark, dockSpawn, embark, hasRoom, shipMoving, shoreBeside } from "./ferry";
 import { landPath, sailable, seaPath } from "./navigation";
 import { buildingAround, isAdjacentTo, tilesAround } from "./rules";
@@ -30,6 +32,7 @@ import {
   islandAt,
   isPathTile,
   markDirty,
+  newShip,
   newVillager,
   population,
   populationCap,
@@ -47,6 +50,7 @@ import {
   type ShipEntity,
   type Task,
   type VillagerEntity,
+  type WreckEntity,
 } from "./state";
 
 export function tick(state: GameState, dt = TICK_SECONDS): void {
@@ -62,6 +66,7 @@ export function tick(state: GameState, dt = TICK_SECONDS): void {
     if (e.type === "villager") updateVillager(state, e, dt);
     else if (e.type === "ship") updateShip(state, e, dt);
   }
+  updateThreats(state, dt);
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -82,25 +87,16 @@ function updateBuilding(state: GameState, b: BuildingEntity, dt: number): void {
           state.events.push({ type: "villager", x: spot.x, y: spot.y });
           b.queue.shift();
         }
-      } else if (job.what === "ship" || job.what === "cargo") {
+      } else if (job.what !== "villager") {
         const at = shipSpawn(b);
         if (sailable(state, Math.floor(at.x), Math.floor(at.y))) {
-          const ship: ShipEntity = {
-            id: state.nextId++,
-            type: "ship",
-            x: at.x,
-            y: at.y,
-            heading: { "+x": 0, "+y": 2, "-x": 4, "-y": 6 }[b.dir ?? "+x"],
-            path: [],
-            dest: null,
-            passengers: [],
-            unload: false,
-            kind: job.what === "cargo" ? "cargo" : "scout",
-            route: null,
-            leg: null,
-            cargo: {},
-            waitUntil: 0,
-          };
+          const ship = newShip(
+            state,
+            job.what === "cargo" ? "cargo" : job.what === "patrol" ? "patrol" : "scout",
+            at.x,
+            at.y,
+            { "+x": 0, "+y": 2, "-x": 4, "-y": 6 }[b.dir ?? "+x"],
+          );
           addEntity(state, ship);
           reveal(state, ship.x, ship.y, shipReveal(state));
           state.events.push({ type: "ship", kind: ship.kind, x: ship.x, y: ship.y });
@@ -218,6 +214,10 @@ function taskValid(state: GameState, v: VillagerEntity, t: Task): boolean {
     }
     case "move":
       return true;
+    case "loot": {
+      const w = state.entities.get(t.wreckId);
+      return w?.type === "wreck" && w.kind === "skeleton";
+    }
     case "board": {
       const ship = state.entities.get(t.shipId);
       return ship?.type === "ship" && hasRoom(ship) && !shipMoving(ship);
@@ -349,6 +349,17 @@ function arrive(state: GameState, v: VillagerEntity): void {
     if (ship?.type === "ship" && beside && hasRoom(ship)) embark(state, v, ship);
     return;
   }
+  if (t.kind === "loot") {
+    const w = state.entities.get(t.wreckId) as WreckEntity;
+    const on = here.x === w.x && here.y === w.y;
+    if (!on && !isAdjacentTo(here.x, here.y, w.x, w.y)) return;
+    v.action = "work";
+    v.tool = null;
+    v.workTimer = 0;
+    faceTowards(v, w.x + 0.5, w.y + 0.5);
+    markDirty(state, v.id);
+    return;
+  }
   if (t.kind === "harvest") {
     const n = state.entities.get(t.nodeId) as NodeEntity;
     if (!isAdjacentTo(here.x, here.y, n.x, n.y)) return;
@@ -391,6 +402,15 @@ function work(state: GameState, v: VillagerEntity, dt: number): void {
     markDirty(state, v.id);
     markDirty(state, n.id);
     if (n.amount <= 0) depleteNode(state, n);
+    return;
+  }
+  if (t.kind === "loot") {
+    const w = state.entities.get(t.wreckId) as WreckEntity;
+    v.workTimer += dt;
+    if (v.workTimer >= SALVAGE_SECONDS) {
+      collectWreck(state, w);
+      releaseTask(state, v);
+    }
     return;
   }
   if (t.kind === "build") {
@@ -545,6 +565,9 @@ function planRoute(state: GameState, v: VillagerEntity): void {
     goals = buildingAround(state, b);
   } else if (t.kind === "board") {
     goals = shoreBeside(state, state.entities.get(t.shipId) as ShipEntity);
+  } else if (t.kind === "loot") {
+    const w = state.entities.get(t.wreckId) as WreckEntity;
+    goals = [{ x: w.x, y: w.y }, ...tilesAround(state, w.x, w.y)];
   } else {
     goals = [{ x: t.x, y: t.y }];
   }

@@ -10,6 +10,7 @@ import {
   DIR_VECTORS,
   Terrain,
   type DecoSpawn,
+  type SiteSpawn,
   type Dir,
   type Island,
   type IslandFlavor,
@@ -73,6 +74,7 @@ function attemptWorld(
     start: undefined as unknown as StartSite,
     nodes: [],
     decor: [],
+    sites: [],
   };
   const start = findStartSite(world);
   if (!start) return null;
@@ -84,7 +86,40 @@ function attemptWorld(
   world.nodes = placeNodes(world, base, reserved);
   if (!ensureHomeResources(world, base, reserved)) return null;
   world.decor = placeDecor(world, base, reserved);
+  world.sites = placeSites(world, base);
   return world;
+}
+
+/**
+ * Sunken ruins (many) and fortresses (a few, far from home) in deep water, spread out so ships
+ * meet them one at a time. Uses its own hash stream, so older worlds keep their islands.
+ */
+function placeSites(world: WorldMap, base: number): SiteSpawn[] {
+  const sites: SiteSpawn[] = [];
+  const home = world.start.townHall;
+  const wanted = { fortress: 3, ruin: 8 };
+  for (const kind of ["fortress", "ruin"] as const) {
+    const minHome = kind === "fortress" ? 55 : 22;
+    const spacing = kind === "fortress" ? 40 : 20;
+    const candidates: { x: number; y: number; r: number }[] = [];
+    for (let y = 4; y < world.height - 4; y++) {
+      for (let x = 4; x < world.width - 4; x++) {
+        const k = tileIndex(world, x, y);
+        if (isLandTerrain(world.terrain[k]!) || world.shore[k]! < 4) continue;
+        if (Math.hypot(x - home.x, y - home.y) < minHome) continue;
+        candidates.push({ x, y, r: hash2d(x, y, base ^ (kind === "fortress" ? 0x5f1 : 0x5f2)) });
+      }
+    }
+    candidates.sort((a, b) => a.r - b.r);
+    let placed = 0;
+    for (const c of candidates) {
+      if (placed >= wanted[kind]) break;
+      if (sites.some((s) => Math.hypot(s.x - c.x, s.y - c.y) < spacing)) continue;
+      sites.push({ kind, x: c.x, y: c.y, variant: Math.floor(c.r * 1000) % 2 });
+      placed++;
+    }
+  }
+  return sites;
 }
 
 function placeIslands(rng: Rng, size: number, homeBiome: BiomeId): IslandSeed[] {

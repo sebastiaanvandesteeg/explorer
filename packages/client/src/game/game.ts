@@ -12,6 +12,7 @@ import {
   inBounds,
   isLand,
   pickTile,
+  RESOURCES,
   tileIndex,
   type BiomeId,
   type BuildingKind,
@@ -20,6 +21,7 @@ import {
   type GameEvent,
   type Patch,
   type PlayerInfo,
+  type Resource,
 } from "@explorer/shared";
 import { Application, Container, Rectangle } from "pixi.js";
 import type { Atlas } from "../assets";
@@ -254,6 +256,52 @@ export class Game {
             : "A scout ship is ready at the dock",
         );
         break;
+      case "pirates": {
+        const hall = this.session.state.world.start.townHall;
+        // The map is drawn isometrically, so compass points follow the screen, not the grid.
+        const sx = ev.x - ev.y - (hall.x - hall.y);
+        const sy = ev.x + ev.y - (hall.x + hall.y);
+        const names = [
+          "east",
+          "south-east",
+          "south",
+          "south-west",
+          "west",
+          "north-west",
+          "north",
+          "north-east",
+        ];
+        const dir = names[(Math.round(Math.atan2(sy, sx) / (Math.PI / 4)) + 8) % 8]!;
+        this.hud.toast(
+          `Pirates! ${ev.count === 1 ? "A raiding ship approaches" : `${ev.count} raiding ships approach`} from the ${dir}`,
+          "error",
+        );
+        break;
+      }
+      case "robbed":
+        this.hud.toast("Pirates are looting a storehouse!", "error");
+        break;
+      case "sunk":
+        this.hud.toast(
+          ev.kind === "pirate"
+            ? "A pirate ship went down! Salvage the wreck or the bones for loot"
+            : `Your ${ev.kind === "patrol" ? "patrol boat" : `${ev.kind} ship`} was sunk`,
+          ev.kind === "pirate" ? "info" : "error",
+        );
+        break;
+      case "found":
+        this.hud.toast(
+          ev.site === "fortress"
+            ? "A sunken fortress lies beneath the waves! Send divers"
+            : "Sunken ruins lie beneath the waves. Send divers",
+        );
+        break;
+      case "salvaged":
+        this.hud.toast(`Recovered from ${ev.what}: ${goodsSummary(ev.goods)}`);
+        break;
+      case "shot":
+        this.entities.shot(ev.kind, ev.from, ev.to);
+        break;
       case "upgrade":
         this.hud.toast(`${UPGRADES[ev.upgrade].name} learned`);
         break;
@@ -368,14 +416,20 @@ export class Game {
     const tile = this.tileAt(sx, sy);
     let best: { e: Entity; z: number } | null = null;
     for (const e of state.entities.values()) {
-      if (tile && e.type !== "ship" && (Math.abs(e.x - tile.x) > 8 || Math.abs(e.y - tile.y) > 8))
+      if (
+        tile &&
+        e.type !== "ship" &&
+        e.type !== "pirate" &&
+        (Math.abs(e.x - tile.x) > 8 || Math.abs(e.y - tile.y) > 8)
+      )
         continue;
       const view = this.entities.view(e.id);
       if (!view || !view.root.visible) continue;
       const b = view.root.getBounds();
       if (!b.containsPoint(sx, sy)) continue;
       // Villagers and ships are small targets: prefer them when overlapping bigger sprites.
-      const z = view.root.zIndex + (e.type === "villager" || e.type === "ship" ? 1000 : 0);
+      const small = e.type === "villager" || e.type === "ship" || e.type === "pirate";
+      const z = view.root.zIndex + (small ? 1000 : 0);
       if (!best || z > best.z) best = { e, z };
     }
     return best?.e ?? null;
@@ -575,7 +629,9 @@ export class Game {
     const tile = this.tileAt(sx, sy);
     if (sel?.type === "villager") {
       const target = this.entityAt(sx, sy);
-      if (target?.type === "ship")
+      if (target?.type === "wreck")
+        void this.send({ kind: "assign", villagerId: sel.id, target: { wreck: target.id } });
+      else if (target?.type === "ship")
         void this.send({ kind: "assign", villagerId: sel.id, target: { ship: target.id } });
       else if (target?.type === "node")
         void this.send({ kind: "assign", villagerId: sel.id, target: { node: target.id } });
@@ -589,6 +645,8 @@ export class Game {
       if (target?.type === "building" && target.kind === "dock")
         void this.send({ kind: "set-route", shipId: sel.id, dockId: target.id });
       else if (tile) void this.send({ kind: "move-ship", shipId: sel.id, x: tile.x, y: tile.y });
+    } else if (sel?.type === "ship" && sel.kind !== "cargo" && this.shipTarget(sel.id, sx, sy)) {
+      // Handled: a wreck to salvage or a sunken site to dive at.
     } else if (sel?.type === "ship" && tile) {
       // Right-clicking land with passengers aboard means "take them there".
       const unload = isLand(state.world, tile.x, tile.y) && sel.passengers.length > 0;
@@ -596,6 +654,17 @@ export class Game {
     } else {
       this.select(null);
     }
+  }
+
+  /** Right-clicking a shipwreck salvages it and a found sunken site sends the passengers diving. */
+  private shipTarget(shipId: number, sx: number, sy: number): boolean {
+    const target = this.entityAt(sx, sy);
+    if (target?.type === "wreck" && target.kind === "shipwreck")
+      void this.send({ kind: "salvage", shipId, wreckId: target.id });
+    else if (target?.type === "site" && target.found)
+      void this.send({ kind: "dive", shipId, siteId: target.id });
+    else return false;
+    return true;
   }
 
   // ------------------------------------------------------------------------- frame
@@ -746,4 +815,9 @@ export class Game {
     }
     o.drawCursors(this.camera);
   }
+}
+
+function goodsSummary(goods: Partial<Record<Resource, number>>): string {
+  const items = RESOURCES.filter((r) => (goods[r] ?? 0) > 0).map((r) => `${goods[r]} ${r}`);
+  return items.length > 0 ? items.join(", ") : "nothing";
 }

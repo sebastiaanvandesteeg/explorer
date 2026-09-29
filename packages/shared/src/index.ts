@@ -17,5 +17,6 @@ export * from "./sim/commands";
 export * from "./sim/ferry";
 export * from "./sim/daylight";
 export * from "./sim/tick";
+export * from "./sim/pirates";
 export * from "./sim/snapshot";
 export * from "./protocol";

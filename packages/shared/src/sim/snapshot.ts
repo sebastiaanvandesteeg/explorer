@@ -1,15 +1,17 @@
 // Serialisation: full snapshots (join + persistence) and incremental patches (every tick).
 import type { TribeId } from "../tribes";
 import type { WorldMap } from "../world/types";
-import type { Stock, UpgradeId } from "./catalogue";
+import { SHIP_HP, type Stock, type UpgradeId } from "./catalogue";
 import {
   emptyState,
+  addSites,
   emptyStock,
   rebuildOccupancy,
   stockOf,
   type Entity,
   type GameEvent,
   type GameState,
+  type PirateEntity,
   type ShipEntity,
   type VillagerEntity,
 } from "./state";
@@ -20,9 +22,10 @@ import {
  * clients they are only accurate as of the entity's last change.
  */
 export type WireEntity =
-  | Exclude<Entity, VillagerEntity | ShipEntity>
+  | Exclude<Entity, VillagerEntity | ShipEntity | PirateEntity>
   | Omit<VillagerEntity, "path" | "retryAt">
-  | Omit<ShipEntity, "path">;
+  | Omit<ShipEntity, "path">
+  | Omit<PirateEntity, "path">;
 
 export interface Patch {
   tick: number;
@@ -47,6 +50,8 @@ export interface Snapshot {
   time: number;
   nextId: number;
   stock: Stock;
+  /** Game time of the next pirate raid. */
+  nextRaid?: number;
   /** Goods waiting on other islands, by island id. Older saves have none. */
   outposts?: Record<number, Stock>;
   upgrades?: UpgradeId[];
@@ -72,7 +77,7 @@ export function toWire(e: Entity): WireEntity {
     const { path: _path, retryAt: _retry, ...rest } = e;
     return clone(rest);
   }
-  if (e.type === "ship") {
+  if (e.type === "ship" || e.type === "pirate") {
     const { path: _path, ...rest } = e;
     return clone(rest);
   }
@@ -94,6 +99,13 @@ export function fromWire(w: WireEntity): Entity {
     e.leg ??= null;
     e.cargo ??= {};
     e.waitUntil ??= 0;
+    e.hp ??= SHIP_HP[e.kind];
+    e.cooldown ??= 0;
+    e.hunt ??= false;
+    e.salvage ??= null;
+    e.dive ??= null;
+  } else if (e.type === "pirate") {
+    e.path = [];
   }
   return e;
 }
@@ -139,6 +151,7 @@ export function toSnapshot(state: GameState): Snapshot {
     stock: { ...state.stock },
     outposts: Object.fromEntries([...state.outposts].map(([id, st]) => [id, { ...st }])),
     upgrades: [...state.upgrades],
+    nextRaid: state.nextRaid,
     entities: [...state.entities.values()].map(toWire),
     explored: encodeRuns(state.explored),
     discovered: [...state.discovered],
@@ -158,6 +171,7 @@ export function fromSnapshot(world: WorldMap, snap: Snapshot, resume = false): G
   for (const [id, st] of Object.entries(snap.outposts ?? {}))
     state.outposts.set(Number(id), { ...emptyStock(), ...st });
   state.upgrades = new Set(snap.upgrades ?? []);
+  if (snap.nextRaid !== undefined) state.nextRaid = snap.nextRaid;
   state.explored = decodeRuns(snap.explored, world.width * world.height);
   state.discovered = new Set(snap.discovered);
   for (const w of snap.entities) {
@@ -168,6 +182,8 @@ export function fromSnapshot(world: WorldMap, snap: Snapshot, resume = false): G
     state.entities.set(e.id, e);
   }
   rebuildOccupancy(state);
+  // Saves from before sunken sites existed get them now.
+  if (![...state.entities.values()].some((e) => e.type === "site")) addSites(state);
   state.dirty.clear();
   state.stockDirty = false;
   return state;

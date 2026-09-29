@@ -2,6 +2,10 @@ import { inBounds, tileIndex } from "../world/grid";
 import {
   BUILDINGS,
   CARGO,
+  DIVE,
+  PATROL,
+  RESOURCES,
+  SALVAGE_SECONDS,
   canAfford,
   cargoCost,
   MARKET_BUYABLE,
@@ -36,14 +40,20 @@ import {
 } from "./state";
 
 export type AssignTarget =
-  { node: number } | { building: number } | { ship: number } | { x: number; y: number };
+  | { node: number }
+  | { building: number }
+  | { ship: number }
+  | { wreck: number }
+  | { x: number; y: number };
 
 export type Command =
   | { kind: "place-building"; building: BuildingKind; x: number; y: number }
   | { kind: "remove-building"; buildingId: number }
   | { kind: "mark"; nodeIds: number[]; marked: boolean }
   | { kind: "train-villager"; buildingId: number }
-  | { kind: "build-ship"; buildingId: number; ship?: "scout" | "cargo" }
+  | { kind: "build-ship"; buildingId: number; ship?: "scout" | "cargo" | "patrol" }
+  | { kind: "salvage"; shipId: number; wreckId: number }
+  | { kind: "dive"; shipId: number; siteId: number }
   | { kind: "set-route"; shipId: number; dockId: number | null }
   | { kind: "move-ship"; shipId: number; x: number; y: number; unload?: boolean }
   | { kind: "assign"; villagerId: number; target: AssignTarget }
@@ -81,6 +91,15 @@ export function releaseTask(state: GameState, v: VillagerEntity): void {
   v.workTimer = 0;
   v.tool = null;
   markDirty(state, v.id);
+}
+
+/** Steering a ship by hand ends whatever it was doing on its own. */
+function stopDuty(ship: ShipEntity): void {
+  ship.route = null;
+  ship.leg = null;
+  ship.hunt = false;
+  ship.salvage = null;
+  ship.dive = null;
 }
 
 export function applyCommand(state: GameState, cmd: Command): CommandResult {
@@ -171,25 +190,73 @@ export function applyCommand(state: GameState, cmd: Command): CommandResult {
     case "build-ship": {
       const b = state.entities.get(cmd.buildingId);
       if (b?.type !== "building" || b.kind !== "dock" || !b.complete) return fail("Needs a dock");
-      const cargo = cmd.ship === "cargo";
-      const kind = cargo ? "cargo" : "scout";
+      const kind = cmd.ship ?? "scout";
+      const queued = kind === "scout" ? "ship" : kind;
       let count = 0;
       for (const e of state.entities.values()) {
         if (e.type === "ship" && e.kind === kind) count++;
-        else if (e.type === "building")
-          count += e.queue.filter((q) => q.what === (cargo ? "cargo" : "ship")).length;
+        else if (e.type === "building") count += e.queue.filter((q) => q.what === queued).length;
       }
-      const max = cargo ? CARGO.max : SHIP.max;
+      const max = kind === "cargo" ? CARGO.max : kind === "patrol" ? PATROL.max : SHIP.max;
       if (count >= max) return fail(`At most ${max} ${kind} ships`);
-      const cost = cargo ? cargoCost(state.world.tribe) : shipCost(state.world.tribe);
+      const tribe = state.world.tribe;
+      const cost =
+        kind === "cargo" ? cargoCost(tribe) : kind === "patrol" ? PATROL.cost : shipCost(tribe);
       if (!canAfford(state.stock, cost)) return fail("Not enough resources");
       spend(state.stock, cost);
       state.stockDirty = true;
       b.queue.push({
-        what: cargo ? "cargo" : "ship",
-        remaining: cargo ? CARGO.buildSeconds : SHIP.buildSeconds,
+        what: queued,
+        remaining:
+          kind === "cargo"
+            ? CARGO.buildSeconds
+            : kind === "patrol"
+              ? PATROL.buildSeconds
+              : SHIP.buildSeconds,
       });
       markDirty(state, b.id);
+      return OK;
+    }
+    case "salvage": {
+      const ship = state.entities.get(cmd.shipId);
+      if (ship?.type !== "ship") return fail("No such ship");
+      const wreck = state.entities.get(cmd.wreckId);
+      if (wreck?.type !== "wreck" || wreck.kind !== "shipwreck") return fail("Nothing to salvage");
+      if (ship.kind === "cargo")
+        return fail("Cargo ships can't salvage: use a scout or patrol boat");
+      const path = seaPath(
+        state,
+        { x: Math.floor(ship.x), y: Math.floor(ship.y) },
+        { x: wreck.x, y: wreck.y },
+      );
+      if (!path) return fail("No route by sea");
+      stopDuty(ship);
+      ship.path = path;
+      ship.dest = { x: wreck.x, y: wreck.y };
+      ship.salvage = { wreckId: wreck.id, remaining: SALVAGE_SECONDS };
+      markDirty(state, ship.id);
+      return OK;
+    }
+    case "dive": {
+      const ship = state.entities.get(cmd.shipId);
+      if (ship?.type !== "ship") return fail("No such ship");
+      const site = state.entities.get(cmd.siteId);
+      if (site?.type !== "site" || !site.found) return fail("Nothing to dive at");
+      if (RESOURCES.every((r) => (site.loot[r] ?? 0) === 0)) return fail("Nothing left down there");
+      if (ship.kind !== "scout") return fail("Only scout ships carry divers");
+      if (ship.passengers.length === 0) return fail("Take villagers aboard: they are the divers");
+      const path = seaPath(
+        state,
+        { x: Math.floor(ship.x), y: Math.floor(ship.y) },
+        { x: site.x, y: site.y },
+      );
+      if (!path) return fail("No route by sea");
+      stopDuty(ship);
+      ship.unload = false;
+      ship.path = path;
+      ship.dest = { x: site.x, y: site.y };
+      ship.dive = { siteId: site.id, remaining: DIVE.seconds };
+      markDirty(state, ship.id);
       return OK;
     }
     case "set-route": {
@@ -235,11 +302,8 @@ export function applyCommand(state: GameState, cmd: Command): CommandResult {
       if (!target || !sailable(state, target.x, target.y)) return fail("Can't sail there");
       const path = seaPath(state, { x: Math.floor(ship.x), y: Math.floor(ship.y) }, target);
       if (!path) return fail("No route by sea");
-      if (ship.route !== null) {
-        // Steering a cargo ship by hand ends its trade route.
-        ship.route = null;
-        ship.leg = null;
-      }
+      // Steering a ship by hand ends its trade route, hunt, salvage or dive.
+      stopDuty(ship);
       if (cmd.unload && ship.passengers.length > 0) {
         const island = w.island[tileIndex(w, tx, ty)]!;
         const blocked = island >= 0 && landingBlock(state, island);
@@ -275,10 +339,10 @@ export function applyCommand(state: GameState, cmd: Command): CommandResult {
       if (!def) return fail("Unknown upgrade");
       if (
         ![...state.entities.values()].some(
-          (e) => e.type === "building" && e.kind === "magic_house" && e.complete,
+          (e) => e.type === "building" && e.kind === def.at && e.complete,
         )
       )
-        return fail("Build a magic house first");
+        return fail(def.at === "dock" ? "Needs a dock" : "Build a magic house first");
       if (state.upgrades.has(def.id)) return fail("Already learned");
       if (!canAfford(state.stock, def.cost)) return fail("Not enough resources");
       spend(state.stock, def.cost);
@@ -320,12 +384,20 @@ export function applyCommand(state: GameState, cmd: Command): CommandResult {
       if ("ship" in t) {
         const ship = state.entities.get(t.ship);
         if (ship?.type !== "ship") return fail("No such ship");
-        if (ship.kind === "cargo") return fail("Cargo ships carry goods, not people");
+        if (ship.kind !== "scout") return fail("Only scout ships carry villagers");
         if (!hasRoom(ship)) return fail("The ship is full");
         if (shoreBeside(state, ship).length === 0)
           return fail("Sail the ship next to the shore first");
         releaseTask(state, v);
         v.task = { kind: "board", shipId: ship.id };
+        return OK;
+      }
+      if ("wreck" in t) {
+        const w = state.entities.get(t.wreck);
+        if (w?.type !== "wreck" || w.kind !== "skeleton")
+          return fail("Ships salvage shipwrecks; villagers pick over bones ashore");
+        releaseTask(state, v);
+        v.task = { kind: "loot", wreckId: w.id };
         return OK;
       }
       if ("node" in t) {
@@ -376,7 +448,7 @@ export function applyCommand(state: GameState, cmd: Command): CommandResult {
 
 /** Send the nearest villager on the ship's shore to climb aboard (idle ones first). */
 function callAboard(state: GameState, ship: ShipEntity): CommandResult {
-  if (ship.kind === "cargo") return fail("Cargo ships carry goods, not people");
+  if (ship.kind !== "scout") return fail("Only scout ships carry villagers");
   if (!hasRoom(ship)) return fail("The ship is full");
   const shore = shoreBeside(state, ship);
   if (shore.length === 0) return fail("Sail the ship next to the shore first");
