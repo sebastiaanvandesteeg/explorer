@@ -33,6 +33,7 @@ export function tileJitter(x: number, y: number, reach = 1): { dx: number; dy: n
 
 export function decorSprite(biome: BiomeId, d: DecoSpawn): string {
   if (d.kind === "sea_rock") return `sea_rock_${Math.floor(hash2d(d.x, d.y, 0x91) * 4)}`;
+  if (d.kind === "sea_arch") return `sea_arch_${d.variant % 2}`;
   if (d.kind === "tall") return `deco_${biome}_tall`;
   return `deco_${biome}_small_${d.variant % 2}`;
 }

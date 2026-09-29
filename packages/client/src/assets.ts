@@ -6,6 +6,8 @@ export interface SpriteMeta {
   anchorY: number;
   smoke?: { x: number; y: number }[];
   sparkle?: { x: number; y: number }[];
+  /** Lit windows and fires: where the building glows at night, and how far. */
+  lights?: { x: number; y: number; r: number }[];
 }
 
 interface Manifest {

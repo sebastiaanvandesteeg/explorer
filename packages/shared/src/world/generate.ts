@@ -241,7 +241,8 @@ function shapeTerrain(islands: IslandSeed[], base: number, size: number) {
       // Islands are one broad plateau, like the concept art: a narrow bank steps down to the
       // beaches, cliffy stretches drop straight into the sea, and outer islands get hills.
       let e: number;
-      if (flavor === "islet") e = h > 0.45 ? 1 : 0;
+      // Islets are rock stacks: a beach, a ledge and a tall crown, higher the bigger the islet.
+      if (flavor === "islet") e = h > 0.52 ? 3 : h > 0.3 ? 2 : h > 0.12 ? 1 : 0;
       else {
         e = h < 0.1 ? 0 : h < 0.2 ? 1 : flavor !== "home" && h > 0.72 ? 3 : 2;
         if (e < 2 && fbm(x * 0.13, y * 0.13, cliffSeed) > 0.58) e = 2;
@@ -329,7 +330,7 @@ function shapeTerrain(islands: IslandSeed[], base: number, size: number) {
     const flavor = flavorOf(k);
     const rocky = BIOME_DEFS[islands[island[k]!]!.biome].rocky * (flavor === "rocky" ? 2.2 : 1);
     if (elevation[k] === 0) terrain[k] = Terrain.Sand;
-    else if (flavor === "islet") terrain[k] = Terrain.Rock;
+    else if (flavor === "islet") terrain[k] = elevation[k]! >= 2 ? Terrain.Grass : Terrain.Rock;
     else if (flavor !== "home" && fbm(x * 0.15, y * 0.15, rockSeed) > 0.72 - rocky * 0.7)
       terrain[k] = Terrain.Rock;
     else terrain[k] = Terrain.Grass;
@@ -603,7 +604,50 @@ function placeNodes(world: WorldMap, base: number, reserved: Set<number>): NodeS
         });
     }
   }
+  crownIslets(world, base, nodes);
   return nodes;
+}
+
+/** Every islet with a grassy crown carries a tree on its highest ground, like the concept art. */
+function crownIslets(world: WorldMap, base: number, nodes: NodeSpawn[]): void {
+  const taken = new Set(nodes.map((n) => tileIndex(world, n.x, n.y)));
+  for (const island of world.islands) {
+    if (island.flavor !== "islet") continue;
+    let best = -1;
+    let bestScore = -Infinity;
+    for (
+      let y = Math.floor(island.cy - island.radius - 1);
+      y <= island.cy + island.radius + 1;
+      y++
+    ) {
+      for (
+        let x = Math.floor(island.cx - island.radius - 1);
+        x <= island.cx + island.radius + 1;
+        x++
+      ) {
+        if (!inBounds(world, x, y)) continue;
+        const k = tileIndex(world, x, y);
+        if (world.island[k] !== island.id || world.terrain[k] !== Terrain.Grass) continue;
+        const score =
+          world.elevation[k]! * 10 - Math.hypot(x + 0.5 - island.cx, y + 0.5 - island.cy);
+        if (score > bestScore) {
+          bestScore = score;
+          best = k;
+        }
+      }
+    }
+    if (best < 0 || taken.has(best)) continue;
+    const kind =
+      BIOME_DEFS[island.biome].trees[
+        Math.floor(hash2d(island.id, best, base ^ 0xc7) * BIOME_DEFS[island.biome].trees.length)
+      ]!;
+    nodes.push({
+      kind,
+      x: best % world.width,
+      y: Math.floor(best / world.width),
+      variant: Math.floor(hash2d(island.id, best, base ^ 0xc8) * NODE_VARIANTS[kind]),
+    });
+  }
 }
 
 /** The home island always has enough of everything to get going, whatever its biome. */
@@ -644,12 +688,46 @@ function ensureHomeResources(world: WorldMap, base: number, reserved: Set<number
   return add(def.trees, 30) && add([def.stone], 8) && add(def.food, 5) && add(ore, 5);
 }
 
+/** Rock arches standing in the shallows beside a coast; each blocks two water tiles. */
+function placeArches(
+  world: WorldMap,
+  base: number,
+  nearDock: (x: number, y: number) => boolean,
+): DecoSpawn[] {
+  const arches: DecoSpawn[] = [];
+  for (let y = 0; y < world.height; y++) {
+    for (let x = 0; x < world.width; x++) {
+      const k = tileIndex(world, x, y);
+      if (isLandTerrain(world.terrain[k]!) || world.shore[k] !== 1 || nearDock(x, y)) continue;
+      if (hash2d(x, y, base ^ 0xa7) > 0.004) continue;
+      const variant = hash2d(x, y, base ^ 0xa8) < 0.5 ? 0 : 1;
+      const bx = variant === 0 ? x + 1 : x;
+      const by = variant === 0 ? y : y + 1;
+      if (!inBounds(world, bx, by) || nearDock(bx, by)) continue;
+      const bk = tileIndex(world, bx, by);
+      if (isLandTerrain(world.terrain[bk]!) || world.shore[bk]! > 2) continue;
+      if (arches.some((a) => Math.hypot(a.x - x, a.y - y) < 18)) continue;
+      arches.push({ kind: "sea_arch", x, y, variant });
+    }
+  }
+  return arches;
+}
+
 function placeDecor(world: WorldMap, base: number, reserved: Set<number>): DecoSpawn[] {
   const decor: DecoSpawn[] = [];
   const taken = new Set(world.nodes.map((n) => tileIndex(world, n.x, n.y)));
   const dock = world.start.dock;
   const nearDock = (x: number, y: number) =>
     x >= dock.x - 5 && x < dock.x + dock.w + 5 && y >= dock.y - 5 && y < dock.y + dock.h + 5;
+  const arches = placeArches(world, base, nearDock);
+  const archTiles = new Set<number>();
+  for (const a of arches) {
+    archTiles.add(tileIndex(world, a.x, a.y));
+    archTiles.add(
+      a.variant === 0 ? tileIndex(world, a.x + 1, a.y) : tileIndex(world, a.x, a.y + 1),
+    );
+  }
+  decor.push(...arches);
   for (let y = 0; y < world.height; y++) {
     for (let x = 0; x < world.width; x++) {
       const k = tileIndex(world, x, y);
@@ -658,7 +736,7 @@ function placeDecor(world: WorldMap, base: number, reserved: Set<number>): DecoS
       const v = hash2d(x, y, base ^ 0xe5);
       if (!isLandTerrain(t)) {
         const shore = world.shore[k]!;
-        if (nearDock(x, y)) continue;
+        if (nearDock(x, y) || archTiles.has(k)) continue;
         if ((shore >= 1 && shore <= 3 && r < 0.01) || (shore > 3 && r < 0.0008)) {
           decor.push({ kind: "sea_rock", x, y, variant: v < 0.5 ? 0 : 1 });
         }

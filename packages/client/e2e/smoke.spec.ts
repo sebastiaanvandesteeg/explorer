@@ -68,4 +68,6 @@ test("offline mode plays without a server connection", async ({ page }) => {
   await expect(page.locator(".players")).toContainText("Offline game");
   await expect(page.locator(".players")).toContainText("Sylvan");
   await expect(page.locator('.resource[data-res="pop"]')).toHaveText("3/5");
+  // The world has a time of day, which every player sees on the HUD clock.
+  await expect(page.locator(".clock")).toContainText(/Day 1 · \w+ · \d\d:\d\d/);
 });

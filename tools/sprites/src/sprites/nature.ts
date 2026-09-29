@@ -679,6 +679,53 @@ function seaRock(variant: number): Sprite {
   return trimmed(rock.name, out, ax, ay);
 }
 
+/**
+ * A natural rock arch standing in the shallows on two water tiles: variant 0 spans +x, variant 1
+ * spans +y. Two mossy legs carry a lintel, with the sea running through the gap.
+ */
+function seaArch(variant: number): Sprite {
+  const rand = prng(5400 + variant * 31);
+  const s = new Scene();
+  const mat = rocky("rock", 6, 0.5);
+  // Along the span axis the legs stand on the two tile centres; across it, mid-tile.
+  const at = (along: number, across: number): [number, number] =>
+    variant === 0 ? [along, across] : [across, along];
+  const leg = (along: number, h: number) => {
+    const [x, y] = at(along, 0.5);
+    rock(s, rand, [x, y, h / 2], [0.23, 0.29, h / 2 + 2], mat, 20);
+  };
+  // Seen from the diagonal the tunnel is foreshortened, so the legs stand well apart.
+  leg(0.27, 36 + rand() * 4);
+  leg(1.73, 32 + rand() * 4);
+  // The lintel: a long, thin rock resting on both legs.
+  const [lx, ly] = at(1.0, 0.5);
+  s.withYaw(variant === 0 ? 0 : Math.PI / 2, [lx, ly], () => {
+    rock(s, rand, [lx, ly, 31], [0.98, 0.21, 5.5], mat, 18);
+  });
+  rock(s, rand, [...at(0.62, 0.78), 3], [0.16, 0.14, 7], mat, 10);
+  const w = variant === 0 ? 2 : 1;
+  const d = variant === 0 ? 1 : 2;
+  const rocks = renderSprite(`sea_arch_${variant}`, s, w, d, 48, 8);
+  const out = new Canvas(rocks.canvas.width + 44, rocks.canvas.height + 20);
+  const ax = rocks.anchorX + 22;
+  const ay = rocks.anchorY + 4;
+  // Surf around each foot: tile (0, 0) is centred half a tile below the anchor, its neighbour
+  // one tile-diagonal further along the span.
+  const feet: [number, number][] =
+    variant === 0
+      ? [
+          [0, 8],
+          [16, 16],
+        ]
+      : [
+          [0, 8],
+          [-16, 16],
+        ];
+  feet.forEach(([dx, dy], i) => surf(out, ax + dx, ay + dy, 12, 5.2, 11 + variant * 2 + i));
+  out.draw(rocks.canvas, 22, 4);
+  return trimmed(rocks.name, out, ax, ay);
+}
+
 /** Land boulders for the shore: like sea rocks but with a shadow and no surf. */
 function shoreRock(variant: number): Sprite {
   const size = [0.8, 0.62, 0.95, 0.5][variant]!;
@@ -821,6 +868,8 @@ export function natureSprites(): Sprite[] {
     bush("n_flower_bush_0", 6700, "blossomGround", 0.26, dots("petal", 0.16, 33, 0.25), 0.05),
     bush("n_flower_bush_bare", 6700, "blossomGround", 0.26, undefined, 0.05),
     ...[0, 1, 2, 3].map(seaRock),
+    seaArch(0),
+    seaArch(1),
     ...[0, 1, 2, 3].map(shoreRock),
     ...(["wood", "charred", "stalk", "silver"] as RegrowStyle[]).flatMap((st) => [
       stump(st),

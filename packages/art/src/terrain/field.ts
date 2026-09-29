@@ -30,6 +30,10 @@ export interface TerrainWorld {
   shore: Uint8Array;
   /** Tiles paved by finished Path buildings (1) — optional, it changes as the settlement grows. */
   paved?: Uint8Array | undefined;
+  /** How trampled the ground is around buildings, 0 (untouched) to 255 (bare earth). */
+  wear?: Uint8Array | undefined;
+  /** Tiles under a farm (1): ploughed field. */
+  field?: Uint8Array | undefined;
 }
 
 /** Interpolated indicator value above which a level counts as present. */
@@ -256,51 +260,38 @@ export class Fields {
         const w10 = a * (1 - b);
         const w01 = (1 - a) * b;
         const w11 = a * b;
-        // Cliff edges (levels above the beach) are rougher than shores: a second, jagged sample.
-        let r00 = w00;
-        let r10 = w10;
-        let r01 = w01;
-        let r11 = w11;
-        let ri = i;
-        let rj = j;
-        if (Math.max(l00, l10, l01, l11) >= 2) {
-          const ju = (vnoise(cu * 3.1, cv * 3.1, ROUGH_A) - 0.5) * 0.2;
-          const jv = (vnoise(cu * 3.1 + 6.1, cv * 3.1 + 2.7, ROUGH_C) - 0.5) * 0.2;
-          const qu = pu + ju;
-          const qv = pv + jv;
-          ri = Math.floor(qu);
-          rj = Math.floor(qv);
-          const ra = qu - ri;
-          const rb = qv - rj;
-          r00 = (1 - ra) * (1 - rb);
-          r10 = ra * (1 - rb);
-          r01 = (1 - ra) * rb;
-          r11 = ra * rb;
-        }
-        const m00 = this.lvAt(ri, rj);
-        const m10 = this.lvAt(ri + 1, rj);
-        const m01 = this.lvAt(ri, rj + 1);
-        const m11 = this.lvAt(ri + 1, rj + 1);
-        // The coast comes from the smooth sample; every level above it from the rough one, clipped
-        // to the coast so no cliff ever stands in the sea.
-        let level = 0;
+        // The coast comes from the smooth sample. Every level above the beach gets a sample of its
+        // own with extra jitter, rougher the higher it goes, so tall rock steps in and out from
+        // level to level instead of rising in one clean extrusion. Levels are clipped to the
+        // coast, so no cliff ever stands in the sea.
         const coast =
           (l00 > 0 ? w00 : 0) + (l10 > 0 ? w10 : 0) + (l01 > 0 ? w01 : 0) + (l11 > 0 ? w11 : 0);
-        if (coast >= LEVEL_THRESHOLD) {
-          level = 1;
-          for (let k = 2; k <= MAX_LEVEL; k++) {
-            const ind =
-              (m00 >= k ? r00 : 0) +
-              (m10 >= k ? r10 : 0) +
-              (m01 >= k ? r01 : 0) +
-              (m11 >= k ? r11 : 0);
-            if (ind >= LEVEL_THRESHOLD) level = k;
-            else break;
-          }
+        const highest = Math.max(l00, l10, l01, l11);
+        let level = 0;
+        let surface = coast;
+        if (coast >= LEVEL_THRESHOLD) level = 1;
+        let open = level === 1;
+        for (let k = 2; k <= highest; k++) {
+          const rough = 0.2 + 0.09 * (k - 2);
+          const qu = pu + (vnoise(cu * 3.1 + 7 * k, cv * 3.1, ROUGH_A + k) - 0.5) * rough;
+          const qv =
+            pv + (vnoise(cu * 3.1 + 6.1, cv * 3.1 + 2.7 + 5 * k, ROUGH_C + k) - 0.5) * rough;
+          const ri = Math.floor(qu);
+          const rj = Math.floor(qv);
+          const ra = qu - ri;
+          const rb = qv - rj;
+          const ind =
+            (this.lvAt(ri, rj) >= k ? (1 - ra) * (1 - rb) : 0) +
+            (this.lvAt(ri + 1, rj) >= k ? ra * (1 - rb) : 0) +
+            (this.lvAt(ri, rj + 1) >= k ? (1 - ra) * rb : 0) +
+            (this.lvAt(ri + 1, rj + 1) >= k ? ra * rb : 0);
+          surface += ind;
+          if (open && ind >= LEVEL_THRESHOLD) level = k;
+          else open = false;
         }
         const idx = (ly * CELL + cj) * n + lx * CELL + ci;
         this.level[idx] = level;
-        this.f[idx] = m00 * r00 + m10 * r10 + m01 * r01 + m11 * r11;
+        this.f[idx] = surface;
         this.land[idx] = coast;
       }
     }

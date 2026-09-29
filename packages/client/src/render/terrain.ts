@@ -1,4 +1,4 @@
-import { chunkRect } from "@explorer/art";
+import { WAVE_SEQUENCE, chunkRect } from "@explorer/art";
 import {
   hash2d,
   HALF_H,
@@ -7,6 +7,7 @@ import {
   isLandTerrain,
   surfaceHeight,
   tileIndex,
+  type BuildingEntity,
   type DecoSpawn,
   type GameState,
 } from "@explorer/shared";
@@ -21,11 +22,15 @@ import {
 } from "pixi.js";
 import type { Atlas } from "../assets";
 import { ChunkPainter } from "./chunkPainter";
+import { buildingsKey, groundMasks, type GroundMasks } from "./ground";
 import { biomeOfTile, decorSprite, tileJitter } from "./names";
+import { coverAt } from "./occlusion";
 import type { Pixels } from "./paintProtocol";
 
 export const CHUNK = 16;
-const MAX_CACHED = 56;
+const MAX_CACHED = 40;
+/** How long each step of the wave animation lasts. */
+const WAVE_MS = 550;
 /** Painting jobs the worker is given at once, so a fast pan is not stuck behind stale requests. */
 const MAX_IN_FLIGHT = 3;
 
@@ -40,6 +45,19 @@ interface Chunk {
   stale: boolean;
   /** What the chunk shows: the ground with the decoration stamped on top. */
   view: { sprite: Sprite; texture: RenderTexture } | null;
+  /** The foam and shallows, one texture per wave frame, shown under the ground. */
+  waves: { sprite: Sprite; textures: Texture[] } | null;
+}
+
+/** A texture from painted RGBA pixels. */
+function pixelTexture(pixels: Pixels, width: number, height: number): Texture {
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  canvas.getContext("2d")!.putImageData(new ImageData(pixels, width, height), 0, 0);
+  const texture = Texture.from(canvas);
+  texture.source.scaleMode = "nearest";
+  return texture;
 }
 
 /** Height of a tile's visible surface: unexplored tiles render as flat fog at sea level. */
@@ -53,6 +71,8 @@ export function visibleHeight(state: GameState, x: number, y: number): number | 
 
 export class TerrainLayer {
   readonly container = new Container();
+  /** Foam and shallows, drawn under `container` so cliffs and rocks stay solid over the waves. */
+  readonly waves = new Container();
   readonly ocean: TilingSprite;
   private readonly chunks = new Map<number, Chunk>();
   private readonly dirty = new Set<number>();
@@ -64,8 +84,9 @@ export class TerrainLayer {
   private readonly cols: number;
   private readonly rows: number;
   private painter: ChunkPainter;
-  /** Tiles paved by finished Path buildings, as last sent to the painter. */
-  private paved: Uint8Array;
+  /** What the settlement has done to the ground, as last sent to the painter. */
+  private masks: GroundMasks;
+  private buildingsKey = "";
   private inFlight = 0;
   private generation = 0;
   private frameNo = 0;
@@ -84,8 +105,8 @@ export class TerrainLayer {
     }
     this.placeShoreRocks();
     this.painter = new ChunkPainter(w, CHUNK);
-    this.paved = new Uint8Array(w.width * w.height);
-    this.syncPaths();
+    this.masks = groundMasks(w, []);
+    this.syncBuildings();
     const margin = 1024;
     this.ocean = new TilingSprite({
       texture: atlas.ocean[0]!,
@@ -146,8 +167,9 @@ export class TerrainLayer {
     this.state = state;
     this.painter.dispose();
     this.painter = new ChunkPainter(state.world, CHUNK);
-    this.paved = new Uint8Array(state.world.width * state.world.height);
-    this.syncPaths();
+    this.masks = groundMasks(state.world, []);
+    this.buildingsKey = "";
+    this.syncBuildings();
     this.generation++;
     this.inFlight = 0;
     this.pending.clear();
@@ -155,39 +177,40 @@ export class TerrainLayer {
   }
 
   /**
-   * Finished Path buildings are painted into the ground rather than stamped as tiles, so their
-   * edges blend into the land. Call after path buildings appear, finish or go away.
+   * Paths, farm fields and trampled yards are painted into the ground rather than stamped as
+   * sprites, so their edges blend into the land. Call after buildings appear, finish or go away;
+   * it only repaints the chunks whose ground actually changed.
    */
-  syncPaths(): void {
+  syncBuildings(): void {
+    const buildings: BuildingEntity[] = [];
+    for (const e of this.state.entities.values()) if (e.type === "building") buildings.push(e);
+    const key = buildingsKey(buildings);
+    if (key === this.buildingsKey) return;
+    this.buildingsKey = key;
     const w = this.state.world;
-    const next = new Uint8Array(w.width * w.height);
-    for (const e of this.state.entities.values()) {
-      if (e.type !== "building" || e.kind !== "path" || !e.complete) continue;
-      for (let y = e.y; y < e.y + e.h; y++)
-        for (let x = e.x; x < e.x + e.w; x++) if (inBounds(w, x, y)) next[tileIndex(w, x, y)] = 1;
-    }
+    const next = groundMasks(w, buildings);
     const touched = new Set<number>();
-    for (let k = 0; k < next.length; k++) {
-      if (next[k] === this.paved[k]) continue;
+    for (let k = 0; k < next.wear.length; k++) {
+      if (
+        next.wear[k] === this.masks.wear[k] &&
+        next.paved[k] === this.masks.paved[k] &&
+        next.field[k] === this.masks.field[k]
+      )
+        continue;
       const x = k % w.width;
       const y = Math.floor(k / w.width);
-      // A path blends into the ground up to a tile around it.
-      for (const [dx, dy] of [
-        [0, 0],
-        [-1, 0],
-        [1, 0],
-        [0, -1],
-        [0, 1],
-      ] as const) {
-        const cx = Math.floor((x + dx) / CHUNK);
-        const cy = Math.floor((y + dy) / CHUNK);
-        if (cx >= 0 && cy >= 0 && cx < this.cols && cy < this.rows)
-          touched.add(cy * this.cols + cx);
-      }
+      // Ground blends into its neighbours up to a couple of tiles away.
+      for (const dx of [-2, 0, 2])
+        for (const dy of [-2, 0, 2]) {
+          const cx = Math.floor((x + dx) / CHUNK);
+          const cy = Math.floor((y + dy) / CHUNK);
+          if (cx >= 0 && cy >= 0 && cx < this.cols && cy < this.rows)
+            touched.add(cy * this.cols + cx);
+        }
     }
     if (touched.size === 0) return;
-    this.paved = next;
-    this.painter.setPaved(next);
+    this.masks = next;
+    this.painter.setMasks(next);
     for (const key of touched) {
       const chunk = this.chunks.get(key);
       if (chunk) chunk.stale = true;
@@ -198,6 +221,11 @@ export class TerrainLayer {
     const frame = Math.floor(time / 450) % 3;
     this.ocean.texture = this.atlas.ocean[frame]!;
     this.ocean.tilePosition.set(Math.sin(time / 4000) * 6, (time / 400) % 64);
+    // Waves run up the shore and back: every chunk shows the same step of the sequence.
+    const step = WAVE_SEQUENCE[Math.floor(time / WAVE_MS) % WAVE_SEQUENCE.length]!;
+    for (const c of this.chunks.values()) {
+      if (c.waves?.sprite.visible) c.waves.sprite.texture = c.waves.textures[step]!;
+    }
   }
 
   /** Mark chunks containing these tiles (and their neighbours' chunks) for redraw. */
@@ -281,6 +309,7 @@ export class TerrainLayer {
       ground: undefined,
       stale: false,
       view: null,
+      waves: null,
     };
     chunk.stale = false;
     this.chunks.set(c.key, chunk);
@@ -288,13 +317,14 @@ export class TerrainLayer {
     this.inFlight++;
     const job = this.painter
       .paint(c.cx, c.cy, { x: c.b.x, y: c.b.y, w: c.b.width, h: c.b.height })
-      .then((pixels) => {
+      .then((painted) => {
         if (generation !== this.generation) return;
         this.inFlight--;
         this.pending.delete(c.key);
         // The chunk may have been evicted or replaced while it was being painted.
         if (this.chunks.get(c.key) !== chunk) return;
-        chunk.ground = pixels;
+        chunk.ground = painted?.ground ?? null;
+        this.setWaves(chunk, c.b, painted?.waves ?? null);
         this.dirty.add(c.key);
       });
     this.pending.set(c.key, job);
@@ -322,6 +352,7 @@ export class TerrainLayer {
         if (!chunk || chunk.ground === undefined) continue;
       }
       chunk.lastSeen = this.frameNo;
+      if (chunk.waves) chunk.waves.sprite.visible = true;
       if (chunk.ground === null && !this.decorChunks.has(v.key)) continue;
       if (chunk.view && !this.dirty.has(v.key)) {
         chunk.view.sprite.visible = true;
@@ -350,8 +381,11 @@ export class TerrainLayer {
       }
     }
     const visibleKeys = new Set(visible.map((v) => v.key));
-    for (const [key, c] of this.chunks)
-      if (c.view && !visibleKeys.has(key)) c.view.sprite.visible = false;
+    for (const [key, c] of this.chunks) {
+      if (visibleKeys.has(key)) continue;
+      if (c.view) c.view.sprite.visible = false;
+      if (c.waves) c.waves.sprite.visible = false;
+    }
     if (this.chunks.size > MAX_CACHED) {
       const old = [...this.chunks.entries()]
         .filter(([k, c]) => !visibleKeys.has(k) && c.ground !== undefined)
@@ -360,12 +394,32 @@ export class TerrainLayer {
     }
   }
 
+  /** Replace a chunk's wave frames (they are painted again whenever its ground is). */
+  private setWaves(chunk: Chunk, b: Rectangle, frames: Pixels[] | null): void {
+    if (chunk.waves) {
+      chunk.waves.sprite.destroy();
+      for (const t of chunk.waves.textures) t.destroy(true);
+      chunk.waves = null;
+    }
+    if (!frames) return;
+    const textures = frames.map((f) => pixelTexture(f, b.width, b.height));
+    const sprite = new Sprite(textures[0]);
+    sprite.position.set(b.x, b.y);
+    sprite.visible = false;
+    this.waves.addChild(sprite);
+    chunk.waves = { sprite, textures };
+  }
+
   private evict(key: number): void {
     const c = this.chunks.get(key);
     if (!c) return;
     if (c.view) {
       c.view.sprite.destroy();
       c.view.texture.destroy(true);
+    }
+    if (c.waves) {
+      c.waves.sprite.destroy();
+      for (const t of c.waves.textures) t.destroy(true);
     }
     this.chunks.delete(key);
     this.dirty.delete(key);
@@ -379,12 +433,7 @@ export class TerrainLayer {
     // no tile edge ever shows; only decoration is stamped on top as sprites.
     let groundTexture: Texture | null = null;
     if (chunk.ground) {
-      const canvas = document.createElement("canvas");
-      canvas.width = b.width;
-      canvas.height = b.height;
-      canvas.getContext("2d")!.putImageData(new ImageData(chunk.ground, b.width, b.height), 0, 0);
-      groundTexture = Texture.from(canvas);
-      groundTexture.source.scaleMode = "nearest";
+      groundTexture = pixelTexture(chunk.ground, b.width, b.height);
       tmp.addChild(new Sprite(groundTexture));
     }
     const add = (name: string, sx: number, sy: number) => {
@@ -408,8 +457,12 @@ export class TerrainLayer {
         if (!deco && !rock) continue;
         const sx = (x - y) * HALF_W;
         const sy = (x + y) * HALF_H;
+        // Decoration is painted over the ground, so anything behind a cliff or hill is left out.
+        const base = isLandTerrain(w.terrain[k]!) ? surfaceHeight(true, w.elevation[k]!) : 0;
+        if (coverAt(w, x + 0.5, y + 0.5, base) > 8) continue;
         if (!isLandTerrain(w.terrain[k]!)) {
-          if (deco?.kind === "sea_rock") add(decorSprite("temperate", deco), sx, sy);
+          if (deco?.kind === "sea_rock" || deco?.kind === "sea_arch")
+            add(decorSprite("temperate", deco), sx, sy);
         } else if (occupancy[k] === 0) {
           const h = surfaceHeight(true, w.elevation[k]!);
           const j = tileJitter(x, y, 1.3);

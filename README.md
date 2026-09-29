@@ -76,6 +76,12 @@ Every island belongs to one of ten biomes, with its own ground, cliffs, plants, 
 | Infernal Isles  | Far away    | Charred trees, ember fruit, obsidian, hellstone | Dark red, embers, grit     |
 | Crystal Spires  | Far away    | Silverleaf trees, crystal clusters              | Indigo, sparkling motes    |
 
+### Day and night
+
+One day lasts eight minutes of game time and starts in the morning. The HUD clock under the expedition name shows the day, the part of the day and the time. Dawn is warm, dusk golden, and night deep blue with fireflies, while houses, churches, the town hall and forges light their windows. It changes how the world looks, not how it plays.
+
+![Midday, dusk and night in the same settlement](docs/daynight.webp)
+
 ### How a settlement grows
 
 - **Villagers pick up work by themselves:** building sites first, then staffing workplaces, then marked resources. They carry up to 5 goods to the nearest town hall, storehouse or camp on their island. Trees regrow from their stumps.
@@ -109,8 +115,10 @@ tools/sprites     palette extraction and the sprite generator → client/public/
 - **Persistence:** each world is saved to `data/worlds/<id>.json` every 30 s, when the last player leaves and on shutdown. Saves are atomic.
   - Players are identified by name plus a random token kept in `localStorage`. Only a hash of the token is stored on the server.
 - **Rendering:**
-  - Terrain is painted per pixel by `@explorer/art` in a Web Worker, one 16×16-tile chunk at a time, and baked into render-texture chunks together with the decoration. Painted ground is cached, so building something only redraws the decoration.
-  - Buildings, trees, villagers and ships are depth-sorted by `x + y`. Plants and rocks get a small fixed offset inside their tile so they do not stand in rows.
+  - Terrain is painted per pixel by `@explorer/art` in a Web Worker, one 16×16-tile chunk at a time, and baked into render-texture chunks together with the decoration. Painted ground is cached, so building something only redraws the decoration. The foam and shallows are painted as three wave frames that play under the ground, so shores lap and shimmer.
+  - Buildings, trees, villagers and ships are depth-sorted by `x + y`. Plants and rocks get a small fixed offset inside their tile so they do not stand in rows. Terrain is drawn under every sprite, so anything standing on low ground behind a cliff or hill fades to a ghost instead of overlapping it.
+  - Paths, farm fields and the trampled earth round buildings are painted into the ground from per-tile masks, so they blend into the land instead of ending at a sprite's edge.
+  - Day and night colour the whole world. The time of day comes from the simulation clock (`GameState.time`), so everyone in a world sees the same sun. A colour grade is multiplied into the biome's grade, and the glow of lit windows and forges is drawn above it so darkness cannot dim it.
   - Fog of war is a smooth mask projected onto the isometric grid.
   - Zoom uses integer steps so pixels stay crisp.
 
@@ -122,7 +130,9 @@ tools/sprites     palette extraction and the sprite generator → client/public/
 2. **Terrain** is not made of sprites. The world is still a grid of tiles for the simulation, but `@explorer/art` (`terrain/`) never draws a tile:
    - It turns the tile data into smooth fields: each tile's level (sea, beach, bank, plateau, hill) is interpolated between tile centres after a wobbling warp, and the contours of those fields become the coasts and cliff edges. Shores come out as curves, not staircases, and agree with the tile grid at over 99.5% of tile centres, so buildings and villagers stand on painted ground.
    - Each pixel casts a view ray through the fields to find a plateau top, a cliff face or the sea, and is coloured from the biome's materials. Ground, beaches, rock slabs, dirt, paved paths and boulder-and-crevice cliffs are functions of the world position, so nothing repeats per tile.
-   - Water gets the foam line, dithered turquoise shallows tinted by the biome and dark reef shadows, all translucent so the animated ocean shows through.
+   - Water gets the foam line, dithered turquoise shallows tinted by the biome and dark reef shadows, all translucent so the animated ocean shows through. Foam and shallows come in three frames that play in and out, so waves run up the shore.
+   - Land climbs 14 pixels per level, so cliffs stand tall. Each level of tall rock gets its own jitter, so stacks step in and out; islets are rock stacks with a grassy crown and a tree, and a few shallow coasts carry sea arches.
+   - Settlements leave their mark: grass round a building is trampled into a worn yard with an irregular edge, and farms stand in ploughed fields whose furrows line up with the crop rows in the sprite.
    - Chunks are painted independently and join without seams (a unit test paints a world in pieces and in one go and compares every pixel).
 3. **Objects** (`sprites/buildings.ts`, `nature.ts`, `decor.ts`, `units.ts`) are modelled with a tiny isometric ray-caster (`raytrace.ts`) from boxes, gable and hip roofs, prisms, cones and blobs.
    - Buildings take a tribe style: wall material, roof shape and accent colours.
@@ -137,7 +147,7 @@ To **review art**:
 
 - Browse every frame at **http://localhost:5190/sprites.html**, shown next to the concept art.
 - Paint part of a generated world to a PNG without a browser: `pnpm --filter @explorer/art preview out.png <seed> <tribe> <island-id | home | tx,ty> <width> <height> <scale>` (sprites are not drawn).
-- Add `&reveal` to an offline URL to lift the fog.
+- Add `&reveal` to an offline URL to lift the fog, and `&phase=0.8` to freeze the time of day (0 is sunrise, 0.25 midday, 0.5 sunset, 0.8 the dead of night).
 - With the dev server running, `node packages/client/scripts/biome-shots.mjs <dir>` screenshots one island of every biome.
 
 `pnpm sprites:check` (part of `pnpm test`) fails when the committed atlas is out of date.
@@ -160,6 +170,6 @@ Server environment variables: `PORT` (8787), `HOST`, `DATA_DIR` (`data/worlds`),
 - Buying the magic house's exploration upgrades
 - Building extra docks on other islands
 - Trade routes and cargo ships
-- Day/night cycle and sound
+- Sound
 - Accounts beyond name + token
 - Deployment

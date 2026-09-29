@@ -13,6 +13,7 @@ import {
 } from "pixi.js";
 import type { Atlas } from "../assets";
 import { ATMOSPHERE, OCEAN, type Atmosphere, type ParticleMotion } from "./biomeStyle";
+import type { DayGrade } from "./daylight";
 
 interface Grade {
   tint: [number, number, number];
@@ -38,6 +39,10 @@ interface Particle {
 }
 
 const MAX_PARTICLES = 160;
+
+/** What comes out on any night that has nothing of its own floating about. */
+const NIGHT_FIREFLIES = { kind: "firefly", rate: 6, motion: "float" as ParticleMotion };
+const NIGHT_VIGNETTE: [number, number, number] = [6, 12, 38];
 
 function gradeOf(a: Atmosphere): Grade {
   return {
@@ -112,6 +117,7 @@ export class AtmosphereLayer {
   private target: Atmosphere = OCEAN;
   private live: Particle[] = [];
   private spawnDebt = 0;
+  private night = 0;
 
   constructor(private readonly atlas: Atlas) {
     this.vignette = new Sprite(vignetteTexture());
@@ -124,7 +130,13 @@ export class AtmosphereLayer {
     this.target = biome ? ATMOSPHERE[biome] : OCEAN;
   }
 
-  update(dt: number, screen: Rectangle, zoom: number, pan: { dx: number; dy: number }): void {
+  update(
+    dt: number,
+    screen: Rectangle,
+    zoom: number,
+    pan: { dx: number; dy: number },
+    day: DayGrade,
+  ): void {
     // Ease every parameter towards the target biome.
     const k = 1 - Math.exp(-dt * 1.6);
     const t = gradeOf(this.target);
@@ -141,18 +153,33 @@ export class AtmosphereLayer {
     ];
     g.vignetteStrength = mix(g.vignetteStrength, t.vignetteStrength);
     g.grain = mix(g.grain, t.grain);
+    // The time of day is multiplied into the biome's grade, and the night closes the vignette in.
+    this.night = day.night;
+    const shown: Grade = {
+      tint: [g.tint[0] * day.tint[0], g.tint[1] * day.tint[1], g.tint[2] * day.tint[2]],
+      saturation: g.saturation * day.saturation,
+      brightness: Math.max(0.42, g.brightness * day.brightness),
+      contrast: g.contrast * day.contrast,
+      vignette: [
+        g.vignette[0] + (NIGHT_VIGNETTE[0] - g.vignette[0]) * day.night * 0.8,
+        g.vignette[1] + (NIGHT_VIGNETTE[1] - g.vignette[1]) * day.night * 0.8,
+        g.vignette[2] + (NIGHT_VIGNETTE[2] - g.vignette[2]) * day.night * 0.8,
+      ],
+      vignetteStrength: g.vignetteStrength + 0.22 * day.night,
+      grain: g.grain,
+    };
     // The `matrix` setter doesn't flag the uniforms as changed, so push the update explicitly.
     const uniforms = this.filter.resources.colorMatrixUniforms as UniformGroup;
-    uniforms.uniforms.uColorMatrix = colourMatrix(g);
+    uniforms.uniforms.uColorMatrix = colourMatrix(shown);
     uniforms.update();
 
     this.vignette.width = screen.width;
     this.vignette.height = screen.height;
     this.vignette.tint =
-      (Math.round(g.vignette[0]) << 16) |
-      (Math.round(g.vignette[1]) << 8) |
-      Math.round(g.vignette[2]);
-    this.vignette.alpha = g.vignetteStrength;
+      (Math.round(shown.vignette[0]) << 16) |
+      (Math.round(shown.vignette[1]) << 8) |
+      Math.round(shown.vignette[2]);
+    this.vignette.alpha = shown.vignetteStrength;
     this.grain.width = screen.width;
     this.grain.height = screen.height;
     this.grain.tileScale.set(zoom);
@@ -169,7 +196,7 @@ export class AtmosphereLayer {
     zoom: number,
     pan: { dx: number; dy: number },
   ): void {
-    const spec = this.target.particles;
+    const spec = this.target.particles ?? (this.night > 0.6 ? NIGHT_FIREFLIES : null);
     if (spec) {
       // Rate is per 1000×1000 screen pixels, so small windows aren't flooded.
       this.spawnDebt += dt * spec.rate * ((screen.width * screen.height) / 1e6);

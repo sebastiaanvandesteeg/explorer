@@ -353,6 +353,26 @@ input.field:focus {
   font-size: 12px;
   opacity: 0.75;
 }
+.clock {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  opacity: 0.85;
+}
+.clock .orb {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #f6d23a;
+  box-shadow: 0 0 6px rgba(246, 210, 58, 0.55);
+}
+.clock .orb.moon {
+  background: #d6def5;
+  box-shadow:
+    inset -3px -1px 0 #8b98c4,
+    0 0 6px rgba(190, 205, 245, 0.45);
+}
 
 .minimap {
   position: absolute;

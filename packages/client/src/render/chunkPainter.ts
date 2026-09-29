@@ -1,8 +1,15 @@
 // Paints terrain chunks in a Web Worker (or right here when workers are not available).
-import { paintChunk, type PaintOptions, type PaintRect, type TerrainWorld } from "@explorer/art";
+import {
+  paintChunk,
+  type PaintedChunk,
+  type PaintOptions,
+  type PaintRect,
+  type TerrainWorld,
+} from "@explorer/art";
 import { BIOMES, type WorldMap } from "@explorer/shared";
 import { ATMOSPHERE, OCEAN } from "./biomeStyle";
-import type { PaintInit, PaintPaved, PaintReply, PaintRequest, Pixels } from "./paintProtocol";
+import type { GroundMasks } from "./ground";
+import type { PaintInit, PaintMasks, PaintReply, PaintRequest } from "./paintProtocol";
 
 /** Shallow-water colour for each biome index, with the open ocean's last. */
 function glowTable(): [number, number, number][] {
@@ -10,7 +17,7 @@ function glowTable(): [number, number, number][] {
 }
 
 interface Job {
-  resolve: (pixels: Pixels | null) => void;
+  resolve: (painted: PaintedChunk | null) => void;
   cx: number;
   cy: number;
   rect: PaintRect;
@@ -42,7 +49,7 @@ export class ChunkPainter {
       worker.onmessage = (e: MessageEvent<PaintReply>) => {
         const job = this.waiting.get(e.data.id);
         this.waiting.delete(e.data.id);
-        job?.resolve(e.data.pixels);
+        job?.resolve(e.data.painted);
       };
       worker.onerror = () => this.fallBack();
       const init: PaintInit = { type: "init", world: terrain, chunk, glow };
@@ -53,15 +60,15 @@ export class ChunkPainter {
     }
   }
 
-  /** Tell the painter which tiles are paved from now on (applies to paints requested after this). */
-  setPaved(paved: Uint8Array): void {
-    this.local.world.paved = paved;
-    const msg: PaintPaved = { type: "paved", paved };
+  /** Tell the painter what the settlement has done to the ground (applies to later paints). */
+  setMasks(masks: GroundMasks): void {
+    Object.assign(this.local.world, masks);
+    const msg: PaintMasks = { type: "masks", ...masks };
     this.worker?.postMessage(msg);
   }
 
-  /** Pixels for a chunk (null when nothing near it is land). */
-  paint(cx: number, cy: number, rect: PaintRect): Promise<Pixels | null> {
+  /** The images for a chunk: standing ground and wave frames (null when no land is near). */
+  paint(cx: number, cy: number, rect: PaintRect): Promise<PaintedChunk | null> {
     return new Promise((resolve) => {
       const id = this.nextId++;
       this.waiting.set(id, { resolve, cx, cy, rect });

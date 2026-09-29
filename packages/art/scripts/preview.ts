@@ -1,6 +1,6 @@
 // Dev tool: paints part of a generated world with the terrain painter and writes a PNG, without
 // a browser. Usage:
-//   pnpm --filter @explorer/art preview <out.png> [seed] [tribe] [target] [width] [height] [scale]
+//   pnpm --filter @explorer/art preview <out.png> [seed] [tribe] [target] [width] [height] [scale] [wave frame 0-2]
 // `target` is an island id, "home", or "tx,ty" (tile coordinates). Sprites are not drawn.
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -16,7 +16,9 @@ const [
   width = "960",
   height = "600",
   scale = "1",
+  frame = "0",
 ] = process.argv.slice(2);
+const wave = Number(frame);
 
 const CHUNK = 16;
 const world = generateWorld(seed, tribe as TribeId);
@@ -59,20 +61,22 @@ for (let ky = 0; ky < rows; ky++)
   for (let kx = 0; kx < cols; kx++) {
     const r = chunkRect(kx, ky, CHUNK);
     if (r.x + r.w < sx || r.x > sx + W || r.y + r.h < sy || r.y > sy + H) continue;
-    const px = paintChunk(world, kx, ky, CHUNK, r, { glow });
+    const chunkImages = paintChunk(world, kx, ky, CHUNK, r, { glow });
     painted++;
-    if (!px) continue;
-    for (let y = 0; y < r.h; y++)
-      for (let x = 0; x < r.w; x++) {
-        const s = (y * r.w + x) * 4;
-        const a = px[s + 3]! / 255;
-        if (a === 0) continue;
-        const dx = r.x + x - Math.floor(sx);
-        const dy = r.y + y - Math.floor(sy);
-        if (dx < 0 || dy < 0 || dx >= W || dy >= H) continue;
-        const d = (dy * W + dx) * 4;
-        for (let k = 0; k < 3; k++) img.data[d + k] = px[s + k]! * a + img.data[d + k]! * (1 - a);
-      }
+    if (!chunkImages) continue;
+    // The waves run under the ground, like they do in the game.
+    for (const px of [chunkImages.waves[wave]!, chunkImages.ground])
+      for (let y = 0; y < r.h; y++)
+        for (let x = 0; x < r.w; x++) {
+          const s = (y * r.w + x) * 4;
+          const a = px[s + 3]! / 255;
+          if (a === 0) continue;
+          const dx = r.x + x - Math.floor(sx);
+          const dy = r.y + y - Math.floor(sy);
+          if (dx < 0 || dy < 0 || dx >= W || dy >= H) continue;
+          const d = (dy * W + dx) * 4;
+          for (let k = 0; k < 3; k++) img.data[d + k] = px[s + k]! * a + img.data[d + k]! * (1 - a);
+        }
   }
 console.log(`painted ${painted} chunks in ${(performance.now() - t0).toFixed(0)} ms`);
 

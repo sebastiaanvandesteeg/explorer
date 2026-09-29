@@ -1,5 +1,6 @@
 // Messages between the main thread and the terrain paint worker (types only).
-import type { PaintRect, TerrainWorld } from "@explorer/art";
+import type { PaintedChunk, PaintRect, TerrainWorld } from "@explorer/art";
+import type { GroundMasks } from "./ground";
 
 export type Pixels = Uint8ClampedArray<ArrayBuffer>;
 
@@ -11,10 +12,9 @@ export interface PaintInit {
   glow: [number, number, number][];
 }
 
-/** The tiles paved by finished Path buildings; sent again whenever they change. */
-export interface PaintPaved {
-  type: "paved";
-  paved: Uint8Array;
+/** What the settlement has done to the ground; sent again whenever it changes. */
+export interface PaintMasks extends GroundMasks {
+  type: "masks";
 }
 
 export interface PaintRequest {
@@ -27,5 +27,5 @@ export interface PaintRequest {
 
 export interface PaintReply {
   id: number;
-  pixels: Pixels | null;
+  painted: PaintedChunk | null;
 }

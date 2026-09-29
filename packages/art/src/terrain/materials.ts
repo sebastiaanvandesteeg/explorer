@@ -1,7 +1,7 @@
 // What the ground is made of. Every biome has a ground, a beach, a rock and a dirt look, plus a
 // cliff and bank ramp for the faces. Colours are functions of the world position, not of a tile,
 // so nothing repeats on a 32×16 grid: patches of colour drift smoothly across tile borders.
-import type { BiomeId } from "@explorer/shared";
+import { ELEV_PX, type BiomeId } from "@explorer/shared";
 import { hexToRgba, rampColor, shade, type RampName, type Rgba } from "../palette";
 import { clamp01, hash2, vnoise } from "../noise";
 
@@ -21,8 +21,15 @@ export const MAT_ROCK = 2;
 export const MAT_DIRT = 3;
 /** Flagstones laid by a Path building. */
 export const MAT_PATH = 4;
+/** Ploughed soil under a farm. */
+export const MAT_FIELD = 5;
 export type Material =
-  typeof MAT_SAND | typeof MAT_GROUND | typeof MAT_ROCK | typeof MAT_DIRT | typeof MAT_PATH;
+  | typeof MAT_SAND
+  | typeof MAT_GROUND
+  | typeof MAT_ROCK
+  | typeof MAT_DIRT
+  | typeof MAT_PATH
+  | typeof MAT_FIELD;
 
 type Surface = (c: PixelCtx) => Rgba;
 type Detail = (c: PixelCtx, n: number) => Rgba | null;
@@ -33,6 +40,8 @@ export interface BiomeArt {
   rock: Surface;
   dirt: Surface;
   path: Surface;
+  /** Ploughed soil for farms. */
+  field: Surface;
   /** Tall cliff faces and low banks. */
   cliff: RampName;
   bank: RampName;
@@ -144,6 +153,27 @@ const slabs = (ramp: RampName, moss = 0.35): Surface =>
 
 const stonePath = flagstones("stone", "soil");
 
+/**
+ * Ploughed rows along the tile x axis: five to a tile, so they line up with the crop rows in the
+ * farm sprite whichever tile the farm stands on.
+ */
+function furrows(ramp: RampName): Surface {
+  return (c) => {
+    const row = (c.u * 5) % 1;
+    const n = vnoise(c.u * 5, c.v * 5, 71);
+    if (row < 0.36) return shade(ramp, 0.12 + n * 0.2, c.X, c.Y, 0.3);
+    return shade(
+      ramp,
+      0.5 + (n - 0.5) * 0.3 + (c.r - 0.5) * 0.12 + (row > 0.86 ? 0.08 : 0),
+      c.X,
+      c.Y,
+      0.3,
+    );
+  };
+}
+
+const soilField = furrows("soil");
+
 const ART: Record<BiomeId, BiomeArt> = {
   temperate: {
     ground: surface(
@@ -160,6 +190,7 @@ const ART: Record<BiomeId, BiomeArt> = {
     rock: slabs("rock"),
     dirt: soilDirt,
     path: stonePath,
+    field: soilField,
     cliff: "rock",
     bank: "soil",
     lip: "grass",
@@ -177,6 +208,7 @@ const ART: Record<BiomeId, BiomeArt> = {
     rock: slabs("sandstone", 0),
     dirt: surface("dune", 0.4, 0.3, speckle("sandstone", 3, 0)),
     path: flagstones("sandstone", "dune"),
+    field: furrows("dune"),
     cliff: "sandstone",
     bank: "dune",
     lip: "dune",
@@ -199,6 +231,7 @@ const ART: Record<BiomeId, BiomeArt> = {
     }),
     dirt: surface("ash", 0.3, 0.3, speckle("basalt", 4, 0)),
     path: flagstones("basalt", "ash"),
+    field: furrows("ash"),
     cliff: "basalt",
     bank: "ash",
     lip: "ash",
@@ -217,6 +250,7 @@ const ART: Record<BiomeId, BiomeArt> = {
     rock: slabs("ice", 0),
     dirt: surface("soil", 0.5, 0.3, speckle("snow", 3, 0)),
     path: flagstones("stone", "snow"),
+    field: soilField,
     cliff: "ice",
     bank: "snow",
     lip: "snow",
@@ -236,6 +270,7 @@ const ART: Record<BiomeId, BiomeArt> = {
     rock: slabs("rock", 0.5),
     dirt: soilDirt,
     path: stonePath,
+    field: soilField,
     cliff: "rock",
     bank: "soil",
     lip: "jungle",
@@ -252,6 +287,7 @@ const ART: Record<BiomeId, BiomeArt> = {
     rock: slabs("rock", 0.5),
     dirt: surface("soil", 0.4, 0.3, speckle("swampGround", 3, 0)),
     path: stonePath,
+    field: soilField,
     cliff: "rock",
     bank: "swampGround",
     lip: "swampGround",
@@ -267,6 +303,7 @@ const ART: Record<BiomeId, BiomeArt> = {
     rock: surface("crystalGround", 0.4, 0.34, speckle("fungalGround", 4, 0)),
     dirt: surface("fungalGround", 0.3, 0.3, speckle("crystalGround", 3, 0)),
     path: flagstones("crystalGround", "fungalGround"),
+    field: furrows("fungalGround"),
     cliff: "crystalGround",
     bank: "fungalGround",
     lip: "fungalGround",
@@ -283,6 +320,7 @@ const ART: Record<BiomeId, BiomeArt> = {
     rock: surface("crystalGround", 0.45, 0.34, speckle("crystal", 4, 1)),
     dirt: surface("crystalGround", 0.35, 0.3, speckle("crystal", 3, 0)),
     path: flagstones("crystalGround", "sand"),
+    field: furrows("crystalGround"),
     cliff: "crystalGround",
     bank: "crystalGround",
     lip: "crystalGround",
@@ -306,6 +344,7 @@ const ART: Record<BiomeId, BiomeArt> = {
     rock: slabs("rock"),
     dirt: soilDirt,
     path: stonePath,
+    field: soilField,
     cliff: "rock",
     bank: "soil",
     lip: "autumnGround",
@@ -325,6 +364,7 @@ const ART: Record<BiomeId, BiomeArt> = {
     rock: slabs("rock"),
     dirt: soilDirt,
     path: stonePath,
+    field: soilField,
     cliff: "rock",
     bank: "soil",
     lip: "blossomGround",
@@ -345,6 +385,8 @@ export function surfaceColor(art: BiomeArt, mat: Material, c: PixelCtx): Rgba {
       return art.dirt(c);
     case MAT_PATH:
       return art.path(c);
+    case MAT_FIELD:
+      return art.field(c);
     default:
       return art.ground(c);
   }
@@ -399,7 +441,7 @@ export function wallColor(art: BiomeArt, c: WallCtx): Rgba {
   }
 
   // Terraces inland: an earth bank with a few stones in it, not a stone wall.
-  if (!c.wet && height <= 8 && c.top !== MAT_ROCK) {
+  if (!c.wet && height <= ELEV_PX && c.top !== MAT_ROCK) {
     if (hash2(Math.floor(c.t / 3), Math.floor(c.z / 3), 38) > 0.84)
       return shade(art.cliff, 0.3 + lit * 0.35 + (c.r - 0.5) * 0.2, c.X, c.Y, 0.4);
     const v =

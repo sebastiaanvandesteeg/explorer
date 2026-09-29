@@ -23,12 +23,17 @@ export function landPath(state: GameState, from: Tile, goals: Tile[]): Tile[] | 
 
 const seaRockCache = new WeakMap<WorldMap, Set<number>>();
 
+/** Water tiles ships cannot enter: sea rocks, and both feet of every sea arch. */
 function seaRocks(world: WorldMap): Set<number> {
   let set = seaRockCache.get(world);
   if (!set) {
-    set = new Set(
-      world.decor.filter((d) => d.kind === "sea_rock").map((d) => tileIndex(world, d.x, d.y)),
-    );
+    set = new Set();
+    for (const d of world.decor) {
+      if (d.kind === "sea_rock") set.add(tileIndex(world, d.x, d.y));
+      else if (d.kind === "sea_arch")
+        set.add(d.variant === 0 ? tileIndex(world, d.x + 1, d.y) : tileIndex(world, d.x, d.y + 1));
+      if (d.kind === "sea_arch") set.add(tileIndex(world, d.x, d.y));
+    }
     seaRockCache.set(world, set);
   }
   return set;

@@ -16,6 +16,7 @@ import {
 } from "./field";
 import {
   MAT_DIRT,
+  MAT_FIELD,
   MAT_GROUND,
   MAT_PATH,
   MAT_ROCK,
@@ -27,7 +28,14 @@ import {
   type PixelCtx,
   type WallCtx,
 } from "./materials";
-import { shadeWater, type RgbTriple, type WaterPixel } from "./water";
+import {
+  HAS_REEF,
+  HAS_WAVES,
+  WAVE_FRAMES,
+  shadeWater,
+  type RgbTriple,
+  type WaterPixel,
+} from "./water";
 
 export type { TerrainWorld } from "./field";
 
@@ -73,6 +81,7 @@ export function chunkRect(cx: number, cy: number, chunk: number): PaintRect {
 
 function materialOfTile(world: TerrainWorld, k: number): Material | -1 {
   if (world.paved?.[k]) return MAT_PATH;
+  if (world.field?.[k]) return MAT_FIELD;
   return materialOfTerrain(world.terrain[k]!);
 }
 
@@ -98,7 +107,7 @@ function levelOfTile(world: TerrainWorld, x: number, y: number): number {
   return t === Terrain.Deep || t === Terrain.Shallow ? 0 : world.elevation[k]! + 1;
 }
 
-const votes = new Float64Array(5);
+const votes = new Float64Array(6);
 
 /**
  * What the ground is at a point: the material of the nearby land tiles of the same level, voted by
@@ -147,7 +156,7 @@ function pickMaterial(world: TerrainWorld, u: number, v: number, level: number):
   let best = 0;
   let bestScore = -1;
   let second = -1;
-  for (let m = 0; m < 5; m++) {
+  for (let m = 0; m < 6; m++) {
     const score = votes[m]! + hash2(Math.floor(u * 4), Math.floor(v * 4), 103 + m) * 0.05;
     if (score > bestScore) {
       second = bestScore;
@@ -155,8 +164,22 @@ function pickMaterial(world: TerrainWorld, u: number, v: number, level: number):
       best = m;
     } else if (score > second) second = score;
   }
-  // Worn earth frames the flagstones where a path meets the ground.
-  if (best === MAT_PATH && bestScore - second < 0.16) return MAT_DIRT;
+  // Worn earth frames the flagstones where a path meets the ground, and the plough where a field
+  // does.
+  if ((best === MAT_PATH || best === MAT_FIELD) && bestScore - second < 0.16) return MAT_DIRT;
+  // Grass round a building is trampled bare, in an irregular clearing.
+  if (best === MAT_GROUND && world.wear) {
+    let trample = 0;
+    for (let n = 0; n < 4; n++) {
+      const tx = i + (n & 1);
+      const ty = j + (n >> 1);
+      if (tx < 0 || ty < 0 || tx >= world.width || ty >= world.height) continue;
+      const w = ((n & 1) === 0 ? 1 - a : a) * (n >> 1 === 0 ? 1 - b : b);
+      trample += w * world.wear[ty * world.width + tx]!;
+    }
+    if (trample / 255 + (vnoise(u * 2.6 + 3.3, v * 2.6 + 8.1, 111) - 0.5) * 0.55 > 0.55)
+      return MAT_DIRT;
+  }
   return best as Material;
 }
 
@@ -172,7 +195,16 @@ function biomeOf(world: TerrainWorld, u: number, v: number): BiomeId {
   return BIOMES[world.biome[ty * world.width + tx]!] ?? "temperate";
 }
 
-const SCRATCH: Rgba = [0, 0, 0, 0];
+const FRAMES: Rgba[] = Array.from({ length: WAVE_FRAMES }, () => [0, 0, 0, 0] as Rgba);
+const REEF_PIXEL: Rgba = [0, 0, 0, 0];
+
+/** A painted chunk: the standing ground, and the moving waves that run under it. */
+export interface PaintedChunk {
+  /** Land, cliffs and reef shadows. */
+  ground: Uint8ClampedArray<ArrayBuffer>;
+  /** WAVE_FRAMES images of the foam and shallows, drawn under the ground. */
+  waves: Uint8ClampedArray<ArrayBuffer>[];
+}
 // Contexts reused for every pixel, so painting allocates nothing in its hot loop.
 const PIXEL: PixelCtx = { X: 0, Y: 0, u: 0, v: 0, r: 0 };
 const WALL: WallCtx = {
@@ -203,23 +235,30 @@ export function paintChunk(
   chunk: number,
   rect: PaintRect,
   options: PaintOptions = DEFAULT_OPTIONS,
-): Uint8ClampedArray<ArrayBuffer> | null {
+): PaintedChunk | null {
   const x0 = cx * chunk;
   const y0 = cy * chunk;
   const fields = new Fields(world, x0 - MARGIN, y0 - MARGIN, chunk + MARGIN * 2);
   if (!fields.hasLand) return null;
   const out = new Uint8ClampedArray(rect.w * rect.h * 4);
+  const waves = Array.from(
+    { length: WAVE_FRAMES },
+    () => new Uint8ClampedArray(rect.w * rect.h * 4),
+  );
   const levels = fields.level;
   const cells = fields.n;
   const ox = fields.tx0;
   const oy = fields.ty0;
 
-  const reach = 1.4;
+  // The ray from the top of the tallest cliff to the sea covers this many tiles along its axis;
+  // its hits lie within a quarter of that (plus some slack) of the middle point in u and v.
+  const mid = LEVEL_PX[MAX_LEVEL]! / 2;
+  const reach = LEVEL_PX[MAX_LEVEL]! / HALF_H / 4 + 0.55;
   for (let py = 0; py < rect.h; py++) {
     const Y = rect.y + py;
     // A ray can only hit something this chunk owns when its middle point is near the chunk. That
     // bounds w = u - v for the row, which bounds the columns worth looking at.
-    const sMid = (Y + 0.5 + 14) / HALF_H;
+    const sMid = (Y + 0.5 + mid) / HALF_H;
     const wLo = Math.max(2 * (x0 - reach) - sMid, sMid - 2 * (y0 + chunk + reach));
     const wHi = Math.min(2 * (x0 + chunk + reach) - sMid, sMid - 2 * (y0 - reach));
     const pxLo = Math.max(0, Math.ceil(wLo * HALF_W - 0.5 - rect.x));
@@ -285,11 +324,21 @@ export function paintChunk(
         WATER.v = hv;
         WATER.glow = options.glow(inMap ? world.biome[k]! : 255);
         WATER.shore = shore;
-        if (shadeWater(fields, world, WATER, SCRATCH)) {
-          out[o] = SCRATCH[0];
-          out[o + 1] = SCRATCH[1];
-          out[o + 2] = SCRATCH[2];
-          out[o + 3] = SCRATCH[3];
+        const fx = shadeWater(fields, world, WATER, FRAMES, REEF_PIXEL);
+        if (fx & HAS_WAVES)
+          for (let f = 0; f < WAVE_FRAMES; f++) {
+            const frame = FRAMES[f]!;
+            const image = waves[f]!;
+            image[o] = frame[0];
+            image[o + 1] = frame[1];
+            image[o + 2] = frame[2];
+            image[o + 3] = frame[3];
+          }
+        if (fx & HAS_REEF) {
+          out[o] = REEF_PIXEL[0];
+          out[o + 1] = REEF_PIXEL[1];
+          out[o + 2] = REEF_PIXEL[2];
+          out[o + 3] = REEF_PIXEL[3];
         }
         continue;
       }
@@ -340,5 +389,5 @@ export function paintChunk(
       out[o + 3] = 255;
     }
   }
-  return out;
+  return { ground: out, waves };
 }

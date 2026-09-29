@@ -13,9 +13,11 @@ import {
   type NodeEntity,
   type ShipEntity,
   type VillagerEntity,
+  type WorldMap,
 } from "@explorer/shared";
-import { Container, Graphics, Sprite, type Rectangle } from "pixi.js";
+import { Container, Graphics, Sprite, Texture, type Rectangle } from "pixi.js";
 import type { Atlas } from "../assets";
+import { coverAlpha, coverAt } from "./occlusion";
 import {
   buildingSprite,
   markerSprite,
@@ -45,6 +47,24 @@ function tileHeight(state: GameState, x: number, y: number): number {
 const screenX = (x: number, y: number) => (x - y) * HALF_W;
 const screenY = (x: number, y: number) => (x + y) * HALF_H;
 
+let glow: Texture | null = null;
+
+/** A soft warm blob, the shape of one window's or fire's glow at night. */
+function glowTexture(): Texture {
+  if (glow) return glow;
+  const c = document.createElement("canvas");
+  c.width = c.height = 64;
+  const ctx = c.getContext("2d")!;
+  const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+  g.addColorStop(0, "rgba(255, 214, 130, 1)");
+  g.addColorStop(0.3, "rgba(255, 176, 74, 0.55)");
+  g.addColorStop(1, "rgba(255, 140, 40, 0)");
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, 64, 64);
+  glow = Texture.from(c);
+  return glow;
+}
+
 interface Smoke {
   sprite: Sprite;
   age: number;
@@ -72,6 +92,8 @@ class BuildingView extends View {
   private key = "";
   smokeAt: { x: number; y: number }[] = [];
   sparkleAt: { x: number; y: number }[] = [];
+  private lightAt: { x: number; y: number; r: number }[] = [];
+  private lights: Sprite[] = [];
   private smokeTimer = 0;
   private sparkleTimer = 0;
 
@@ -117,10 +139,14 @@ class BuildingView extends View {
         const meta = this.layer.atlas.meta[name];
         this.smokeAt = b.complete && meta?.smoke ? meta.smoke : [];
         this.sparkleAt = b.complete && meta?.sparkle ? meta.sparkle : [];
+        this.setLights(b.complete && meta?.lights ? meta.lights : []);
       }
     }
     this.root.position.set(screenX(b.x, b.y), screenY(b.x, b.y) - h);
     this.root.zIndex = this.flat ? -1e6 + b.x + b.y : b.x + b.y + b.w + b.h - 1;
+    // Behind a cliff or hill in front of it, a building shows as a ghost instead of overlapping it.
+    if (!this.flat)
+      this.root.alpha = coverAlpha(coverAt(state.world, b.x + b.w - 0.5, b.y + b.h - 0.5, h));
     // Progress bar for construction or a production queue.
     this.bar.clear();
     const job = b.queue[0];
@@ -135,6 +161,37 @@ class BuildingView extends View {
         .rect(cx - 12, top + 1, Math.max(0, Math.min(1, progress)) * 24, 3)
         .fill({ color: b.complete ? 0xe2a841 : 0x8fae45 });
     }
+  }
+
+  /** Windows and fires shine at night: soft additive glows drawn above the colour grade. */
+  private setLights(lights: { x: number; y: number; r: number }[]): void {
+    for (const l of this.lights) l.destroy();
+    this.lightAt = lights;
+    this.lights = lights.map(() => {
+      const s = new Sprite(glowTexture());
+      s.anchor.set(0.5);
+      s.blendMode = "add";
+      this.layer.lights.addChild(s);
+      return s;
+    });
+  }
+
+  override destroy(): void {
+    for (const l of this.lights) l.destroy();
+    super.destroy();
+  }
+
+  private shine(now: number): void {
+    const night = this.layer.night;
+    this.lights.forEach((s, i) => {
+      const at = this.lightAt[i]!;
+      s.visible = night > 0.02 && this.root.visible;
+      if (!s.visible) return;
+      s.position.set(this.root.x + at.x, this.root.y + at.y);
+      s.scale.set((at.r * 2.4) / 64);
+      // A gentle flicker, out of step from window to window.
+      s.alpha = night * (0.62 + 0.14 * Math.sin(now / 230 + i * 2.1 + this.root.x));
+    });
   }
 
   private buildDock(b: BuildingEntity): void {
@@ -154,6 +211,7 @@ class BuildingView extends View {
   }
 
   override frame(now: number, dt: number): void {
+    if (this.lights.length > 0) this.shine(now);
     if (!this.root.visible) return;
     if (this.smokeAt.length > 0) {
       this.smokeTimer -= dt;
@@ -208,6 +266,7 @@ class NodeView extends View {
     const j = tileJitter(n.x, n.y);
     this.root.position.set(screenX(n.x, n.y) + j.dx, screenY(n.x, n.y) - h + j.dy);
     this.root.zIndex = n.x + n.y + 1;
+    this.root.alpha = coverAlpha(coverAt(this.layer.state.world, n.x + 0.5, n.y + 0.5, h));
     this.root.visible =
       this.layer.state.explored[tileIndex(this.layer.state.world, n.x, n.y)] === 1;
   }
@@ -230,6 +289,14 @@ abstract class MovingView extends View {
   protected moving = false;
   x = 0;
   y = 0;
+  private shown = 1;
+
+  /** Ease toward being a ghost while hidden behind terrain, and back to solid when clear. */
+  protected fadeBehindTerrain(world: WorldMap, z: number, dt: number): number {
+    const target = coverAlpha(coverAt(world, this.x, this.y, z));
+    this.shown += (target - this.shown) * Math.min(1, dt * 8);
+    return this.shown;
+  }
 
   protected track(x: number, y: number, now: number, snap: boolean): void {
     if (snap) {
@@ -317,6 +384,7 @@ class VillagerView extends MovingView {
       Math.round(screenY(this.x, this.y) - this.height),
     );
     this.root.zIndex = this.x + this.y + 0.01;
+    this.root.alpha = this.fadeBehindTerrain(this.layer.state.world, this.height, dt);
   }
 }
 
@@ -350,6 +418,7 @@ class ShipView extends MovingView {
       Math.round(screenY(this.x, this.y)) + bob,
     );
     this.root.zIndex = this.x + this.y;
+    this.root.alpha = this.fadeBehindTerrain(this.layer.state.world, 0, dt);
     if (this.moving) {
       this.wakeTimer -= dt;
       if (this.wakeTimer <= 0) {
@@ -375,6 +444,10 @@ export class EntityLayer {
   /** Depth-sorted buildings, trees, villagers and ships. */
   readonly container = new Container({ sortableChildren: true });
   readonly effects = new Container();
+  /** Night glows: drawn by the game above the colour grade, so darkness cannot dim them. */
+  readonly lights = new Container();
+  /** 0 by day up to 1 at midnight. */
+  night = 0;
   private views = new Map<number, View>();
   private smoke: Smoke[] = [];
   private sparkles: Sparkle[] = [];
@@ -389,8 +462,8 @@ export class EntityLayer {
       w: number;
       h: number;
     }) => void,
-    /** Finished paths are painted into the terrain, so it repaints when they change. */
-    private readonly onPathsChange: () => void,
+    /** Paths, fields and yards are painted into the terrain, so it repaints when buildings change. */
+    private readonly onBuildingsChange: () => void,
   ) {}
 
   rebuild(state: GameState): void {
@@ -410,13 +483,13 @@ export class EntityLayer {
   }
 
   sync(changed: Iterable<number>, removed: Iterable<number>, now: number): void {
-    let paths = false;
+    let buildings = false;
     for (const id of removed) {
       const v = this.views.get(id);
       if (!v) continue;
       if (v instanceof BuildingView) {
         this.onFootprintChange(v.rect);
-        if (v.kind === "path") paths = true;
+        buildings = true;
       }
       v.destroy();
       this.views.delete(id);
@@ -434,9 +507,9 @@ export class EntityLayer {
       }
       v.update(e, now);
       if (e.type === "building" && isNew) this.onFootprintChange(e);
-      if (e.type === "building" && e.kind === "path") paths = true;
+      if (e.type === "building") buildings = true;
     }
-    if (paths) this.onPathsChange();
+    if (buildings) this.onBuildingsChange();
   }
 
   /** Re-check visibility of nodes on newly explored tiles. */

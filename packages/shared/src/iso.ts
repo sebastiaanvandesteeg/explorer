@@ -7,7 +7,7 @@ export const HALF_W = TILE_W / 2;
 export const HALF_H = TILE_H / 2;
 
 /** Screen pixels per elevation level. */
-export const ELEV_PX = 8;
+export const ELEV_PX = 14;
 /** Land sits this many pixels above the water plane, even at elevation 0. */
 export const LAND_BASE_PX = 4;
 export const MAX_ELEVATION = 3;

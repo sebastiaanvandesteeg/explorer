@@ -1,6 +1,6 @@
 import { HALF_H, HALF_W, Terrain, generateWorld } from "@explorer/shared";
 import { describe, expect, it } from "vitest";
-import { chunkRect, paintChunk, type TerrainWorld } from "../src";
+import { WAVE_FRAMES, WAVE_SEQUENCE, chunkRect, paintChunk, type TerrainWorld } from "../src";
 import { Fields, MARGIN, tileLevel } from "../src/terrain/field";
 
 const CHUNK = 16;
@@ -35,7 +35,8 @@ function island(size = 48): TerrainWorld {
 
 function paint(world: TerrainWorld, cx: number, cy: number, chunk = CHUNK) {
   const rect = chunkRect(cx, cy, chunk);
-  return { rect, pixels: paintChunk(world, cx, cy, chunk, rect) };
+  const painted = paintChunk(world, cx, cy, chunk, rect);
+  return { rect, pixels: painted?.ground ?? null, waves: painted?.waves ?? null };
 }
 
 describe("paintChunk", () => {
@@ -118,26 +119,35 @@ describe("paintChunk", () => {
     const cols = Math.ceil(world.width / CHUNK);
     let compared = 0;
     let differing = 0;
+    // The standing ground and every wave frame must agree with the one-piece paint.
+    const layers = (r: ReturnType<typeof paint>) => [r.pixels!, ...r.waves!];
     for (let cy = 0; cy < cols; cy++)
       for (let cx = 0; cx < cols; cx++) {
-        const { rect, pixels } = paint(world, cx, cy);
-        if (!pixels) continue;
-        for (let py = 0; py < rect.h; py++)
-          for (let px = 0; px < rect.w; px++) {
-            const i = (py * rect.w + px) * 4;
-            if (pixels[i + 3] === 0) continue;
-            const wx = rect.x + px - whole.rect.x;
-            const wy = rect.y + py - whole.rect.y;
-            const j = (wy * whole.rect.w + wx) * 4;
-            compared++;
-            for (let k = 0; k < 4; k++)
-              if (pixels[i + k] !== whole.pixels![j + k]) {
-                differing++;
-                break;
-              }
-          }
+        const part = paint(world, cx, cy);
+        if (!part.pixels) continue;
+        const partLayers = layers(part);
+        const wholeLayers = layers(whole);
+        for (let layer = 0; layer < partLayers.length; layer++) {
+          const pixels = partLayers[layer]!;
+          const reference = wholeLayers[layer]!;
+          const { rect } = part;
+          for (let py = 0; py < rect.h; py++)
+            for (let px = 0; px < rect.w; px++) {
+              const i = (py * rect.w + px) * 4;
+              if (pixels[i + 3] === 0) continue;
+              const wx = rect.x + px - whole.rect.x;
+              const wy = rect.y + py - whole.rect.y;
+              const j = (wy * whole.rect.w + wx) * 4;
+              compared++;
+              for (let k = 0; k < 4; k++)
+                if (pixels[i + k] !== reference[j + k]) {
+                  differing++;
+                  break;
+                }
+            }
+        }
       }
-    expect(compared).toBeGreaterThan(20000);
+    expect(compared).toBeGreaterThan(60000);
     expect(differing).toBe(0);
   });
 
@@ -161,6 +171,45 @@ describe("paintChunk", () => {
   });
 });
 
+describe("waves", () => {
+  it("paints WAVE_FRAMES frames that differ near the coast and agree far from it", () => {
+    const world = island();
+    const { rect, waves } = paint(world, 1, 1);
+    expect(waves).toHaveLength(WAVE_FRAMES);
+    for (const step of WAVE_SEQUENCE) expect(step).toBeLessThan(WAVE_FRAMES);
+    let painted = 0;
+    let differs = 0;
+    for (let i = 0; i < rect.w * rect.h * 4; i += 4) {
+      const alphas = waves!.map((w) => w[i + 3]!);
+      if (alphas.every((a) => a === 0)) continue;
+      painted++;
+      const same = waves!.every(
+        (w) =>
+          w[i] === waves![0]![i] &&
+          w[i + 1] === waves![0]![i + 1] &&
+          w[i + 3] === waves![0]![i + 3],
+      );
+      if (!same) differs++;
+    }
+    // A band of water round the island moves; most of the wave pixels change between frames.
+    expect(painted).toBeGreaterThan(2000);
+    expect(differs).toBeGreaterThan(painted * 0.15);
+    expect(differs).toBeLessThan(painted);
+  });
+
+  it("keeps the foam lapping: the white line is wider in the last frame than in the first", () => {
+    const world = island();
+    const { rect, waves } = paint(world, 1, 1);
+    const white = (frame: Uint8ClampedArray) => {
+      let n = 0;
+      for (let i = 0; i < rect.w * rect.h * 4; i += 4)
+        if (frame[i + 3] === 255 && frame[i]! > 235 && frame[i + 1]! > 240) n++;
+      return n;
+    };
+    expect(white(waves![WAVE_FRAMES - 1]!)).toBeGreaterThan(white(waves![0]!) * 1.3);
+  });
+});
+
 describe("paved paths", () => {
   it("paint flagstones that differ from the ground they replace", () => {
     const plain = island();
@@ -180,6 +229,45 @@ describe("paved paths", () => {
     // About five tiles' worth of pixels change, and nothing far away does.
     expect(changed).toBeGreaterThan(600);
     expect(changed).toBeLessThan(4000);
+  });
+});
+
+describe("settlement ground", () => {
+  const changedPixels = (a: Uint8ClampedArray, b: Uint8ClampedArray) => {
+    let changed = 0;
+    for (let i = 0; i < a.length; i += 4)
+      if (a[i] !== b[i] || a[i + 1] !== b[i + 1] || a[i + 2] !== b[i + 2]) changed++;
+    return changed;
+  };
+  const size = 48 * 48;
+
+  it("tramples grass into bare earth around a building, in an irregular clearing", () => {
+    const plain = island();
+    const worn = { ...plain, wear: new Uint8Array(size) };
+    for (let y = 22; y < 27; y++)
+      for (let x = 22; x < 27; x++) worn.wear![y * plain.width + x] = 255;
+    const a = paint(plain, 1, 1).pixels!;
+    const b = paint(worn, 1, 1).pixels!;
+    const changed = changedPixels(a, b);
+    // About a 5×5 tile clearing (and nothing elsewhere).
+    expect(changed).toBeGreaterThan(3000);
+    expect(changed).toBeLessThan(16000);
+  });
+
+  it("leaves untouched ground alone when the wear mask is empty", () => {
+    const plain = island();
+    const none = { ...plain, wear: new Uint8Array(size), field: new Uint8Array(size) };
+    expect(changedPixels(paint(plain, 1, 1).pixels!, paint(none, 1, 1).pixels!)).toBe(0);
+  });
+
+  it("ploughs the tiles under a farm", () => {
+    const plain = island();
+    const ploughed = { ...plain, field: new Uint8Array(size) };
+    for (let y = 21; y < 24; y++)
+      for (let x = 21; x < 24; x++) ploughed.field![y * plain.width + x] = 1;
+    const changed = changedPixels(paint(plain, 1, 1).pixels!, paint(ploughed, 1, 1).pixels!);
+    expect(changed).toBeGreaterThan(1500);
+    expect(changed).toBeLessThan(9000);
   });
 });
 
