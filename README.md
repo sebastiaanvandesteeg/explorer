@@ -36,17 +36,17 @@ Pick a tribe, start an expedition, then use **Copy invite link** to bring up to 
 
 ### Controls
 
-| Action | How                                                                                                                                    |
-| ------ | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Pan    | Drag the ground, right/middle-drag, or WASD / arrow keys                                                                               |
-| Zoom   | Mouse wheel, `+` / `-`                                                                                                                 |
-| Gather | `H`, then click or drag a box across trees, rocks and bushes (Shift to unmark)                                                         |
-| Build  | `1`–`9`, `0`, `P` or the build menu, then click. Shift-click keeps placing. Paths can be dragged                                       |
-| Select | Click a villager, ship, building or resource                                                                                           |
-| Order  | With a villager selected, right-click a resource, building, ship or the ground. With a ship selected, right-click the sea or an island |
-| Cancel | `Esc` or right-click                                                                                                                   |
-| Chat   | `Enter`                                                                                                                                |
-| Home   | `C` centres on the town hall                                                                                                           |
+| Action | How                                                                                                                                                                                             |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Pan    | Drag the ground, right/middle-drag, or WASD / arrow keys                                                                                                                                        |
+| Zoom   | Mouse wheel, `+` / `-`                                                                                                                                                                          |
+| Gather | `H`, then click or drag a box across trees, rocks and bushes (Shift to unmark)                                                                                                                  |
+| Build  | `1`–`9`, `0`, `P` or the build menu, then click. Shift-click keeps placing. Paths can be dragged                                                                                                |
+| Select | Click a villager, ship, building or resource                                                                                                                                                    |
+| Order  | With a villager selected, right-click a resource, building, ship, bones or the ground. With a ship selected, right-click the sea, an island, a dock (cargo ships), a shipwreck or a sunken site |
+| Cancel | `Esc` or right-click                                                                                                                                                                            |
+| Chat   | `Enter`                                                                                                                                                                                         |
+| Home   | `C` centres on the town hall                                                                                                                                                                    |
 
 ### Tribes
 
@@ -76,6 +76,34 @@ Every island belongs to one of ten biomes, with its own ground, cliffs, plants, 
 | Infernal Isles  | Far away    | Charred trees, ember fruit, obsidian, hellstone | Dark red, embers, grit     |
 | Crystal Spires  | Far away    | Silverleaf trees, crystal clusters              | Indigo, sparkling motes    |
 
+### Magic house upgrades
+
+Each is learned once, for the whole team, and paid from the shared treasury with faith (from churches), gold (from the market and gold veins) and crystal (only found in the Crystal Spires).
+
+| Upgrade      | Cost                        | Effect                                                                       |
+| ------------ | --------------------------- | ---------------------------------------------------------------------------- |
+| Far Sight    | 25 faith, 20 gold           | Ships reveal 60% more of the sea                                             |
+| Swift Sails  | 40 faith, 30 gold           | All ships sail 50% faster                                                    |
+| Ember Ward   | 50 faith, 40 gold           | Lets villagers land on the Infernal Isles (they refuse to go ashore without) |
+| Prism Ward   | 50 faith, 40 gold           | Lets villagers land on the Crystal Spires                                    |
+| Deep Holds   | 40 gold, 5 crystal          | Cargo ships carry 50% more                                                   |
+| Seer's Chart | 60 faith, 10 crystal        | Marks every island on the map                                                |
+| Stormcaller  | 60 faith, 40 gold, 3 relics | Lightning strikes pirates near your settlements and ships                    |
+
+### Pirates, wrecks and hidden treasure
+
+**Pirates.** After the first seven minutes a raiding ship sails in from the edge of the map every few minutes (more of them as the days pass, up to three at once). It hunts the nearest ship of yours, or beaches beside a storehouse, camp or dock and robs a share of that island's stockpile for eight seconds before sailing off with the loot. You get a toast with the direction it came from.
+
+- **Ships have hull points** (scout 30, cargo 45, patrol boat 70) and mend slowly beside a dock. A ship that sinks takes its passengers with it and leaves a wreck.
+- **Defences**, from cheap to grand:
+  - **Patrol boat** (80 wood, 10 tools at a dock): armed, and hunts any pirate within 18 tiles on its own until you give it an order.
+  - **Cannons** (dock fitting, 60 wood, 10 tools): every ship gets guns.
+  - **Iron Hulls** (dock fitting, 40 wood, 30 stone, 15 tools): 50% more hull points.
+  - **Stormcaller** (magic house): lightning strikes pirates near your ships and buildings.
+- **Wrecks:** a pirate that goes down at sea leaves a **shipwreck**, and one that was raiding leaves **bones** on the beach, both holding whatever it stole plus a bounty of gold, tools and sometimes a **relic**. Right-click a shipwreck with a scout or patrol boat selected, or the bones with a villager, to loot them.
+
+**Under the sea.** Sunken ruins and a few fortresses lie in deep water, far from home. They stay hidden until a ship sails within three tiles, then show as a faint shape under the waves. Load a scout ship with villagers (they are the divers), sail over the site and press **Send divers** (or right-click the site). After 15 seconds each diver has brought up 30% of what is left. Fortresses hold gold, crystal, tools and several relics. Relics are a new resource that only wrecks and sites give; they pay for Stormcaller.
+
 ### Day and night
 
 One day lasts eight minutes of game time and starts in the morning. The HUD clock under the expedition name shows the day, the part of the day and the time. Dawn is warm, dusk golden, and night deep blue with fireflies, while houses, churches, the town hall and forges light their windows. It changes how the world looks, not how it plays.
@@ -89,9 +117,13 @@ One day lasts eight minutes of game time and starts in the morning. The HUD cloc
 - **Workplaces** take one worker each:
   - Lumber camps fell trees, quarries break rocks, and mines dig ore, gold and crystal, all within a radius.
   - Farms grow food. The blacksmith forges 2 ore into 1 set of tools. The church gathers faith.
-- **Advanced buildings** need tools: the market (sell lots of 10 goods for gold, or buy basics), the church and the magic house. The magic house will sell magical upgrades for exploring; for now it shows which are coming.
+- **Advanced buildings** need tools: the market (sell lots of 10 goods for gold, or buy basics), the church and the magic house. The magic house sells upgrades (see below).
 - **Exploring:** the dock builds scout ships. Sailing clears the fog for everyone, and each newly found island is announced.
 - **Settling:** select a ship next to the shore (or at the pier) and press **Take a villager aboard**, or right-click the ship with a villager selected. Then right-click another island to sail there and put everyone ashore. Once your villagers stand on an island you can build there. Put up a storehouse first, so they have somewhere to drop off goods.
+- **Trade routes:** each island keeps its own stockpile. Goods gathered at home go into the shared treasury that pays for everything; goods gathered on another island wait in a pile on that island until a cargo ship brings them home.
+  - Build a **dock** on the shore of a settled island (click the shore tile; the pier runs out over open water). The home dock cannot be demolished.
+  - Docks build **cargo ships** as well as scouts (4 at most). Select a cargo ship and right-click a dock on another island to set its route: it waits for goods, loads up to 40, sails to the nearest home dock, unloads and returns, on repeat. Steering it by hand cancels the route.
+  - Farms, forges and churches on other islands produce into that island's pile too. Select a dock or storehouse to see what is waiting.
 
 ## Architecture
 
@@ -99,7 +131,7 @@ One day lasts eight minutes of game time and starts in the morning. The HUD cloc
 packages/shared   @explorer/shared: deterministic core used by client and server
   iso.ts            2:1 isometric projection and elevation-aware picking
   world/            seeded archipelago generation, A* pathfinding
-  sim/              catalogue, state, commands, 10 Hz tick, snapshots and patches
+  sim/              catalogue, state, commands, 10 Hz tick, pirates and diving, snapshots and patches
   protocol.ts       WebSocket message types
 packages/art      @explorer/art: the colour palette and the per-pixel terrain painter
   terrain/          smooth fields from the tile data, ray-marched land, cliffs and water
@@ -167,9 +199,6 @@ Server environment variables: `PORT` (8787), `HOST`, `DATA_DIR` (`data/worlds`),
 
 ## Not built yet
 
-- Buying the magic house's exploration upgrades
-- Building extra docks on other islands
-- Trade routes and cargo ships
 - Sound
 - Accounts beyond name + token
 - Deployment

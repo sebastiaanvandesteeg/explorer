@@ -265,7 +265,12 @@ function pointedHull(x0: number, x1: number, cy: number, hw: number, topPx: numb
 }
 
 /** Hull, deck cargo, mast and a square sail, heading along +x in the local frame. */
-function shipScene(heading: number): Scene {
+type ShipStyle = "scout" | "cargo" | "patrol" | "pirate";
+
+function shipScene(heading: number, style: ShipStyle = "scout"): Scene {
+  const cargo = style === "cargo";
+  const pirate = style === "pirate";
+  const patrol = style === "patrol";
   const s = new Scene();
   // Modelled around the world origin so the sprite anchor is the ship's centre.
   s.withYaw((heading * Math.PI) / 4, [0, 0], () => {
@@ -277,11 +282,24 @@ function shipScene(heading: number): Scene {
     const m = (z: number) => z / 19.6;
     const hull: Material = (c) => {
       const z = c.lp[2];
-      if (c.ln[2] > 0.8) return planks("plank", "x", 0.07)(c);
+      if (c.ln[2] > 0.8) return planks(pirate ? "darkwood" : "plank", "x", 0.07)(c);
       if (z < 3.5) return shade("hull", lit(c, 0.15), c.px, c.py, 0.2);
-      if (z > hullTop - 1.2) return shade("plank", lit(c, 0.15), c.px, c.py, 0.2);
+      if (z > hullTop - 1.2)
+        return shade(
+          pirate ? "darkwood" : patrol ? "slate" : "plank",
+          lit(c, 0.15),
+          c.px,
+          c.py,
+          0.2,
+        );
       const k = (z / 2) % 1 < 0.3 ? -0.16 : 0;
-      return shade("timber", lit(c, 0.12 + k), c.px, c.py, 0.2);
+      return shade(
+        pirate ? "darkwood" : patrol ? "slate" : "timber",
+        lit(c, 0.12 + k),
+        c.px,
+        c.py,
+        0.2,
+      );
     };
     // Convex hull with a pointed bow (+x) and a flat stern, sides flaring slightly outwards.
     s.convex(
@@ -307,28 +325,64 @@ function shipScene(heading: number): Scene {
       [cx - L * 0.48, cy + W, hullTop + 6],
       flat("plank", 0.1),
     );
-    // Cargo crates.
+    // Cargo crates: a scout carries a few, a freighter is stacked with them.
     const crate = (x0: number, y0: number, x1: number, y1: number, z0: number, z1: number) =>
       s.box(
         [cx + x0, cy + y0, z0],
         [cx + x1, cy + y1, z1],
         crateMaterial([cx + x0, cy + y0, z0], [cx + x1, cy + y1, z1]),
       );
-    crate(-0.34, -0.2, -0.12, 0.02, hullTop, hullTop + 5);
-    crate(-0.34, 0.04, -0.14, 0.22, hullTop, hullTop + 4.5);
-    crate(0.22, -0.16, 0.42, 0.06, hullTop, hullTop + 4.5);
-    crate(-0.32, -0.17, -0.15, 0, hullTop + 5, hullTop + 9);
+    if (patrol || pirate) {
+      // Gun ports and cannons along both sides of the deck.
+      for (const x of [-0.3, 0, 0.3]) {
+        for (const side of [-1, 1]) {
+          s.prism(
+            "y",
+            [cx + x, cy + side * (W - 0.02), hullTop + 2.5],
+            0.05,
+            0.16,
+            flat("rock", -0.1),
+            6,
+          );
+        }
+      }
+      s.box(
+        [cx - 0.36, cy - 0.16, hullTop],
+        [cx - 0.16, cy + 0.16, hullTop + 3],
+        flat("plank", -0.1),
+      );
+    } else {
+      crate(-0.34, -0.2, -0.12, 0.02, hullTop, hullTop + 5);
+      crate(-0.34, 0.04, -0.14, 0.22, hullTop, hullTop + 4.5);
+      crate(0.22, -0.16, 0.42, 0.06, hullTop, hullTop + 4.5);
+      crate(-0.32, -0.17, -0.15, 0, hullTop + 5, hullTop + 9);
+    }
+    if (cargo) {
+      crate(0.46, -0.2, 0.66, 0, hullTop, hullTop + 5);
+      crate(0.46, 0.02, 0.64, 0.22, hullTop, hullTop + 4);
+      crate(0.24, 0.1, 0.42, 0.26, hullTop, hullTop + 5);
+      crate(0.5, -0.17, 0.66, -0.02, hullTop + 5, hullTop + 9);
+      crate(-0.1, -0.22, 0.1, -0.06, hullTop, hullTop + 4);
+    }
     // Mast, yard and sail.
     s.prism("z", [cx + 0.05, cy, hullTop + 22], 0.035, 22, flat("timber"), 6);
     s.prism("y", [cx + 0.08, cy, hullTop + 38], 0.02, 0.36, flat("timber"), 6);
     s.box(
       [cx + 0.1, cy - 0.34, hullTop + 12],
       [cx + 0.13, cy + 0.34, hullTop + 37],
-      cloth("sail"),
+      cloth(pirate ? "basalt" : patrol ? "cloth" : "sail"),
       {
         castsShadow: true,
       },
     );
+    if (pirate) {
+      // A pale skull-and-crossbones patch on the black sail.
+      s.box(
+        [cx + 0.13, cy - 0.1, hullTop + 22],
+        [cx + 0.15, cy + 0.1, hullTop + 30],
+        flat("stone", 0.25),
+      );
+    }
     // Pennant.
     s.box(
       [cx - 0.2, cy - 0.01, hullTop + 44],
@@ -339,9 +393,105 @@ function shipScene(heading: number): Scene {
   return s;
 }
 
-function ship(heading: number): Sprite {
-  const s = shipScene(heading);
-  return renderSprite(`ship_${heading}`, s, 1, 1, 70, 40);
+function ship(heading: number, style: ShipStyle = "scout"): Sprite {
+  const s = shipScene(heading, style);
+  return renderSprite(`${style === "scout" ? "ship" : style}_${heading}`, s, 1, 1, 70, 40);
+}
+
+/** A half-sunk hull with a snapped mast, listing in the swell. */
+function shipwreck(variant: number): Sprite {
+  const s = new Scene();
+  s.withYaw((variant * Math.PI) / 2 + 0.4, [0, 0], () => {
+    const L = 0.85;
+    const W = 0.28;
+    const hull: Material = (c) =>
+      c.ln[2] > 0.8
+        ? planks("darkwood", "x", 0.07)(c)
+        : shade("darkwood", lit(c, 0.05 + ((c.lp[2] / 2) % 1 < 0.3 ? -0.14 : 0)), c.px, c.py, 0.2);
+    s.convex(
+      [
+        { n: [0, 0, -1], d: 0 },
+        { n: [0, 0, 1], d: 5 / 19.6 },
+        { n: [-1, 0, 0], d: L * 0.6 },
+        { n: [0, 1, -0.25], d: W },
+        { n: [0, -1, -0.25], d: W },
+        { n: [0.6, 1, 0], d: 0.6 * L },
+        { n: [0.6, -1, 0], d: 0.6 * L },
+      ],
+      hull,
+    );
+    // Broken ribs, the stump of the mast and a fallen yard.
+    for (const x of [-0.35, -0.1, 0.15]) {
+      s.box([x, -W * 0.9, 4], [x + 0.04, -W * 0.7, 9 + (x > 0 ? 0 : 3)], flat("timber", -0.1));
+      s.box([x, W * 0.7, 4], [x + 0.04, W * 0.9, 8], flat("timber", -0.1));
+    }
+    s.prism("z", [0.05, 0, 12], 0.04, 8, flat("darkwood"), 6);
+    s.prism("y", [-0.2, 0.05, 6], 0.025, 0.4, flat("timber"), 6);
+    s.box([0.02, -0.16, 12], [0.06, 0.12, 20], cloth("basalt"));
+  });
+  return renderSprite(`wreck_ship_${variant}`, s, 1, 1, 40, 20);
+}
+
+/** Bones and a rusty cutlass on the sand. Drawn straight onto a tile-sized canvas. */
+function bones(): Sprite {
+  const c = new Canvas(26, 20);
+  const bone = rampColor("plaster", 4);
+  const boneShade = rampColor("plaster", 2);
+  const steel = rampColor("rock", 4);
+  const rust = rampColor("thatch", 2);
+  // A ribcage of curved bones, a skull, and scattered long bones.
+  for (let i = 0; i < 4; i++) {
+    c.fill(9 + i * 2, 10 + (i % 2), 1, 4, i % 2 ? boneShade : bone);
+    c.set(10 + i * 2, 10, bone);
+  }
+  c.fill(8, 14, 9, 1, boneShade);
+  c.fill(4, 9, 4, 4, bone);
+  c.fill(5, 8, 2, 1, bone);
+  c.set(5, 10, rampColor("outline", 0));
+  c.set(7, 10, rampColor("outline", 0));
+  c.fill(5, 13, 2, 1, boneShade);
+  c.fill(17, 11, 5, 1, bone);
+  c.set(16, 10, bone);
+  c.set(22, 12, bone);
+  c.fill(12, 4, 8, 1, steel);
+  c.set(20, 5, steel);
+  c.fill(11, 4, 2, 2, rust);
+  outline(c, 0.35);
+  return { name: "wreck_bones", canvas: c, anchorX: 13, anchorY: 2 };
+}
+
+/** Sunken ruins seen through the water: toppled columns, or a fortress of walls and towers. */
+function sunkenSite(kind: "ruin" | "fortress"): Sprite {
+  const s = new Scene();
+  const stone: Material = (c) => shade("stone", lit(c, 0.05), c.px, c.py, 0.25);
+  const mossy: Material = (c) =>
+    c.ln[2] > 0.5 ? shade("moss", lit(c, 0.05), c.px, c.py, 0.25) : stone(c);
+  if (kind === "ruin") {
+    s.prism("z", [0.3, 0.3, 8], 0.11, 8, stone, 8);
+    s.prism("z", [0.72, 0.36, 4.5], 0.11, 4.5, stone, 8);
+    s.prism("x", [0.55, 0.75, 4], 0.1, 0.7, stone, 8);
+    s.box([0.15, 0.55, 0], [0.4, 0.85, 4], mossy);
+    s.box([0.62, 0.05, 0], [0.9, 0.22, 3], stone);
+    return renderSprite("site_ruin", s, 1, 1, 24, 8);
+  }
+  const wall = (x0: number, y0: number, x1: number, y1: number, h: number) =>
+    s.box([x0, y0, 0], [x1, y1, h], mossy);
+  wall(0.1, 0.1, 1.9, 0.3, 8);
+  wall(0.1, 1.7, 1.9, 1.9, 8);
+  wall(0.1, 0.3, 0.3, 1.7, 8);
+  wall(1.7, 0.3, 1.9, 1.7, 5);
+  for (const [x, y] of [
+    [0.25, 0.25],
+    [1.75, 0.25],
+    [0.25, 1.75],
+    [1.75, 1.75],
+  ] as const) {
+    s.prism("z", [x, y, 11], 0.22, 11, stone, 10);
+    s.cone([x, y, 22], 0.27, 9, flat("slate", -0.05), 10);
+  }
+  s.box([0.8, 0.8, 0], [1.2, 1.2, 14], stone);
+  s.cone([1, 1, 14], 0.36, 10, flat("slate", -0.05), 10);
+  return renderSprite("site_fortress", s, 2, 2, 44, 10);
 }
 
 function rowboat(dir: "x" | "y"): Sprite {
@@ -486,6 +636,14 @@ function icons(): Sprite[] {
       c.fill(3, 2, 7, 5, rampColor("sail", 3));
       c.fill(3, 2, 2, 5, rampColor("sail", 4));
     }),
+    icon("relic", (c) => {
+      c.fill(4, 10, 6, 2, rampColor("gold", 2));
+      c.fill(5, 5, 4, 5, rampColor("crystal", 3));
+      c.fill(6, 3, 2, 2, rampColor("crystal", 4));
+      c.fill(5, 5, 1, 4, rampColor("crystal", 5));
+      c.set(6, 1, rampColor("gold", 5));
+      c.fill(3, 11, 8, 1, rampColor("gold", 3));
+    }),
     icon("flag", (c) => {
       c.fill(3, 1, 1, 12, rampColor("timber", 2));
       c.fill(4, 1, 7, 5, rampColor("cloth", 3));
@@ -564,6 +722,14 @@ export function unitSprites(): Sprite[] {
     carried("crystal"),
     ...particles(),
     ...Array.from({ length: 8 }, (_, h) => ship(h)),
+    ...Array.from({ length: 8 }, (_, h) => ship(h, "cargo")),
+    ...Array.from({ length: 8 }, (_, h) => ship(h, "patrol")),
+    ...Array.from({ length: 8 }, (_, h) => ship(h, "pirate")),
+    shipwreck(0),
+    shipwreck(1),
+    bones(),
+    sunkenSite("ruin"),
+    sunkenSite("fortress"),
     rowboat("x"),
     rowboat("y"),
     ...[0, 1, 2, 3].map(smoke),

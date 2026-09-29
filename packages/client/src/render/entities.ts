@@ -1,5 +1,9 @@
 import {
+  PATROL,
+  PIRATE,
+  CARGO,
   SHIP,
+  shipMaxHp,
   VILLAGER,
   HALF_H,
   HALF_W,
@@ -11,7 +15,10 @@ import {
   type Entity,
   type GameState,
   type NodeEntity,
+  type PirateEntity,
   type ShipEntity,
+  type SiteEntity,
+  type WreckEntity,
   type VillagerEntity,
   type WorldMap,
 } from "@explorer/shared";
@@ -75,6 +82,8 @@ interface Smoke {
 
 abstract class View {
   abstract readonly root: Container;
+  /** Flat things sit in the ground layer, under everything that stands up. */
+  readonly flat: boolean = false;
   abstract update(e: Entity, now: number): void;
   frame(_now: number, _dt: number): void {}
   destroy(): void {
@@ -99,7 +108,7 @@ class BuildingView extends View {
 
   constructor(
     private readonly layer: EntityLayer,
-    readonly flat: boolean,
+    override readonly flat: boolean,
   ) {
     super();
     this.root.addChild(this.bar);
@@ -150,7 +159,14 @@ class BuildingView extends View {
     // Progress bar for construction or a production queue.
     this.bar.clear();
     const job = b.queue[0];
-    const total = job?.what === "ship" ? SHIP.buildSeconds : VILLAGER.trainSeconds;
+    const total =
+      job?.what === "ship"
+        ? SHIP.buildSeconds
+        : job?.what === "cargo"
+          ? CARGO.buildSeconds
+          : job?.what === "patrol"
+            ? PATROL.buildSeconds
+            : VILLAGER.trainSeconds;
     const progress = !b.complete ? b.progress : job ? 1 - job.remaining / total : null;
     if (progress !== null && b.kind !== "path") {
       const cx = screenX(b.w / 2, b.h / 2);
@@ -388,25 +404,167 @@ class VillagerView extends MovingView {
   }
 }
 
+/** A small hull bar over a damaged ship; nothing at full health. */
+function hullBar(bar: Graphics, hp: number, max: number): void {
+  bar.clear();
+  if (hp >= max) return;
+  const t = Math.max(0, hp / max);
+  bar
+    .rect(-11, -40, 22, 4)
+    .fill({ color: 0x1b1a1f })
+    .rect(-10, -39, Math.round(20 * t), 2)
+    .fill({ color: t > 0.5 ? 0x8fae45 : t > 0.25 ? 0xe2a841 : 0xd9486a });
+}
+
+class PirateView extends MovingView {
+  readonly root = new Container();
+  private sprite: Sprite;
+  private bar = new Graphics();
+  private p: PirateEntity | null = null;
+  private wakeTimer = 0;
+
+  constructor(private readonly layer: EntityLayer) {
+    super();
+    this.sprite = layer.atlas.sprite("pirate_0");
+    this.root.addChild(this.sprite, this.bar);
+  }
+
+  update(e: Entity, now: number): void {
+    const p = e as PirateEntity;
+    this.track(p.x, p.y, now, this.p === null);
+    this.p = p;
+    const name = `pirate_${p.heading % 8}`;
+    this.sprite.texture = this.layer.atlas.texture(name);
+    this.layer.atlas.anchor(this.sprite, name);
+    hullBar(this.bar, p.hp, PIRATE.hp);
+  }
+
+  override frame(now: number, dt: number): void {
+    const p = this.p;
+    if (!p) return;
+    this.interpolate(now);
+    const world = this.layer.state.world;
+    // Raiders in the fog stay unseen until someone explores the water they sail on.
+    this.root.visible =
+      this.layer.state.explored[tileIndex(world, Math.floor(this.x), Math.floor(this.y))] === 1;
+    const bob = Math.round(Math.sin(now / 480 + p.id) * 1);
+    this.root.position.set(
+      Math.round(screenX(this.x, this.y)),
+      Math.round(screenY(this.x, this.y)) + bob,
+    );
+    this.root.zIndex = this.x + this.y;
+    this.root.alpha = this.fadeBehindTerrain(world, 0, dt);
+    if (this.moving && this.root.visible) {
+      this.wakeTimer -= dt;
+      if (this.wakeTimer <= 0) {
+        this.wakeTimer = 0.14;
+        this.layer.sparkle(
+          this.root.x + (Math.random() - 0.5) * 16,
+          this.root.y + 4 + Math.random() * 6,
+          now,
+        );
+      }
+    }
+  }
+}
+
+/** A shipwreck bobbing at sea or bones on the sand. */
+class WreckView extends View {
+  readonly root = new Container();
+  private sprite: Sprite | null = null;
+  private w: WreckEntity | null = null;
+
+  constructor(private readonly layer: EntityLayer) {
+    super();
+  }
+
+  update(e: Entity): void {
+    const w = e as WreckEntity;
+    this.w = w;
+    const name = w.kind === "skeleton" ? "wreck_bones" : `wreck_ship_${w.variant % 2}`;
+    if (!this.sprite) {
+      this.sprite = this.layer.atlas.sprite(name);
+      this.root.addChild(this.sprite);
+    }
+    const state = this.layer.state;
+    if (w.kind === "skeleton") {
+      const h = tileHeight(state, w.x, w.y);
+      this.root.position.set(screenX(w.x, w.y), screenY(w.x, w.y) - h);
+      this.root.zIndex = w.x + w.y + 0.5;
+      this.root.alpha = coverAlpha(coverAt(state.world, w.x + 0.5, w.y + 0.5, h));
+    } else {
+      this.root.zIndex = w.x + w.y + 0.5;
+    }
+    this.root.visible = state.explored[tileIndex(state.world, w.x, w.y)] === 1;
+  }
+
+  override frame(now: number): void {
+    const w = this.w;
+    if (!w || w.kind === "skeleton") return;
+    // A shipwreck rocks gently on the swell.
+    this.root.position.set(
+      Math.round(screenX(w.x + 0.5, w.y + 0.5)),
+      Math.round(screenY(w.x + 0.5, w.y + 0.5) + Math.sin(now / 900 + w.id) * 1.2),
+    );
+  }
+}
+
+/** Sunken ruins seen through the water: only once a ship has sailed over them. */
+class SiteView extends View {
+  readonly root = new Container();
+  override readonly flat = true;
+  private sprite: Sprite | null = null;
+
+  constructor(private readonly layer: EntityLayer) {
+    super();
+  }
+
+  update(e: Entity): void {
+    const site = e as SiteEntity;
+    const name = site.kind === "fortress" ? "site_fortress" : "site_ruin";
+    if (!this.sprite) {
+      this.sprite = this.layer.atlas.sprite(name);
+      this.sprite.tint = 0x7fc4c8;
+      this.sprite.alpha = 0.55;
+      this.root.addChild(this.sprite);
+    }
+    const o = site.kind === "fortress" ? 0.5 : 0;
+    this.root.position.set(screenX(site.x - o, site.y - o), screenY(site.x - o, site.y - o));
+    this.root.zIndex = -1e6 + site.x + site.y;
+    this.root.visible =
+      site.found &&
+      this.layer.state.explored[tileIndex(this.layer.state.world, site.x, site.y)] === 1;
+    // Emptied sites fade further into the deep.
+    this.sprite.alpha = Object.values(site.loot).some((n) => (n ?? 0) > 0) ? 0.6 : 0.3;
+  }
+
+  override frame(now: number): void {
+    if (this.sprite && this.root.visible)
+      this.sprite.y = Math.round(Math.sin(now / 1100 + this.root.x) * 1.5);
+  }
+}
+
 class ShipView extends MovingView {
   readonly root = new Container();
   private sprite: Sprite;
   private s: ShipEntity | null = null;
   private wakeTimer = 0;
+  private bar = new Graphics();
 
   constructor(private readonly layer: EntityLayer) {
     super();
     this.sprite = layer.atlas.sprite("ship_0");
-    this.root.addChild(this.sprite);
+    this.root.addChild(this.sprite, this.bar);
   }
 
   update(e: Entity, now: number): void {
     const s = e as ShipEntity;
     this.track(s.x, s.y, now, this.s === null);
     this.s = s;
-    const name = `ship_${s.heading % 8}`;
+    const name = `${s.kind === "scout" ? "ship" : s.kind}_${s.heading % 8}`;
     this.sprite.texture = this.layer.atlas.texture(name);
     this.layer.atlas.anchor(this.sprite, name);
+    hullBar(this.bar, s.hp, shipMaxHp(this.layer.state, s.kind));
   }
 
   override frame(now: number, dt: number): void {
@@ -451,6 +609,7 @@ export class EntityLayer {
   private views = new Map<number, View>();
   private smoke: Smoke[] = [];
   private sparkles: Sparkle[] = [];
+  private bolts: { g: Graphics; age: number }[] = [];
 
   constructor(
     readonly atlas: Atlas,
@@ -502,8 +661,7 @@ export class EntityLayer {
       if (!v) {
         v = this.create(e);
         this.views.set(id, v);
-        const flat = v instanceof BuildingView && v.flat;
-        (flat ? this.ground : this.container).addChild(v.root);
+        (v.flat ? this.ground : this.container).addChild(v.root);
       }
       v.update(e, now);
       if (e.type === "building" && isNew) this.onFootprintChange(e);
@@ -532,6 +690,12 @@ export class EntityLayer {
         return new VillagerView(this);
       case "ship":
         return new ShipView(this);
+      case "pirate":
+        return new PirateView(this);
+      case "wreck":
+        return new WreckView(this);
+      case "site":
+        return new SiteView(this);
     }
   }
 
@@ -543,7 +707,8 @@ export class EntityLayer {
         r.x < view.right + 64 &&
         r.y > view.top - 32 &&
         r.y < view.bottom + 96;
-      if (v instanceof VillagerView || v instanceof ShipView || onScreen) v.frame(now, dt);
+      if (v instanceof VillagerView || v instanceof ShipView || v instanceof PirateView || onScreen)
+        v.frame(now, dt);
     }
     // Chimney smoke rises, drifts and fades.
     for (let i = this.smoke.length - 1; i >= 0; i--) {
@@ -562,6 +727,15 @@ export class EntityLayer {
       p.sprite.position.set(Math.round(p.x + t * 10), Math.round(p.y - t * 22));
       p.sprite.alpha = 0.9 * (1 - t * 0.6);
     }
+    for (let i = this.bolts.length - 1; i >= 0; i--) {
+      const b = this.bolts[i]!;
+      b.age += dt;
+      b.g.alpha = Math.max(0, 1 - b.age / 0.3);
+      if (b.age > 0.3) {
+        b.g.destroy();
+        this.bolts.splice(i, 1);
+      }
+    }
     for (let i = this.sparkles.length - 1; i >= 0; i--) {
       const s = this.sparkles[i]!;
       s.age += dt;
@@ -573,6 +747,38 @@ export class EntityLayer {
       const name = `sparkle_${Math.min(2, Math.floor((s.age / 0.6) * 3))}`;
       s.sprite.texture = this.atlas.texture(name);
     }
+  }
+
+  /** A cannon shot: smoke at the muzzle and sparks where it lands. Bolts are drawn as lightning. */
+  shot(
+    kind: "cannon" | "bolt",
+    from: { x: number; y: number },
+    to: { x: number; y: number },
+  ): void {
+    const fx = screenX(from.x, from.y);
+    const fy = screenY(from.x, from.y) - 10;
+    const tx = screenX(to.x, to.y);
+    const ty = screenY(to.x, to.y) - 6;
+    if (kind === "bolt") {
+      const g = new Graphics();
+      let x = tx;
+      let y = ty - 90;
+      g.moveTo(x, y);
+      for (let i = 0; i < 6; i++) {
+        x = tx + (Math.random() - 0.5) * 14 * (1 - i / 6);
+        y += 15;
+        g.lineTo(x, y);
+      }
+      g.stroke({ color: 0xf4eeff, width: 3 }).stroke({ color: 0xa48cf0, width: 1, alpha: 0.8 });
+      this.effects.addChild(g);
+      this.bolts.push({ g, age: 0 });
+      for (let i = 0; i < 4; i++)
+        this.sparkle(tx + (Math.random() - 0.5) * 20, ty + Math.random() * 8, 0);
+      return;
+    }
+    this.puff(fx, fy, 0);
+    for (let i = 0; i < 3; i++)
+      this.sparkle(tx + (Math.random() - 0.5) * 14, ty + (Math.random() - 0.5) * 8, 0);
   }
 
   puff(x: number, y: number, _now: number): void {

@@ -2,14 +2,17 @@ import {
   BIOMES,
   BUILDINGS,
   canPlaceBuilding,
+  dockSite,
   dayNumber,
   dayPhase,
   discoveryName,
+  UPGRADES,
   HALF_H,
   HALF_W,
   inBounds,
   isLand,
   pickTile,
+  RESOURCES,
   tileIndex,
   type BiomeId,
   type BuildingKind,
@@ -18,6 +21,7 @@ import {
   type GameEvent,
   type Patch,
   type PlayerInfo,
+  type Resource,
 } from "@explorer/shared";
 import { Application, Container, Rectangle } from "pixi.js";
 import type { Atlas } from "../assets";
@@ -229,7 +233,10 @@ export class Game {
       this.hud.setStock(state);
     }
     if (this.selected !== null && !state.entities.has(this.selected)) this.select(null);
-    if (this.selected !== null && (p.entities.some((e) => e.id === this.selected) || p.stock))
+    if (
+      this.selected !== null &&
+      (p.entities.some((e) => e.id === this.selected) || p.stock || p.outposts)
+    )
       this.selectionDirty = true;
     for (const ev of p.events ?? []) this.onEvent(ev);
   }
@@ -243,7 +250,63 @@ export class Game {
         this.hud.toast("A new villager joined the settlement");
         break;
       case "ship":
-        this.hud.toast("A scout ship is ready at the dock");
+        this.hud.toast(
+          ev.kind === "cargo"
+            ? "A cargo ship is ready at the dock"
+            : "A scout ship is ready at the dock",
+        );
+        break;
+      case "pirates": {
+        const hall = this.session.state.world.start.townHall;
+        // The map is drawn isometrically, so compass points follow the screen, not the grid.
+        const sx = ev.x - ev.y - (hall.x - hall.y);
+        const sy = ev.x + ev.y - (hall.x + hall.y);
+        const names = [
+          "east",
+          "south-east",
+          "south",
+          "south-west",
+          "west",
+          "north-west",
+          "north",
+          "north-east",
+        ];
+        const dir = names[(Math.round(Math.atan2(sy, sx) / (Math.PI / 4)) + 8) % 8]!;
+        this.hud.toast(
+          `Pirates! ${ev.count === 1 ? "A raiding ship approaches" : `${ev.count} raiding ships approach`} from the ${dir}`,
+          "error",
+        );
+        break;
+      }
+      case "robbed":
+        this.hud.toast("Pirates are looting a storehouse!", "error");
+        break;
+      case "sunk":
+        this.hud.toast(
+          ev.kind === "pirate"
+            ? "A pirate ship went down! Salvage the wreck or the bones for loot"
+            : `Your ${ev.kind === "patrol" ? "patrol boat" : `${ev.kind} ship`} was sunk`,
+          ev.kind === "pirate" ? "info" : "error",
+        );
+        break;
+      case "found":
+        this.hud.toast(
+          ev.site === "fortress"
+            ? "A sunken fortress lies beneath the waves! Send divers"
+            : "Sunken ruins lie beneath the waves. Send divers",
+        );
+        break;
+      case "salvaged":
+        this.hud.toast(`Recovered from ${ev.what}: ${goodsSummary(ev.goods)}`);
+        break;
+      case "shot":
+        this.entities.shot(ev.kind, ev.from, ev.to);
+        break;
+      case "upgrade":
+        this.hud.toast(`${UPGRADES[ev.upgrade].name} learned`);
+        break;
+      case "cargo":
+        this.hud.toast(`A cargo ship brought ${ev.amount} goods home`);
         break;
       case "discovered":
         this.hud.toast(discoveryText(ev.biome));
@@ -298,6 +361,12 @@ export class Game {
   }
 
   private footprintFor(kind: BuildingKind, tile: { x: number; y: number }): Footprint {
+    if (kind === "dock") {
+      // A dock is placed by its shore tile; the pier is whatever fits out over the water.
+      const site = dockSite(this.session.state, tile.x, tile.y);
+      const z = visibleHeight(this.session.state, tile.x, tile.y) ?? 0;
+      return site ? { ...site, z } : { x: tile.x, y: tile.y, w: 1, h: 1, z };
+    }
     const [w, h] = BUILDINGS[kind].size;
     const x = tile.x - Math.floor((w - 1) / 2);
     const y = tile.y - Math.floor((h - 1) / 2);
@@ -347,14 +416,20 @@ export class Game {
     const tile = this.tileAt(sx, sy);
     let best: { e: Entity; z: number } | null = null;
     for (const e of state.entities.values()) {
-      if (tile && e.type !== "ship" && (Math.abs(e.x - tile.x) > 8 || Math.abs(e.y - tile.y) > 8))
+      if (
+        tile &&
+        e.type !== "ship" &&
+        e.type !== "pirate" &&
+        (Math.abs(e.x - tile.x) > 8 || Math.abs(e.y - tile.y) > 8)
+      )
         continue;
       const view = this.entities.view(e.id);
       if (!view || !view.root.visible) continue;
       const b = view.root.getBounds();
       if (!b.containsPoint(sx, sy)) continue;
       // Villagers and ships are small targets: prefer them when overlapping bigger sprites.
-      const z = view.root.zIndex + (e.type === "villager" || e.type === "ship" ? 1000 : 0);
+      const small = e.type === "villager" || e.type === "ship" || e.type === "pirate";
+      const z = view.root.zIndex + (small ? 1000 : 0);
       if (!best || z > best.z) best = { e, z };
     }
     return best?.e ?? null;
@@ -526,7 +601,8 @@ export class Game {
     if (tool.kind === "build") {
       if (tool.building === "path" || !this.hoverTile) return;
       const f = this.footprintFor(tool.building, this.hoverTile);
-      void this.send({ kind: "place-building", building: tool.building, x: f.x, y: f.y }).then(
+      const at = tool.building === "dock" ? this.hoverTile : f;
+      void this.send({ kind: "place-building", building: tool.building, x: at.x, y: at.y }).then(
         (ok) => {
           if (ok && !shift) this.setTool({ kind: "select" });
         },
@@ -553,7 +629,9 @@ export class Game {
     const tile = this.tileAt(sx, sy);
     if (sel?.type === "villager") {
       const target = this.entityAt(sx, sy);
-      if (target?.type === "ship")
+      if (target?.type === "wreck")
+        void this.send({ kind: "assign", villagerId: sel.id, target: { wreck: target.id } });
+      else if (target?.type === "ship")
         void this.send({ kind: "assign", villagerId: sel.id, target: { ship: target.id } });
       else if (target?.type === "node")
         void this.send({ kind: "assign", villagerId: sel.id, target: { node: target.id } });
@@ -561,6 +639,14 @@ export class Game {
         void this.send({ kind: "assign", villagerId: sel.id, target: { building: target.id } });
       else if (tile)
         void this.send({ kind: "assign", villagerId: sel.id, target: { x: tile.x, y: tile.y } });
+    } else if (sel?.type === "ship" && sel.kind === "cargo") {
+      // A dock on another island becomes the ship's trade route; anywhere else steers it by hand.
+      const target = this.entityAt(sx, sy);
+      if (target?.type === "building" && target.kind === "dock")
+        void this.send({ kind: "set-route", shipId: sel.id, dockId: target.id });
+      else if (tile) void this.send({ kind: "move-ship", shipId: sel.id, x: tile.x, y: tile.y });
+    } else if (sel?.type === "ship" && sel.kind !== "cargo" && this.shipTarget(sel.id, sx, sy)) {
+      // Handled: a wreck to salvage or a sunken site to dive at.
     } else if (sel?.type === "ship" && tile) {
       // Right-clicking land with passengers aboard means "take them there".
       const unload = isLand(state.world, tile.x, tile.y) && sel.passengers.length > 0;
@@ -568,6 +654,17 @@ export class Game {
     } else {
       this.select(null);
     }
+  }
+
+  /** Right-clicking a shipwreck salvages it and a found sunken site sends the passengers diving. */
+  private shipTarget(shipId: number, sx: number, sy: number): boolean {
+    const target = this.entityAt(sx, sy);
+    if (target?.type === "wreck" && target.kind === "shipwreck")
+      void this.send({ kind: "salvage", shipId, wreckId: target.id });
+    else if (target?.type === "site" && target.found)
+      void this.send({ kind: "dive", shipId, siteId: target.id });
+    else return false;
+    return true;
   }
 
   // ------------------------------------------------------------------------- frame
@@ -666,9 +763,10 @@ export class Game {
     let ghost: { name: string; f: Footprint; ok: boolean } | null = null;
     if (hover && tool.kind === "build") {
       const f = this.footprintFor(tool.building, hover);
-      const ok = canPlaceBuilding(state, tool.building, f.x, f.y).ok;
+      const at = tool.building === "dock" ? hover : f;
+      const ok = canPlaceBuilding(state, tool.building, at.x, at.y).ok;
       o.footprint(f, ok);
-      if (tool.building !== "path")
+      if (tool.building !== "path" && tool.building !== "dock")
         ghost = { name: tool.building === "farm" ? "farm_2" : tool.building, f, ok };
     } else if (
       tool.kind === "harvest" &&
@@ -717,4 +815,9 @@ export class Game {
     }
     o.drawCursors(this.camera);
   }
+}
+
+function goodsSummary(goods: Partial<Record<Resource, number>>): string {
+  const items = RESOURCES.filter((r) => (goods[r] ?? 0) > 0).map((r) => `${goods[r]} ${r}`);
+  return items.length > 0 ? items.join(", ") : "nothing";
 }

@@ -1,16 +1,28 @@
 import { describe, expect, it } from "vitest";
 import {
   applyCommand,
+  addEntity,
+  addGoods,
   applyPatch,
   BUILDINGS,
   canPlaceBuilding,
   createInitialState,
+  dockSpawn,
   fromSnapshot,
   generateWorld,
   harvestSeconds,
+  isLandTerrain,
+  newShip,
+  PIRATE,
+  landingBlock,
   population,
   populationCap,
+  sailable,
+  sailSpeedFactor,
   shipCost,
+  shipReveal,
+  STORM,
+  stockOf,
   takePatch,
   tick,
   toSnapshot,
@@ -19,8 +31,12 @@ import {
   type BuildingKind,
   type GameState,
   type NodeEntity,
+  type PirateEntity,
   type ShipEntity,
+  type SiteEntity,
+  UPGRADES,
   type VillagerEntity,
+  type WreckEntity,
 } from "../src";
 
 const world = generateWorld("sim-tests");
@@ -82,6 +98,7 @@ describe("initial state", () => {
       gold: 0,
       faith: 0,
       crystal: 0,
+      relic: 0,
     });
     expect(of(s, "node").length).toBe(world.nodes.length);
     const th = world.start.townHall;
@@ -405,5 +422,375 @@ describe("settling other islands", () => {
     run(s, 40);
     const store = of<BuildingEntity>(s, "building").find((b) => b.kind === "storehouse")!;
     expect(store.complete).toBe(true);
+  });
+});
+
+describe("trade routes", () => {
+  const home = world.start.islandId;
+
+  /** Put a villager ashore on another island and find a shore tile where a dock fits. */
+  function settleOutpost(s: GameState): { islandId: number; at: { x: number; y: number } } {
+    for (const island of world.islands) {
+      if (island.id === home) continue;
+      const tiles: { x: number; y: number }[] = [];
+      for (let y = 0; y < world.height; y++)
+        for (let x = 0; x < world.width; x++) {
+          const k = y * world.width + x;
+          if (world.island[k] === island.id) {
+            s.explored[k] = 1;
+            tiles.push({ x, y });
+          }
+        }
+      for (let y = 0; y < world.height; y++)
+        for (let x = 0; x < world.width; x++) s.explored[y * world.width + x] = 1;
+      const land = tiles.find((t) => isLandTerrain(world.terrain[t.y * world.width + t.x]!));
+      if (!land) continue;
+      s.entities.set(999_000 + island.id, {
+        ...of<VillagerEntity>(s, "villager")[0]!,
+        id: 999_000 + island.id,
+        x: land.x + 0.5,
+        y: land.y + 0.5,
+      });
+      const at = tiles.find((t) => canPlaceBuilding(s, "dock", t.x, t.y, { ignoreCost: true }).ok);
+      if (at) return { islandId: island.id, at };
+      s.entities.delete(999_000 + island.id);
+    }
+    throw new Error("no island with room for a dock");
+  }
+
+  it("refuses a dock on an island nobody has settled", () => {
+    const s = fresh();
+    for (let k = 0; k < s.explored.length; k++) s.explored[k] = 1;
+    const other = world.islands.find((i) => i.id !== home)!;
+    const k = world.island.findIndex((id, i) => id === other.id && world.terrain[i]! > 0);
+    const res = canPlaceBuilding(s, "dock", k % world.width, Math.floor(k / world.width));
+    expect(res.ok).toBe(false);
+  });
+
+  it("lets settlers build a dock on the shore of another island", () => {
+    const s = fresh();
+    const { islandId, at } = settleOutpost(s);
+    s.stock.wood = s.stock.stone = 500;
+    expect(applyCommand(s, { kind: "place-building", building: "dock", ...at })).toEqual({
+      ok: true,
+    });
+    const dock = of<BuildingEntity>(s, "building").find((b) => b.kind === "dock" && !b.complete)!;
+    expect(dock.dir).toBeDefined();
+    expect(world.island[dock.y * world.width + dock.x]).not.toBe(islandId + 1e9);
+    expect(applyCommand(s, { kind: "remove-building", buildingId: dock.id }).ok).toBe(true);
+  });
+
+  it("keeps the home dock", () => {
+    const s = fresh();
+    const dock = of<BuildingEntity>(s, "building").find((b) => b.kind === "dock")!;
+    expect(applyCommand(s, { kind: "remove-building", buildingId: dock.id }).ok).toBe(false);
+  });
+
+  it("keeps goods gathered elsewhere on that island until a cargo ship hauls them home", () => {
+    const s = fresh();
+    const { islandId, at } = settleOutpost(s);
+    s.stock.wood = s.stock.stone = 500;
+    applyCommand(s, { kind: "place-building", building: "dock", ...at });
+    const outDock = of<BuildingEntity>(s, "building").find(
+      (b) => b.kind === "dock" && !b.complete,
+    )!;
+    outDock.complete = true;
+    outDock.progress = 1;
+
+    // A pile on the outpost is not spendable at home.
+    const homeWood = s.stock.wood;
+    addGoods(s, islandId, "wood", 60);
+    expect(s.stock.wood).toBe(homeWood);
+    expect(stockOf(s, islandId).wood).toBe(60);
+
+    const homeDock = of<BuildingEntity>(s, "building").find(
+      (b) => b.kind === "dock" && b !== outDock,
+    )!;
+    expect(applyCommand(s, { kind: "build-ship", buildingId: homeDock.id, ship: "cargo" })).toEqual(
+      { ok: true },
+    );
+    run(s, 31);
+    const ship = of<ShipEntity>(s, "ship").find((e) => e.kind === "cargo")!;
+    expect(ship).toBeDefined();
+    expect(ship.passengers).toHaveLength(0);
+    expect(
+      applyCommand(s, {
+        kind: "assign",
+        villagerId: of<VillagerEntity>(s, "villager")[0]!.id,
+        target: { ship: ship.id },
+      }).ok,
+    ).toBe(false);
+    expect(applyCommand(s, { kind: "set-route", shipId: ship.id, dockId: homeDock.id }).ok).toBe(
+      false,
+    );
+    expect(applyCommand(s, { kind: "set-route", shipId: ship.id, dockId: outDock.id })).toEqual({
+      ok: true,
+    });
+
+    const before = s.stock.wood;
+    let guard = 0;
+    while (s.stock.wood === before && guard++ < 3000) tick(s);
+    // One trip carries at most a shipload; the rest waits for the next.
+    expect(s.stock.wood).toBe(before + 40);
+    expect(stockOf(s, islandId).wood).toBe(20);
+    run(s, 300);
+    expect(stockOf(s, islandId).wood).toBe(0);
+    expect(s.stock.wood).toBe(before + 60);
+  });
+
+  it("survives snapshots and patches", () => {
+    const s = fresh();
+    const { islandId } = settleOutpost(s);
+    const client = fromSnapshot(world, JSON.parse(JSON.stringify(toSnapshot(s))));
+    addGoods(s, islandId, "stone", 12);
+    applyPatch(client, JSON.parse(JSON.stringify(takePatch(s))));
+    expect(stockOf(client, islandId).stone).toBe(12);
+    const restored = fromSnapshot(world, JSON.parse(JSON.stringify(toSnapshot(s))), true);
+    expect(stockOf(restored, islandId).stone).toBe(12);
+  });
+});
+
+describe("magic house upgrades", () => {
+  function withMagicHouse(): GameState {
+    const s = fresh();
+    s.stock = { ...s.stock, wood: 999, stone: 999, tools: 99, gold: 500, faith: 500, crystal: 50 };
+    const at = spotFor(s, "magic_house");
+    applyCommand(s, { kind: "place-building", building: "magic_house", ...at });
+    const b = of<BuildingEntity>(s, "building").find((e) => e.kind === "magic_house")!;
+    b.complete = true;
+    b.progress = 1;
+    return s;
+  }
+
+  it("needs a magic house, and charges for each upgrade once", () => {
+    const s = fresh();
+    s.stock.faith = s.stock.gold = 500;
+    expect(applyCommand(s, { kind: "buy-upgrade", upgrade: "far_sight" }).ok).toBe(false);
+    const m = withMagicHouse();
+    const gold = m.stock.gold;
+    expect(applyCommand(m, { kind: "buy-upgrade", upgrade: "far_sight" })).toEqual({ ok: true });
+    expect(m.stock.gold).toBe(gold - UPGRADES.far_sight.cost.gold!);
+    expect(applyCommand(m, { kind: "buy-upgrade", upgrade: "far_sight" }).ok).toBe(false);
+  });
+
+  it("makes ships faster and see further", () => {
+    const m = withMagicHouse();
+    const before = { reveal: shipReveal(m), speed: sailSpeedFactor(m) };
+    applyCommand(m, { kind: "buy-upgrade", upgrade: "far_sight" });
+    applyCommand(m, { kind: "buy-upgrade", upgrade: "swift_sails" });
+    expect(shipReveal(m)).toBeGreaterThan(before.reveal);
+    expect(sailSpeedFactor(m)).toBeGreaterThan(before.speed);
+  });
+
+  it("keeps villagers off warded biomes until the ward is bought", () => {
+    let found: { w: ReturnType<typeof generateWorld>; id: number } | null = null;
+    for (let n = 0; n < 40 && !found; n++) {
+      const w = generateWorld(`ward-${n}`);
+      const island = w.islands.find((i) => i.biome === "infernal");
+      if (island) found = { w, id: island.id };
+    }
+    expect(found).not.toBeNull();
+    const s = createInitialState(found!.w);
+    expect(landingBlock(s, found!.id)).not.toBeNull();
+    s.upgrades.add("ember_ward");
+    expect(landingBlock(s, found!.id)).toBeNull();
+    expect(landingBlock(s, found!.w.start.islandId)).toBeNull();
+  });
+
+  it("charts every island and travels through snapshots and patches", () => {
+    const m = withMagicHouse();
+    const client = fromSnapshot(world, JSON.parse(JSON.stringify(toSnapshot(m))));
+    takePatch(m);
+    applyCommand(m, { kind: "buy-upgrade", upgrade: "seers_chart" });
+    for (const island of world.islands) {
+      expect(m.explored[Math.floor(island.cy) * world.width + Math.floor(island.cx)]).toBe(1);
+    }
+    applyPatch(client, JSON.parse(JSON.stringify(takePatch(m))));
+    expect(client.upgrades.has("seers_chart")).toBe(true);
+    const restored = fromSnapshot(world, JSON.parse(JSON.stringify(toSnapshot(m))), true);
+    expect(restored.upgrades.has("seers_chart")).toBe(true);
+  });
+});
+
+describe("pirates, wrecks and sunken sites", () => {
+  const dockOf = (s: GameState) =>
+    of<BuildingEntity>(s, "building").find((b) => b.kind === "dock")!;
+
+  function ship(s: GameState, kind: ShipEntity["kind"], x: number, y: number): ShipEntity {
+    return addEntity(s, newShip(s, kind, x, y, 0));
+  }
+
+  function pirate(s: GameState, x: number, y: number): PirateEntity {
+    return addEntity(s, {
+      id: s.nextId++,
+      type: "pirate",
+      x,
+      y,
+      heading: 0,
+      hp: PIRATE.hp,
+      path: [],
+      phase: "hunt",
+      target: null,
+      timer: 0,
+      cooldown: 0,
+      loot: {},
+      home: { x: Math.floor(x), y: Math.floor(y) },
+    });
+  }
+
+  /** Open water a few tiles off the home dock's pier. */
+  function nearDock(s: GameState, dist = 6): { x: number; y: number } {
+    const spawn = dockSpawn(dockOf(s));
+    for (let r = dist; r < dist + 10; r++) {
+      const x = Math.floor(spawn.x) + r;
+      if (sailable(s, x, Math.floor(spawn.y))) return { x: x + 0.5, y: Math.floor(spawn.y) + 0.5 };
+    }
+    return { x: spawn.x, y: spawn.y };
+  }
+
+  it("scatters ruins and fortresses over deep water, far from home", () => {
+    expect(world.sites.length).toBeGreaterThan(5);
+    expect(world.sites.some((x) => x.kind === "fortress")).toBe(true);
+    const hall = world.start.townHall;
+    for (const site of world.sites) {
+      expect(world.shore[site.y * world.width + site.x]).toBeGreaterThanOrEqual(4);
+      expect(Math.hypot(site.x - hall.x, site.y - hall.y)).toBeGreaterThan(20);
+    }
+    expect(generateWorld("sim-tests").sites).toEqual(world.sites);
+    const sites = of<SiteEntity>(fresh(), "site");
+    expect(sites).toHaveLength(world.sites.length);
+    expect(sites.every((x) => !x.found)).toBe(true);
+  });
+
+  it("sends raiders that rob a settlement and sail off", () => {
+    const s = fresh();
+    s.nextRaid = 0;
+    s.stock.wood = 400;
+    let robbed = false;
+    let seen = false;
+    for (let i = 0; i < 3000 && !(seen && of(s, "pirate").length === 0); i++) {
+      tick(s);
+      if (s.events.some((e) => e.type === "robbed")) robbed = true;
+      if (of(s, "pirate").length > 0) seen = true;
+      s.nextRaid = Math.max(s.nextRaid, s.time + 1000);
+    }
+    expect(seen).toBe(true);
+    expect(robbed).toBe(true);
+    expect(s.stock.wood).toBeLessThan(400);
+    expect(of(s, "pirate")).toHaveLength(0);
+  });
+
+  it("lets a patrol boat sink a pirate and leave a shipwreck with loot", () => {
+    const s = fresh();
+    s.nextRaid = 1e9;
+    const at = nearDock(s);
+    const patrol = ship(s, "patrol", at.x, at.y);
+    const p = pirate(s, at.x + 8, at.y);
+    run(s, 60);
+    expect(s.entities.has(p.id)).toBe(false);
+    expect(s.entities.has(patrol.id)).toBe(true);
+    const wreck = of<WreckEntity>(s, "wreck")[0]!;
+    expect(wreck.kind).toBe("shipwreck");
+    expect(wreck.loot.gold).toBeGreaterThan(0);
+
+    // A scout can pick the wreck clean.
+    const scout = ship(s, "scout", wreck.x + 0.5, wreck.y + 0.5);
+    const gold = s.stock.gold;
+    expect(applyCommand(s, { kind: "salvage", shipId: scout.id, wreckId: wreck.id })).toEqual({
+      ok: true,
+    });
+    run(s, 20);
+    expect(s.entities.has(wreck.id)).toBe(false);
+    expect(s.stock.gold).toBeGreaterThan(gold);
+  });
+
+  it("sinks ships that meet a pirate unarmed, and cannons change that", () => {
+    const unarmed = fresh();
+    unarmed.nextRaid = 1e9;
+    const at = nearDock(unarmed);
+    const lone = ship(unarmed, "scout", at.x, at.y);
+    pirate(unarmed, at.x + 3, at.y);
+    run(unarmed, 30);
+    expect(unarmed.entities.has(lone.id)).toBe(false);
+    expect(of<WreckEntity>(unarmed, "wreck").length).toBe(1);
+
+    const armed = fresh();
+    armed.nextRaid = 1e9;
+    armed.upgrades.add("cannons");
+    armed.upgrades.add("iron_hulls");
+    const there = nearDock(armed);
+    const gunship = ship(armed, "scout", there.x, there.y);
+    const foe = pirate(armed, there.x + 3, there.y);
+    run(armed, 30);
+    expect(armed.entities.has(foe.id)).toBe(false);
+    expect(armed.entities.has(gunship.id)).toBe(true);
+  });
+
+  it("strikes pirates with lightning once Stormcaller is learned", () => {
+    const s = fresh();
+    s.nextRaid = 1e9;
+    s.upgrades.add("storm_bolt");
+    const at = nearDock(s, 8);
+    const p = pirate(s, at.x, at.y);
+    p.hp = STORM.damage * 2;
+    run(s, STORM.interval * 3);
+    expect(s.entities.has(p.id)).toBe(false);
+  });
+
+  it("lets villagers loot the bones a raider leaves ashore", () => {
+    const s = fresh();
+    s.nextRaid = 1e9;
+    const h = hall(s);
+    const land = spotFor(s, "house");
+    s.entities.set(9001, {
+      id: 9001,
+      type: "wreck",
+      kind: "skeleton",
+      x: land.x,
+      y: land.y,
+      variant: 0,
+      loot: { gold: 12, relic: 1 },
+    });
+    const v = of<VillagerEntity>(s, "villager")[0]!;
+    expect(h).toBeDefined();
+    expect(applyCommand(s, { kind: "assign", villagerId: v.id, target: { wreck: 9001 } })).toEqual({
+      ok: true,
+    });
+    run(s, 40);
+    expect(s.entities.has(9001)).toBe(false);
+    expect(s.stock.relic).toBe(1);
+    expect(s.stock.gold).toBe(12);
+  });
+
+  it("finds a sunken site by sailing over it, and divers bring up its treasure", () => {
+    const s = fresh();
+    s.nextRaid = 1e9;
+    const site = of<SiteEntity>(s, "site").find((x) => x.kind === "ruin")!;
+    const scout = ship(s, "scout", site.x + 0.5, site.y + 2.5);
+    run(s, 1);
+    expect(site.found).toBe(true);
+    expect(applyCommand(s, { kind: "dive", shipId: scout.id, siteId: site.id }).ok).toBe(false);
+    const divers = of<VillagerEntity>(s, "villager").slice(0, 2);
+    for (const v of divers) {
+      scout.passengers.push(v.id);
+      v.aboard = scout.id;
+    }
+    const gold = s.stock.gold;
+    const treasure = site.loot.gold!;
+    expect(applyCommand(s, { kind: "dive", shipId: scout.id, siteId: site.id })).toEqual({
+      ok: true,
+    });
+    run(s, 40);
+    expect(s.stock.gold).toBeGreaterThan(gold);
+    expect(site.loot.gold!).toBeLessThan(treasure);
+    expect(scout.dive).toBeNull();
+  });
+
+  it("keeps raid timers, upgrades and sites through a save", () => {
+    const s = fresh();
+    s.nextRaid = 777;
+    const restored = fromSnapshot(world, JSON.parse(JSON.stringify(toSnapshot(s))), true);
+    expect(restored.nextRaid).toBe(777);
+    expect(of(restored, "site")).toHaveLength(world.sites.length);
   });
 });

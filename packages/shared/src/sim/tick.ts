@@ -5,6 +5,7 @@ import type { Tile } from "../world/pathfind";
 import {
   BUILDING_REVEAL,
   BUILDINGS,
+  CARGO,
   CHURCH,
   FARM,
   farmRate,
@@ -12,6 +13,7 @@ import {
   harvestSeconds,
   NODES,
   REGROW,
+  SALVAGE_SECONDS,
   SHIP,
   shipSpeed,
   SMITH,
@@ -20,18 +22,27 @@ import {
   type WorkerJob,
 } from "./catalogue";
 import { releaseTask } from "./commands";
-import { disembark, embark, hasRoom, shipMoving, shoreBeside } from "./ferry";
-import { landPath, sailable } from "./navigation";
+import { collectWreck, updateThreats } from "./pirates";
+import { disembark, dockSpawn, embark, hasRoom, shipMoving, shoreBeside } from "./ferry";
+import { landPath, sailable, seaPath } from "./navigation";
 import { buildingAround, isAdjacentTo, tilesAround } from "./rules";
 import {
   addEntity,
+  addGoods,
+  islandAt,
   isPathTile,
   markDirty,
+  newShip,
   newVillager,
   population,
   populationCap,
   removeEntity,
   reveal,
+  sailSpeedFactor,
+  shipReveal,
+  cargoCapacity,
+  stockOf,
+  touchStock,
   walkable,
   type BuildingEntity,
   type GameState,
@@ -39,6 +50,7 @@ import {
   type ShipEntity,
   type Task,
   type VillagerEntity,
+  type WreckEntity,
 } from "./state";
 
 export function tick(state: GameState, dt = TICK_SECONDS): void {
@@ -54,6 +66,7 @@ export function tick(state: GameState, dt = TICK_SECONDS): void {
     if (e.type === "villager") updateVillager(state, e, dt);
     else if (e.type === "ship") updateShip(state, e, dt);
   }
+  updateThreats(state, dt);
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -74,23 +87,19 @@ function updateBuilding(state: GameState, b: BuildingEntity, dt: number): void {
           state.events.push({ type: "villager", x: spot.x, y: spot.y });
           b.queue.shift();
         }
-      } else if (job.what === "ship") {
+      } else if (job.what !== "villager") {
         const at = shipSpawn(b);
         if (sailable(state, Math.floor(at.x), Math.floor(at.y))) {
-          const ship: ShipEntity = {
-            id: state.nextId++,
-            type: "ship",
-            x: at.x,
-            y: at.y,
-            heading: { "+x": 0, "+y": 2, "-x": 4, "-y": 6 }[b.dir ?? "+x"],
-            path: [],
-            dest: null,
-            passengers: [],
-            unload: false,
-          };
+          const ship = newShip(
+            state,
+            job.what === "cargo" ? "cargo" : job.what === "patrol" ? "patrol" : "scout",
+            at.x,
+            at.y,
+            { "+x": 0, "+y": 2, "-x": 4, "-y": 6 }[b.dir ?? "+x"],
+          );
           addEntity(state, ship);
-          reveal(state, ship.x, ship.y, SHIP.reveal);
-          state.events.push({ type: "ship", x: ship.x, y: ship.y });
+          reveal(state, ship.x, ship.y, shipReveal(state));
+          state.events.push({ type: "ship", kind: ship.kind, x: ship.x, y: ship.y });
           b.queue.shift();
         }
       }
@@ -100,32 +109,34 @@ function updateBuilding(state: GameState, b: BuildingEntity, dt: number): void {
   const v = state.entities.get(b.workerId);
   const tending = v?.type === "villager" && v.action === "work" && v.task?.kind === "staff";
   if (!tending) return;
+  const island = islandAt(state, b.x, b.y);
+  const stock = stockOf(state, island);
   if (b.kind === "farm") {
     const stageBefore = farmStage(b);
     b.growth += dt * farmRate(state.world.tribe);
     if (b.growth >= FARM.cycle) {
       b.growth = 0;
-      state.stock.food += FARM.yield;
-      state.stockDirty = true;
+      stock.food += FARM.yield;
+      touchStock(state, island);
     }
     if (farmStage(b) !== stageBefore) markDirty(state, b.id);
   } else if (b.kind === "blacksmith") {
     // The forge only burns while there is ore to work.
-    if (state.stock.ore < SMITH.ore) return;
+    if (stock.ore < SMITH.ore) return;
     b.growth += dt;
     if (b.growth >= SMITH.seconds) {
       b.growth = 0;
-      state.stock.ore -= SMITH.ore;
-      state.stock.tools += SMITH.tools;
-      state.stockDirty = true;
+      stock.ore -= SMITH.ore;
+      stock.tools += SMITH.tools;
+      touchStock(state, island);
       markDirty(state, b.id);
     }
   } else if (b.kind === "church") {
     b.growth += dt;
     if (b.growth >= CHURCH.seconds) {
       b.growth = 0;
-      state.stock.faith += CHURCH.faith;
-      state.stockDirty = true;
+      stock.faith += CHURCH.faith;
+      touchStock(state, island);
     }
   }
 }
@@ -140,18 +151,7 @@ export function farmStage(b: BuildingEntity): 0 | 1 | 2 {
 }
 
 /** Where a dock launches ships: just past the end of the pier. */
-export function shipSpawn(b: BuildingEntity): { x: number; y: number } {
-  switch (b.dir) {
-    case "-x":
-      return { x: b.x - 0.5, y: b.y + 1 };
-    case "+y":
-      return { x: b.x + 1, y: b.y + b.h + 0.5 };
-    case "-y":
-      return { x: b.x + 1, y: b.y - 0.5 };
-    default:
-      return { x: b.x + b.w + 0.5, y: b.y + 1 };
-  }
-}
+export const shipSpawn = dockSpawn;
 
 function updateNode(state: GameState, n: NodeEntity, dt: number): void {
   n.timer -= dt;
@@ -214,6 +214,10 @@ function taskValid(state: GameState, v: VillagerEntity, t: Task): boolean {
     }
     case "move":
       return true;
+    case "loot": {
+      const w = state.entities.get(t.wreckId);
+      return w?.type === "wreck" && w.kind === "skeleton";
+    }
     case "board": {
       const ship = state.entities.get(t.shipId);
       return ship?.type === "ship" && hasRoom(ship) && !shipMoving(ship);
@@ -345,6 +349,17 @@ function arrive(state: GameState, v: VillagerEntity): void {
     if (ship?.type === "ship" && beside && hasRoom(ship)) embark(state, v, ship);
     return;
   }
+  if (t.kind === "loot") {
+    const w = state.entities.get(t.wreckId) as WreckEntity;
+    const on = here.x === w.x && here.y === w.y;
+    if (!on && !isAdjacentTo(here.x, here.y, w.x, w.y)) return;
+    v.action = "work";
+    v.tool = null;
+    v.workTimer = 0;
+    faceTowards(v, w.x + 0.5, w.y + 0.5);
+    markDirty(state, v.id);
+    return;
+  }
   if (t.kind === "harvest") {
     const n = state.entities.get(t.nodeId) as NodeEntity;
     if (!isAdjacentTo(here.x, here.y, n.x, n.y)) return;
@@ -387,6 +402,15 @@ function work(state: GameState, v: VillagerEntity, dt: number): void {
     markDirty(state, v.id);
     markDirty(state, n.id);
     if (n.amount <= 0) depleteNode(state, n);
+    return;
+  }
+  if (t.kind === "loot") {
+    const w = state.entities.get(t.wreckId) as WreckEntity;
+    v.workTimer += dt;
+    if (v.workTimer >= SALVAGE_SECONDS) {
+      collectWreck(state, w);
+      releaseTask(state, v);
+    }
     return;
   }
   if (t.kind === "build") {
@@ -433,8 +457,9 @@ function startDelivery(state: GameState, v: VillagerEntity): boolean {
 
 function finishDelivery(state: GameState, v: VillagerEntity): void {
   if (v.carrying) {
-    state.stock[v.carrying.resource] += v.carrying.amount;
-    state.stockDirty = true;
+    // Goods go into the pile of the island the villager stands on.
+    const here = tileOf(v);
+    addGoods(state, islandAt(state, here.x, here.y), v.carrying.resource, v.carrying.amount);
     v.carrying = null;
   }
   v.action = "idle";
@@ -540,6 +565,9 @@ function planRoute(state: GameState, v: VillagerEntity): void {
     goals = buildingAround(state, b);
   } else if (t.kind === "board") {
     goals = shoreBeside(state, state.entities.get(t.shipId) as ShipEntity);
+  } else if (t.kind === "loot") {
+    const w = state.entities.get(t.wreckId) as WreckEntity;
+    goals = [{ x: w.x, y: w.y }, ...tilesAround(state, w.x, w.y)];
   } else {
     goals = [{ x: t.x, y: t.y }];
   }
@@ -592,8 +620,11 @@ function wander(state: GameState, v: VillagerEntity): void {
 // Ships
 
 function updateShip(state: GameState, s: ShipEntity, dt: number): void {
-  if (s.path.length === 0) return;
-  let budget = shipSpeed(state.world.tribe) * dt;
+  if (s.path.length === 0) {
+    if (s.kind === "cargo" && s.route !== null) runRoute(state, s);
+    return;
+  }
+  let budget = shipSpeed(state.world.tribe, s.kind) * sailSpeedFactor(state) * dt;
   while (budget > 1e-6 && s.path.length > 0) {
     const next = s.path[0]!;
     const tx = next.x + 0.5;
@@ -607,7 +638,7 @@ function updateShip(state: GameState, s: ShipEntity, dt: number): void {
       s.y = ty;
       budget -= dist;
       s.path.shift();
-      reveal(state, s.x, s.y, SHIP.reveal);
+      reveal(state, s.x, s.y, shipReveal(state));
     } else {
       s.x += (dx / dist) * budget;
       s.y += (dy / dist) * budget;
@@ -622,4 +653,98 @@ function updateShip(state: GameState, s: ShipEntity, dt: number): void {
     }
   }
   markDirty(state, s.id);
+}
+
+// ---------------------------------------------------------------------------------------------
+// Trade routes
+
+const dockAt = (state: GameState, id: number | null): BuildingEntity | null => {
+  const b = id === null ? undefined : state.entities.get(id);
+  return b?.type === "building" && b.kind === "dock" && b.complete ? b : null;
+};
+
+/** The completed dock on the home island nearest to another dock: where cargo goes ashore. */
+export function homeDockFor(state: GameState, from: BuildingEntity): BuildingEntity | null {
+  const home = state.world.start.islandId;
+  let best: BuildingEntity | null = null;
+  let bestD = Infinity;
+  for (const e of state.entities.values()) {
+    if (e.type !== "building" || e.kind !== "dock" || !e.complete) continue;
+    if (islandAt(state, e.x, e.y) !== home) continue;
+    const d = Math.hypot(e.x - from.x, e.y - from.y);
+    if (d < bestD) {
+      best = e;
+      bestD = d;
+    }
+  }
+  return best;
+}
+
+export function cargoLoad(s: ShipEntity): number {
+  let n = 0;
+  for (const v of Object.values(s.cargo)) n += v ?? 0;
+  return n;
+}
+
+/**
+ * A cargo ship shuttles between the dock it collects from (on another island) and a dock on the
+ * home island: it waits for goods, loads what the outpost has stored, sails home and unloads.
+ */
+function runRoute(state: GameState, s: ShipEntity): void {
+  if (state.time < s.waitUntil) return;
+  const pickup = dockAt(state, s.route);
+  const home = pickup ? homeDockFor(state, pickup) : null;
+  if (!pickup) {
+    s.route = null;
+    s.leg = null;
+    markDirty(state, s.id);
+    return;
+  }
+  const rest = (seconds: number) => {
+    s.waitUntil = state.time + seconds;
+    markDirty(state, s.id);
+  };
+  if (!home) return rest(5);
+  if (s.leg === null) s.leg = cargoLoad(s) > 0 ? "drop" : "pickup";
+  const dock = s.leg === "pickup" ? pickup : home;
+  const spot = dockSpawn(dock);
+  const tile = { x: Math.floor(spot.x), y: Math.floor(spot.y) };
+  if (Math.hypot(s.x - spot.x, s.y - spot.y) > 1.5) {
+    const path = sailable(state, tile.x, tile.y)
+      ? seaPath(state, { x: Math.floor(s.x), y: Math.floor(s.y) }, tile)
+      : null;
+    if (!path) return rest(5);
+    s.path = path;
+    s.dest = tile;
+    markDirty(state, s.id);
+    return;
+  }
+  const island = islandAt(state, pickup.x, pickup.y);
+  if (s.leg === "pickup") {
+    const pile = stockOf(state, island);
+    let room = cargoCapacity(state) - cargoLoad(s);
+    const available = Object.values(pile).reduce((a, b) => a + b, 0);
+    if (available < Math.min(CARGO.minLoad, room)) return rest(2);
+    for (const r of Object.keys(pile) as (keyof typeof pile)[]) {
+      const take = Math.min(pile[r], room);
+      if (take <= 0) continue;
+      pile[r] -= take;
+      s.cargo[r] = (s.cargo[r] ?? 0) + take;
+      room -= take;
+    }
+    touchStock(state, island);
+    s.leg = "drop";
+    return rest(1);
+  }
+  let delivered = 0;
+  for (const r of Object.keys(s.cargo) as (keyof typeof s.cargo)[]) {
+    const n = s.cargo[r] ?? 0;
+    if (n <= 0) continue;
+    addGoods(state, islandAt(state, home.x, home.y), r, n);
+    delivered += n;
+  }
+  s.cargo = {};
+  s.leg = "pickup";
+  if (delivered > 0) state.events.push({ type: "cargo", amount: delivered, x: spot.x, y: spot.y });
+  rest(1);
 }

@@ -10,6 +10,7 @@ export const RESOURCES = [
   "gold",
   "faith",
   "crystal",
+  "relic",
 ] as const;
 export type Resource = (typeof RESOURCES)[number];
 export type Stock = Record<Resource, number>;
@@ -70,12 +71,14 @@ export const BUILDINGS: Record<BuildingKind, BuildingDef> = {
   dock: {
     kind: "dock",
     name: "Dock",
-    description: "Builds scout ships. Villagers can walk out on the pier to board.",
+    description:
+      "Builds scout and cargo ships. Villagers can walk out on the pier to board. Docks on other islands are where cargo ships collect goods.",
     size: [2, 3],
-    cost: {},
-    work: 0,
-    buildable: false,
+    cost: { wood: 60, stone: 20 },
+    work: 16,
+    buildable: true,
     walkable: true,
+    hotkey: "b",
   },
   house: {
     kind: "house",
@@ -181,7 +184,8 @@ export const BUILDINGS: Record<BuildingKind, BuildingDef> = {
   magic_house: {
     kind: "magic_house",
     name: "Magic House",
-    description: "Where magical upgrades for exploring the seas will be sold.",
+    description:
+      "Sells magical upgrades for the seas: faster ships, wider sight and wards for the far biomes.",
     size: [2, 2],
     cost: { wood: 40, stone: 30, tools: 10, gold: 20 },
     work: 24,
@@ -285,6 +289,7 @@ export const START_STOCK: Stock = {
   gold: 0,
   faith: 0,
   crystal: 0,
+  relic: 0,
 };
 export const START_VILLAGERS = 3;
 
@@ -305,6 +310,167 @@ export const SHIP = {
   reveal: 8,
   max: 3,
   capacity: 4,
+};
+
+/** Cargo ships haul an island's stockpile home along a trade route between two docks. */
+export const CARGO = {
+  cost: { wood: 60, stone: 10 } as Partial<Stock>,
+  buildSeconds: 30,
+  /** Goods carried per trip. */
+  capacity: 40,
+  max: 4,
+  /** Sails slower than a scout. */
+  speedFactor: 0.8,
+  /** A ship waits at the dock until at least this many goods are waiting (or it can fill up). */
+  minLoad: 5,
+};
+
+export type ShipKind = "scout" | "cargo" | "patrol";
+
+/** Hit points of a ship, before Iron Hulls. */
+export const SHIP_HP: Record<ShipKind, number> = { scout: 30, cargo: 45, patrol: 70 };
+
+/** Warships: they hunt pirates on their own whenever they are not sailing somewhere. */
+export const PATROL = {
+  cost: { wood: 80, tools: 10 } as Partial<Stock>,
+  buildSeconds: 35,
+  max: 3,
+  speedFactor: 1.1,
+  /** Pirates within this distance are chased down. */
+  engage: 18,
+};
+
+/** Ship guns: patrol boats always have cannons, other ships once the Cannons upgrade is bought. */
+export const GUNS: Record<ShipKind, { damage: number; range: number; cooldown: number } | null> = {
+  patrol: { damage: 9, range: 6, cooldown: 2 },
+  scout: { damage: 5, range: 5, cooldown: 2.5 },
+  cargo: { damage: 3, range: 4, cooldown: 3 },
+};
+
+/** Pirate raids: ships that hunt your fleet, or beach at a settlement and rob its stockpile. */
+export const PIRATE = {
+  hp: 36,
+  damage: 4,
+  range: 4.5,
+  cooldown: 2.5,
+  speed: 3.2,
+  /** Seconds of game time before the first raid, then between raids. */
+  firstRaid: 420,
+  interval: [200, 320] as const,
+  /** Seconds spent looting a beached settlement, and the share of each pile taken per second. */
+  raidSeconds: 8,
+  stealShare: 0.04,
+  /** A raider never comes closer than this to the town it is heading for, and only spawns this far out. */
+  spawnDistance: 45,
+  maxAtOnce: 3,
+};
+
+export const STORM = { interval: 6, damage: 14, range: 16 };
+
+export const DIVE = {
+  seconds: 15,
+  /** Share of a site's remaining treasure each diver brings up per dive. */
+  share: 0.3,
+  /** Sites are found by sailing this close. */
+  discover: 3,
+  reach: 2.2,
+};
+
+export const SALVAGE_SECONDS = 4;
+
+export type UpgradeId =
+  | "far_sight"
+  | "swift_sails"
+  | "deep_holds"
+  | "seers_chart"
+  | "ember_ward"
+  | "prism_ward"
+  | "storm_bolt"
+  | "cannons"
+  | "iron_hulls";
+
+export interface UpgradeDef {
+  id: UpgradeId;
+  name: string;
+  description: string;
+  cost: Partial<Stock>;
+  /** Where it is sold: the magic house for spells, the dock for ship fittings. */
+  at: "magic_house" | "dock";
+}
+
+/** Upgrades are learned once, for the whole team. */
+export const UPGRADES: Record<UpgradeId, UpgradeDef> = {
+  far_sight: {
+    id: "far_sight",
+    name: "Far Sight",
+    description: "Ships reveal 60% more of the sea around them",
+    cost: { faith: 25, gold: 20 },
+    at: "magic_house",
+  },
+  swift_sails: {
+    id: "swift_sails",
+    name: "Swift Sails",
+    description: "All ships sail 50% faster",
+    cost: { faith: 40, gold: 30 },
+    at: "magic_house",
+  },
+  ember_ward: {
+    id: "ember_ward",
+    name: "Ember Ward",
+    description:
+      "Protects villagers from the fires of the Infernal Isles, so they can settle there",
+    cost: { faith: 50, gold: 40 },
+    at: "magic_house",
+  },
+  prism_ward: {
+    id: "prism_ward",
+    name: "Prism Ward",
+    description: "Attunes villagers to the Crystal Spires, so they can settle there",
+    cost: { faith: 50, gold: 40 },
+    at: "magic_house",
+  },
+  deep_holds: {
+    id: "deep_holds",
+    name: "Deep Holds",
+    description: "Cargo ships carry 50% more goods",
+    cost: { gold: 40, crystal: 5 },
+    at: "magic_house",
+  },
+  seers_chart: {
+    id: "seers_chart",
+    name: "Seer's Chart",
+    description: "Marks the position of every island on the map",
+    cost: { faith: 60, crystal: 10 },
+    at: "magic_house",
+  },
+  storm_bolt: {
+    id: "storm_bolt",
+    name: "Stormcaller",
+    description: "Lightning strikes pirates that come near your settlements and ships",
+    cost: { faith: 60, gold: 40, relic: 3 },
+    at: "magic_house",
+  },
+  cannons: {
+    id: "cannons",
+    name: "Cannons",
+    description: "Every ship gets guns and fires on pirates in range",
+    cost: { wood: 60, tools: 10 },
+    at: "dock",
+  },
+  iron_hulls: {
+    id: "iron_hulls",
+    name: "Iron Hulls",
+    description: "Ships take 50% more damage before they sink",
+    cost: { wood: 40, stone: 30, tools: 15 },
+    at: "dock",
+  },
+};
+export const UPGRADE_IDS = Object.keys(UPGRADES) as UpgradeId[];
+
+/** Biomes that villagers can only settle once the matching ward has been bought. */
+export const WARDED_BIOMES: Partial<Record<string, UpgradeId>> = {
+  infernal: "ember_ward",
+  crystal: "prism_ward",
 };
 
 export const REGROW = {
@@ -378,6 +544,18 @@ export function shipCost(tribe: TribeId): Partial<Stock> {
   );
 }
 
-export function shipSpeed(tribe: TribeId): number {
-  return SHIP.speed * (TRIBE_DEFS[tribe].bonus === "sailing" ? 1.25 : 1);
+export function shipSpeed(tribe: TribeId, kind: ShipKind = "scout"): number {
+  const base = SHIP.speed * (TRIBE_DEFS[tribe].bonus === "sailing" ? 1.25 : 1);
+  return kind === "cargo"
+    ? base * CARGO.speedFactor
+    : kind === "patrol"
+      ? base * PATROL.speedFactor
+      : base;
+}
+
+export function cargoCost(tribe: TribeId): Partial<Stock> {
+  if (TRIBE_DEFS[tribe].bonus !== "sailing") return CARGO.cost;
+  return Object.fromEntries(
+    Object.entries(CARGO.cost).map(([r, n]) => [r, Math.round((n ?? 0) * 0.75)]),
+  );
 }

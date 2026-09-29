@@ -90,6 +90,16 @@ export interface DecoSpawn {
   variant: number;
 }
 
+/** Something hidden on the sea floor: ships passing overhead discover it, divers salvage it. */
+export type SiteKind = "ruin" | "fortress";
+
+export interface SiteSpawn {
+  kind: SiteKind;
+  x: number;
+  y: number;
+  variant: number;
+}
+
 export type Dir = "+x" | "-x" | "+y" | "-y";
 
 export const DIR_VECTORS: Record<Dir, { x: number; y: number }> = {
@@ -133,4 +143,6 @@ export interface WorldMap {
   start: StartSite;
   nodes: NodeSpawn[];
   decor: DecoSpawn[];
+  /** Sunken ruins and fortresses in deep water. */
+  sites: SiteSpawn[];
 }
