@@ -2,6 +2,7 @@ import {
   BIOMES,
   BUILDINGS,
   canPlaceBuilding,
+  characterOf,
   dockSite,
   dayNumber,
   dayPhase,
@@ -12,12 +13,15 @@ import {
   inBounds,
   islandName,
   isLand,
+  landPath,
   pickTile,
   RESOURCES,
   tileIndex,
+  walkable,
   worldPath,
   type BiomeId,
   type BuildingKind,
+  type CharacterEntity,
   type Command,
   type Entity,
   type GameEvent,
@@ -58,6 +62,8 @@ interface Drag {
 }
 
 const PAN_SPEED = 700;
+/** How quickly the camera catches up with your character (higher is snappier). */
+const FOLLOW_RATE = 7;
 
 export class Game {
   private readonly world = new Container();
@@ -85,6 +91,10 @@ export class Game {
   private pointer: { x: number; y: number } | null = null;
   private drag: Drag | null = null;
   private keys = new Set<string>();
+  /** Adventure worlds: the camera follows your character until you look around on your own. */
+  private follow: boolean;
+  private followHintShown = false;
+  private myCharacterId: number | null = null;
   private status: SessionStatus = "connecting";
   private minimapTimer = 0;
   private raidersSeen = false;
@@ -106,6 +116,7 @@ export class Game {
     root: HTMLElement,
   ) {
     const state = session.state;
+    this.follow = state.mode === "adventure";
     this.camera = new Camera(state.world.width, state.world.height);
     this.terrain = new TerrainLayer(app.renderer, atlas, state);
     this.entities = new EntityLayer(
@@ -165,7 +176,13 @@ export class Game {
     this.hud.setStock(state);
     const th = state.world.start.townHall;
     this.camera.zoom = window.innerHeight > 1000 ? 3 : 2;
-    this.centerOnTile(th.x + 1.5, th.y + 1.5);
+    const me = this.myCharacter();
+    if (me) this.centerOnTile(me.x, me.y);
+    else this.centerOnTile(th.x + 1.5, th.y + 1.5);
+    if (state.mode === "adventure")
+      this.hud.toast(
+        "Adventure: right-click to walk. The camera follows you: drag or WASD to look around, C to come back",
+      );
 
     session.on({
       patch: (p) => this.onPatch(p),
@@ -192,6 +209,7 @@ export class Game {
         this.entities.rebuild(session.state);
         this.hud.setStock(session.state);
         this.selectionDirty = true;
+        this.myCharacterId = null;
       },
     });
     this.hud.setPlayers(session.players, session.you, session.worldId ? "online" : "offline");
@@ -380,6 +398,45 @@ export class Game {
     this.camera.centerOn((x - y) * HALF_W, (x + y) * HALF_H);
   }
 
+  /** Your own character (adventure worlds only). */
+  private myCharacter(): CharacterEntity | undefined {
+    const state = this.session.state;
+    if (state.mode !== "adventure") return undefined;
+    const cached = this.myCharacterId !== null ? state.entities.get(this.myCharacterId) : undefined;
+    if (cached?.type === "character") return cached;
+    const found = characterOf(state, this.session.you);
+    this.myCharacterId = found?.id ?? null;
+    return found;
+  }
+
+  /** Send your character walking; the camera follows it again. */
+  private walkTo(x: number, y: number): void {
+    this.follow = true;
+    void this.send({ kind: "move-character", x, y });
+  }
+
+  /** Looking around on your own lets go of your character until you press C. */
+  private detachCamera(): void {
+    if (!this.follow) return;
+    this.follow = false;
+    if (!this.followHintShown) {
+      this.followHintShown = true;
+      this.hud.toast("Press C to follow your character again");
+    }
+  }
+
+  private followCharacter(dt: number): void {
+    const me = this.myCharacter();
+    const pos = me ? this.entities.position(me.id) : null;
+    if (!pos) return;
+    // Aim at the character's body, not its feet.
+    const ty = pos.y - 10;
+    const dx = pos.x - this.camera.x;
+    const dy = ty - this.camera.y;
+    const k = Math.hypot(dx, dy) > 600 ? 1 : 1 - Math.exp(-dt * FOLLOW_RATE);
+    this.camera.centerOn(this.camera.x + dx * k, this.camera.y + dy * k);
+  }
+
   private footprintFor(kind: BuildingKind, tile: { x: number; y: number }): Footprint {
     if (kind === "dock") {
       // A dock is placed by its shore tile; the pier is whatever fits out over the water.
@@ -423,6 +480,42 @@ export class Game {
     return null;
   }
 
+  /**
+   * Test hook (used by the Playwright smoke test): canvas position of a tile a few steps from
+   * your character that it can walk to, clear of the HUD panels, and which tile that is.
+   */
+  findWalkTarget(): { x: number; y: number; tile: { x: number; y: number } } | null {
+    const state = this.session.state;
+    const me = this.myCharacter();
+    if (!me) return null;
+    const from = { x: Math.floor(me.x), y: Math.floor(me.y) };
+    for (let r = 4; r < 10; r++) {
+      for (let dy = -r; dy <= r; dy++) {
+        for (let dx = -r; dx <= r; dx++) {
+          if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue;
+          const tile = { x: from.x + dx, y: from.y + dy };
+          if (!walkable(state, tile.x, tile.y) || !landPath(state, from, [tile])) continue;
+          const z = visibleHeight(state, tile.x, tile.y) ?? 0;
+          const p = this.camera.worldToScreen(
+            (tile.x - tile.y) * HALF_W,
+            (tile.x + tile.y) * HALF_H + HALF_H - z,
+          );
+          const picked = this.tileAt(p.x, p.y);
+          if (picked?.x !== tile.x || picked.y !== tile.y) continue;
+          if (
+            p.x < 240 ||
+            p.y < 90 ||
+            p.x > this.camera.width - 240 ||
+            p.y > this.camera.height - 150
+          )
+            continue;
+          return { x: p.x, y: p.y, tile };
+        }
+      }
+    }
+    return null;
+  }
+
   // ------------------------------------------------------------------------- picking
 
   private tileAt(sx: number, sy: number): { x: number; y: number } | null {
@@ -436,8 +529,8 @@ export class Game {
     const tile = this.tileAt(sx, sy);
     let best: { e: Entity; z: number } | null = null;
     for (const e of state.entities.values()) {
-      // Weather is not something to click on.
-      if (e.type === "storm") continue;
+      // Weather is not something to click on, and neither are people's characters.
+      if (e.type === "storm" || e.type === "character") continue;
       if (
         tile &&
         e.type !== "ship" &&
@@ -530,7 +623,10 @@ export class Game {
       if (!d.moved && Math.hypot(p.x - d.startX, p.y - d.startY) > 5) d.moved = true;
       const panning =
         d.button === 1 || d.button === 2 || (d.button === 0 && this.tool.kind === "select");
-      if (d.moved && panning) this.camera.panBy(p.x - d.lastX, p.y - d.lastY);
+      if (d.moved && panning) {
+        this.camera.panBy(p.x - d.lastX, p.y - d.lastY);
+        this.detachCamera();
+      }
       if (d.button === 0 && this.tool.kind === "build" && this.tool.building === "path")
         this.paintPath();
       d.lastX = p.x;
@@ -591,8 +687,11 @@ export class Game {
         e.preventDefault();
         this.hud.focusChat();
       } else if (k === "c") {
-        const th = this.session.state.world.start.townHall;
-        this.centerOnTile(th.x + 1.5, th.y + 1.5);
+        if (this.myCharacter()) this.follow = true;
+        else {
+          const th = this.session.state.world.start.townHall;
+          this.centerOnTile(th.x + 1.5, th.y + 1.5);
+        }
       } else if (k === "+" || k === "=")
         this.camera.zoomAt(1, this.camera.width / 2, this.camera.height / 2);
       else if (k === "-" || k === "_")
@@ -680,6 +779,10 @@ export class Game {
       // Right-clicking land with passengers aboard means "take them there".
       const unload = isLand(state.world, tile.x, tile.y) && sel.passengers.length > 0;
       void this.send({ kind: "move-ship", shipId: sel.id, x: tile.x, y: tile.y, unload });
+    } else if (state.mode === "adventure" && tile) {
+      // Nothing to give orders to: right-click is "walk here" for your own character.
+      this.select(null);
+      this.walkTo(tile.x, tile.y);
     } else {
       this.select(null);
     }
@@ -714,7 +817,11 @@ export class Game {
     if (this.keys.has("d") || this.keys.has("arrowright")) dx -= 1;
     if (this.keys.has("w") || this.keys.has("arrowup")) dy += 1;
     if (this.keys.has("s") || this.keys.has("arrowdown")) dy -= 1;
-    if (dx || dy) this.camera.panBy(dx * PAN_SPEED * dt, dy * PAN_SPEED * dt);
+    if (dx || dy) {
+      this.camera.panBy(dx * PAN_SPEED * dt, dy * PAN_SPEED * dt);
+      this.detachCamera();
+    }
+    if (this.follow) this.followCharacter(dt);
 
     this.camera.apply(this.world);
     // The night glows live outside the graded world but must follow the camera exactly.
@@ -746,7 +853,7 @@ export class Game {
     this.minimapTimer -= dt;
     if (this.minimapTimer <= 0) {
       this.minimapTimer = 0.4;
-      this.hud.minimap.draw(state, this.viewCorners());
+      this.hud.minimap.draw(state, this.viewCorners(), this.session.players);
       this.hud.setAlerts(state);
       this.watchForRaiders(state);
     }
@@ -899,7 +1006,35 @@ export class Game {
         if (sel.dest) o.destination({ x: sel.dest.x, y: sel.dest.y, w: 1, h: 1, z: 0 });
       }
     }
+    if (state.mode === "adventure") this.drawCharacters(o, state);
     o.drawCursors(this.camera);
+  }
+
+  /** A ring and a name for every player's character, and a flag where yours is heading. */
+  private drawCharacters(o: Overlay, state: GameState): void {
+    const alive = new Set<number>();
+    for (const e of state.entities.values()) {
+      if (e.type !== "character" || e.aboard !== null) continue;
+      const pos = this.entities.position(e.id);
+      if (!pos) continue;
+      const info = this.session.players.find((p) => p.id === e.playerId);
+      const you = e.playerId === this.session.you;
+      o.character(
+        e.id,
+        info?.name ?? "?",
+        info?.color ?? "#f0e6d0",
+        you,
+        pos.x,
+        pos.y,
+        this.camera,
+      );
+      alive.add(e.id);
+      if (you && e.dest) {
+        const z = visibleHeight(state, e.dest.x, e.dest.y) ?? 0;
+        o.destination({ x: e.dest.x, y: e.dest.y, w: 1, h: 1, z });
+      }
+    }
+    o.pruneCharacters(alive);
   }
 }
 

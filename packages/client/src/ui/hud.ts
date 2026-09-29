@@ -1133,7 +1133,7 @@ export class Minimap {
     this.fog = colours.fog;
   }
 
-  draw(state: GameState, view: { x: number; y: number }[]): void {
+  draw(state: GameState, view: { x: number; y: number }[], players: PlayerInfo[] = []): void {
     if (!this.base || this.canvas.width !== state.world.width) this.prepare(state);
     const img = this.image!;
     const px = new Uint32Array(img.data.buffer);
@@ -1155,7 +1155,10 @@ export class Minimap {
         for (let y = e.y; y < e.y + e.h; y++)
           for (let x = e.x; x < e.x + e.w; x++) dot(x, y, abgr("#5b4028"));
       } else if (e.type === "villager" && e.aboard === null) dot(e.x, e.y, abgr("#fbf0cf"));
-      else if (e.type === "ship") dot(e.x, e.y, abgr("#e98a3a"), 2);
+      else if (e.type === "character" && e.aboard === null) {
+        const colour = players.find((p) => p.id === e.playerId)?.color ?? "#f0e6d0";
+        dot(e.x, e.y, abgr(colour), 2);
+      } else if (e.type === "ship") dot(e.x, e.y, abgr("#e98a3a"), 2);
       else if (e.type === "pirate" && pirateSpotted(state, e)) dot(e.x, e.y, abgr("#d9486a"), 2);
       else if (
         e.type === "storm" &&

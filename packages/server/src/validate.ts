@@ -65,6 +65,9 @@ export function parseCommand(v: unknown): Command | null {
       if (!isInt(v.shipId) || !isInt(v.x) || !isInt(v.y)) return null;
       if (v.unload !== undefined && typeof v.unload !== "boolean") return null;
       return { kind: "move-ship", shipId: v.shipId, x: v.x, y: v.y, unload: v.unload === true };
+    case "move-character":
+      if (!isInt(v.x) || !isInt(v.y)) return null;
+      return { kind: "move-character", x: v.x, y: v.y };
     case "call-aboard":
     case "unload":
       if (!isInt(v.shipId)) return null;

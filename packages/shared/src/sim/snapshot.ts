@@ -2,6 +2,7 @@
 import type { TribeId } from "../tribes";
 import type { WorldMap } from "../world/types";
 import { isDifficulty, type Difficulty } from "./difficulty";
+import { isGameMode, type GameMode } from "./mode";
 import { SIGNATURE_NODES } from "../world/biomes";
 import { NODES, SHIP_HP, type Stock, type UpgradeId } from "./catalogue";
 import {
@@ -12,6 +13,7 @@ import {
   emptyStock,
   rebuildOccupancy,
   stockOf,
+  type CharacterEntity,
   type Entity,
   type GameEvent,
   type GameState,
@@ -28,8 +30,9 @@ import {
  * clients they are only accurate as of the entity's last change.
  */
 export type WireEntity =
-  | Exclude<Entity, VillagerEntity | ShipEntity | PirateEntity>
+  | Exclude<Entity, VillagerEntity | CharacterEntity | ShipEntity | PirateEntity>
   | Omit<VillagerEntity, "path" | "retryAt">
+  | Omit<CharacterEntity, "path">
   | Omit<ShipEntity, "path">
   | Omit<PirateEntity, "path">;
 
@@ -55,6 +58,8 @@ export interface Snapshot {
   tribe?: TribeId;
   /** Older saves predate difficulty; they load as Normal. */
   difficulty?: Difficulty;
+  /** Older saves predate adventure worlds; they load as Colony. */
+  mode?: GameMode;
   tick: number;
   time: number;
   nextId: number;
@@ -90,7 +95,7 @@ export function toWire(e: Entity): WireEntity {
     const { path: _path, retryAt: _retry, ...rest } = e;
     return clone(rest);
   }
-  if (e.type === "ship" || e.type === "pirate") {
+  if (e.type === "ship" || e.type === "pirate" || e.type === "character") {
     const { path: _path, ...rest } = e;
     return clone(rest);
   }
@@ -102,6 +107,10 @@ export function fromWire(w: WireEntity): Entity {
   if (e.type === "villager") {
     e.path = [];
     e.retryAt = 0;
+    e.aboard ??= null;
+  } else if (e.type === "character") {
+    e.path = [];
+    e.dest ??= null;
     e.aboard ??= null;
   } else if (e.type === "ship") {
     e.path = [];
@@ -159,6 +168,7 @@ export function toSnapshot(state: GameState): Snapshot {
     seed: state.world.seed,
     tribe: state.world.tribe,
     difficulty: state.difficulty,
+    mode: state.mode,
     tick: state.tick,
     time: state.time,
     nextId: state.nextId,
@@ -180,7 +190,11 @@ export function toSnapshot(state: GameState): Snapshot {
  * the server replans their routes (paths are never serialised).
  */
 export function fromSnapshot(world: WorldMap, snap: Snapshot, resume = false): GameState {
-  const state = emptyState(world, isDifficulty(snap.difficulty) ? snap.difficulty : "normal");
+  const state = emptyState(
+    world,
+    isDifficulty(snap.difficulty) ? snap.difficulty : "normal",
+    isGameMode(snap.mode) ? snap.mode : "colony",
+  );
   state.tick = snap.tick;
   state.time = snap.time;
   state.nextId = snap.nextId;
@@ -197,6 +211,10 @@ export function fromSnapshot(world: WorldMap, snap: Snapshot, resume = false): G
     const e = fromWire(w);
     if (resume && e.type === "villager" && (e.action === "walk" || e.action === "deliver")) {
       e.action = "idle";
+    }
+    if (resume && e.type === "character") {
+      e.action = "idle";
+      e.dest = null;
     }
     state.entities.set(e.id, e);
   }

@@ -6,9 +6,14 @@ import WebSocket from "ws";
 import {
   applyPatch,
   canPlaceBuilding,
+  characterOf,
+  characters,
   fromSnapshot,
   generateWorld,
+  landPath,
   tally,
+  walkable,
+  type CharacterEntity,
   type GameState,
   type ServerMessage,
   type WorldInfo,
@@ -36,11 +41,12 @@ async function createWorld(
   seed = "server-test",
   tribe?: string,
   difficulty?: string,
+  mode?: string,
 ): Promise<WorldInfo> {
   const res = await fetch(`${base()}/api/worlds`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ seed, tribe, difficulty }),
+    body: JSON.stringify({ seed, tribe, difficulty, mode }),
   });
   expect(res.status).toBe(201);
   return (await res.json()) as WorldInfo;
@@ -186,6 +192,151 @@ describe("difficulty", () => {
       body: JSON.stringify({ difficulty: "nightmare" }),
     });
     expect(bad.status).toBe(400);
+  });
+});
+
+/** A walkable tile a few steps from a character, reachable on foot. */
+function goalNear(state: GameState, c: CharacterEntity): { x: number; y: number } {
+  const from = { x: Math.floor(c.x), y: Math.floor(c.y) };
+  for (let r = 3; r < 12; r++)
+    for (let dy = -r; dy <= r; dy++)
+      for (let dx = -r; dx <= r; dx++) {
+        const to = { x: from.x + dx, y: from.y + dy };
+        if (Math.max(Math.abs(dx), Math.abs(dy)) !== r || !walkable(state, to.x, to.y)) continue;
+        if (landPath(state, from, [to])) return to;
+      }
+  throw new Error("no goal");
+}
+
+const settled = (c: CharacterEntity, goal: { x: number; y: number }) =>
+  c.action === "idle" && c.x === goal.x + 0.5 && c.y === goal.y + 0.5;
+
+describe("adventure worlds", () => {
+  it("are created in a chosen mode, and colony is the default", async () => {
+    expect((await createWorld("mode-default")).mode).toBe("colony");
+    const info = await createWorld("mode-adventure", undefined, undefined, "adventure");
+    expect(info.mode).toBe("adventure");
+    const res = await fetch(`${base()}/api/worlds/${info.id}`);
+    expect(await res.json()).toMatchObject({ mode: "adventure" });
+    const bad = await fetch(`${base()}/api/worlds`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ mode: "sandbox" }),
+    });
+    expect(bad.status).toBe(400);
+  });
+
+  it("give every player a character of their own, and the others see it arrive", async () => {
+    const { id } = await createWorld("adv-join", undefined, undefined, "adventure");
+    const anna = new Player();
+    const welcomeA = await anna.join(id, "Anna", token(1));
+    const a = mirror(welcomeA);
+    expect(a.mode).toBe("adventure");
+    expect(characters(a).map((c) => c.playerId)).toEqual(["p1"]);
+    if (welcomeA.t !== "welcome") throw new Error("expected welcome");
+    expect(welcomeA.you).toBe("p1");
+
+    const ben = new Player();
+    const b = mirror(await ben.join(id, "Ben", token(2)));
+    expect(characters(b).map((c) => c.playerId)).toEqual(["p1", "p2"]);
+    // Anna gets Ben's character through the patch, not a fresh snapshot.
+    const seen = await anna.next<Extract<ServerMessage, { t: "patch" }>>(
+      (m) =>
+        m.t === "patch" &&
+        m.patch.entities.some((e) => e.type === "character" && e.playerId === "p2"),
+    );
+    applyPatch(a, seen.patch);
+    expect(characters(a)).toHaveLength(2);
+  });
+
+  it("walk when their own player says so, and nobody else's", async () => {
+    const { id } = await createWorld("adv-walk", undefined, undefined, "adventure");
+    const anna = new Player();
+    const ben = new Player();
+    const a = mirror(await anna.join(id, "Anna", token(1)));
+    const b = mirror(await ben.join(id, "Ben", token(2)));
+    const room = (await app.rooms.get(id))!;
+    const benBefore = { ...characterOf(room.state, "p2")! };
+    const annaChar = characterOf(a, "p1")!;
+    const goal = goalNear(a, annaChar);
+    anna.send({ t: "cmd", seq: 1, cmd: { kind: "move-character", ...goal } });
+    expect(await anna.next((m) => m.t === "result")).toEqual({ t: "result", seq: 1, ok: true });
+    // Both mirrors watch Anna's character walk to the spot.
+    for (const [player, state] of [
+      [anna, a],
+      [ben, b],
+    ] as const) {
+      for (let i = 0; i < 60 && !settled(characterOf(state, "p1")!, goal); i++)
+        applyPatch(
+          state,
+          (await player.next<Extract<ServerMessage, { t: "patch" }>>((m) => m.t === "patch")).patch,
+        );
+      expect(settled(characterOf(state, "p1")!, goal)).toBe(true);
+    }
+    const benNow = characterOf(room.state, "p2")!;
+    expect([benNow.x, benNow.y]).toEqual([benBefore.x, benBefore.y]);
+  });
+
+  it("refuse to walk where there is no way, with a reason", async () => {
+    const { id } = await createWorld("adv-refuse", undefined, undefined, "adventure");
+    const anna = new Player();
+    await anna.join(id, "Anna", token(1));
+    anna.send({ t: "cmd", seq: 1, cmd: { kind: "move-character", x: 1, y: 1 } });
+    expect(await anna.next((m) => m.t === "result")).toMatchObject({ seq: 1, ok: false });
+    anna.send({ t: "cmd", seq: 2, cmd: { kind: "move-character", x: 1.5, y: "3" } });
+    expect(await anna.next((m) => m.t === "error")).toMatchObject({ code: "bad-request" });
+  });
+
+  it("have no characters in a colony world, and refuse to move one", async () => {
+    const { id } = await createWorld("adv-colony");
+    const anna = new Player();
+    const a = mirror(await anna.join(id, "Anna", token(1)));
+    expect(characters(a)).toHaveLength(0);
+    anna.send({ t: "cmd", seq: 1, cmd: { kind: "move-character", x: 10, y: 10 } });
+    expect(await anna.next((m) => m.t === "result")).toEqual({
+      t: "result",
+      seq: 1,
+      ok: false,
+      reason: "This world has no characters",
+    });
+  });
+
+  it("keep their place when a player leaves, comes back or the server restarts", async () => {
+    const { id } = await createWorld("adv-persist", undefined, undefined, "adventure");
+    const anna = new Player();
+    const a = mirror(await anna.join(id, "Anna", token(1)));
+    const goal = goalNear(a, characterOf(a, "p1")!);
+    const originalId = characterOf(a, "p1")!.id;
+    anna.send({ t: "cmd", seq: 1, cmd: { kind: "move-character", ...goal } });
+    await anna.next((m) => m.t === "result");
+    for (let i = 0; i < 60 && !settled(characterOf(a, "p1")!, goal); i++)
+      applyPatch(
+        a,
+        (await anna.next<Extract<ServerMessage, { t: "patch" }>>((m) => m.t === "patch")).patch,
+      );
+    anna.ws.close();
+    await new Promise((r) => setTimeout(r, 50));
+
+    const back = new Player();
+    const b = mirror(await back.join(id, "Anna", token(1)));
+    expect(characters(b)).toHaveLength(1);
+    expect(characterOf(b, "p1")).toMatchObject({
+      id: originalId,
+      x: goal.x + 0.5,
+      y: goal.y + 0.5,
+    });
+
+    await app.close();
+    app = await startApp({ port: 0, host: "127.0.0.1", dataDir });
+    const later = new Player();
+    const c = mirror(await later.join(id, "Anna", token(1)));
+    expect(c.mode).toBe("adventure");
+    expect(characters(c)).toHaveLength(1);
+    expect(characterOf(c, "p1")).toMatchObject({
+      id: originalId,
+      x: goal.x + 0.5,
+      y: goal.y + 0.5,
+    });
   });
 });
 

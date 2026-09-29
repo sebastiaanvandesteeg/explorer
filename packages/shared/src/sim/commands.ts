@@ -22,6 +22,7 @@ import {
   type UpgradeId,
   UPGRADES,
 } from "./catalogue";
+import { moveCharacter } from "./characters";
 import { disembark, hasRoom, landingBlock, shipMoving, shoreBeside } from "./ferry";
 import { seaPath, sailable } from "./navigation";
 import { greatWorkStages } from "./greatwork";
@@ -63,7 +64,8 @@ export type Command =
   | { kind: "unload"; shipId: number }
   | { kind: "buy-upgrade"; upgrade: UpgradeId }
   | { kind: "fund-great-work"; buildingId: number }
-  | { kind: "trade"; resource: Resource; action: "sell" | "buy" };
+  | { kind: "trade"; resource: Resource; action: "sell" | "buy" }
+  | { kind: "move-character"; x: number; y: number };
 
 export type CommandResult = { ok: true } | { ok: false; reason: string };
 
@@ -105,8 +107,19 @@ function stopDuty(ship: ShipEntity): void {
   ship.dive = null;
 }
 
-export function applyCommand(state: GameState, cmd: Command): CommandResult {
+/**
+ * Apply a command from a player. `actor` is the player slot it came from (null for the
+ * simulation's own callers, such as tests): commands about a player's own character act on the
+ * actor's character and nobody else's. The rest are shared by the whole team.
+ */
+export function applyCommand(
+  state: GameState,
+  cmd: Command,
+  actor: string | null = null,
+): CommandResult {
   switch (cmd.kind) {
+    case "move-character":
+      return moveCharacter(state, actor, cmd);
     case "place-building": {
       if (!(cmd.building in BUILDINGS)) return fail("Unknown building");
       const check = canPlaceBuilding(state, cmd.building, cmd.x, cmd.y);
