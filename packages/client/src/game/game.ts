@@ -39,6 +39,7 @@ import { AtmosphereLayer } from "../render/atmosphere";
 import { Camera } from "../render/camera";
 import { daylight } from "../render/daylight";
 import { EntityLayer } from "../render/entities";
+import { buildingThumb } from "../render/names";
 import { FogLayer } from "../render/masks";
 import { Overlay, type Footprint } from "../render/overlay";
 import { TerrainLayer, visibleHeight } from "../render/terrain";
@@ -960,7 +961,7 @@ export class Game {
       const ok = canPlaceBuilding(state, tool.building, at.x, at.y).ok;
       o.footprint(f, ok);
       if (tool.building !== "path" && tool.building !== "dock")
-        ghost = { name: tool.building === "farm" ? "farm_2" : tool.building, f, ok };
+        ghost = { name: buildingThumb(tool.building, state.world.tribe), f, ok };
     } else if (
       tool.kind === "harvest" &&
       this.drag?.moved &&

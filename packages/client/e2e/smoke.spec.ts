@@ -49,6 +49,9 @@ test("the landing page shows the game and sets sail to /play", async ({ page }) 
 });
 
 test("start an expedition, build a house, and a friend joins", async ({ page, browser }) => {
+  // A page error stops the render loop (the build preview once threw every frame).
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("/play");
   await page.getByPlaceholder("Your name").fill("Anna");
   await page.getByRole("radio", { name: /Northfolk/ }).click();
@@ -94,6 +97,7 @@ test("start an expedition, build a house, and a friend joins", async ({ page, br
   await expect.poll(() => buildings(friend, "house")).toBe(1);
   await expect(friend.locator(".resource").first()).toHaveText(/^\d+$/);
   await friendContext.close();
+  expect(errors).toEqual([]);
 });
 
 test("offline mode plays without a server connection", async ({ page }) => {
