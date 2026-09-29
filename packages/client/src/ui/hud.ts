@@ -71,6 +71,8 @@ export interface HudActions {
   state(): GameState;
   /** The four corners of what the camera shows, in tile coordinates. */
   view(): { x: number; y: number }[];
+  /** Mute or unmute the sound; returns whether it is muted now. */
+  toggleSound(): boolean;
 }
 
 export function discoveryText(name: string, biome: BiomeId): string {
@@ -112,6 +114,7 @@ export class Hud {
   readonly map: MapScreen;
   private alertEl: HTMLElement;
   private titleEl: HTMLElement;
+  private soundBtn: HTMLButtonElement;
   private alertKey = "";
 
   constructor(
@@ -197,6 +200,14 @@ export class Hud {
     this.playersEl = h("div");
     this.clockEl = h("div.clock", { title: "Time of day: the same for everyone in the world" });
     const tribeDef = TRIBE_DEFS[tribe];
+    this.soundBtn = h(
+      "button.btn.mini.sound",
+      {
+        title: "Turn the sound on or off (N)",
+        onclick: () => this.setSound(actions.toggleSound()),
+      },
+      "Sound: on",
+    ) as HTMLButtonElement;
     this.titleEl = h(
       "h3",
       { title: `${tribeDef.description} ${tribeDef.bonusText}.` },
@@ -227,6 +238,7 @@ export class Hud {
           )
         : null,
       this.statusEl,
+      this.soundBtn,
     );
 
     this.minimap = new Minimap((x, y) => actions.focusTile(x, y));
@@ -285,6 +297,12 @@ export class Hud {
     const fit = () => this.root.style.setProperty("--hud-top", `${resources.offsetHeight + 24}px`);
     fit();
     if (typeof ResizeObserver !== "undefined") new ResizeObserver(fit).observe(resources);
+  }
+
+  /** Show whether the sound is muted. */
+  setSound(muted: boolean): void {
+    this.soundBtn.textContent = muted ? "Sound: off" : "Sound: on";
+    this.soundBtn.classList.toggle("off", muted);
   }
 
   /** Note the world's difficulty in the expedition title, unless it is the ordinary one. */

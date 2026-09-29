@@ -47,6 +47,7 @@ Pick a tribe, start an expedition, then use **Copy invite link** to bring up to 
 | Cancel | `Esc` or right-click                                                                                                                                                                            |
 | Chat   | `Enter`                                                                                                                                                                                         |
 | Map    | `M` opens the chart of the archipelago (or use the Map button by the minimap). `M` or `Esc` closes it                                                                                           |
+| Sound  | `N` mutes or unmutes (or the Sound button in the expedition panel). Your choice is remembered                                                                                                   |
 | Home   | `C` centres on the town hall                                                                                                                                                                    |
 
 ### Tribes
@@ -76,6 +77,14 @@ Every island belongs to one of ten biomes, with its own ground, cliffs, plants, 
 | Fungal Hollows  | Further out | Giant mushrooms, glowshrooms                    | Violet, floating spores    |
 | Infernal Isles  | Far away    | Charred trees, ember fruit, obsidian, hellstone | Dark red, embers, grit     |
 | Crystal Spires  | Far away    | Silverleaf trees, crystal clusters              | Indigo, sparkling motes    |
+
+### Sound
+
+All the sound is synthesised in the browser with the Web Audio API: oscillators and filtered noise, no audio files (the same idea as the art). Browsers only allow sound after you click or press a key, so it starts with your first one.
+
+- **Ambience** follows where the camera is and what the world is doing: the sea and wind, rain in storms, insects at night, birds by day and owls after dark, and each biome's own voice (frogs in Murkmire, bubbling in the Fungal Hollows, crackling embers, crystal sparkles, blossom wind chimes).
+- **Things you can hear happen**: hammering when a building goes up, chopping and picking as villagers work, coins when cargo comes home, a horn for a new ship, an arpeggio for a new island, bells for a spell, cannon fire, thunder, a ship going down, a sonar ping for a sunken site, an alarm when raiders are sighted or rob you, and a slow chord for the Great Work.
+- **Placed in the world**: sounds on screen play at full volume and pan left or right by where they are; those off screen fade with distance.
 
 ### The map
 
@@ -191,7 +200,7 @@ packages/shared   @explorer/shared: deterministic core used by client and server
 packages/art      @explorer/art: the colour palette and the per-pixel terrain painter
   terrain/          smooth fields from the tile data, ray-marched land, cliffs and water
 packages/server   @explorer/server: node:http + ws, world rooms, JSON persistence
-packages/client   @explorer/client: PixiJS v8 renderer, input, DOM HUD, sessions
+packages/client   @explorer/client: PixiJS v8 renderer, input, DOM HUD, map screen, synthesised sound, sessions
 tools/sprites     palette extraction and the sprite generator → client/public/assets
 ```
 
@@ -254,6 +263,5 @@ Server environment variables: `PORT` (8787), `HOST`, `DATA_DIR` (`data/worlds`),
 
 ## Not built yet
 
-- Sound
 - Accounts beyond name + token
 - Deployment

@@ -365,6 +365,12 @@ input.field:focus {
   letter-spacing: 0;
   opacity: 0.9;
 }
+.players .sound {
+  justify-self: start;
+}
+.players .sound.off {
+  opacity: 0.6;
+}
 .players .status {
   font-size: 12px;
   opacity: 0.75;

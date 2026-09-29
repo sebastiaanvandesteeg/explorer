@@ -24,6 +24,8 @@ import {
   type Patch,
   type PlayerInfo,
   type Resource,
+  type StormEntity,
+  type VillagerEntity,
 } from "@explorer/shared";
 import { Application, Container, Rectangle } from "pixi.js";
 import type { Atlas } from "../assets";
@@ -37,6 +39,8 @@ import { Overlay, type Footprint } from "../render/overlay";
 import { TerrainLayer, visibleHeight } from "../render/terrain";
 import { discoveryText, Hud, type Tool } from "../ui/hud";
 import { compassFrom, currentThreat } from "../ui/mapData";
+import { spatialMix, stormLevel, type Mood } from "../audio/mix";
+import { SoundSystem } from "../audio/system";
 
 interface Drag {
   button: number;
@@ -83,6 +87,9 @@ export class Game {
   private status: SessionStatus = "connecting";
   private minimapTimer = 0;
   private raidersSeen = false;
+  private readonly sound: SoundSystem;
+  private workTimer = 0;
+  private moodTimer = 0;
   private selectionDirty = true;
   private disposers: (() => void)[] = [];
   /** `?phase=` freezes the time of day, for reviewing art. */
@@ -143,11 +150,15 @@ export class Game {
         deselect: () => this.select(null),
         state: () => this.session.state,
         view: () => this.viewCorners(),
+        toggleSound: () => this.sound.toggle(),
       },
       invite,
       state.world.tribe,
     );
 
+    this.sound = new SoundSystem((x, y) => this.heard(x, y));
+    this.hud.setSound(this.sound.isMuted);
+    this.disposers.push(() => this.sound.dispose());
     this.hud.setDifficulty(state.difficulty);
     this.entities.rebuild(state);
     this.hud.setStock(state);
@@ -250,6 +261,7 @@ export class Game {
   }
 
   private onEvent(ev: GameEvent): void {
+    this.sound.event(ev);
     switch (ev.type) {
       case "built":
         this.hud.toast(`${BUILDINGS[ev.kind].name} built`);
@@ -338,6 +350,7 @@ export class Game {
 
   private async send(cmd: Command): Promise<boolean> {
     const res = await this.session.command(cmd);
+    this.sound.ui(res.ok ? "click" : "error");
     if (!res.ok) this.hud.toast(res.reason, "error");
     this.selectionDirty = true;
     return res.ok;
@@ -357,6 +370,7 @@ export class Game {
   }
 
   private select(id: number | null): void {
+    if (id !== null && id !== this.selected) this.sound.ui("select");
     this.selected = id;
     this.selectionDirty = true;
   }
@@ -567,6 +581,7 @@ export class Game {
       }
       this.keys.add(k);
       if (k === "m") this.hud.map.open();
+      else if (k === "n") this.hud.setSound(this.sound.toggle());
       else if (k === "escape") {
         if (this.tool.kind !== "select") this.setTool({ kind: "select" });
         else this.select(null);
@@ -717,6 +732,16 @@ export class Game {
       this.selectionDirty = false;
       this.hud.setSelection(state, this.selected);
     }
+    this.moodTimer -= dt;
+    if (this.moodTimer <= 0) {
+      this.sound.update(this.mood(), 0.5 - this.moodTimer);
+      this.moodTimer = 0.5;
+    }
+    this.workTimer -= dt;
+    if (this.workTimer <= 0) {
+      this.workTimer = 0.4;
+      this.workSounds(state);
+    }
     this.minimapTimer -= dt;
     if (this.minimapTimer <= 0) {
       this.minimapTimer = 0.4;
@@ -726,11 +751,43 @@ export class Game {
     }
   }
 
+  /** Where a sound at a place in the world seems to come from, for the player looking at the screen. */
+  private heard(x: number, y: number): { gain: number; pan: number } {
+    const p = this.camera.worldToScreen((x - y) * HALF_W, (x + y) * HALF_H);
+    return spatialMix(p.x, p.y, this.camera.width, this.camera.height);
+  }
+
+  /** What the ambience should sound like now: the time of day, any storm about, the place. */
+  private mood(): Mood {
+    const state = this.session.state;
+    const c = this.camera.screenToWorld(this.camera.width / 2, this.camera.height / 2);
+    const tx = (c.x / HALF_W + c.y / HALF_H) / 2;
+    const ty = (c.y / HALF_H - c.x / HALF_W) / 2;
+    const storms = [...state.entities.values()].filter((e) => e.type === "storm");
+    return {
+      night: this.entities.night,
+      storm: stormLevel(storms as StormEntity[], tx, ty),
+      biome: this.biome,
+    };
+  }
+
+  /** One villager on screen at random gets to be heard chopping, mining or hammering. */
+  private workSounds(state: GameState): void {
+    const heard: VillagerEntity[] = [];
+    for (const e of state.entities.values()) {
+      if (e.type !== "villager" || e.action !== "work" || e.aboard !== null) continue;
+      if (this.heard(e.x, e.y).gain >= 1) heard.push(e);
+    }
+    const v = heard[Math.floor(Math.random() * heard.length)];
+    if (v) this.sound.work(v.tool, v.x, v.y);
+  }
+
   /** Say so once when pirates first come into sight, and again after the seas have been quiet. */
   private watchForRaiders(state: GameState): void {
     const threat = currentThreat(state);
     if (threat && !this.raidersSeen) {
       this.hud.toast(`Pirates sighted to the ${threat.direction}!`, "error");
+      this.sound.cue({ sound: "alarm" });
     }
     this.raidersSeen = threat !== null;
   }
