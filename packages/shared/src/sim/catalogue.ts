@@ -28,6 +28,7 @@ export type BuildingKind =
   | "market"
   | "church"
   | "magic_house"
+  | "lighthouse"
   | "path";
 
 /** Gatherers roam a radius around their workplace; the others work at the building itself. */
@@ -191,6 +192,17 @@ export const BUILDINGS: Record<BuildingKind, BuildingDef> = {
     work: 24,
     buildable: true,
     hotkey: "0",
+  },
+  lighthouse: {
+    kind: "lighthouse",
+    name: "Lighthouse",
+    description:
+      "Its beam lights the sea at night for miles: raiders can be seen coming, ships keep their sight and patrol boats keep hunting in the dark.",
+    size: [2, 2],
+    cost: { wood: 60, stone: 60, tools: 10 },
+    work: 22,
+    buildable: true,
+    hotkey: "l",
   },
   path: {
     kind: "path",
@@ -361,7 +373,38 @@ export const PIRATE = {
   spawnDistance: 45,
 };
 
-export const STORM = { interval: 6, damage: 14, range: 16 };
+/** The Stormcaller spell: lightning at pirates near your ships and buildings. */
+export const STORMCALLER = { interval: 6, damage: 14, range: 16 };
+
+/** What night does. Darkness at or above `dark` hides things outside the light; raids wait for `raid`. */
+export const NIGHT = { dark: 0.5, raid: 0.3, sightLoss: 0.4 };
+
+/** How far, in tiles, each thing keeps watch around itself: by day, and after dark. */
+export const WATCH = {
+  building: 14,
+  ship: 10,
+  litBuilding: 6,
+  litShip: 4,
+  /** The lighthouse's beam: day and night alike. */
+  lighthouse: 24,
+};
+
+export const LIGHTHOUSE = { reveal: 16 };
+
+/** Storms: they roll across the sea and batter any ship caught outside a harbour. */
+export const WEATHER = {
+  first: 240,
+  interval: [200, 320] as const,
+  radius: [7, 11] as const,
+  life: [110, 170] as const,
+  speed: 1.4,
+  /** Hull points lost per second at full strength. */
+  damage: 1.6,
+  /** A ship this close to a finished dock is in harbour and safe. */
+  harbour: 4,
+  /** Seconds a storm takes to build up and to blow out. */
+  ramp: 15,
+};
 
 export const DIVE = {
   seconds: 15,
@@ -382,6 +425,7 @@ export type UpgradeId =
   | "ember_ward"
   | "prism_ward"
   | "storm_bolt"
+  | "calm_waters"
   | "cannons"
   | "iron_hulls";
 
@@ -444,6 +488,13 @@ export const UPGRADES: Record<UpgradeId, UpgradeDef> = {
     name: "Stormcaller",
     description: "Lightning strikes pirates that come near your settlements and ships",
     cost: { faith: 60, gold: 40, relic: 3 },
+    at: "magic_house",
+  },
+  calm_waters: {
+    id: "calm_waters",
+    name: "Calm Waters",
+    description: "Storms cannot hurt your ships",
+    cost: { faith: 40, gold: 30 },
     at: "magic_house",
   },
   cannons: {

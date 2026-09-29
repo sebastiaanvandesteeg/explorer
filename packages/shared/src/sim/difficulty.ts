@@ -19,13 +19,16 @@ export interface DifficultyDef {
   pirateHp: number;
   pirateDamage: number;
   steal: number;
+  /** Multiplier on how much storms hurt ships (0: storms are only weather) and on their spacing. */
+  stormDamage: number;
+  stormSpacing: number;
 }
 
 export const DIFFICULTY_DEFS: Record<Difficulty, DifficultyDef> = {
   peaceful: {
     id: "peaceful",
     name: "Peaceful",
-    description: "No pirates: explore, settle and trade in peace.",
+    description: "No pirates and harmless storms: explore, settle and trade in peace.",
     raids: false,
     firstRaid: 0,
     interval: [0, 0],
@@ -34,11 +37,14 @@ export const DIFFICULTY_DEFS: Record<Difficulty, DifficultyDef> = {
     pirateHp: 1,
     pirateDamage: 1,
     steal: 1,
+    stormDamage: 0,
+    stormSpacing: 1.5,
   },
   normal: {
     id: "normal",
     name: "Normal",
-    description: "A raiding ship every few minutes once the first week of the expedition is over.",
+    description:
+      "Raiding ships come at dusk, every few minutes, once the expedition has found its feet.",
     raids: true,
     firstRaid: 420,
     interval: [200, 320],
@@ -47,11 +53,14 @@ export const DIFFICULTY_DEFS: Record<Difficulty, DifficultyDef> = {
     pirateHp: 1,
     pirateDamage: 1,
     steal: 1,
+    stormDamage: 1,
+    stormSpacing: 1,
   },
   hard: {
     id: "hard",
     name: "Hard",
-    description: "Earlier, bigger and tougher raids that take more of what you have stored.",
+    description:
+      "Earlier, bigger and tougher raids that take more of what you have stored, and fiercer storms.",
     raids: true,
     firstRaid: 300,
     interval: [130, 220],
@@ -60,6 +69,8 @@ export const DIFFICULTY_DEFS: Record<Difficulty, DifficultyDef> = {
     pirateHp: 1.4,
     pirateDamage: 1.25,
     steal: 1.5,
+    stormDamage: 1.5,
+    stormSpacing: 0.7,
   },
 };
 

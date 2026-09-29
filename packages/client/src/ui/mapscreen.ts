@@ -1,7 +1,7 @@
 // The full-screen chart of the archipelago (M): every island the team has found, by name, with
 // what is stored there, the trade routes, the fleet, wrecks, sunken sites and pirates. It is drawn
 // in the same isometric view as the game, so "north-east" on the chart is north-east on screen.
-import { HALF_H, HALF_W, tileIndex, type GameState } from "@explorer/shared";
+import { HALF_H, HALF_W, tileIndex, WATCH, type GameState } from "@explorer/shared";
 import type { Atlas } from "../assets";
 import { describePirate, describeShip, goodsText } from "./describe";
 import { h } from "./dom";
@@ -13,6 +13,7 @@ import {
   islandRows,
   routeLines,
   seaSights,
+  stormHeading,
   type FleetRow,
   type Goods,
   type IslandRow,
@@ -229,6 +230,24 @@ export class MapScreen {
       this.hover?.hit.kind === "island" ? rows.find((r) => r.id === this.hover!.hit.id) : undefined;
     if (hovered) ring(hovered, "rgba(251, 240, 207, 0.95)", 2);
 
+    // Storms: a pale-edged patch of dark weather with an arrow for the way it is heading.
+    for (const storm of sights.storms) {
+      const c = this.project(storm.x, storm.y);
+      const rx = storm.radius * SQRT2 * this.a;
+      const ry = storm.radius * SQRT2 * this.b;
+      ctx.beginPath();
+      ctx.ellipse(c.x, c.y, rx, ry, 0, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(20, 32, 48, 0.5)";
+      ctx.fill();
+      ctx.setLineDash([3, 3]);
+      ctx.strokeStyle = "rgba(196, 212, 224, 0.85)";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.setLineDash([]);
+      const ahead = this.project(storm.x + storm.vx, storm.y + storm.vy);
+      this.arrow(c.x, c.y, Math.atan2(ahead.y - c.y, ahead.x - c.x), "#c4d4e0", 7);
+    }
+
     // Trade routes.
     for (const line of routeLines(state)) {
       const from = this.project(line.from.x, line.from.y);
@@ -250,11 +269,35 @@ export class MapScreen {
       );
     }
 
-    // Buildings: the town hall stands out, docks are teal, the rest brown.
+    // A lighthouse's reach: the stretch of sea it keeps watch over.
+    for (const e of state.entities.values()) {
+      if (e.type !== "building" || e.kind !== "lighthouse" || !e.complete) continue;
+      const c = this.project(e.x + e.w / 2, e.y + e.h / 2);
+      ctx.beginPath();
+      ctx.ellipse(
+        c.x,
+        c.y,
+        WATCH.lighthouse * SQRT2 * this.a,
+        WATCH.lighthouse * SQRT2 * this.b,
+        0,
+        0,
+        Math.PI * 2,
+      );
+      ctx.fillStyle = "rgba(255, 236, 170, 0.07)";
+      ctx.fill();
+      ctx.setLineDash([2, 4]);
+      ctx.strokeStyle = "rgba(255, 236, 170, 0.5)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    // Buildings: the town hall stands out, docks are teal, lighthouses yellow, the rest brown.
     for (const e of state.entities.values()) {
       if (e.type !== "building" || e.kind === "path") continue;
       const p = this.project(e.x + e.w / 2, e.y + e.h / 2);
       if (e.kind === "town_hall") this.star(p.x, p.y, 7, GOLD);
+      else if (e.kind === "lighthouse") this.diamond(p.x, p.y, 5, "#ffec9a");
       else
         this.square(p.x, p.y, e.kind === "dock" ? 4 : 3, e.kind === "dock" ? "#4fc1b0" : "#a07650");
     }
@@ -480,6 +523,20 @@ export class MapScreen {
       }
     }
     const t = this.unproject(sx, sy);
+    for (const storm of seaSights(state).storms) {
+      if (Math.hypot(storm.x - t.x, storm.y - t.y) > storm.radius) continue;
+      return {
+        kind: "entity",
+        id: storm.id,
+        x: storm.x,
+        y: storm.y,
+        title: "Storm",
+        lines: [
+          `Heading ${stormHeading(storm)}, ${Math.max(0, Math.ceil(storm.life - storm.age))} s left`,
+          "Ships outside a harbour take damage",
+        ],
+      };
+    }
     const tx = Math.floor(t.x);
     const ty = Math.floor(t.y);
     if (tx < 0 || ty < 0 || tx >= w.width || ty >= w.height) return null;
@@ -630,6 +687,20 @@ export class MapScreen {
     for (const s of fleet) parts.push(this.fleetRow(s));
 
     const sea: HTMLElement[] = [];
+    for (const storm of sights.storms)
+      sea.push(
+        h(
+          "button.map-row",
+          { onclick: () => this.focus(storm.x, storm.y) },
+          h(
+            "div.map-row-head",
+            {},
+            h("strong", {}, "Storm"),
+            h("small", {}, `heading ${stormHeading(storm)}`),
+          ),
+          h("small", {}, "Ships outside a harbour take damage."),
+        ),
+      );
     if (sights.pirates.length > 0)
       sea.push(
         h(
@@ -683,10 +754,12 @@ export class MapScreen {
       {},
       h("span", {}, h("i.k.star"), "Town hall"),
       h("span", {}, h("i.k.dock"), "Dock"),
+      h("span", {}, h("i.k.light"), "Lighthouse"),
       h("span", {}, h("i.k.ship"), "Ship"),
       h("span", {}, h("i.k.pirate"), "Pirates"),
       h("span", {}, h("i.k.site"), "Sunken site"),
       h("span", {}, h("i.k.wreck"), "Wreck"),
+      h("span", {}, h("i.k.storm"), "Storm"),
       h("span", {}, h("i.k.route"), "Trade route"),
     );
   }

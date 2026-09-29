@@ -664,6 +664,72 @@ function magicHouse(st: Style): Sprite {
   });
 }
 
+/**
+ * A round tower on a stone plinth with a gallery, a glowing lantern room and a cap in the tribe's
+ * roofing. The lantern is a bright, lit block so the game finds it as a light; `beam` marks where
+ * the sweeping beam starts.
+ */
+function lighthouse(st: Style): Sprite {
+  const s = new Scene();
+  s.groundShadow = { x0: -0.1, y0: -0.1, x1: 2.2, y1: 2.2 };
+  const plinth = 14;
+  const lower = 34;
+  const upper = 22;
+  const openings: Opening[] = [
+    { face: "+y", u0: 0.85, u1: 1.15, z0: plinth + 1, z1: plinth + 12, kind: "door" },
+    { face: "+x", u0: 0.9, u1: 1.1, z0: plinth + 20, z1: plinth + 27, kind: "window" },
+  ];
+  s.prism("z", [1, 1, plinth / 2], 0.66, plinth / 2, st.base, 14);
+  s.prism(
+    "z",
+    [1, 1, plinth + lower / 2],
+    0.5,
+    lower / 2,
+    st.wall(plinth + lower, openings, []),
+    14,
+  );
+  const gallery = plinth + lower + upper;
+  s.prism("z", [1, 1, plinth + lower + upper / 2], 0.4, upper / 2, st.wall(gallery, [], []), 14);
+  // Gallery deck with a rail, and the lantern room above it.
+  s.prism("z", [1, 1, gallery + 1.5], 0.55, 1.5, st.trim, 14);
+  const glass: Material = (c) => rampColor("glass", c.light > 0.55 ? 3 : 2);
+  s.prism("z", [1, 1, gallery + 8], 0.27, 5, glass, 12);
+  for (let i = 0; i < 8; i++) {
+    const a = (i * Math.PI) / 4;
+    s.prism(
+      "z",
+      [1 + Math.cos(a) * 0.29, 1 + Math.sin(a) * 0.29, gallery + 8],
+      0.025,
+      5,
+      st.trim,
+      5,
+    );
+  }
+  // The cap.
+  const capBase = gallery + 13;
+  s.prism("z", [1, 1, capBase + 0.75], 0.34, 0.75, st.trim, 12);
+  if (st.roofKind === "flat") {
+    s.ellipsoid([1, 1, capBase + 1.5], [0.32, 0.32, 9], (c) =>
+      shade("dome", lit(c, ((c.p[0] + c.p[1]) * 12) % 1 < 0.15 ? -0.1 : 0.1), c.px, c.py, 0.25),
+    );
+    s.prism("z", [1, 1, capBase + 13], 0.02, 3, flat("gold", 0.2), 6);
+  } else {
+    s.cone([1, 1, capBase + 1.5], 0.4, st.roofKind === "steep" ? 22 : 16, st.hallRoof, 14);
+    s.prism(
+      "z",
+      [1, 1, capBase + (st.roofKind === "steep" ? 26 : 20)],
+      0.02,
+      3,
+      flat("gold", 0.2),
+      6,
+    );
+  }
+  banner(s, st, 1.32, 0.78, plinth + 2, 10);
+  return renderSprite(`b_lighthouse_${st.tribe}`, s, 2, 2, 112, 10, {
+    beam: [at(1, 1, gallery + 8)],
+  });
+}
+
 // ---------------------------------------------------------------------------------------------
 // Shared pieces
 
@@ -780,6 +846,7 @@ export function buildingSprites(): Sprite[] {
       market(st),
       church(st),
       magicHouse(st),
+      lighthouse(st),
     );
   }
   out.push(dockTile("x", false), dockTile("x", true), dockTile("y", false), dockTile("y", true));

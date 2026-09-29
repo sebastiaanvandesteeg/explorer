@@ -6,8 +6,8 @@ import { UPGRADES, SHIP, VILLAGER, WARDED_BIOMES } from "./catalogue";
 import {
   hasUpgrade,
   islandAt,
+  lookAround,
   markDirty,
-  reveal,
   walkable,
   type GameState,
   type ShipEntity,
@@ -106,7 +106,7 @@ export function disembark(state: GameState, ship: ShipEntity): number {
     v.task = null;
     v.path = [];
     v.retryAt = state.time + 0.5;
-    reveal(state, v.x, v.y, VILLAGER.reveal);
+    lookAround(state, v.x, v.y, VILLAGER.reveal);
     markDirty(state, v.id);
   });
   const first = spots[0]!;

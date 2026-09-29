@@ -23,11 +23,13 @@ import {
   shipCost,
   SMITH,
   stockOf,
+  stormStrength,
   tileIndex,
   TRIBE_DEFS,
   UPGRADE_IDS,
   UPGRADES,
   VILLAGER,
+  WATCH,
   type BiomeId,
   type BuildingEntity,
   type BuildingKind,
@@ -49,7 +51,7 @@ import type { SessionStatus } from "../net/session";
 import { buildingThumb, villagerSprite } from "../render/names";
 import { describeIsland, describePirate, describeShip, goodsText, nearestSite } from "./describe";
 import { h } from "./dom";
-import { currentThreat } from "./mapData";
+import { currentStorm, currentThreat, pirateSpotted } from "./mapData";
 import { MapScreen } from "./mapscreen";
 import { abgr, mapColours } from "./mapColours";
 import { ICON, LABEL } from "./resources";
@@ -252,7 +254,7 @@ export class Hud {
     const chat = h("div.chat", {}, this.chatLog, this.chatInput);
 
     this.toastsEl = h("div.toasts");
-    this.alertEl = h("div.alert.panel", { style: { display: "none" } });
+    this.alertEl = h("div.alerts");
     const notices = h("div.notices", {}, this.alertEl, this.toastsEl);
     this.helpEl = h("div.help.panel");
     this.bannerEl = h("div.banner.panel", { style: { display: "none" } });
@@ -356,48 +358,66 @@ export class Hud {
     this.bannerEl.textContent = text ?? "";
   }
 
-  /** The pirate alert: shown for as long as raiders are at large, with a button to go and look. */
-  setThreat(state: GameState): void {
+  /**
+   * The alerts: pirates in sight and storms closing on ships, each with a button to go and look.
+   * They stay up for as long as the danger does.
+   */
+  setAlerts(state: GameState): void {
+    // `locate` is asked again when the button is pressed: the raiders and the storm keep moving.
+    const rows: {
+      key: string;
+      text: string;
+      look: string;
+      locate: () => { x: number; y: number } | undefined;
+    }[] = [];
     const threat = currentThreat(state);
-    if (!threat) {
-      if (this.alertKey !== "") {
-        this.alertKey = "";
-        this.alertEl.style.display = "none";
-      }
-      return;
+    if (threat) {
+      const where = threat.target
+        ? describeIsland(state, islandAt(state, threat.target.x, threat.target.y))
+        : null;
+      rows.push({
+        key: "pirates",
+        text:
+          threat.raiding > 0 && where
+            ? `Pirates are robbing ${where}!`
+            : `${threat.pirates} pirate ship${threat.pirates === 1 ? "" : "s"} in sight to the ${threat.direction}`,
+        look: "Go to the nearest pirate ship",
+        locate: () => currentThreat(this.actions.state())?.nearest,
+      });
     }
-    const where = threat.target
-      ? describeIsland(state, islandAt(state, threat.target.x, threat.target.y))
-      : null;
-    const text =
-      threat.raiding > 0 && where
-        ? `Pirates are robbing ${where}!`
-        : `${threat.pirates} pirate ship${threat.pirates === 1 ? "" : "s"} approaching from the ${threat.direction}`;
-    const seen =
-      state.explored[
-        tileIndex(state.world, Math.floor(threat.nearest.x), Math.floor(threat.nearest.y))
-      ];
-    const key = `${text}|${seen}`;
+    const storm = currentStorm(state);
+    if (storm) {
+      rows.push({
+        key: "storm",
+        text: `A storm from the ${storm.direction} is closing on ${storm.ships} of your ships: bring them into harbour`,
+        look: "Go to the storm",
+        locate: () => currentStorm(this.actions.state())?.storm,
+      });
+    }
+    const key = rows.map((r) => r.text).join("|");
     if (key === this.alertKey) return;
     this.alertKey = key;
     this.alertEl.replaceChildren(
-      h("span.siren", {}, "!"),
-      h("span", {}, text),
-      h(
-        "button.btn.mini",
-        {
-          title: seen
-            ? "Go to the nearest pirate ship"
-            : "Go to the settlement they are heading for",
-          onclick: () => {
-            const to = seen ? threat.nearest : (threat.target ?? state.world.start.townHall);
-            this.actions.focusTile(to.x + 0.5, to.y + 0.5);
-          },
-        },
-        "Look",
+      ...rows.map((r) =>
+        h(
+          `div.alert.panel${r.key === "storm" ? ".storm" : ""}`,
+          {},
+          h("span.siren", {}, r.key === "storm" ? "~" : "!"),
+          h("span", {}, r.text),
+          h(
+            "button.btn.mini",
+            {
+              title: r.look,
+              onclick: () => {
+                const at = r.locate();
+                if (at) this.actions.focusTile(at.x + 0.5, at.y + 0.5);
+              },
+            },
+            "Look",
+          ),
+        ),
       ),
     );
-    this.alertEl.style.display = "";
   }
 
   toast(text: string, kind: "info" | "error" = "info"): void {
@@ -829,6 +849,8 @@ export class Hud {
         status = "Staffed by a villager";
       } else if (e.kind === "town_hall") {
         status = `Population ${population(state)}/${populationCap(state)}`;
+      } else if (e.kind === "lighthouse") {
+        status = `Its beam watches ${WATCH.lighthouse} tiles of sea, day and night`;
       } else if (e.kind === "magic_house") {
         status = `Treasury: ${state.stock.gold} gold · ${state.stock.faith} faith · ${state.stock.crystal} crystal · ${state.stock.relic} relics`;
       } else {
@@ -973,12 +995,18 @@ export class Minimap {
           for (let x = e.x; x < e.x + e.w; x++) dot(x, y, abgr("#5b4028"));
       } else if (e.type === "villager" && e.aboard === null) dot(e.x, e.y, abgr("#fbf0cf"));
       else if (e.type === "ship") dot(e.x, e.y, abgr("#e98a3a"), 2);
+      else if (e.type === "pirate" && pirateSpotted(state, e)) dot(e.x, e.y, abgr("#d9486a"), 2);
       else if (
-        e.type === "pirate" &&
+        e.type === "storm" &&
+        stormStrength(e) > 0 &&
         state.explored[tileIndex(w, Math.floor(e.x), Math.floor(e.y))]
-      )
-        dot(e.x, e.y, abgr("#d9486a"), 2);
-      else if (e.type === "site" && e.found) dot(e.x, e.y, abgr("#6cb9a8"), 1);
+      ) {
+        // A storm is a ring of pale pixels round its eye.
+        for (let a = 0; a < 64; a++) {
+          const t = (a / 64) * Math.PI * 2;
+          dot(e.x + Math.cos(t) * e.radius, e.y + Math.sin(t) * e.radius, abgr("#c4d4e0"));
+        }
+      } else if (e.type === "site" && e.found) dot(e.x, e.y, abgr("#6cb9a8"), 1);
     }
     this.ctx.putImageData(img, 0, 0);
     if (view.length === 4) {

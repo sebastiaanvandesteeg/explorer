@@ -454,6 +454,11 @@ input.field:focus {
   justify-items: center;
   pointer-events: none;
 }
+.alerts {
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+}
 .alert {
   display: flex;
   align-items: center;
@@ -470,6 +475,13 @@ input.field:focus {
       0 0 0 2px var(--ink),
       0 0 14px rgba(201, 67, 26, 0.7);
   }
+}
+.alert.storm {
+  border-color: #6f8fb4;
+  animation: none;
+}
+.alert.storm .siren {
+  background: #4a6f9a;
 }
 .alert .siren {
   display: grid;
@@ -678,6 +690,10 @@ input.field:focus {
 .k.dock {
   background: #4fc1b0;
 }
+.k.light {
+  background: #ffec9a;
+  transform: rotate(45deg) scale(0.8);
+}
 .k.ship {
   background: #e98a3a;
   clip-path: polygon(100% 50%, 0 0, 30% 50%, 0 100%);
@@ -694,6 +710,11 @@ input.field:focus {
 .k.wreck {
   background: linear-gradient(45deg, transparent 40%, #a4f4e4 40% 60%, transparent 60%);
   border: 0;
+}
+.k.storm {
+  background: rgba(20, 32, 48, 0.8);
+  border: 1.5px dashed #c4d4e0;
+  border-radius: 50%;
 }
 .k.route {
   height: 0;

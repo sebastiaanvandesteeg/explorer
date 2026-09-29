@@ -1,6 +1,7 @@
 import { inBounds, isLandTerrain, tileIndex } from "../world/grid";
 import { hash2d } from "../rng";
 import { DIFFICULTY_DEFS, type Difficulty } from "./difficulty";
+import { sightFactor } from "./light";
 import type { BiomeId } from "../world/biomes";
 import { Terrain, type Dir, type NodeKind, type SiteKind, type WorldMap } from "../world/types";
 import {
@@ -13,6 +14,7 @@ import {
   SHIP_HP,
   START_STOCK,
   START_VILLAGERS,
+  WEATHER,
   type BuildingKind,
   type Resource,
   type ShipKind,
@@ -155,6 +157,20 @@ export interface WreckEntity {
   loot: Partial<Stock>;
 }
 
+/** A storm front: it drifts across the sea and hurts ships outside harbour. */
+export interface StormEntity {
+  id: number;
+  type: "storm";
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  radius: number;
+  /** Seconds since it formed, and how long it lasts. */
+  age: number;
+  life: number;
+}
+
 /** Sunken ruins and fortresses: unseen until a ship sails over them. */
 export interface SiteEntity {
   id: number;
@@ -175,7 +191,8 @@ export type Entity =
   | ShipEntity
   | PirateEntity
   | WreckEntity
-  | SiteEntity;
+  | SiteEntity
+  | StormEntity;
 
 export type GameEvent =
   | { type: "built"; kind: BuildingKind; x: number; y: number }
@@ -194,6 +211,7 @@ export type GameEvent =
       from: { x: number; y: number };
       to: { x: number; y: number };
     }
+  | { type: "storm"; x: number; y: number }
   | { type: "found"; site: SiteKind; x: number; y: number }
   | { type: "salvaged"; what: string; goods: Partial<Stock>; x: number; y: number };
 
@@ -214,6 +232,8 @@ export interface GameState {
   /** Game time of the next pirate raid, and of the next lightning strike. */
   nextRaid: number;
   nextBolt: number;
+  /** Game time the next storm forms. */
+  nextStorm: number;
   /** Outpost islands whose stockpile changed since the last patch. */
   outpostsDirty: Set<number>;
   entities: Map<number, Entity>;
@@ -291,6 +311,7 @@ export function emptyState(world: WorldMap, difficulty: Difficulty = "normal"): 
     upgradesDirty: false,
     nextRaid: DIFFICULTY_DEFS[difficulty].firstRaid,
     nextBolt: 0,
+    nextStorm: WEATHER.first,
     entities: new Map(),
     explored: new Uint8Array(n),
     discovered: new Set(),
@@ -526,6 +547,11 @@ export function reveal(state: GameState, cx: number, cy: number, r: number): voi
       }
     }
   }
+}
+
+/** Look around from a spot: like `reveal`, but a villager or ship sees less of the sea at night. */
+export function lookAround(state: GameState, x: number, y: number, r: number): void {
+  reveal(state, x, y, r * sightFactor(state, x, y));
 }
 
 /** Mark the centre of every island as seen, so the whole archipelago shows on the map. */

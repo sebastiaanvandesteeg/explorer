@@ -19,6 +19,7 @@ import {
   type Command,
   type Entity,
   type GameEvent,
+  type GameState,
   type Patch,
   type PlayerInfo,
   type Resource,
@@ -34,7 +35,7 @@ import { FogLayer } from "../render/masks";
 import { Overlay, type Footprint } from "../render/overlay";
 import { TerrainLayer, visibleHeight } from "../render/terrain";
 import { discoveryText, Hud, type Tool } from "../ui/hud";
-import { compassFrom } from "../ui/mapData";
+import { compassFrom, currentThreat } from "../ui/mapData";
 
 interface Drag {
   button: number;
@@ -80,6 +81,7 @@ export class Game {
   private keys = new Set<string>();
   private status: SessionStatus = "connecting";
   private minimapTimer = 0;
+  private raidersSeen = false;
   private selectionDirty = true;
   private disposers: (() => void)[] = [];
   /** `?phase=` freezes the time of day, for reviewing art. */
@@ -261,14 +263,14 @@ export class Game {
             : "A scout ship is ready at the dock",
         );
         break;
-      case "pirates": {
-        const dir = compassFrom(this.session.state.world.start.townHall, ev);
+      case "pirates":
+        // Raiders are announced when the lookouts first sight them, not when they set sail.
+        break;
+      case "storm":
         this.hud.toast(
-          `Pirates! ${ev.count === 1 ? "A raiding ship approaches" : `${ev.count} raiding ships approach`} from the ${dir}`,
-          "error",
+          `A storm is rolling in from the ${compassFrom(this.session.state.world.start.townHall, ev)}`,
         );
         break;
-      }
       case "robbed":
         this.hud.toast("Pirates are looting a storehouse!", "error");
         break;
@@ -407,6 +409,8 @@ export class Game {
     const tile = this.tileAt(sx, sy);
     let best: { e: Entity; z: number } | null = null;
     for (const e of state.entities.values()) {
+      // Weather is not something to click on.
+      if (e.type === "storm") continue;
       if (
         tile &&
         e.type !== "ship" &&
@@ -705,8 +709,18 @@ export class Game {
     if (this.minimapTimer <= 0) {
       this.minimapTimer = 0.4;
       this.hud.minimap.draw(state, this.viewCorners());
-      this.hud.setThreat(state);
+      this.hud.setAlerts(state);
+      this.watchForRaiders(state);
     }
+  }
+
+  /** Say so once when pirates first come into sight, and again after the seas have been quiet. */
+  private watchForRaiders(state: GameState): void {
+    const threat = currentThreat(state);
+    if (threat && !this.raidersSeen) {
+      this.hud.toast(`Pirates sighted to the ${threat.direction}!`, "error");
+    }
+    this.raidersSeen = threat !== null;
   }
 
   /** The four corners of the screen as tile coordinates, for the minimap and the map. */

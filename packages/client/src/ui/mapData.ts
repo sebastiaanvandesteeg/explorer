@@ -5,9 +5,12 @@ import {
   islandAt,
   islandName,
   RESOURCES,
+  inHarbour,
   settledIslands,
   stockOf,
+  stormStrength,
   tileIndex,
+  watched,
   type BuildingEntity,
   type GameState,
   type PirateEntity,
@@ -16,6 +19,7 @@ import {
   type ShipKind,
   type SiteEntity,
   type Stock,
+  type StormEntity,
   type WreckEntity,
 } from "@explorer/shared";
 import { biomeName, describeShip } from "./describe";
@@ -174,9 +178,17 @@ export function fleetRows(state: GameState): FleetRow[] {
   });
 }
 
+/** Can the team see this pirate: on explored water, and after dark only within a light's reach? */
+export function pirateSpotted(state: GameState, p: PirateEntity): boolean {
+  const k = tileIndex(state.world, Math.floor(p.x), Math.floor(p.y));
+  return state.explored[k] === 1 && watched(state, p.x, p.y);
+}
+
 export interface SeaSights {
-  /** Pirates on water someone has explored. */
+  /** Pirates the team can see. */
   pirates: PirateEntity[];
+  /** Storms over explored water. */
+  storms: StormEntity[];
   wrecks: WreckEntity[];
   /** Sunken sites a ship has found, emptied or not. */
   sites: SiteEntity[];
@@ -185,10 +197,11 @@ export interface SeaSights {
 /** What is out on the water that the team knows about. */
 export function seaSights(state: GameState): SeaSights {
   const w = state.world;
-  const sights: SeaSights = { pirates: [], wrecks: [], sites: [] };
+  const sights: SeaSights = { pirates: [], storms: [], wrecks: [], sites: [] };
   for (const e of state.entities.values()) {
     const seen = () => state.explored[tileIndex(w, Math.floor(e.x), Math.floor(e.y))] === 1;
-    if (e.type === "pirate" && seen()) sights.pirates.push(e);
+    if (e.type === "pirate" && pirateSpotted(state, e)) sights.pirates.push(e);
+    else if (e.type === "storm" && seen() && stormStrength(e) > 0) sights.storms.push(e);
     else if (e.type === "wreck" && seen()) sights.wrecks.push(e);
     else if (e.type === "site" && e.found) sights.sites.push(e);
   }
@@ -224,13 +237,14 @@ export interface Threat {
   target: BuildingEntity | null;
 }
 
-/** The pirates at large, for the alert banner. Null when the seas are quiet. */
+/** The pirates in sight, for the alert banner. Null when the seas are quiet. */
 export function currentThreat(state: GameState): Threat | null {
   const pirates: PirateEntity[] = [];
   const buildings: BuildingEntity[] = [];
   for (const e of state.entities.values()) {
-    if (e.type === "pirate") pirates.push(e);
-    else if (
+    if (e.type === "pirate") {
+      if (pirateSpotted(state, e)) pirates.push(e);
+    } else if (
       e.type === "building" &&
       e.complete &&
       (e.kind === "dock" || BUILDINGS[e.kind].dropOff)
@@ -258,4 +272,33 @@ export function currentThreat(state: GameState): Threat | null {
     raiding: pirates.filter((p) => p.phase === "raid").length,
     target,
   };
+}
+
+export interface StormWarning {
+  storm: StormEntity;
+  direction: string;
+  /** Ships of ours that are out in the open and close to it. */
+  ships: number;
+}
+
+/** The storm to warn about: one in sight with unsheltered ships near it. Null when none. */
+export function currentStorm(state: GameState): StormWarning | null {
+  if (state.upgrades.has("calm_waters")) return null;
+  const hall = state.world.start.townHall;
+  const ships = [...state.entities.values()].filter(
+    (e): e is ShipEntity => e.type === "ship" && !inHarbour(state, e),
+  );
+  let best: StormWarning | null = null;
+  for (const storm of seaSights(state).storms) {
+    const near = ships.filter((s) => Math.hypot(s.x - storm.x, s.y - storm.y) <= storm.radius + 16);
+    if (near.length === 0) continue;
+    if (!best || near.length > best.ships)
+      best = { storm, direction: compassFrom(hall, storm), ships: near.length };
+  }
+  return best;
+}
+
+/** Which way a storm is heading, as the screen shows it. */
+export function stormHeading(storm: StormEntity): string {
+  return compassFrom({ x: 0, y: 0 }, { x: storm.vx, y: storm.vy });
 }

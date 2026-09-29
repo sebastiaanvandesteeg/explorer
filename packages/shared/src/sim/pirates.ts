@@ -1,8 +1,20 @@
 // Threats and treasure at sea: pirate raids, ship combat, wrecks, sunken sites and divers.
 import { hash2d } from "../rng";
-import { DIVE, GUNS, PATROL, PIRATE, RESOURCES, STORM, BUILDINGS, type Stock } from "./catalogue";
+import {
+  DIVE,
+  GUNS,
+  NIGHT,
+  PATROL,
+  PIRATE,
+  RESOURCES,
+  STORMCALLER,
+  BUILDINGS,
+  type Stock,
+} from "./catalogue";
+import { nightLevel } from "./daylight";
 import { DIFFICULTY_DEFS } from "./difficulty";
 import { dockSpawn } from "./ferry";
+import { watched } from "./light";
 import { sailable, seaPath } from "./navigation";
 import { nearestWater } from "./rules";
 import {
@@ -106,7 +118,7 @@ function bounty(state: GameState, p: PirateEntity): Goods {
 // ---------------------------------------------------------------------------------------------
 // Damage
 
-function damageShip(state: GameState, s: ShipEntity, dmg: number): void {
+export function damageShip(state: GameState, s: ShipEntity, dmg: number): void {
   s.hp -= dmg;
   markDirty(state, s.id);
   if (s.hp > 0) return;
@@ -155,6 +167,8 @@ function nearestLand(
 function spawnRaids(state: GameState): void {
   const rules = DIFFICULTY_DEFS[state.difficulty];
   if (!rules.raids || state.time < state.nextRaid) return;
+  // Raiders come with the dark: a raid that falls due by day waits for dusk.
+  if (nightLevel(state.time) < NIGHT.raid) return;
   const [lo, hi] = rules.interval;
   state.nextRaid = state.time + lo + hash2d(state.tick, 1, 0x9b) * (hi - lo);
   const alive = all<PirateEntity>(state, "pirate").length;
@@ -416,7 +430,7 @@ function repair(state: GameState, s: ShipEntity, dt: number): void {
 function patrol(state: GameState, s: ShipEntity): void {
   if (s.salvage || s.dive || state.time < s.waitUntil) return;
   const prey = all<PirateEntity>(state, "pirate")
-    .filter((p) => dist(p, s) <= PATROL.engage)
+    .filter((p) => dist(p, s) <= PATROL.engage && watched(state, p.x, p.y))
     .sort((a, b) => dist(a, s) - dist(b, s))[0];
   if (!prey) {
     if (s.hunt) {
@@ -538,12 +552,12 @@ function stormBolt(state: GameState): void {
   ];
   let best: PirateEntity | null = null;
   for (const p of all<PirateEntity>(state, "pirate")) {
-    if (!guarded.some((g) => dist(g, p) <= STORM.range)) continue;
+    if (!guarded.some((g) => dist(g, p) <= STORMCALLER.range)) continue;
     if (!best || p.hp < best.hp) best = p;
   }
   if (!best) return;
-  state.nextBolt = state.time + STORM.interval;
-  best.hp -= STORM.damage;
+  state.nextBolt = state.time + STORMCALLER.interval;
+  best.hp -= STORMCALLER.damage;
   markDirty(state, best.id);
   state.events.push({
     type: "shot",

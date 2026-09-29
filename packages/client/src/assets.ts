@@ -8,6 +8,8 @@ export interface SpriteMeta {
   sparkle?: { x: number; y: number }[];
   /** Lit windows and fires: where the building glows at night, and how far. */
   lights?: { x: number; y: number; r: number }[];
+  /** A lighthouse's lamp: where its beam starts. */
+  beam?: { x: number; y: number }[];
 }
 
 interface Manifest {

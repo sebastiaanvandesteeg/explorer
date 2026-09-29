@@ -15,12 +15,15 @@ import {
 } from "@explorer/shared";
 import {
   compassFrom,
+  currentStorm,
   currentThreat,
   fleetRows,
   goodsList,
   islandRows,
+  pirateSpotted,
   routeLines,
   seaSights,
+  stormHeading,
 } from "./mapData";
 import { islandLines } from "./mapscreen";
 
@@ -128,12 +131,14 @@ describe("threats and sights", () => {
       home: { x: 0, y: 0 },
     });
 
-  it("reports pirates at large, nearest first, with a compass point", () => {
+  it("reports pirates in sight, nearest first, with a compass point", () => {
     const s = fresh();
+    s.explored.fill(1);
     expect(currentThreat(s)).toBeNull();
     const hall = world.start.townHall;
-    pirate(s, hall.x + 60, hall.y - 60);
-    const near = pirate(s, hall.x + 20, hall.y - 20);
+    pirate(s, hall.x + 60, hall.y - 60); // far out at sea: nobody is watching there
+    pirate(s, hall.x + 9, hall.y - 9);
+    const near = pirate(s, hall.x + 6, hall.y - 6);
     const threat = currentThreat(s)!;
     expect(threat.pirates).toBe(2);
     expect(threat.nearest.id).toBe(near.id);
@@ -146,13 +151,92 @@ describe("threats and sights", () => {
 
   it("only shows pirates and wrecks on explored water, and sunken sites once found", () => {
     const s = fresh();
-    const p = pirate(s, 3.5, 3.5);
+    const hall = world.start.townHall;
+    const p = pirate(s, hall.x + 4.5, hall.y - 4.5);
+    s.explored.fill(0);
     expect(seaSights(s).pirates).toEqual([]);
-    s.explored[3 * world.width + 3] = 1;
+    s.explored[Math.floor(p.y) * world.width + Math.floor(p.x)] = 1;
     expect(seaSights(s).pirates).toEqual([p]);
     expect(seaSights(s).sites).toEqual([]);
     for (const e of s.entities.values()) if (e.type === "site") e.found = true;
     expect(seaSights(s).sites).toHaveLength(world.sites.length);
+  });
+});
+
+describe("night and storms", () => {
+  const pirate = (s: GameState, x: number, y: number): PirateEntity =>
+    addEntity(s, {
+      id: s.nextId++,
+      type: "pirate",
+      x,
+      y,
+      heading: 0,
+      hp: 36,
+      path: [],
+      phase: "hunt",
+      target: null,
+      timer: 0,
+      cooldown: 0,
+      loot: {},
+      home: { x: 0, y: 0 },
+    });
+
+  it("loses sight of raiders in the dark unless a lighthouse watches", () => {
+    const s = fresh();
+    s.explored.fill(1);
+    // Within the town hall's daytime lookout, but well away from the dock's.
+    const hall = [...s.entities.values()].find(
+      (e): e is BuildingEntity => e.type === "building" && e.kind === "town_hall",
+    )!;
+    const dock = [...s.entities.values()].find(
+      (e): e is BuildingEntity => e.type === "building" && e.kind === "dock",
+    )!;
+    const cx = hall.x + hall.w / 2;
+    const cy = hall.y + hall.h / 2;
+    let spot: { x: number; y: number } | null = null;
+    for (let dy = -13; dy <= 13 && !spot; dy++)
+      for (let dx = -13; dx <= 13 && !spot; dx++) {
+        const d = Math.hypot(dx, dy);
+        const away = Math.hypot(cx + dx - (dock.x + dock.w / 2), cy + dy - (dock.y + dock.h / 2));
+        if (d >= 8 && d <= 12 && away > 16) spot = { x: cx + dx, y: cy + dy };
+      }
+    const p = pirate(s, spot!.x, spot!.y);
+    s.time = (0.25 - 0.1) * 480;
+    expect(pirateSpotted(s, p)).toBe(true);
+    expect(currentThreat(s)).not.toBeNull();
+    s.time = (0.8 - 0.1) * 480;
+    expect(pirateSpotted(s, p)).toBe(false);
+    expect(currentThreat(s)).toBeNull();
+    addEntity(s, newBuilding(s, "lighthouse", Math.floor(p.x) - 10, Math.floor(p.y), true));
+    expect(pirateSpotted(s, p)).toBe(true);
+  });
+
+  it("warns of storms only when ships in the open are close to one", () => {
+    const s = fresh();
+    s.explored.fill(1);
+    const storm = addEntity(s, {
+      id: s.nextId++,
+      type: "storm",
+      x: 90,
+      y: 90,
+      vx: 1,
+      vy: 0,
+      radius: 8,
+      age: 40,
+      life: 100,
+    });
+    expect(currentStorm(s)).toBeNull(); // no ships
+    const far = addEntity(s, newShip(s, "scout", 20.5, 20.5, 0));
+    expect(currentStorm(s)).toBeNull();
+    far.x = 105;
+    far.y = 90;
+    const warning = currentStorm(s)!;
+    expect(warning.storm.id).toBe(storm.id);
+    expect(warning.ships).toBe(1);
+    expect(stormHeading(storm)).toBe("south-east");
+    s.upgrades.add("calm_waters");
+    expect(currentStorm(s)).toBeNull();
+    expect(seaSights(s).storms).toHaveLength(1);
   });
 });
 

@@ -55,6 +55,7 @@ export interface Snapshot {
   stock: Stock;
   /** Game time of the next pirate raid. */
   nextRaid?: number;
+  nextStorm?: number;
   /** Goods waiting on other islands, by island id. Older saves have none. */
   outposts?: Record<number, Stock>;
   upgrades?: UpgradeId[];
@@ -156,6 +157,7 @@ export function toSnapshot(state: GameState): Snapshot {
     outposts: Object.fromEntries([...state.outposts].map(([id, st]) => [id, { ...st }])),
     upgrades: [...state.upgrades],
     nextRaid: state.nextRaid,
+    nextStorm: state.nextStorm,
     entities: [...state.entities.values()].map(toWire),
     explored: encodeRuns(state.explored),
     discovered: [...state.discovered],
@@ -176,6 +178,7 @@ export function fromSnapshot(world: WorldMap, snap: Snapshot, resume = false): G
     state.outposts.set(Number(id), { ...emptyStock(), ...st });
   state.upgrades = new Set(snap.upgrades ?? []);
   if (snap.nextRaid !== undefined) state.nextRaid = snap.nextRaid;
+  if (snap.nextStorm !== undefined) state.nextStorm = snap.nextStorm;
   state.explored = decodeRuns(snap.explored, world.width * world.height);
   state.discovered = new Set(snap.discovered);
   for (const w of snap.entities) {
