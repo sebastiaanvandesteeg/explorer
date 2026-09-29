@@ -166,7 +166,7 @@ export class Hud {
     for (const def of Object.values(BUILDINGS)) {
       if (!def.buildable) continue;
       const thumbName = buildingThumb(def.kind, tribe);
-      const f = atlas.frame(thumbName);
+      const f = atlas.size(thumbName);
       const scale = Math.min(40 / f.w, 32 / f.h, 1);
       const thumb = h("span.thumb", {}, icon(thumbName, scale));
       const cost = h("span.cost");
@@ -645,7 +645,7 @@ export class Hud {
     const icon = (name: string) => {
       const el = h("span.icon");
       if (this.atlas.has(name)) {
-        const f = this.atlas.frame(name);
+        const f = this.atlas.size(name);
         Object.assign(el.style, this.atlas.iconStyle(name, Math.min(2, 40 / f.h, 48 / f.w)));
       }
       return el;

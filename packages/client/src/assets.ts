@@ -30,9 +30,23 @@ export class Atlas {
     return s;
   }
 
-  /** Texels per world pixel for a frame (villagers are drawn at double resolution). */
+  /** Texels per world pixel for a frame (buildings, trees, ships and people are drawn at 2). */
   res(name: string): number {
     return this.meta[name]?.res ?? 1;
+  }
+
+  /** A frame's size in world pixels (its texels divided by `res`). */
+  size(name: string): { w: number; h: number } {
+    const f = this.frame(name);
+    const r = this.res(name);
+    return { w: f.w / r, h: f.h / r };
+  }
+
+  /** Show a different frame on an existing sprite: texture, anchor and scale together. */
+  setFrame(s: Sprite, name: string): void {
+    s.texture = this.texture(name);
+    this.anchor(s, name);
+    s.scale.set(1 / this.res(name));
   }
 
   anchor(s: Sprite, name: string): void {

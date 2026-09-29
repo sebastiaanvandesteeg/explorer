@@ -331,20 +331,26 @@ export class Scene {
   /**
    * Render into a canvas where world (0, 0, 0) lands on pixel (anchorX, anchorY).
    * `depthEdges` darkens pixels in front of a depth discontinuity to separate overlapping parts.
+   * `scale` is pixels per world pixel: at 2 the canvas is twice as dense, so a scene of the same
+   * size carries twice the detail (width, height and the anchor are then in these finer pixels).
    */
   render(
     width: number,
     height: number,
     anchorX: number,
     anchorY: number,
-    { outlines = true, depthEdges = true }: { outlines?: boolean; depthEdges?: boolean } = {},
+    {
+      outlines = true,
+      depthEdges = true,
+      scale = 1,
+    }: { outlines?: boolean; depthEdges?: boolean; scale?: number } = {},
   ): Canvas {
     const canvas = new Canvas(width, height);
     const depth = new Float32Array(width * height).fill(Infinity);
     for (let py = 0; py < height; py++) {
       for (let px = 0; px < width; px++) {
-        const sx = px + 0.5 - anchorX;
-        const sy = py + 0.5 - anchorY;
+        const sx = (px + 0.5 - anchorX) / scale;
+        const sy = (py + 0.5 - anchorY) / scale;
         const a = sx / HALF_W;
         const b = (sy + RAY_START_HEIGHT * Z_SCALE) / HALF_H;
         const o: Vec3 = [(a + b) / 2, (b - a) / 2, RAY_START_HEIGHT];

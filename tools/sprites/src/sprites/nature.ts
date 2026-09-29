@@ -7,7 +7,7 @@ import { rocky } from "../materials";
 import { hash3, noise3, prng } from "../noise3";
 import { RAMPS, hexToRgba, rampColor, shade, type RampName, type Rgba } from "../palette";
 import { flat, lit, Scene, type Material, type ShadeContext, type Vec3 } from "../raytrace";
-import { renderSprite, trimmed, type Sprite } from "../sprite";
+import { renderSprite, SPRITE_RES, trimmed, type Sprite } from "../sprite";
 
 type Extra = (c: ShadeContext, v: number) => Rgba | null;
 
@@ -26,9 +26,25 @@ export function foliage(
       noise3(x, y, z, 2) - 0.5,
       noise3(x, y, z, 3) - 0.5,
     ];
+    // A second, finer layer of bumps: single leaves catching the light within each clump.
+    const [fx, fy, fz] = [x * 3.3, y * 3.3, z * 3.3];
+    const leaf: Vec3 = [
+      noise3(fx, fy, fz, 6) - 0.5,
+      noise3(fx, fy, fz, 7) - 0.5,
+      noise3(fx, fy, fz, 8) - 0.5,
+    ];
     const k = bumpiness;
-    const n: Vec3 = [c.n[0] + bump[0] * k, c.n[1] + bump[1] * k, c.n[2] + bump[2] * k];
-    const v = 0.16 + 0.9 * c.lightFor(n) + (noise3(x * 2, y * 2, z * 2, 4) - 0.5) * 0.16 + bias;
+    const n: Vec3 = [
+      c.n[0] + bump[0] * k + leaf[0] * k * 0.85,
+      c.n[1] + bump[1] * k + leaf[1] * k * 0.85,
+      c.n[2] + bump[2] * k + leaf[2] * k * 0.85,
+    ];
+    const v =
+      0.16 +
+      0.9 * c.lightFor(n) +
+      (noise3(x * 2, y * 2, z * 2, 4) - 0.5) * 0.16 +
+      (noise3(fx * 1.7, fy * 1.7, fz * 1.7, 9) - 0.5) * 0.13 +
+      bias;
     const extra = extras?.(c, v);
     if (extra) return extra;
     return shade(rampName, v, c.px, c.py, 0.4);
@@ -38,7 +54,8 @@ export function foliage(
 /** Occasional coloured pixels (fruit, berries, flowers) on the lit side of foliage. */
 export function dots(ramp: RampName, chance: number, seed: number, minLight = 0.35): Extra {
   return (c, v) => {
-    if (v > minLight && hash3(c.px, c.py, 0, seed) > 1 - chance) {
+    // Texels are half a world pixel: a little fewer of them, so berries stay berries.
+    if (v > minLight && hash3(c.px, c.py, 0, seed) > 1 - chance * 0.7) {
       const colors = rampLength(ramp);
       return rampColor(ramp, v > 0.7 ? colors - 2 : colors - 3);
     }
@@ -70,6 +87,18 @@ export function canopy(
   mat: Material,
 ): void {
   s.ellipsoid([cx, cy, cz], [r * 0.85, r * 0.85, rz * 0.85], mat);
+  // Small clumps of leaves round the rim: a scalloped, less blobby silhouette.
+  for (let i = 0; i < Math.round(blobs * 0.9); i++) {
+    const a = rand() * Math.PI * 2;
+    const tilt = (rand() - 0.4) * 1.5;
+    const dist = r * (0.72 + rand() * 0.3);
+    const br = r * (0.2 + rand() * 0.14);
+    s.ellipsoid(
+      [cx + Math.cos(a) * dist, cy + Math.sin(a) * dist, cz + tilt * rz * 0.85],
+      [br, br, br * 19.6 * 0.9],
+      mat,
+    );
+  }
   for (let i = 0; i < blobs; i++) {
     const a = rand() * Math.PI * 2;
     const tilt = (rand() - 0.35) * 1.3;
@@ -671,7 +700,7 @@ function boulders(
   seed: number,
   size: number,
   moss: number,
-  opts: { shadow: boolean; lobes: number },
+  opts: { shadow: boolean; lobes: number; res?: number },
 ): Sprite {
   const rand = prng(seed);
   const s = new Scene();
@@ -690,7 +719,7 @@ function boulders(
     const r = (0.16 + rand() * 0.08) * size;
     rock(s, rand, [x, y, 0], [r, r * 0.85, (5 + rand() * 5) * size], mat, 12);
   }
-  return renderSprite(name, s, 1, 1, 34 * size, 8);
+  return renderSprite(name, s, 1, 1, 34 * size, 8, undefined, { res: opts.res ?? SPRITE_RES });
 }
 
 /** A ring of surf around a rock's base, with a few loose wave arcs beyond it. */
@@ -730,6 +759,8 @@ function seaRock(variant: number): Sprite {
   const rock = boulders(`sea_rock_${variant}`, 5000 + variant * 17, size, 0.5, {
     shadow: false,
     lobes: variant === 3 ? 1 : 2,
+    // Painted over with 1× surf below, so it stays at the world's own pixel density.
+    res: 1,
   });
   const out = new Canvas(rock.canvas.width + 30, rock.canvas.height + 14);
   const ax = rock.anchorX + 15;
@@ -766,7 +797,7 @@ function seaArch(variant: number): Sprite {
   rock(s, rand, [...at(0.62, 0.78), 3], [0.16, 0.14, 7], mat, 10);
   const w = variant === 0 ? 2 : 1;
   const d = variant === 0 ? 1 : 2;
-  const rocks = renderSprite(`sea_arch_${variant}`, s, w, d, 48, 8);
+  const rocks = renderSprite(`sea_arch_${variant}`, s, w, d, 48, 8, undefined, { res: 1 });
   const out = new Canvas(rocks.canvas.width + 44, rocks.canvas.height + 20);
   const ax = rocks.anchorX + 22;
   const ay = rocks.anchorY + 4;

@@ -1110,7 +1110,9 @@ const LIGHT_COLOURS = new Set(
  * into a soft glow that comes up at dusk.
  */
 export function findLights(sprite: Sprite): { x: number; y: number; r: number }[] {
-  const cell = 6;
+  // Offsets and radii are in world pixels; the sprite's own pixels may be finer.
+  const res = (sprite.meta?.res as number | undefined) ?? 1;
+  const cell = 6 * res;
   const groups = new Map<string, { x: number; y: number; n: number }>();
   for (let y = 0; y < sprite.canvas.height; y++)
     for (let x = 0; x < sprite.canvas.width; x++) {
@@ -1127,9 +1129,9 @@ export function findLights(sprite: Sprite): { x: number; y: number; r: number }[
     .sort((a, b) => b.n - a.n)
     .slice(0, 6)
     .map((g) => ({
-      x: Math.round(g.x / g.n - sprite.anchorX),
-      y: Math.round(g.y / g.n - sprite.anchorY),
-      r: Math.round(9 + 2.2 * Math.sqrt(g.n)),
+      x: Math.round((g.x / g.n - sprite.anchorX) / res),
+      y: Math.round((g.y / g.n - sprite.anchorY) / res),
+      r: Math.round(9 + 2.2 * Math.sqrt(g.n / (res * res))),
     }));
 }
 

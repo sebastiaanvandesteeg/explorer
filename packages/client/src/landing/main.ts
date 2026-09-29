@@ -68,8 +68,10 @@ function plot(name: string, tiles: number, biome: BiomeId, scale: number): HTMLE
   void atlas.then((a) => {
     const meta = a.sprites[name];
     if (!meta) return;
-    pic.style.left = `${((tiles * TILE_W) / 2 - meta.anchorX) * scale}px`;
-    pic.style.top = `${-meta.anchorY * scale}px`;
+    // The anchor is in texels; a double-resolution frame has two to the world pixel.
+    const res = meta.res ?? 1;
+    pic.style.left = `${((tiles * TILE_W) / 2 - meta.anchorX / res) * scale}px`;
+    pic.style.top = `${(-meta.anchorY / res) * scale}px`;
   });
   return el;
 }

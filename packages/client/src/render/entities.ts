@@ -502,8 +502,7 @@ class PirateView extends MovingView {
     this.track(p.x, p.y, now, this.p === null);
     this.p = p;
     const name = `pirate_${p.heading % 8}`;
-    this.sprite.texture = this.layer.atlas.texture(name);
-    this.layer.atlas.anchor(this.sprite, name);
+    this.layer.atlas.setFrame(this.sprite, name);
     hullBar(this.bar, p.hp, pirateMaxHp(this.layer.state));
   }
 
@@ -739,8 +738,7 @@ class ShipView extends MovingView {
     this.track(s.x, s.y, now, this.s === null);
     this.s = s;
     const name = `${s.kind === "scout" ? "ship" : s.kind}_${s.heading % 8}`;
-    this.sprite.texture = this.layer.atlas.texture(name);
-    this.layer.atlas.anchor(this.sprite, name);
+    this.layer.atlas.setFrame(this.sprite, name);
     hullBar(this.bar, s.hp, shipMaxHp(this.layer.state, s.kind));
   }
 
@@ -909,8 +907,7 @@ export class EntityLayer {
       }
       const frame = Math.min(3, Math.floor(t * 4));
       const name = `smoke_${frame}`;
-      p.sprite.texture = this.atlas.texture(name);
-      this.atlas.anchor(p.sprite, name);
+      this.atlas.setFrame(p.sprite, name);
       p.sprite.position.set(Math.round(p.x + t * 10), Math.round(p.y - t * 22));
       p.sprite.alpha = 0.9 * (1 - t * 0.6);
     }

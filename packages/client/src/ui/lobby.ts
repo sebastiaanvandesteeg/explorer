@@ -102,7 +102,7 @@ export function showLobby(root: HTMLElement, opts: LobbyOptions): () => void {
     void opts.atlas.then((atlas) => {
       const name = `b_town_hall_${id}`;
       if (!atlas.has(name)) return;
-      const f = atlas.frame(name);
+      const f = atlas.size(name);
       const icon = h("span.icon");
       Object.assign(icon.style, atlas.iconStyle(name, Math.min(56 / f.w, 52 / f.h)));
       pic.append(icon);
