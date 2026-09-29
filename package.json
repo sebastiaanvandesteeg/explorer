@@ -1,0 +1,27 @@
+{
+  "name": "explorer",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm --parallel --filter @explorer/server --filter @explorer/client dev",
+    "build": "pnpm --filter @explorer/client build",
+    "start": "pnpm --filter @explorer/server start",
+    "test": "pnpm sprites:check && pnpm -r test",
+    "test:e2e": "pnpm --filter @explorer/client test:e2e",
+    "typecheck": "pnpm -r typecheck",
+    "check": "pnpm format:check && pnpm typecheck && pnpm test",
+    "sprites": "pnpm --filter @explorer/sprites generate",
+    "sprites:check": "pnpm --filter @explorer/sprites check",
+    "sprites:palette": "pnpm --filter @explorer/sprites palette",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "prettier": "^3.9.9",
+    "typescript": "^7.0.2"
+  },
+  "packageManager": "pnpm@11.24.0",
+  "engines": {
+    "node": ">=24"
+  }
+}
