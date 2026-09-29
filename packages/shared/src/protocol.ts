@@ -1,6 +1,7 @@
 // Messages between browser clients and the Node server (JSON over one WebSocket per player).
 import type { Command } from "./sim/commands";
 import type { Difficulty } from "./sim/difficulty";
+import type { GameMode } from "./sim/mode";
 import type { TribeId } from "./tribes";
 import type { Patch, Snapshot } from "./sim/snapshot";
 
@@ -27,6 +28,7 @@ export interface WorldInfo {
   seed: string;
   tribe: TribeId;
   difficulty: Difficulty;
+  mode: GameMode;
   players: number;
   online: number;
   maxPlayers: number;

@@ -48,6 +48,7 @@ export class Overlay {
   private ghost: Sprite | null = null;
   private ghostName = "";
   private cursors = new Map<string, RemoteCursor>();
+  private nameTags = new Map<number, Text>();
 
   constructor(private readonly atlas: Atlas) {
     this.under.addChild(this.g);
@@ -129,6 +130,54 @@ export class Overlay {
 
   highlight(f: Footprint): void {
     diamond(this.g, f).stroke({ width: 1, color: 0xfbf0cf, alpha: 0.9, pixelLine: true });
+  }
+
+  /**
+   * A player's character: a ring in their colour at its feet (heavier for your own) and their
+   * name above its head. `x` and `y` are where its feet are, in world pixels.
+   */
+  character(
+    id: number,
+    name: string,
+    color: string,
+    you: boolean,
+    x: number,
+    y: number,
+    camera: Camera,
+  ): void {
+    const hex = Number.parseInt(color.slice(1), 16);
+    this.g
+      .ellipse(x, y, 8, 4)
+      .fill({ color: hex, alpha: you ? 0.35 : 0.2 })
+      .stroke({ width: you ? 2 : 1, color: hex, alpha: 1, pixelLine: !you });
+    let tag = this.nameTags.get(id);
+    if (!tag) {
+      tag = new Text({
+        text: name,
+        style: {
+          fontFamily: "Pixelify Sans, sans-serif",
+          fontSize: 13,
+          fill: color,
+          stroke: { color: "#1b1a1f", width: 3 },
+        },
+      });
+      tag.anchor.set(0.5, 1);
+      this.screen.addChild(tag);
+      this.nameTags.set(id, tag);
+    }
+    if (tag.text !== name) tag.text = name;
+    const p = camera.worldToScreen(x, y - 26);
+    tag.position.set(Math.round(p.x), Math.round(p.y));
+  }
+
+  /** Forget the name tags of characters that are gone. */
+  pruneCharacters(alive: Set<number>): void {
+    for (const [id, tag] of this.nameTags) {
+      if (!alive.has(id)) {
+        tag.destroy();
+        this.nameTags.delete(id);
+      }
+    }
   }
 
   setCursor(player: PlayerInfo, x: number | null, y: number | null, z: number): void {

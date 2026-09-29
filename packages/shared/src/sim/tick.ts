@@ -6,6 +6,7 @@ import {
   BUILDING_REVEAL,
   BUILDINGS,
   CARGO,
+  CHARACTER,
   LIGHTHOUSE,
   CHURCH,
   FARM,
@@ -24,6 +25,7 @@ import {
   type WorkerJob,
 } from "./catalogue";
 import { releaseTask } from "./commands";
+import { faceTowards, stepAlong, tileOf } from "./walk";
 import { greatWorkStages } from "./greatwork";
 import { collectWreck, updateThreats } from "./pirates";
 import { stormOnRoute, updateWeather } from "./weather";
@@ -34,7 +36,6 @@ import {
   addEntity,
   addGoods,
   islandAt,
-  isPathTile,
   lookAround,
   markDirty,
   newShip,
@@ -51,6 +52,7 @@ import {
   touchStock,
   walkable,
   type BuildingEntity,
+  type CharacterEntity,
   type GameState,
   type NodeEntity,
   type ShipEntity,
@@ -70,6 +72,7 @@ export function tick(state: GameState, dt = TICK_SECONDS): void {
   for (const e of all) {
     if (!state.entities.has(e.id)) continue;
     if (e.type === "villager") updateVillager(state, e, dt);
+    else if (e.type === "character") updateCharacter(state, e, dt);
     else if (e.type === "ship") updateShip(state, e, dt);
   }
   updateThreats(state, dt);
@@ -217,9 +220,24 @@ export function completeBuilding(state: GameState, b: BuildingEntity): void {
 }
 
 // ---------------------------------------------------------------------------------------------
-// Villagers
+// Characters
 
-const tileOf = (v: { x: number; y: number }): Tile => ({ x: Math.floor(v.x), y: Math.floor(v.y) });
+/** A player's character only walks where its player sent it. */
+function updateCharacter(state: GameState, c: CharacterEntity, dt: number): void {
+  if (c.action !== "walk") {
+    if (c.dest) {
+      c.dest = null;
+      markDirty(state, c.id);
+    }
+    return;
+  }
+  if (!stepAlong(state, c, dt, CHARACTER.speed, CHARACTER.reveal)) return;
+  c.action = "idle";
+  c.dest = null;
+}
+
+// ---------------------------------------------------------------------------------------------
+// Villagers
 
 function taskValid(state: GameState, v: VillagerEntity, t: Task): boolean {
   switch (t.kind) {
@@ -312,51 +330,6 @@ function updateVillager(state: GameState, v: VillagerEntity, dt: number): void {
       planRoute(state, v);
       return;
   }
-}
-
-function setFacing(v: VillagerEntity, dx: number, dy: number): void {
-  if (Math.abs(dx) < 1e-6 && Math.abs(dy) < 1e-6) return;
-  if (Math.abs(dx) >= Math.abs(dy)) v.facing = dx > 0 ? 0 : 2;
-  else v.facing = dy > 0 ? 1 : 3;
-}
-
-/** Advance along the path. Returns true on arrival; replans (idle) if the way is blocked. */
-function stepAlong(state: GameState, v: VillagerEntity, dt: number): boolean {
-  const here = tileOf(v);
-  let budget =
-    VILLAGER.speed * dt * (isPathTile(state, here.x, here.y) ? VILLAGER.pathSpeedBonus : 1);
-  while (budget > 1e-6 && v.path.length > 0) {
-    const next = v.path[0]!;
-    if (!walkable(state, next.x, next.y)) {
-      v.path = [];
-      v.action = "idle";
-      markDirty(state, v.id);
-      return false;
-    }
-    const tx = next.x + 0.5;
-    const ty = next.y + 0.5;
-    const dx = tx - v.x;
-    const dy = ty - v.y;
-    const dist = Math.hypot(dx, dy);
-    setFacing(v, dx, dy);
-    if (dist <= budget) {
-      v.x = tx;
-      v.y = ty;
-      budget -= dist;
-      v.path.shift();
-      lookAround(state, v.x, v.y, VILLAGER.reveal);
-    } else {
-      v.x += (dx / dist) * budget;
-      v.y += (dy / dist) * budget;
-      budget = 0;
-    }
-  }
-  markDirty(state, v.id);
-  return v.path.length === 0;
-}
-
-function faceTowards(v: VillagerEntity, x: number, y: number): void {
-  setFacing(v, x - v.x, y - v.y);
 }
 
 function arrive(state: GameState, v: VillagerEntity): void {

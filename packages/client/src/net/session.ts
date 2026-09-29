@@ -1,6 +1,7 @@
 import {
   applyCommand,
   createInitialState,
+  ensureCharacter,
   generateWorld,
   PLAYER_COLORS,
   takePatch,
@@ -9,6 +10,7 @@ import {
   type Command,
   type CommandResult,
   type Difficulty,
+  type GameMode,
   type GameState,
   type Patch,
   type PlayerInfo,
@@ -63,9 +65,12 @@ export class LocalSession extends Emitter implements Session {
     name: string,
     tribe: TribeId = "islanders",
     difficulty: Difficulty = "normal",
+    mode: GameMode = "colony",
   ) {
     super();
-    this.state = createInitialState(generateWorld(seed, tribe), { difficulty });
+    this.state = createInitialState(generateWorld(seed, tribe), { difficulty, mode });
+    if (mode === "adventure") ensureCharacter(this.state, this.you);
+    this.state.dirty.clear();
     this.players = [{ id: this.you, name, color: PLAYER_COLORS[0], online: true }];
     this.timer = setInterval(() => {
       tick(this.state);
@@ -78,7 +83,7 @@ export class LocalSession extends Emitter implements Session {
   }
 
   async command(cmd: Command): Promise<CommandResult> {
-    return applyCommand(this.state, cmd);
+    return applyCommand(this.state, cmd, this.you);
   }
 
   cursor(): void {}

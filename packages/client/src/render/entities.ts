@@ -22,7 +22,7 @@ import {
   type SiteEntity,
   type StormEntity,
   type WreckEntity,
-  type VillagerEntity,
+  type Walker,
   type WorldMap,
 } from "@explorer/shared";
 import { Container, Graphics, Sprite, Texture, type Rectangle } from "pixi.js";
@@ -403,12 +403,13 @@ abstract class MovingView extends View {
   }
 }
 
+/** Villagers and player characters look the same: a person on foot. */
 class VillagerView extends MovingView {
   readonly root = new Container();
   private body: Sprite;
   private carry: Sprite | null = null;
   private carryName = "";
-  private v: VillagerEntity | null = null;
+  private v: Walker | null = null;
   private height = 0;
 
   constructor(private readonly layer: EntityLayer) {
@@ -418,7 +419,7 @@ class VillagerView extends MovingView {
   }
 
   update(e: Entity, now: number): void {
-    const v = e as VillagerEntity;
+    const v = e as Entity & Walker;
     // Villagers at sea ride inside the ship.
     this.root.visible = v.aboard === null;
     const boarding = this.v !== null && this.v.aboard !== v.aboard;
@@ -863,6 +864,7 @@ export class EntityLayer {
       case "node":
         return new NodeView(this);
       case "villager":
+      case "character":
         return new VillagerView(this);
       case "ship":
         return new ShipView(this);

@@ -2,6 +2,7 @@ import { TRIBE_DEFS } from "../tribes";
 import { inBounds, isLandTerrain, tileIndex } from "../world/grid";
 import { hash2d } from "../rng";
 import { DIFFICULTY_DEFS, type Difficulty } from "./difficulty";
+import type { GameMode } from "./mode";
 import { sightFactor } from "./light";
 import type { BiomeId } from "../world/biomes";
 import { Terrain, type Dir, type NodeKind, type SiteKind, type WorldMap } from "../world/types";
@@ -73,24 +74,40 @@ export type Task =
 
 export type VillagerAction = "idle" | "walk" | "deliver" | "work";
 
-export interface VillagerEntity {
+/** What villagers and player characters share: a person who walks about on land. */
+export interface Walker {
   id: number;
-  type: "villager";
   /** Continuous world position (tile centre = integer + 0.5). */
   x: number;
   y: number;
   tunic: number;
   facing: 0 | 1 | 2 | 3;
   action: VillagerAction;
-  task: Task | null;
   path: { x: number; y: number }[];
   carrying: { resource: Resource; amount: number } | null;
-  workTimer: number;
   tool: Tool | null;
+  /** Ship carrying this person, or null when on land. */
+  aboard: number | null;
+}
+
+export interface VillagerEntity extends Walker {
+  type: "villager";
+  task: Task | null;
+  workTimer: number;
   /** Earliest time this villager looks for work again after failing to find any. */
   retryAt: number;
-  /** Ship carrying this villager, or null when on land. */
-  aboard: number | null;
+}
+
+/**
+ * A player's own character, in adventure worlds. One per player slot: it keeps its place when the
+ * player leaves and is there again when they come back. Nothing orders it about but its player.
+ */
+export interface CharacterEntity extends Walker {
+  type: "character";
+  /** The player slot that controls this character (see `PlayerInfo.id`). */
+  playerId: string;
+  /** Where the current walk ends, or null when standing still. */
+  dest: { x: number; y: number } | null;
 }
 
 export interface ShipEntity {
@@ -216,6 +233,7 @@ export type Entity =
   | BuildingEntity
   | NodeEntity
   | VillagerEntity
+  | CharacterEntity
   | ShipEntity
   | PirateEntity
   | WreckEntity
@@ -248,6 +266,8 @@ export interface GameState {
   world: WorldMap;
   /** How hostile the world is; fixed when it is created. */
   difficulty: Difficulty;
+  /** Whether players command villagers (colony) or each control a character (adventure). */
+  mode: GameMode;
   time: number;
   tick: number;
   nextId: number;
@@ -327,11 +347,16 @@ export function rebuildOccupancy(state: GameState): void {
   for (const e of state.entities.values()) occupy(state, e, true);
 }
 
-export function emptyState(world: WorldMap, difficulty: Difficulty = "normal"): GameState {
+export function emptyState(
+  world: WorldMap,
+  difficulty: Difficulty = "normal",
+  mode: GameMode = "colony",
+): GameState {
   const n = world.width * world.height;
   return {
     world,
     difficulty,
+    mode,
     time: 0,
     tick: 0,
     nextId: 1,
@@ -527,9 +552,9 @@ export function addSites(state: GameState): void {
 
 export function createInitialState(
   world: WorldMap,
-  opts: { difficulty?: Difficulty } = {},
+  opts: { difficulty?: Difficulty; mode?: GameMode } = {},
 ): GameState {
-  const state = emptyState(world, opts.difficulty);
+  const state = emptyState(world, opts.difficulty, opts.mode);
   const s = world.start;
   addEntity(state, newBuilding(state, "town_hall", s.townHall.x, s.townHall.y, true));
   addEntity(state, newBuilding(state, "dock", s.dock.x, s.dock.y, true, s.dock.dir));
@@ -621,11 +646,11 @@ export function islandAt(state: GameState, x: number, y: number): number {
   return inBounds(w, x, y) ? w.island[tileIndex(w, x, y)]! : -1;
 }
 
-/** Islands where the team has a foothold: a villager ashore or a building. */
+/** Islands where the team has a foothold: a villager or character ashore, or a building. */
 export function settledIslands(state: GameState): Set<number> {
   const out = new Set<number>([state.world.start.islandId]);
   for (const e of state.entities.values()) {
-    if (e.type === "villager" && e.aboard === null)
+    if ((e.type === "villager" || e.type === "character") && e.aboard === null)
       out.add(islandAt(state, Math.floor(e.x), Math.floor(e.y)));
     else if (e.type === "building") out.add(islandAt(state, e.x, e.y));
   }

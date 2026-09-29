@@ -31,7 +31,7 @@ pnpm dev
 
 The site root is the landing page; the game itself lives at **/play** (http://localhost:5190/play). Pick a tribe, start an expedition, then use **Copy invite link** to bring up to 7 friends. Invite links look like `/play/w/<id>`.
 
-- **Offline:** "Play offline" in the lobby (or `/play?offline&seed=anything&tribe=northfolk`) runs the whole simulation in your browser. Nothing is saved.
+- **Offline:** "Play offline" in the lobby (or `/play?offline&seed=anything&tribe=northfolk`, plus `&mode=adventure` for an adventure world) runs the whole simulation in your browser. Nothing is saved.
 - **Production:** `pnpm build && pnpm start` builds the client, and the Node server then serves the landing page, the game and the API from one port (8787).
 - **Old links:** invite links (`/w/<id>`) and offline URLs (`/?offline…`) from before the game moved to /play redirect there.
 
@@ -49,7 +49,22 @@ The site root is the landing page; the game itself lives at **/play** (http://lo
 | Chat   | `Enter`                                                                                                                                                                                         |
 | Map    | `M` opens the chart of the archipelago (or use the Map button by the minimap). `M` or `Esc` closes it                                                                                           |
 | Sound  | `N` mutes or unmutes (or the Sound button in the expedition panel). Your choice is remembered                                                                                                   |
-| Home   | `C` centres on the town hall                                                                                                                                                                    |
+| Home   | `C` centres on the town hall (in an adventure world it brings the camera back to your character)                                                                                                |
+| Walk   | Adventure worlds only: right-click the ground with nothing selected (see below)                                                                                                                 |
+
+### Adventure mode (early preview)
+
+When you create a world you choose **how you play**. **Colony** is the game as described everywhere else in this file: you command villagers from above. **Adventure** is the start of a different game on the same islands, where each player controls one character of their own instead. The mode is fixed when the world is created and saved with it; older worlds are colonies.
+
+What works so far:
+
+- **One character per player.** It appears on the shore beside the town hall the first time you join (each of the 8 players gets a spot of their own), and is where you left it when you come back, even after a server restart. Everyone sees everyone's character, drawn with a ring in the player's colour and their name above it, and as a dot in the player's colour on the minimap.
+- **Right-click to walk.** With nothing selected, right-click the ground and your character walks there by the shortest way (faster on paths). Right-click a tree, rock or building and you walk to the ground beside it. Only you can move your character. Selecting a villager or ship first keeps the colony controls: right-click orders that instead.
+- **The camera follows you.** Dragging the ground or pressing WASD lets go of it so you can look around; `C` or a new right-click brings it back.
+- **Your character counts as a foothold** on the island it stands on, sees a little further than a villager (6 tiles, and it uncovers the map as it goes), and keeps buildings from going up on top of it.
+- **Villagers still run the settlement** (they gather marked resources, raise buildings and staff workplaces by themselves) and the colony commands work as before. Nothing else about the economy changes yet.
+
+What is planned, in order: acting with your own hands (gather, build and carry goods to the stockpile), boarding and steering a ship as its captain with the rest of the crew at stations, ports run by NPCs with shops and quests, and retuning pirates, storms and costs for a crew of people rather than a fleet of villagers.
 
 ### Tribes
 
@@ -205,7 +220,7 @@ A storm front forms at the edge of the map every few minutes and drifts across t
 packages/shared   @explorer/shared: deterministic core used by client and server
   iso.ts            2:1 isometric projection and elevation-aware picking
   world/            seeded archipelago generation, island names, A* pathfinding
-  sim/              catalogue, state, commands, 10 Hz tick, pirates, weather, lookouts and diving, snapshots and patches
+  sim/              catalogue, state, commands, 10 Hz tick, pirates, weather, lookouts and diving, characters and walking, snapshots and patches
   protocol.ts       WebSocket message types
 packages/art      @explorer/art: the colour palette and the per-pixel terrain painter
   terrain/          smooth fields from the tile data, ray-marched land, cliffs and water
@@ -217,6 +232,7 @@ tools/sprites     palette extraction and the sprite generator → client/public/
 ```
 
 - **Server-authoritative co-op.** Each world is a room that runs `tick()` 10 times a second. It validates every command with `applyCommand()` and broadcasts a patch with only what changed.
+  - Every command is applied on behalf of the player who sent it (`applyCommand(state, cmd, actor)`). Commands about a player's own character, such as `move-character`, act on the actor's character and nobody else's; the rest are shared by the whole team.
   - Clients receive the world _seed_ plus a snapshot of the parts that change. They regenerate the terrain themselves.
   - Clients mirror state with `applyPatch()` and smooth movement between ticks.
 - **Offline mode** uses the same `tick()` and `applyCommand()` in the browser (`LocalSession`), so single-player and co-op behave identically.

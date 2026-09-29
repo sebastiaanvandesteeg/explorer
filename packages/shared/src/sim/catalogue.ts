@@ -347,6 +347,12 @@ export const VILLAGER = {
   reveal: 5,
 };
 
+/** A player's own character: a little quicker on its feet than a villager, and sees a little further. */
+export const CHARACTER = {
+  speed: 3,
+  reveal: 6,
+};
+
 export const SHIP = {
   cost: { wood: 40 } as Partial<Stock>,
   buildSeconds: 20,

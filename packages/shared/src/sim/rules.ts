@@ -116,11 +116,15 @@ export function canPlaceBuilding(
     }
   }
   for (const e of state.entities.values()) {
-    if (e.type !== "villager") continue;
+    if (e.type !== "villager" && e.type !== "character") continue;
     const vx = Math.floor(e.x);
     const vy = Math.floor(e.y);
     if (vx >= x && vx < x + fw && vy >= y && vy < y + fh && kind !== "path") {
-      return { ok: false, reason: "A villager is standing there" };
+      return {
+        ok: false,
+        reason:
+          e.type === "villager" ? "A villager is standing there" : "Someone is standing there",
+      };
     }
   }
   if (!opts.ignoreCost && !canAfford(state.stock, def.cost))
