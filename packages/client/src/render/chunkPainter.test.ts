@@ -29,7 +29,9 @@ describe("ChunkPainter", () => {
     const before = await painter.paint(home.cx, home.cy, rect);
     const masks = groundMasks(world, []);
     const th = world.start.townHall;
-    for (let x = th.x; x < th.x + 6; x++) masks.paved[(th.y + 4) * world.width + x] = 1;
+    // Flagstones under the town hall itself: its first tile is in the chunk being painted.
+    for (let y = th.y; y < th.y + 3; y++)
+      for (let x = th.x; x < th.x + 3; x++) masks.paved[y * world.width + x] = 1;
     painter.setMasks(masks);
     const after = await painter.paint(home.cx, home.cy, rect);
     expect(Buffer.from(after!.ground.buffer).equals(Buffer.from(before!.ground.buffer))).toBe(

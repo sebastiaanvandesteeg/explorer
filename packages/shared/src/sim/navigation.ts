@@ -53,7 +53,7 @@ export function seaPath(state: GameState, from: Tile, to: Tile): Tile[] | null {
       width: w.width,
       height: w.height,
       canMove: (_ax, _ay, bx, by) => sailable(state, bx, by),
-      maxNodes: 60_000,
+      maxNodes: 400_000,
     },
     from,
     [to],

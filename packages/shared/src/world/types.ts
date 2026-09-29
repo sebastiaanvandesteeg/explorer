@@ -138,8 +138,8 @@ export interface WorldMap {
   /** Island id per tile, or -1 for open water. Water tiles near an island carry its id too. */
   island: Int16Array;
   /**
-   * Biome index per tile (see BIOMES), reaching well out to sea so fog and water can take on a
-   * region's colours; NO_BIOME in the open ocean.
+   * Biome index per tile (see BIOMES): every tile, water included, belongs to a biome region, so
+   * fog and water take on its colours.
    */
   biome: Uint8Array;
   /** Chebyshev distance from water to the nearest land (0 on land, capped at 255). */

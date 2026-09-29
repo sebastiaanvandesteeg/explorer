@@ -136,7 +136,7 @@ export class Game {
       this.overlay.under,
       this.entities.container,
       this.entities.effects,
-      this.fog.sprite,
+      this.fog.container,
       this.overlay.over,
     );
     this.atmosphere = new AtmosphereLayer(atlas);
@@ -260,7 +260,7 @@ export class Game {
       now,
     );
     if (p.revealed?.length) {
-      this.fog.invalidate();
+      this.fog.invalidate(p.revealed);
       this.entities.revealed(p.revealed);
     }
     const buildingChanged = p.entities.some((e) => e.type === "building") || p.removed.length > 0;

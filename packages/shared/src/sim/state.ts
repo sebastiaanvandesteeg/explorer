@@ -658,6 +658,46 @@ export function settledIslands(state: GameState): Set<number> {
   return out;
 }
 
+/**
+ * Somewhere the team is: one point for each island it has buildings on (the first one built) and
+ * one for every ship. Pirates and storms form around these, so they find you wherever you are.
+ * `r` in [0, 1) picks one.
+ */
+export function presenceAt(state: GameState, r: number): { x: number; y: number } {
+  const points: { x: number; y: number }[] = [];
+  const islands = new Set<number>();
+  for (const e of state.entities.values()) {
+    if (e.type === "building") {
+      const island = islandAt(state, e.x, e.y);
+      if (islands.has(island)) continue;
+      islands.add(island);
+      points.push({ x: e.x + e.w / 2, y: e.y + e.h / 2 });
+    } else if (e.type === "ship") points.push({ x: e.x, y: e.y });
+  }
+  if (points.length === 0) {
+    const hall = state.world.start.townHall;
+    return { x: hall.x + 1.5, y: hall.y + 1.5 };
+  }
+  return points[Math.min(points.length - 1, Math.floor(r * points.length))]!;
+}
+
+/** A point `min`..`max` tiles from `at` in a direction picked by `angle` (0..1), kept on the map. */
+export function ringPoint(
+  world: { width: number; height: number },
+  at: { x: number; y: number },
+  min: number,
+  max: number,
+  angle: number,
+  reach: number,
+): { x: number; y: number } {
+  const a = angle * Math.PI * 2;
+  const d = min + reach * (max - min);
+  return {
+    x: Math.min(world.width - 4, Math.max(3, at.x + Math.cos(a) * d)),
+    y: Math.min(world.height - 4, Math.max(3, at.y + Math.sin(a) * d)),
+  };
+}
+
 export function isPathTile(state: GameState, x: number, y: number): boolean {
   const w = state.world;
   const k = tileIndex(w, x, y);

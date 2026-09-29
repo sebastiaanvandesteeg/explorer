@@ -25,6 +25,8 @@ import {
   islandAt,
   markDirty,
   pirateMaxHp,
+  presenceAt,
+  ringPoint,
   removeEntity,
   shipMaxHp,
   stockOf,
@@ -193,13 +195,13 @@ function spawnRaids(state: GameState): void {
 function spawnPirate(state: GameState, index: number): PirateEntity | null {
   const w = state.world;
   const hall = w.start.townHall;
+  // Raiders sail in from over the horizon of somewhere the team is: a settled island or a ship.
+  const target = presenceAt(state, hash2d(state.tick, index, 0x9a9));
   for (let attempt = 0; attempt < 80; attempt++) {
     const r = (salt: number) => hash2d(state.tick + index * 7919, attempt, 0x9a0 + salt);
-    const along = Math.floor(r(1) * (w.width - 8)) + 4;
-    const side = Math.floor(r(2) * 4);
-    const inset = 3;
-    const x = side === 0 ? inset : side === 1 ? w.width - 1 - inset : along;
-    const y = side === 2 ? inset : side === 3 ? w.height - 1 - inset : along;
+    const spot = ringPoint(w, target, PIRATE.spawnRing[0], PIRATE.spawnRing[1], r(1), r(2));
+    const x = Math.floor(spot.x);
+    const y = Math.floor(spot.y);
     if (!sailable(state, x, y)) continue;
     if (Math.hypot(x - hall.x, y - hall.y) < PIRATE.spawnDistance) continue;
     const p: PirateEntity = {

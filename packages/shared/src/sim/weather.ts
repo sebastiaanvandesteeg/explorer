@@ -9,6 +9,8 @@ import {
   addEntity,
   hasUpgrade,
   markDirty,
+  presenceAt,
+  ringPoint,
   removeEntity,
   tally,
   type GameState,
@@ -100,18 +102,13 @@ function spawnStorm(state: GameState): void {
   const [lo, hi] = WEATHER.interval;
   const r = (salt: number) => hash2d(state.tick, salt, 0x57a);
   state.nextStorm = state.time + (lo + r(1) * (hi - lo)) * rules.stormSpacing;
-  // Blow in from a random edge, aimed at somewhere in the middle third of the map.
-  const side = Math.floor(r(2) * 4);
-  const along = (0.15 + 0.7 * r(3)) * (side < 2 ? w.height : w.width);
-  const from =
-    side === 0
-      ? { x: 0, y: along }
-      : side === 1
-        ? { x: w.width, y: along }
-        : side === 2
-          ? { x: along, y: 0 }
-          : { x: along, y: w.height };
-  const aim = { x: w.width * (0.33 + 0.34 * r(4)), y: w.height * (0.33 + 0.34 * r(5)) };
+  // Form out at sea, some way from somewhere the team is, and blow across it.
+  const target = presenceAt(state, r(2));
+  const from = ringPoint(w, target, WEATHER.spawnRing[0], WEATHER.spawnRing[1], r(3), r(8));
+  const aim = {
+    x: target.x + (r(4) - 0.5) * 40,
+    y: target.y + (r(5) - 0.5) * 40,
+  };
   const d = dist(from, aim) || 1;
   const storm: StormEntity = {
     id: state.nextId++,

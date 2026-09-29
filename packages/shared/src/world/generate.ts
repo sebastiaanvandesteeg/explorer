@@ -3,15 +3,7 @@
 import { fbm } from "../noise";
 import { createRng, hash2d, hashSeed, type Rng } from "../rng";
 import { TRIBE_DEFS, type TribeId } from "../tribes";
-import {
-  BIOME_DEFS,
-  BIOMES,
-  biomeIndex,
-  NO_BIOME,
-  SIGNATURE,
-  type BiomeDef,
-  type BiomeId,
-} from "./biomes";
+import { BIOME_DEFS, BIOMES, biomeIndex, SIGNATURE, type BiomeDef, type BiomeId } from "./biomes";
 import { canStep, inBounds, isLandTerrain, NEIGHBOURS_4, NEIGHBOURS_8, tileIndex } from "./grid";
 import { findPath } from "./pathfind";
 import {
@@ -28,8 +20,35 @@ import {
   type WorldMap,
 } from "./types";
 
-export const WORLD_SIZE = 192;
 const HOME_RADIUS = 19;
+
+/**
+ * The archipelago is a grid of regions, each about as big as a whole world used to be and each
+ * belonging to one biome, which gets `ISLANDS_PER_BIOME` islands of its own (and some islets).
+ * Ten biomes fill ten of the twelve cells; the two furthest from home stay open sea.
+ */
+export const REGION_SIZE = 192;
+export const WORLD_COLS = 4;
+export const WORLD_ROWS = 3;
+export const WORLD_WIDTH = REGION_SIZE * WORLD_COLS;
+export const WORLD_HEIGHT = REGION_SIZE * WORLD_ROWS;
+export const ISLANDS_PER_BIOME = 3;
+
+export interface RegionLayout {
+  cols: number;
+  rows: number;
+  /** Tiles along one side of a region. */
+  region: number;
+}
+
+export const DEFAULT_REGIONS: RegionLayout = {
+  cols: WORLD_COLS,
+  rows: WORLD_ROWS,
+  region: REGION_SIZE,
+};
+
+/** The default grid, a custom one, or a number for a single small region (handy in tests). */
+export type WorldLayout = RegionLayout | number;
 
 interface IslandSeed extends Island {
   sx: number;
@@ -44,10 +63,12 @@ const REGION_REACH = 16;
 export function generateWorld(
   seed: string,
   tribe: TribeId = "islanders",
-  size = WORLD_SIZE,
+  layout: WorldLayout = DEFAULT_REGIONS,
 ): WorldMap {
+  const grid: RegionLayout =
+    typeof layout === "number" ? { cols: 1, rows: 1, region: layout } : layout;
   for (let attempt = 0; attempt < 24; attempt++) {
-    const world = attemptWorld(seed, tribe, attempt, size);
+    const world = attemptWorld(seed, tribe, attempt, grid);
     if (world) return world;
   }
   throw new Error(`could not generate a valid world for seed "${seed}"`);
@@ -57,18 +78,22 @@ function attemptWorld(
   seed: string,
   tribe: TribeId,
   attempt: number,
-  size: number,
+  grid: RegionLayout,
 ): WorldMap | null {
   const genSeed = attempt === 0 ? seed : `${seed}#${attempt}`;
   const base = hashSeed(genSeed);
   const rng = createRng(`${genSeed}:islands`);
-  const islands = placeIslands(rng, size, TRIBE_DEFS[tribe].homeBiome);
-  const partial = shapeTerrain(islands, base, size);
+  const width = grid.cols * grid.region;
+  const height = grid.rows * grid.region;
+  const regions = planRegions(rng, grid, TRIBE_DEFS[tribe].homeBiome);
+  const islands = placeRegionIslands(rng, grid, regions);
+  const waterBiome = regionBiomes(grid, regions, base);
+  const partial = shapeTerrain(islands, base, width, height, waterBiome);
   const world: WorldMap = {
     seed,
     tribe,
-    width: size,
-    height: size,
+    width,
+    height,
     ...partial,
     islands: islands.map(({ id, cx, cy, radius, biome, flavor, tiles }) => ({
       id,
@@ -146,13 +171,18 @@ function placeSignatureNodes(world: WorldMap, base: number, reserved: Set<number
 function placeSites(world: WorldMap, base: number): SiteSpawn[] {
   const sites: SiteSpawn[] = [];
   const home = world.start.townHall;
-  const wanted = { fortress: 3, ruin: 8 };
+  // Sites are spread over the whole sea: about one fortress in every eighty thousand tiles of
+  // it, and three ruins to a fortress. Fortresses lie far from home.
+  const area = world.width * world.height;
+  const fortresses = Math.max(1, Math.round(area / 48_000));
+  const wanted = { fortress: fortresses, ruin: fortresses * 3 };
+  const stride = 3;
   for (const kind of ["fortress", "ruin"] as const) {
-    const minHome = kind === "fortress" ? 55 : 22;
-    const spacing = kind === "fortress" ? 40 : 20;
+    const minHome = kind === "fortress" ? 100 : 22;
+    const spacing = kind === "fortress" ? 60 : 26;
     const candidates: { x: number; y: number; r: number }[] = [];
-    for (let y = 4; y < world.height - 4; y++) {
-      for (let x = 4; x < world.width - 4; x++) {
+    for (let y = 4; y < world.height - 4; y += stride) {
+      for (let x = 4; x < world.width - 4; x += stride) {
         const k = tileIndex(world, x, y);
         if (isLandTerrain(world.terrain[k]!) || world.shore[k]! < 4) continue;
         if (Math.hypot(x - home.x, y - home.y) < minHome) continue;
@@ -171,79 +201,48 @@ function placeSites(world: WorldMap, base: number): SiteSpawn[] {
   return sites;
 }
 
-function placeIslands(rng: Rng, size: number, homeBiome: BiomeId): IslandSeed[] {
-  const list: IslandSeed[] = [];
-  const add = (cx: number, cy: number, radius: number, flavor: IslandFlavor, stretch: number) => {
-    list.push({
-      id: list.length,
-      cx,
-      cy,
-      radius,
-      biome: homeBiome,
-      flavor,
-      tiles: 0,
-      sx: rng.float(1 - stretch, 1 + stretch),
-      sy: rng.float(1 - stretch, 1 + stretch),
-      rot: rng.float(0, Math.PI),
-      noiseSeed: rng.int(1, 0x7fffffff),
-    });
-  };
-  add(
-    size / 2 + rng.float(-4, 4),
-    size / 2 + rng.float(-4, 4),
-    HOME_RADIUS + rng.float(0, 3),
-    "home",
-    0.1,
-  );
-  const flavors: IslandFlavor[] = ["wooded", "fertile", "rocky"];
-  const target = rng.int(10, 14);
-  let placed = 0;
-  for (let tries = 0; tries < 900 && placed < target; tries++) {
-    const r = rng.float(7, 15);
-    const cx = rng.float(r + 7, size - r - 7);
-    const cy = rng.float(r + 7, size - r - 7);
-    if (list.some((o) => Math.hypot(o.cx - cx, o.cy - cy) < (o.radius + r) * 1.28 + 6)) continue;
-    add(cx, cy, r, flavors[rng.int(0, 2)]!, 0.25);
-    placed++;
-  }
-  assignBiomes(rng, list, homeBiome);
-  const islets = rng.int(14, 24);
-  let isletCount = 0;
-  for (let tries = 0; tries < 900 && isletCount < islets; tries++) {
-    const r = rng.float(1.3, 2.8);
-    const cx = rng.float(4, size - 4);
-    const cy = rng.float(4, size - 4);
-    if (list.some((o) => Math.hypot(o.cx - cx, o.cy - cy) < o.radius * 1.28 + r + 4)) continue;
-    add(cx, cy, r, "islet", 0.2);
-    // Islets belong to the nearest real island's biome.
-    const islet = list[list.length - 1]!;
-    let nearest = list[0]!;
-    for (const o of list) {
-      if (o.flavor === "islet") continue;
-      if (
-        Math.hypot(o.cx - cx, o.cy - cy) - o.radius <
-        Math.hypot(nearest.cx - cx, nearest.cy - cy) - nearest.radius
-      )
-        nearest = o;
-    }
-    islet.biome = nearest.biome;
-    isletCount++;
-  }
-  return list;
+interface Region {
+  col: number;
+  row: number;
+  x0: number;
+  y0: number;
+  x1: number;
+  y1: number;
+  cx: number;
+  cy: number;
+  biome: BiomeId;
 }
 
 /**
- * Spread every biome over the archipelago by distance from home: gentle tier-0 biomes nearby,
- * tier-1 further out and the hostile or magical tier-2 biomes at the edges.
+ * Give every biome a cell of the region grid. Home is the cell nearest the middle of the map;
+ * the others are dealt out by distance from it, gentle tier-0 biomes next door, tier-1 further
+ * out and the hostile or magical tier-2 biomes furthest. Cells beyond the last biome stay sea.
  */
-function assignBiomes(rng: Rng, list: IslandSeed[], homeBiome: BiomeId): void {
-  const home = list[0]!;
-  const others = list
-    .slice(1)
-    .sort(
-      (a, b) =>
-        Math.hypot(a.cx - home.cx, a.cy - home.cy) - Math.hypot(b.cx - home.cx, b.cy - home.cy),
-    );
+function planRegions(rng: Rng, grid: RegionLayout, homeBiome: BiomeId): Region[] {
+  const { cols, rows, region } = grid;
+  const cells: Region[] = [];
+  for (let row = 0; row < rows; row++)
+    for (let col = 0; col < cols; col++)
+      cells.push({
+        col,
+        row,
+        x0: col * region,
+        y0: row * region,
+        x1: (col + 1) * region,
+        y1: (row + 1) * region,
+        cx: (col + 0.5) * region,
+        cy: (row + 0.5) * region,
+        biome: homeBiome,
+      });
+  const mid = { x: (cols * region) / 2, y: (rows * region) / 2 };
+  const nearMid = (c: Region) => Math.hypot(c.cx - mid.x, c.cy - mid.y) + rng.float(0, 1e-3);
+  const keyed = cells.map((c) => ({ c, k: nearMid(c) })).sort((a, b) => a.k - b.k);
+  const home = keyed[0]!.c;
+  const others = cells
+    .filter((c) => c !== home)
+    .map((c) => ({ c, k: Math.hypot(c.cx - home.cx, c.cy - home.cy) + rng.float(0, 0.3 * region) }))
+    .sort((a, b) => a.k - b.k)
+    .map((e) => e.c);
   const shuffled = (tier: number) => {
     const ids = BIOMES.filter((b) => BIOME_DEFS[b].tier === tier && b !== homeBiome);
     for (let i = ids.length - 1; i > 0; i--) {
@@ -253,14 +252,160 @@ function assignBiomes(rng: Rng, list: IslandSeed[], homeBiome: BiomeId): void {
     return ids;
   };
   const sequence = [...shuffled(0), ...shuffled(1), ...shuffled(2)];
-  others.forEach((is, i) => {
-    is.biome =
-      sequence[Math.min(sequence.length - 1, Math.floor((i * sequence.length) / others.length))]!;
+  const used = [home];
+  others.slice(0, sequence.length).forEach((c, i) => {
+    c.biome = sequence[i]!;
+    used.push(c);
   });
+  return used;
 }
 
-function shapeTerrain(islands: IslandSeed[], base: number, size: number) {
-  const n = size * size;
+/** The islands of every region: home's own island first, then three to a biome, then islets. */
+function placeRegionIslands(rng: Rng, grid: RegionLayout, regions: Region[]): IslandSeed[] {
+  const region = grid.region;
+  const scale = Math.min(1, region / 192);
+  const list: IslandSeed[] = [];
+  const add = (
+    cx: number,
+    cy: number,
+    radius: number,
+    flavor: IslandFlavor,
+    stretch: number,
+    biome: BiomeId,
+  ) => {
+    list.push({
+      id: list.length,
+      cx,
+      cy,
+      radius,
+      biome,
+      flavor,
+      tiles: 0,
+      sx: rng.float(1 - stretch, 1 + stretch),
+      sy: rng.float(1 - stretch, 1 + stretch),
+      rot: rng.float(0, Math.PI),
+      noiseSeed: rng.int(1, 0x7fffffff),
+    });
+  };
+  const margin = Math.max(6, 14 * scale);
+  // A spot for a circle of radius r inside a region, clear of every island placed so far.
+  const spot = (
+    r: number,
+    reg: Region,
+    gap: number,
+    near?: { x: number; y: number; d: number },
+  ): { x: number; y: number } | null => {
+    for (let tries = 0; tries < 500; tries++) {
+      const cx = near
+        ? near.x + rng.float(-near.d, near.d)
+        : rng.float(reg.x0 + r + margin, reg.x1 - r - margin);
+      const cy = near
+        ? near.y + rng.float(-near.d, near.d)
+        : rng.float(reg.y0 + r + margin, reg.y1 - r - margin);
+      if (cx < reg.x0 + r + margin || cx > reg.x1 - r - margin) continue;
+      if (cy < reg.y0 + r + margin || cy > reg.y1 - r - margin) continue;
+      // The gap relaxes as tries run out, so a cramped region still gets its islands.
+      const g = gap * (1 - tries / 700);
+      if (list.some((o) => Math.hypot(o.cx - cx, o.cy - cy) < (o.radius + r) * 1.28 + g)) continue;
+      return { x: cx, y: cy };
+    }
+    return null;
+  };
+  const flavorsFor = (): IslandFlavor[] => {
+    const f: IslandFlavor[] = ["wooded", "fertile", "rocky"];
+    for (let i = f.length - 1; i > 0; i--) {
+      const j = rng.int(0, i);
+      [f[i], f[j]] = [f[j]!, f[i]!];
+    }
+    return f;
+  };
+  const gap = region * 0.16;
+  regions.forEach((reg, index) => {
+    const flavors = flavorsFor();
+    let count = ISLANDS_PER_BIOME;
+    if (index === 0) {
+      // Home: the town's island sits near the middle of its region.
+      const r = Math.min(HOME_RADIUS + rng.float(0, 3), region * 0.34);
+      const at = spot(r, reg, 0, { x: reg.cx, y: reg.cy, d: region * 0.1 }) ?? {
+        x: reg.cx,
+        y: reg.cy,
+      };
+      add(at.x, at.y, r, "home", 0.1, reg.biome);
+      count--;
+    }
+    for (let i = 0; i < count; i++) {
+      const r = rng.float(0.047, 0.088) * region;
+      const at = spot(r, reg, gap);
+      if (at) add(at.x, at.y, r, flavors[i % flavors.length]!, 0.25, reg.biome);
+    }
+  });
+  for (const reg of regions) {
+    const wanted = Math.max(1, Math.round(rng.int(5, 9) * scale * scale));
+    let placed = 0;
+    for (let tries = 0; tries < 600 && placed < wanted; tries++) {
+      const r = rng.float(1.3, 2.8);
+      const cx = rng.float(reg.x0 + 4, reg.x1 - 4);
+      const cy = rng.float(reg.y0 + 4, reg.y1 - 4);
+      if (list.some((o) => Math.hypot(o.cx - cx, o.cy - cy) < o.radius * 1.28 + r + 4)) continue;
+      add(cx, cy, r, "islet", 0.2, reg.biome);
+      placed++;
+    }
+  }
+  return list;
+}
+
+/**
+ * The biome of every water tile: each region's sea takes its colours, with borders that wander
+ * (a warped nearest-region rule) instead of running along the grid. Worked out at half the
+ * resolution, which is plenty for tints and moods.
+ */
+function regionBiomes(grid: RegionLayout, regions: Region[], base: number): Uint8Array {
+  const W = grid.cols * grid.region;
+  const H = grid.rows * grid.region;
+  const rng = createRng(`${base}:regions`);
+  const seeds = regions.map((r) => ({
+    x: r.cx + rng.float(-0.1, 0.1) * grid.region,
+    y: r.cy + rng.float(-0.1, 0.1) * grid.region,
+    index: biomeIndex(r.biome),
+  }));
+  const warp = grid.region * 0.28;
+  const seedX = base ^ 0x7e11;
+  const seedY = base ^ 0x7e12;
+  const hw = Math.ceil(W / 2);
+  const hh = Math.ceil(H / 2);
+  const coarse = new Uint8Array(hw * hh);
+  for (let j = 0; j < hh; j++) {
+    for (let i = 0; i < hw; i++) {
+      const x = i * 2 + 1;
+      const y = j * 2 + 1;
+      const wx = x + (fbm(x * 0.012, y * 0.012, seedX) - 0.5) * 2 * warp;
+      const wy = y + (fbm(x * 0.012, y * 0.012, seedY) - 0.5) * 2 * warp;
+      let best = seeds[0]!.index;
+      let bestD = Infinity;
+      for (const s of seeds) {
+        const d = (s.x - wx) ** 2 + (s.y - wy) ** 2;
+        if (d < bestD) {
+          bestD = d;
+          best = s.index;
+        }
+      }
+      coarse[j * hw + i] = best;
+    }
+  }
+  const out = new Uint8Array(W * H);
+  for (let y = 0; y < H; y++)
+    for (let x = 0; x < W; x++) out[y * W + x] = coarse[(y >> 1) * hw + (x >> 1)]!;
+  return out;
+}
+
+function shapeTerrain(
+  islands: IslandSeed[],
+  base: number,
+  W: number,
+  H: number,
+  waterBiome: Uint8Array,
+) {
+  const n = W * H;
   const heightField = new Float32Array(n).fill(-1);
   const island = new Int16Array(n).fill(-1);
   for (const is of islands) {
@@ -268,9 +413,9 @@ function shapeTerrain(islands: IslandSeed[], base: number, size: number) {
     const cos = Math.cos(is.rot);
     const sin = Math.sin(is.rot);
     const x0 = Math.max(0, Math.floor(is.cx - reach));
-    const x1 = Math.min(size - 1, Math.ceil(is.cx + reach));
+    const x1 = Math.min(W - 1, Math.ceil(is.cx + reach));
     const y0 = Math.max(0, Math.floor(is.cy - reach));
-    const y1 = Math.min(size - 1, Math.ceil(is.cy + reach));
+    const y1 = Math.min(H - 1, Math.ceil(is.cy + reach));
     for (let y = y0; y <= y1; y++) {
       for (let x = x0; x <= x1; x++) {
         const dx = x + 0.5 - is.cx;
@@ -282,7 +427,7 @@ function shapeTerrain(islands: IslandSeed[], base: number, size: number) {
         const rEff = is.radius * (is.flavor === "islet" ? 0.8 + 0.4 * wobble : 0.6 + 0.8 * wobble);
         let h = 1 - d / rEff;
         h += (fbm(x * 0.23, y * 0.23, is.noiseSeed ^ 0x5bd1e995) - 0.5) * 0.14;
-        const k = y * size + x;
+        const k = y * W + x;
         if (h > heightField[k]!) {
           heightField[k] = h;
           island[k] = is.id;
@@ -297,12 +442,12 @@ function shapeTerrain(islands: IslandSeed[], base: number, size: number) {
     NEIGHBOURS_4.reduce((c, [dx, dy]) => {
       const nx = x + dx;
       const ny = y + dy;
-      return c + (nx >= 0 && ny >= 0 && nx < size && ny < size ? land[ny * size + nx]! : 0);
+      return c + (nx >= 0 && ny >= 0 && nx < W && ny < H ? land[ny * W + nx]! : 0);
     }, 0);
   for (let pass = 0; pass < 2; pass++) {
-    for (let y = 0; y < size; y++) {
-      for (let x = 0; x < size; x++) {
-        const k = y * size + x;
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        const k = y * W + x;
         const c = landN4(x, y);
         if (land[k] && c <= 1) land[k] = 0;
         else if (!land[k] && c >= 3) {
@@ -316,9 +461,9 @@ function shapeTerrain(islands: IslandSeed[], base: number, size: number) {
   const flavorOf = (k: number): IslandFlavor => islands[island[k]!]?.flavor ?? "islet";
   const elevation = new Uint8Array(n);
   const cliffSeed = base ^ 0x1234567;
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      const k = y * size + x;
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const k = y * W + x;
       if (!land[k]) continue;
       const h = heightField[k]!;
       const flavor = flavorOf(k);
@@ -337,13 +482,13 @@ function shapeTerrain(islands: IslandSeed[], base: number, size: number) {
   // Mode filter removes single-tile bumps so plateaus stay buildable.
   for (let pass = 0; pass < 2; pass++) {
     const copy = elevation.slice();
-    for (let y = 1; y < size - 1; y++) {
-      for (let x = 1; x < size - 1; x++) {
-        const k = y * size + x;
+    for (let y = 1; y < H - 1; y++) {
+      for (let x = 1; x < W - 1; x++) {
+        const k = y * W + x;
         if (!land[k]) continue;
         const counts = [0, 0, 0, 0];
         for (const [dx, dy] of NEIGHBOURS_8) {
-          const nk = (y + dy) * size + x + dx;
+          const nk = (y + dy) * W + x + dx;
           if (land[nk]) counts[copy[nk]!]!++;
         }
         const mine = copy[k]!;
@@ -356,7 +501,8 @@ function shapeTerrain(islands: IslandSeed[], base: number, size: number) {
 
   // Shore distance, island attribution and biome regions for water, by multi-source BFS.
   const shore = new Uint8Array(n).fill(255);
-  const biome = new Uint8Array(n).fill(NO_BIOME);
+  // Water takes its region's biome; land and the sea close to it take the island's.
+  const biome = waterBiome.slice();
   const queue: number[] = [];
   for (let k = 0; k < n; k++) {
     if (land[k]) {
@@ -367,19 +513,19 @@ function shapeTerrain(islands: IslandSeed[], base: number, size: number) {
   }
   for (let head = 0; head < queue.length; head++) {
     const k = queue[head]!;
-    const x = k % size;
-    const y = Math.floor(k / size);
+    const x = k % W;
+    const y = Math.floor(k / W);
     const d = shore[k]!;
     if (d >= 254) continue;
     for (const [dx, dy] of NEIGHBOURS_8) {
       const nx = x + dx;
       const ny = y + dy;
-      if (nx < 0 || ny < 0 || nx >= size || ny >= size) continue;
-      const nk = ny * size + nx;
+      if (nx < 0 || ny < 0 || nx >= W || ny >= H) continue;
+      const nk = ny * W + nx;
       if (shore[nk]! <= d + 1) continue;
       shore[nk] = d + 1;
       island[nk] = d + 1 <= 6 ? island[k]! : -1;
-      biome[nk] = d + 1 <= REGION_REACH ? biome[k]! : NO_BIOME;
+      if (d + 1 <= REGION_REACH) biome[nk] = biome[k]!;
       queue.push(nk);
     }
   }
@@ -387,14 +533,14 @@ function shapeTerrain(islands: IslandSeed[], base: number, size: number) {
   // Interior level-0 pockets become level 1: beaches only exist near the water.
   for (let k = 0; k < n; k++) {
     if (!land[k] || elevation[k] !== 0) continue;
-    const x = k % size;
-    const y = Math.floor(k / size);
+    const x = k % W;
+    const y = Math.floor(k / W);
     let nearWater = false;
     for (let dy = -2; dy <= 2 && !nearWater; dy++)
       for (let dx = -2; dx <= 2; dx++) {
         const nx = x + dx;
         const ny = y + dy;
-        if (nx >= 0 && ny >= 0 && nx < size && ny < size && !land[ny * size + nx]) {
+        if (nx >= 0 && ny >= 0 && nx < W && ny < H && !land[ny * W + nx]) {
           nearWater = true;
           break;
         }
@@ -405,8 +551,8 @@ function shapeTerrain(islands: IslandSeed[], base: number, size: number) {
   const terrain = new Uint8Array(n);
   const rockSeed = base ^ 0x2468ace;
   for (let k = 0; k < n; k++) {
-    const x = k % size;
-    const y = Math.floor(k / size);
+    const x = k % W;
+    const y = Math.floor(k / W);
     if (!land[k]) {
       terrain[k] = shore[k]! <= 2 ? Terrain.Shallow : Terrain.Deep;
       continue;

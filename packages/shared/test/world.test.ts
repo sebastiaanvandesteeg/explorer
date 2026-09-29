@@ -7,7 +7,8 @@ import {
   isWater,
   tileIndex,
   Terrain,
-  WORLD_SIZE,
+  WORLD_WIDTH,
+  WORLD_HEIGHT,
 } from "../src";
 
 const same = (a: Uint8Array, b: Uint8Array) =>
@@ -32,7 +33,8 @@ describe("generateWorld", () => {
   const seeds = Array.from({ length: 50 }, (_, i) => `seed-${i}`);
   it.each(seeds)("builds a playable start island for %s", (seed) => {
     const w = generateWorld(seed);
-    expect(w.width).toBe(WORLD_SIZE);
+    expect(w.width).toBe(WORLD_WIDTH);
+    expect(w.height).toBe(WORLD_HEIGHT);
     const home = w.islands[w.start.islandId]!;
     expect(home.flavor).toBe("home");
     expect(home.tiles).toBeGreaterThan(450);

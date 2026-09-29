@@ -1343,28 +1343,32 @@ describe("storms", () => {
 });
 
 describe("signature goods", () => {
-  it("puts enough of every far biome's good on its islands, in every world", () => {
-    for (const tribe of TRIBES) {
-      for (const seed of ["goods-a", "goods-b", "sim-tests"]) {
-        const w = generateWorld(seed, tribe);
-        for (const [biome, sig] of Object.entries(SIGNATURE)) {
-          const islands = w.islands.filter((i) => i.biome === biome && i.flavor !== "islet");
-          if (islands.length === 0) continue;
-          const ids = new Set(islands.map((i) => i.id));
-          const deposits = w.nodes.filter(
-            (n) => n.kind === sig.node && ids.has(w.island[n.y * w.width + n.x]!),
-          );
-          expect(deposits.length, `${tribe}/${seed}: ${sig.node}`).toBeGreaterThanOrEqual(
-            sig.deposits,
-          );
-          const units = deposits.length * NODES[sig.node].amount;
-          expect(units, `${tribe}/${seed}: ${sig.node}`).toBeGreaterThanOrEqual(130);
+  it(
+    "puts enough of every far biome's good on its islands, in every world",
+    { timeout: 120_000 },
+    () => {
+      for (const tribe of TRIBES) {
+        for (const seed of ["goods-a", "goods-b", "sim-tests"]) {
+          const w = generateWorld(seed, tribe);
+          for (const [biome, sig] of Object.entries(SIGNATURE)) {
+            const islands = w.islands.filter((i) => i.biome === biome && i.flavor !== "islet");
+            if (islands.length === 0) continue;
+            const ids = new Set(islands.map((i) => i.id));
+            const deposits = w.nodes.filter(
+              (n) => n.kind === sig.node && ids.has(w.island[n.y * w.width + n.x]!),
+            );
+            expect(deposits.length, `${tribe}/${seed}: ${sig.node}`).toBeGreaterThanOrEqual(
+              sig.deposits,
+            );
+            const units = deposits.length * NODES[sig.node].amount;
+            expect(units, `${tribe}/${seed}: ${sig.node}`).toBeGreaterThanOrEqual(130);
+          }
+          const tiles = w.nodes.map((n) => n.y * w.width + n.x);
+          expect(new Set(tiles).size).toBe(tiles.length);
         }
-        const tiles = w.nodes.map((n) => n.y * w.width + n.x);
-        expect(new Set(tiles).size).toBe(tiles.length);
       }
-    }
-  });
+    },
+  );
 
   it("gives each far biome a good only it can yield", () => {
     const goods = signatureGoods();

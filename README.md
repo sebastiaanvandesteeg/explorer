@@ -86,6 +86,18 @@ You choose one of nine tribes when you start a world, and the whole co-op team p
 - The Cinderborn are the hard start: their home is the grim Infernal Isles, with little food and no ore of its own (the home island always gets enough ore for a blacksmith). The gentle biomes still lie nearest home.
 - A tribe's home biome never asks for its own signature good in the Great Work, so the Glowkin need no glowcap, the Mirefolk no mirepearl and the Cinderborn no hellstone.
 
+### The world
+
+The archipelago is **768 × 576 tiles**: a grid of 4 × 3 regions, each 192 × 192 tiles, about the size of a whole world in earlier versions. Ten of the twelve regions belong to a biome and the two furthest from home are open sea. Every biome gets **three islands of its own** (one wooded, one fertile, one rocky, so each region has wood, food and stone), plus five to nine islets; the home biome's three include your own island. The tribe's biome sits in the middle of the map, the gentle biomes around it, the hostile and magical ones towards the edges.
+
+- **Regions are big.** The sea belongs to a biome too, out to borders that wander instead of following the grid: sail out of Greenlands water and the fog, the colour grade, the ambience and the mood change on the way to the next region. The whole map is about ten times the area of the old one, so a scout takes a couple of minutes to cross it.
+- **Ships plan long routes.** Sea routes are searched with an exact-distance heuristic and a budget big enough to cross the map corner to corner.
+- **Sunken sites** are spread over the whole sea in proportion to its area: about nine fortresses (over a hundred tiles from home) and three times as many ruins.
+- **Raiders and storms come to you.** They form 55 to 85 tiles (raiders) or 85 to 115 tiles (storms) from somewhere your team is, either a settled island or one of your ships, picked at random, so a raid takes about as long to arrive wherever you are and outposts and far-flung ships are targets too.
+- **The chart** (`M`) and the minimap scale to fit, and the fog is drawn in blocks so uncovering sea stays cheap.
+
+Saves made before the world grew are not compatible: a world's terrain is rebuilt from its seed, and the same seed now makes a different, larger archipelago.
+
 ### Biomes
 
 Every island belongs to one of ten biomes, with its own ground, cliffs, plants, rocks and deposits. Gentle biomes lie near home; the hellish and magical ones are furthest out. When the camera moves over a biome, the mood shifts to match: a colour grade, a tinted vignette, particles and, for grim places, a dark gritty texture. Fog of war takes each region's colour, so the sea around the Infernal Isles fogs dark red before you even see them.
@@ -147,7 +159,7 @@ Each is learned once, for the whole team, and paid from the shared treasury with
 | Normal     | First raid after seven minutes, then one every few minutes, up to three ships at once                                                         |
 | Hard       | From five minutes (at dusk), more often, one extra raider each time, 40% tougher hulls, 25% harder-hitting guns and half again as much stolen |
 
-A raiding ship sails in from the edge of the map. It hunts the nearest ship of yours, or beaches beside a storehouse, camp or dock and robs a share of that island's stockpile for eight seconds before sailing off with the loot (more raiders arrive as the days pass). A red alert appears at the top of the screen for as long as raiders are in sight (see night, below), with the direction they are in and a **Look** button that takes the camera to them.
+A raiding ship sails in from over the horizon of your settlements and ships (see The world). It hunts the nearest ship of yours, or beaches beside a storehouse, camp or dock and robs a share of that island's stockpile for eight seconds before sailing off with the loot (more raiders arrive as the days pass). A red alert appears at the top of the screen for as long as raiders are in sight (see night, below), with the direction they are in and a **Look** button that takes the camera to them.
 
 - **Ships have hull points** (scout 30, cargo 45, patrol boat 70) and mend slowly beside a dock. A ship that sinks takes its passengers with it and leaves a wreck.
 - **Defences**, from cheap to grand:
@@ -197,7 +209,7 @@ Night is not only scenery:
 
 ### Storms
 
-A storm front forms at the edge of the map every few minutes and drifts across the sea for a couple of minutes, with rain and lightning over it. Any ship inside it, yours or a pirate's, loses hull points until it sails out, unless it is moored at a finished dock (within four tiles of the pier). A toast tells you when one forms, and an alert appears while one is closing on ships of yours that are out in the open. Cargo ships wait in port while a storm sits on their route. **Calm Waters** (magic house) makes your ships immune. In a Peaceful world storms are only weather; on Hard they hit half again as hard and come more often.
+A storm front forms out at sea, some way from your settlements or ships, every few minutes and drifts across the sea for a couple of minutes, with rain and lightning over it. Any ship inside it, yours or a pirate's, loses hull points until it sails out, unless it is moored at a finished dock (within four tiles of the pier). A toast tells you when one forms, and an alert appears while one is closing on ships of yours that are out in the open. Cargo ships wait in port while a storm sits on their route. **Calm Waters** (magic house) makes your ships immune. In a Peaceful world storms are only weather; on Hard they hit half again as hard and come more often.
 
 ### How a settlement grows
 

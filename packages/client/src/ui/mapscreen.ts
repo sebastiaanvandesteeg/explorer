@@ -127,7 +127,7 @@ export class MapScreen {
     const availH = Math.max(200, window.innerHeight - 130);
     // Each tile is a 2:1 rhombus: `a` wide by half that high.
     this.a = Math.max(
-      1,
+      0.25,
       Math.min(availW / (w.width + w.height), (availH * 2) / (w.width + w.height)),
     );
     this.b = this.a * (HALF_H / HALF_W);

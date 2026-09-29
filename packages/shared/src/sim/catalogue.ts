@@ -409,6 +409,11 @@ export const PIRATE = {
   stealShare: 0.04,
   /** A raider only spawns this far from the town hall. See DIFFICULTY_DEFS for the timings. */
   spawnDistance: 45,
+  /**
+   * Raiders form this far (min, max, in tiles) from somewhere the team has a presence, whatever
+   * the size of the world, so a raid always takes about the same time to arrive.
+   */
+  spawnRing: [55, 85] as const,
 };
 
 /** The Stormcaller spell: lightning at pirates near your ships and buildings. */
@@ -436,6 +441,8 @@ export const WEATHER = {
   radius: [7, 11] as const,
   life: [110, 170] as const,
   speed: 1.4,
+  /** Storms form this far (min, max, in tiles) from somewhere the team has a presence. */
+  spawnRing: [85, 115] as const,
   /** Hull points lost per second at full strength. */
   damage: 1.6,
   /** A ship this close to a finished dock is in harbour and safe. */

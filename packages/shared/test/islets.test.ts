@@ -77,8 +77,8 @@ describe("sea arches", () => {
         for (const b of arches)
           if (a !== b) expect(Math.hypot(a.x - b.x, a.y - b.y)).toBeGreaterThan(17);
       }
-      // A handful per world, not a crowd.
-      expect(arches.length).toBeLessThan(12);
+      // A few to a region, not a crowd.
+      expect(arches.length).toBeLessThan(40);
     }
     expect(seen).toBeGreaterThan(5);
   });

@@ -82,8 +82,10 @@ export function findPath(q: PathQuery, start: Tile, goals: readonly Tile[]): Til
       const d = Math.max(dx, dy) + (SQRT2 - 1) * Math.min(dx, dy);
       if (d < best) best = d;
     }
-    // Paths make walking cheaper, so scale the heuristic to stay admissible.
-    return best * 0.6;
+    // Paths make walking cheaper, so scale the heuristic to stay admissible. Without tile costs
+    // every step costs at least one, and the exact distance is the sharpest honest guess: long
+    // sea crossings depend on it.
+    return q.cost ? best * 0.6 : best;
   };
   const gScore = new Map<number, number>([[startKey, 0]]);
   const came = new Map<number, number>();
