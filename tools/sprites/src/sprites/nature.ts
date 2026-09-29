@@ -5,7 +5,7 @@ import { NODE_VARIANTS, Z_SCALE, type NodeKind } from "@explorer/shared";
 import { Canvas } from "../canvas";
 import { rocky } from "../materials";
 import { hash3, noise3, prng } from "../noise3";
-import { RAMPS, rampColor, shade, type RampName, type Rgba } from "../palette";
+import { RAMPS, hexToRgba, rampColor, shade, type RampName, type Rgba } from "../palette";
 import { flat, lit, Scene, type Material, type ShadeContext, type Vec3 } from "../raytrace";
 import { renderSprite, trimmed, type Sprite } from "../sprite";
 
@@ -604,25 +604,135 @@ function crystalCluster(v: number): Sprite {
   return renderSprite(`n_crystal_${v}`, s, 1, 1, 52, 10);
 }
 
-function seaRock(variant: number): Sprite {
-  const rand = prng(5000 + variant);
+/** A boulder formation: a main mass with lobes, mossy on top, lit from the upper left. */
+function boulders(
+  name: string,
+  seed: number,
+  size: number,
+  moss: number,
+  opts: { shadow: boolean; lobes: number },
+): Sprite {
+  const rand = prng(seed);
   const s = new Scene();
-  const mat = rocky("rock", 6, 0.25);
-  rock(s, rand, [0.5, 0.5, 2], [0.36, 0.3, 13], mat, 18);
-  rock(s, rand, [0.28 + rand() * 0.1, 0.72, 0], [0.18, 0.15, 6], mat, 12);
-  // Foam ring at the waterline.
-  const sprite = renderSprite(`sea_rock_${variant}`, s, 1, 1, 30, 8);
-  const c = sprite.canvas;
-  const out = new Canvas(c.width + 8, c.height + 4);
-  const foam = rampColor("foam", 3);
-  for (let i = 0; i < 40; i++) {
-    const a = (i / 40) * Math.PI * 2;
-    const fx = Math.round(sprite.anchorX + 4 + Math.cos(a) * 13);
-    const fy = Math.round(sprite.anchorY + 8 + Math.sin(a) * 6);
-    if (hash3(i, variant, 0, 3) > 0.2) out.set(fx, fy, foam);
+  if (opts.shadow) s.groundShadow = { x0: -0.2, y0: -0.2, x1: 1.25, y1: 1.25 };
+  const mat = rocky("rock", 6, moss);
+  const mainH = (9 + rand() * 5) * size;
+  rock(s, rand, [0.5, 0.5, 2], [0.4 * size, 0.33 * size, mainH], mat, 22);
+  const slots: [number, number][] = [
+    [0.24, 0.7],
+    [0.76, 0.3],
+    [0.7, 0.74],
+    [0.3, 0.26],
+  ];
+  for (let i = 0; i < opts.lobes; i++) {
+    const [x, y] = slots[(i + Math.floor(rand() * 2)) % slots.length]!;
+    const r = (0.16 + rand() * 0.08) * size;
+    rock(s, rand, [x, y, 0], [r, r * 0.85, (5 + rand() * 5) * size], mat, 12);
   }
-  out.draw(c, 4, 0);
-  return trimmed(sprite.name, out, sprite.anchorX + 4, sprite.anchorY);
+  return renderSprite(name, s, 1, 1, 34 * size, 8);
+}
+
+/** A ring of surf around a rock's base, with a few loose wave arcs beyond it. */
+function surf(canvas: Canvas, cx: number, cy: number, rx: number, ry: number, seed: number): void {
+  const white = rampColor("foam", 4);
+  const pale = rampColor("foam", 2);
+  const faint = hexToRgba("#a0c4b6", 190);
+  const n = 90;
+  for (let i = 0; i < n; i++) {
+    const a = (i / n) * Math.PI * 2;
+    const wob = 1 + (noise3(Math.cos(a) * 2 + seed, Math.sin(a) * 2, 0.5, 7) - 0.5) * 0.35;
+    const front = Math.sin(a) > -0.2;
+    const x = Math.round(cx + Math.cos(a) * rx * wob);
+    const y = Math.round(cy + Math.sin(a) * ry * wob);
+    if (hash3(i, seed, 0, 8) > 0.12) {
+      canvas.set(x, y, white);
+      if (front && hash3(i, seed, 1, 8) > 0.35) canvas.set(x, y + 1, pale);
+    }
+    // A paler, broken ring just outside.
+    const x2 = Math.round(cx + Math.cos(a) * (rx + 2.5) * wob);
+    const y2 = Math.round(cy + Math.sin(a) * (ry + 1.5) * wob);
+    if (hash3(i, seed, 2, 8) > 0.5) canvas.blend(x2, y2, faint);
+  }
+  // Two swooshes trailing off to either side.
+  for (const side of [-1, 1]) {
+    const len = 6 + Math.floor(hash3(side, seed, 3, 8) * 5);
+    for (let k = 0; k < len; k++) {
+      const x = Math.round(cx + side * (rx + 3 + k));
+      const y = Math.round(cy + ry * 0.55 + Math.sin(k * 0.5) * 0.9);
+      canvas.set(x, y, k < len - 3 ? pale : faint);
+    }
+  }
+}
+
+function seaRock(variant: number): Sprite {
+  const size = [1, 0.85, 1.15, 0.7][variant]!;
+  const rock = boulders(`sea_rock_${variant}`, 5000 + variant * 17, size, 0.5, {
+    shadow: false,
+    lobes: variant === 3 ? 1 : 2,
+  });
+  const out = new Canvas(rock.canvas.width + 30, rock.canvas.height + 14);
+  const ax = rock.anchorX + 15;
+  const ay = rock.anchorY;
+  // The rock's footprint centre sits half a tile below its anchor (the tile's top vertex).
+  surf(out, ax, ay + 8, 13 * size, 5.6 * size, variant + 1);
+  out.draw(rock.canvas, 15, 0);
+  return trimmed(rock.name, out, ax, ay);
+}
+
+/**
+ * A natural rock arch standing in the shallows on two water tiles: variant 0 spans +x, variant 1
+ * spans +y. Two mossy legs carry a lintel, with the sea running through the gap.
+ */
+function seaArch(variant: number): Sprite {
+  const rand = prng(5400 + variant * 31);
+  const s = new Scene();
+  const mat = rocky("rock", 6, 0.5);
+  // Along the span axis the legs stand on the two tile centres; across it, mid-tile.
+  const at = (along: number, across: number): [number, number] =>
+    variant === 0 ? [along, across] : [across, along];
+  const leg = (along: number, h: number) => {
+    const [x, y] = at(along, 0.5);
+    rock(s, rand, [x, y, h / 2], [0.23, 0.29, h / 2 + 2], mat, 20);
+  };
+  // Seen from the diagonal the tunnel is foreshortened, so the legs stand well apart.
+  leg(0.27, 36 + rand() * 4);
+  leg(1.73, 32 + rand() * 4);
+  // The lintel: a long, thin rock resting on both legs.
+  const [lx, ly] = at(1.0, 0.5);
+  s.withYaw(variant === 0 ? 0 : Math.PI / 2, [lx, ly], () => {
+    rock(s, rand, [lx, ly, 31], [0.98, 0.21, 5.5], mat, 18);
+  });
+  rock(s, rand, [...at(0.62, 0.78), 3], [0.16, 0.14, 7], mat, 10);
+  const w = variant === 0 ? 2 : 1;
+  const d = variant === 0 ? 1 : 2;
+  const rocks = renderSprite(`sea_arch_${variant}`, s, w, d, 48, 8);
+  const out = new Canvas(rocks.canvas.width + 44, rocks.canvas.height + 20);
+  const ax = rocks.anchorX + 22;
+  const ay = rocks.anchorY + 4;
+  // Surf around each foot: tile (0, 0) is centred half a tile below the anchor, its neighbour
+  // one tile-diagonal further along the span.
+  const feet: [number, number][] =
+    variant === 0
+      ? [
+          [0, 8],
+          [16, 16],
+        ]
+      : [
+          [0, 8],
+          [-16, 16],
+        ];
+  feet.forEach(([dx, dy], i) => surf(out, ax + dx, ay + dy, 12, 5.2, 11 + variant * 2 + i));
+  out.draw(rocks.canvas, 22, 4);
+  return trimmed(rocks.name, out, ax, ay);
+}
+
+/** Land boulders for the shore: like sea rocks but with a shadow and no surf. */
+function shoreRock(variant: number): Sprite {
+  const size = [0.8, 0.62, 0.95, 0.5][variant]!;
+  return boulders(`shore_rock_${variant}`, 5200 + variant * 23, size, 0.4, {
+    shadow: true,
+    lobes: variant === 3 ? 0 : 1 + (variant % 2),
+  });
 }
 
 // --- Regrowth stages --------------------------------------------------------------------------
@@ -757,8 +867,10 @@ export function natureSprites(): Sprite[] {
     ...range(V.blossom_tree).map(blossom),
     bush("n_flower_bush_0", 6700, "blossomGround", 0.26, dots("petal", 0.16, 33, 0.25), 0.05),
     bush("n_flower_bush_bare", 6700, "blossomGround", 0.26, undefined, 0.05),
-    seaRock(0),
-    seaRock(1),
+    ...[0, 1, 2, 3].map(seaRock),
+    seaArch(0),
+    seaArch(1),
+    ...[0, 1, 2, 3].map(shoreRock),
     ...(["wood", "charred", "stalk", "silver"] as RegrowStyle[]).flatMap((st) => [
       stump(st),
       sapling(st),

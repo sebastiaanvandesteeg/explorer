@@ -16,7 +16,7 @@ import {
   type Opening,
 } from "../materials";
 import { hash3, prng } from "../noise3";
-import { rampColor, shade, type RampName } from "../palette";
+import { RAMPS, hexToRgba, rampColor, shade, type RampName } from "../palette";
 import { flat, lit, project, Scene, type Material, type Vec3 } from "../raytrace";
 import { renderSprite, type Sprite } from "../sprite";
 import { canopy, dots, foliage, strand } from "./nature";
@@ -465,26 +465,23 @@ function mine(st: Style): Sprite {
 function farm(st: Style, stage: 0 | 1 | 2): Sprite {
   const s = new Scene();
   s.groundShadow = { x0: -0.2, y0: -0.2, x1: 3.3, y1: 3.3 };
-  s.box(
-    [0.12, 0.12, 0],
-    [2.88, 2.88, 1.5],
-    (c) => {
-      const furrow = (c.lp[0] * 4.65) % 1 < 0.4;
-      return shade("soil", lit(c, furrow ? -0.25 : 0), c.px, c.py, 0.2);
-    },
-    { castsShadow: false },
-  );
+  // No soil here: the terrain paints the ploughed field, with an organic edge, under the sprite.
+  // Crops stand on its ridges (five rows to a tile), thinning out and ragged toward the fence.
   if (stage > 0) {
-    for (let i = 0; i < 12; i++) {
-      const x = 0.3 + i * 0.215;
-      if (x > 2.75) break;
-      for (let j = 0; j < 12; j++) {
-        const y = 0.3 + j * 0.215;
+    const rand = prng(7300 + stage);
+    for (let row = 0; row < 15; row++) {
+      const x = (row + 0.68) / 5;
+      if (x < 0.15 || x > 2.85) continue;
+      for (let j = 0; j < 17; j++) {
+        const y = 0.22 + j * 0.16 + (rand() - 0.5) * 0.05;
+        if (y > 2.85) break;
         if (x < 0.95 && y < 0.95) continue;
-        const h = stage === 1 ? 3 : 9;
+        const edge = Math.min(x, y, 3 - x, 3 - y);
+        if (rand() < (edge < 0.45 ? 0.5 : 0.07)) continue;
+        const h = (stage === 1 ? 3 : 9) * (0.75 + rand() * 0.5);
         s.ellipsoid(
-          [x, y, 1.5 + h / 2],
-          [0.09, 0.09, h / 2],
+          [x + (rand() - 0.5) * 0.03, y, h / 2],
+          [0.085, 0.085, h / 2],
           stage === 1 ? flat("sprout") : flat("wheat", 0.08),
           { castsShadow: stage === 2 },
         );
@@ -724,6 +721,47 @@ export function scaffold(w: number, h: number): Sprite {
   return renderSprite(`scaffold_${w}x${h}`, s, w, h, height + 12, 8);
 }
 
+/** Colours that read as light: lit window glass and the fire of a forge. */
+const LIGHT_COLOURS = new Set(
+  [...RAMPS.glass.slice(2), ...RAMPS.fire.slice(2)].map((h) => hexToRgba(h).slice(0, 3).join(",")),
+);
+
+/**
+ * Where a building shines at night: the warm pixels of its lit windows and fires, grouped into
+ * small clusters, as offsets from the sprite's anchor with a glow radius. The game turns each
+ * into a soft glow that comes up at dusk.
+ */
+export function findLights(sprite: Sprite): { x: number; y: number; r: number }[] {
+  const cell = 6;
+  const groups = new Map<string, { x: number; y: number; n: number }>();
+  for (let y = 0; y < sprite.canvas.height; y++)
+    for (let x = 0; x < sprite.canvas.width; x++) {
+      const [r, g, b, a] = sprite.canvas.get(x, y);
+      if (a < 255 || !LIGHT_COLOURS.has(`${r},${g},${b}`)) continue;
+      const key = `${Math.floor(x / cell)},${Math.floor(y / cell)}`;
+      const group = groups.get(key) ?? { x: 0, y: 0, n: 0 };
+      group.x += x;
+      group.y += y;
+      group.n++;
+      groups.set(key, group);
+    }
+  return [...groups.values()]
+    .sort((a, b) => b.n - a.n)
+    .slice(0, 6)
+    .map((g) => ({
+      x: Math.round(g.x / g.n - sprite.anchorX),
+      y: Math.round(g.y / g.n - sprite.anchorY),
+      r: Math.round(9 + 2.2 * Math.sqrt(g.n)),
+    }));
+}
+
+/** Give a finished building sprite its night lights, if it has any. */
+function withLights(sprite: Sprite): Sprite {
+  if (sprite.name.startsWith("b_farm")) return sprite;
+  const lights = findLights(sprite);
+  return lights.length === 0 ? sprite : { ...sprite, meta: { ...sprite.meta, lights } };
+}
+
 export function buildingSprites(): Sprite[] {
   const out: Sprite[] = [];
   for (const tribe of TRIBES) {
@@ -754,5 +792,5 @@ export function buildingSprites(): Sprite[] {
   ] as const) {
     out.push(scaffold(w, h));
   }
-  return out;
+  return out.map(withLights);
 }

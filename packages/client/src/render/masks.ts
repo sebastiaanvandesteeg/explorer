@@ -1,15 +1,8 @@
-// Soft, smooth overlays drawn from per-tile masks: fog of war and the shallow-water glow around
-// islands. A small canvas (a few pixels per tile) is blurred and mapped onto the isometric grid
-// with an affine transform, which gives the gentle gradients of the concept art without tile steps.
-// Both take their colour from the biome region, so fog around the Infernal Isles is dark red.
-import {
-  BIOMES,
-  HALF_H,
-  HALF_W,
-  isLandTerrain,
-  type GameState,
-  type WorldMap,
-} from "@explorer/shared";
+// Fog of war as a soft overlay drawn from a per-tile mask. A small canvas (a few pixels per tile)
+// is blurred and mapped onto the isometric grid with an affine transform, which gives gentle
+// gradients without tile steps. It takes its colour from the biome region, so fog around the
+// Infernal Isles is dark red.
+import { BIOMES, HALF_H, HALF_W, type GameState, type WorldMap } from "@explorer/shared";
 import { Matrix, Sprite, Texture } from "pixi.js";
 import { ATMOSPHERE, OCEAN } from "./biomeStyle";
 
@@ -120,31 +113,4 @@ export class FogLayer {
     blurInto(this.soft, this.raw, 1.6);
     this.texture.source.update();
   }
-}
-
-/** Glow in the shallows around every coast, tinted by the island's biome (static per world). */
-export function shallowGlow(state: GameState): Sprite {
-  const w = state.world;
-  const raw = document.createElement("canvas");
-  const soft = document.createElement("canvas");
-  for (const c of [raw, soft]) {
-    c.width = w.width * PX_PER_TILE;
-    c.height = w.height * PX_PER_TILE;
-  }
-  const ctx = raw.getContext("2d")!;
-  const alpha = [0, 0.62, 0.42, 0.22, 0.08];
-  for (let y = 0; y < w.height; y++) {
-    for (let x = 0; x < w.width; x++) {
-      const k = y * w.width + x;
-      const d = isLandTerrain(w.terrain[k]!) ? 1 : w.shore[k]!;
-      const a = alpha[d] ?? 0;
-      if (a <= 0) continue;
-      const biome = BIOMES[w.biome[k]!];
-      const [r, g, b] = (biome ? ATMOSPHERE[biome] : OCEAN).glow;
-      ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${a})`;
-      ctx.fillRect(x * PX_PER_TILE, y * PX_PER_TILE, PX_PER_TILE, PX_PER_TILE);
-    }
-  }
-  blurInto(soft, raw, 2.2);
-  return isoSprite(soft).sprite;
 }

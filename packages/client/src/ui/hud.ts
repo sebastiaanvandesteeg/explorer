@@ -3,6 +3,8 @@ import {
   BUILDINGS,
   canAfford,
   CHURCH,
+  clockText,
+  dayPeriod,
   discoveryName,
   FARM,
   MARKET_BUYABLE,
@@ -97,6 +99,8 @@ export class Hud {
     buttons: { el: HTMLButtonElement; enabled: () => boolean }[];
   } = { buttons: [] };
   private playersEl: HTMLElement;
+  private clockEl: HTMLElement;
+  private clockShown = "";
   private statusEl: HTMLElement;
   private toastsEl: HTMLElement;
   private chatLog: HTMLElement;
@@ -188,6 +192,7 @@ export class Hud {
     this.selectionEl = h("div.selection.panel");
     this.statusEl = h("div.status");
     this.playersEl = h("div");
+    this.clockEl = h("div.clock", { title: "Time of day: the same for everyone in the world" });
     const tribeDef = TRIBE_DEFS[tribe];
     const players = h(
       "div.players.panel",
@@ -198,6 +203,7 @@ export class Hud {
         h("span.dot", { style: { background: tribeDef.banner } }),
         `Expedition · ${tribeDef.name}`,
       ),
+      this.clockEl,
       this.playersEl,
       inviteUrl
         ? h(
@@ -348,6 +354,16 @@ export class Hud {
     );
     this.chatLog.append(h("div.line", {}, who, text));
     while (this.chatLog.children.length > 8) this.chatLog.firstElementChild!.remove();
+  }
+
+  /** Show the day, the part of the day and the time; only touches the page when it changes. */
+  setClock(phase: number, day: number): void {
+    const period = dayPeriod(phase);
+    const text = `Day ${day} · ${period} · ${clockText(phase)}`;
+    if (text === this.clockShown) return;
+    this.clockShown = text;
+    const night = period === "Night";
+    this.clockEl.replaceChildren(h(`span.orb${night ? ".moon" : ""}`), text);
   }
 
   setPlayers(players: PlayerInfo[], you: string, status: SessionStatus): void {

@@ -40,15 +40,17 @@ async function startOnline(worldId: string, name: string): Promise<void> {
 
 async function startOffline(name: string, seed: string, tribe: TribeId): Promise<void> {
   const reveal = params.has("reveal") ? "&reveal" : "";
+  const phase = params.has("phase") ? `&phase=${encodeURIComponent(params.get("phase")!)}` : "";
   history.replaceState(
     null,
     "",
-    `/?offline&seed=${encodeURIComponent(seed)}&tribe=${tribe}${reveal}`,
+    `/?offline&seed=${encodeURIComponent(seed)}&tribe=${tribe}${reveal}${phase}`,
   );
   const done = loading("Generating islands…");
   const assets = await atlas();
   const session = new LocalSession(seed, name, tribe);
-  // Dev aid for reviewing art: `&reveal` lifts the fog in offline games.
+  // Dev aids for reviewing art: `&reveal` lifts the fog in offline games, and `&phase=0.8` freezes
+  // the time of day (0 is sunrise, 0.25 noon, 0.5 sunset, 0.8 night).
   if (params.has("reveal")) session.state.explored.fill(1);
   done();
   await Game.create(root, session, assets);

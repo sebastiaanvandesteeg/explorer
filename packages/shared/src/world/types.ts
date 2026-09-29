@@ -70,10 +70,11 @@ export const NODE_KINDS = [
 /** Harvestable things placed by world generation. */
 export type NodeKind = (typeof NODE_KINDS)[number];
 /**
- * Purely visual decoration; never blocks villagers (sea rocks do block ships). Clients pick the
- * sprite from the tile's biome: small ground cover (two variants) or a taller plant.
+ * Purely visual decoration; never blocks villagers (sea rocks and arches do block ships). Clients
+ * pick the sprite from the tile's biome: small ground cover (two variants) or a taller plant. A
+ * sea arch stands on two water tiles: (x, y) and the one beside it along +x (variant 0) or +y.
  */
-export type DecoKind = "small" | "tall" | "sea_rock";
+export type DecoKind = "small" | "tall" | "sea_rock" | "sea_arch";
 
 export interface NodeSpawn {
   kind: NodeKind;

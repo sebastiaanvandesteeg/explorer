@@ -12,6 +12,18 @@
      "x": 11.999999999999998,
      "y": -37.6
     }
+   ],
+   "lights": [
+    {
+     "x": -3,
+     "y": 6,
+     "r": 13
+    },
+    {
+     "x": 1,
+     "y": 8,
+     "r": 11
+    }
    ]
   },
   "b_blacksmith_northfolk": {
@@ -22,6 +34,18 @@
     {
      "x": 11.999999999999998,
      "y": -37.6
+    }
+   ],
+   "lights": [
+    {
+     "x": -3,
+     "y": 6,
+     "r": 13
+    },
+    {
+     "x": 1,
+     "y": 8,
+     "r": 11
     }
    ]
   },
@@ -34,6 +58,18 @@
      "x": 11.999999999999998,
      "y": -37.6
     }
+   ],
+   "lights": [
+    {
+     "x": -3,
+     "y": 5,
+     "r": 16
+    },
+    {
+     "x": 1,
+     "y": 7,
+     "r": 16
+    }
    ]
   },
   "b_blacksmith_sylvan": {
@@ -45,27 +81,167 @@
      "x": 11.999999999999998,
      "y": -37.6
     }
+   ],
+   "lights": [
+    {
+     "x": 2,
+     "y": 7,
+     "r": 15
+    },
+    {
+     "x": -2,
+     "y": 7,
+     "r": 12
+    }
    ]
   },
   "b_church_islanders": {
    "page": 0,
    "anchorX": 40,
-   "anchorY": 53
+   "anchorY": 53,
+   "lights": [
+    {
+     "x": -9,
+     "y": 16,
+     "r": 18
+    },
+    {
+     "x": 12,
+     "y": 4,
+     "r": 17
+    },
+    {
+     "x": 12,
+     "y": 8,
+     "r": 16
+    },
+    {
+     "x": -9,
+     "y": 20,
+     "r": 15
+    },
+    {
+     "x": 2,
+     "y": 10,
+     "r": 14
+    },
+    {
+     "x": 1,
+     "y": 10,
+     "r": 14
+    }
+   ]
   },
   "b_church_northfolk": {
    "page": 0,
    "anchorX": 40,
-   "anchorY": 53
+   "anchorY": 53,
+   "lights": [
+    {
+     "x": -9,
+     "y": 16,
+     "r": 18
+    },
+    {
+     "x": 12,
+     "y": 4,
+     "r": 17
+    },
+    {
+     "x": 12,
+     "y": 8,
+     "r": 16
+    },
+    {
+     "x": -9,
+     "y": 20,
+     "r": 15
+    },
+    {
+     "x": 2,
+     "y": 10,
+     "r": 14
+    },
+    {
+     "x": 1,
+     "y": 10,
+     "r": 14
+    }
+   ]
   },
   "b_church_sunfolk": {
    "page": 0,
    "anchorX": 40,
-   "anchorY": 36
+   "anchorY": 36,
+   "lights": [
+    {
+     "x": -9,
+     "y": 15,
+     "r": 18
+    },
+    {
+     "x": 12,
+     "y": 8,
+     "r": 17
+    },
+    {
+     "x": 12,
+     "y": 4,
+     "r": 16
+    },
+    {
+     "x": -9,
+     "y": 19,
+     "r": 16
+    },
+    {
+     "x": 2,
+     "y": 9,
+     "r": 14
+    },
+    {
+     "x": 1,
+     "y": 10,
+     "r": 13
+    }
+   ]
   },
   "b_church_sylvan": {
    "page": 0,
    "anchorX": 40,
-   "anchorY": 47
+   "anchorY": 47,
+   "lights": [
+    {
+     "x": -9,
+     "y": 16,
+     "r": 18
+    },
+    {
+     "x": 12,
+     "y": 4,
+     "r": 17
+    },
+    {
+     "x": 12,
+     "y": 8,
+     "r": 16
+    },
+    {
+     "x": -9,
+     "y": 20,
+     "r": 15
+    },
+    {
+     "x": 2,
+     "y": 11,
+     "r": 13
+    },
+    {
+     "x": 1,
+     "y": 11,
+     "r": 13
+    }
+   ]
   },
   "b_farm_0_islanders": {
    "page": 0,
@@ -136,6 +312,18 @@
      "x": 9.600000000000001,
      "y": -36.519999999999996
     }
+   ],
+   "lights": [
+    {
+     "x": 7,
+     "y": 12,
+     "r": 15
+    },
+    {
+     "x": -18,
+     "y": 7,
+     "r": 14
+    }
    ]
   },
   "b_house_northfolk": {
@@ -147,17 +335,93 @@
      "x": 9.600000000000001,
      "y": -36.519999999999996
     }
+   ],
+   "lights": [
+    {
+     "x": 8,
+     "y": 12,
+     "r": 13
+    },
+    {
+     "x": -19,
+     "y": 6,
+     "r": 13
+    },
+    {
+     "x": -18,
+     "y": 7,
+     "r": 13
+    },
+    {
+     "x": 7,
+     "y": 13,
+     "r": 13
+    }
    ]
   },
   "b_house_sunfolk": {
    "page": 0,
    "anchorX": 24,
-   "anchorY": 29
+   "anchorY": 29,
+   "lights": [
+    {
+     "x": 8,
+     "y": 12,
+     "r": 13
+    },
+    {
+     "x": 7,
+     "y": 13,
+     "r": 13
+    },
+    {
+     "x": -19,
+     "y": 6,
+     "r": 12
+    },
+    {
+     "x": -18,
+     "y": 8,
+     "r": 12
+    },
+    {
+     "x": -18,
+     "y": 6,
+     "r": 11
+    },
+    {
+     "x": -19,
+     "y": 7,
+     "r": 11
+    }
+   ]
   },
   "b_house_sylvan": {
    "page": 0,
    "anchorX": 19,
-   "anchorY": 23
+   "anchorY": 23,
+   "lights": [
+    {
+     "x": -7,
+     "y": 11,
+     "r": 14
+    },
+    {
+     "x": 6,
+     "y": 11,
+     "r": 14
+    },
+    {
+     "x": -8,
+     "y": 11,
+     "r": 12
+    },
+    {
+     "x": 5,
+     "y": 13,
+     "r": 11
+    }
+   ]
   },
   "b_lumber_camp_islanders": {
    "page": 0,
@@ -188,6 +452,33 @@
      "x": 0,
      "y": -62
     }
+   ],
+   "lights": [
+    {
+     "x": 9,
+     "y": -4,
+     "r": 16
+    },
+    {
+     "x": -10,
+     "y": -14,
+     "r": 14
+    },
+    {
+     "x": 6,
+     "y": 19,
+     "r": 13
+    },
+    {
+     "x": -9,
+     "y": -12,
+     "r": 13
+    },
+    {
+     "x": 6,
+     "y": 17,
+     "r": 13
+    }
    ]
   },
   "b_magic_house_northfolk": {
@@ -198,6 +489,33 @@
     {
      "x": 0,
      "y": -62
+    }
+   ],
+   "lights": [
+    {
+     "x": -10,
+     "y": -14,
+     "r": 14
+    },
+    {
+     "x": 6,
+     "y": 19,
+     "r": 13
+    },
+    {
+     "x": -9,
+     "y": -12,
+     "r": 13
+    },
+    {
+     "x": 6,
+     "y": 17,
+     "r": 13
+    },
+    {
+     "x": 9,
+     "y": -2,
+     "r": 12
     }
    ]
   },
@@ -210,6 +528,33 @@
      "x": 0,
      "y": -62
     }
+   ],
+   "lights": [
+    {
+     "x": 9,
+     "y": -3,
+     "r": 16
+    },
+    {
+     "x": -10,
+     "y": -14,
+     "r": 14
+    },
+    {
+     "x": 6,
+     "y": 19,
+     "r": 13
+    },
+    {
+     "x": -9,
+     "y": -12,
+     "r": 13
+    },
+    {
+     "x": 6,
+     "y": 17,
+     "r": 13
+    }
    ]
   },
   "b_magic_house_sylvan": {
@@ -220,6 +565,33 @@
     {
      "x": 0,
      "y": -62
+    }
+   ],
+   "lights": [
+    {
+     "x": 9,
+     "y": -3,
+     "r": 16
+    },
+    {
+     "x": -10,
+     "y": -14,
+     "r": 14
+    },
+    {
+     "x": 6,
+     "y": 19,
+     "r": 13
+    },
+    {
+     "x": -9,
+     "y": -12,
+     "r": 13
+    },
+    {
+     "x": 6,
+     "y": 17,
+     "r": 13
     }
    ]
   },
@@ -246,22 +618,50 @@
   "b_mine_islanders": {
    "page": 0,
    "anchorX": 20,
-   "anchorY": 12
+   "anchorY": 12,
+   "lights": [
+    {
+     "x": -5,
+     "y": 10,
+     "r": 14
+    }
+   ]
   },
   "b_mine_northfolk": {
    "page": 0,
    "anchorX": 20,
-   "anchorY": 12
+   "anchorY": 12,
+   "lights": [
+    {
+     "x": -5,
+     "y": 10,
+     "r": 14
+    }
+   ]
   },
   "b_mine_sunfolk": {
    "page": 0,
    "anchorX": 20,
-   "anchorY": 12
+   "anchorY": 12,
+   "lights": [
+    {
+     "x": -5,
+     "y": 10,
+     "r": 14
+    }
+   ]
   },
   "b_mine_sylvan": {
    "page": 0,
    "anchorX": 20,
-   "anchorY": 12
+   "anchorY": 12,
+   "lights": [
+    {
+     "x": -5,
+     "y": 10,
+     "r": 14
+    }
+   ]
   },
   "b_quarry_islanders": {
    "page": 0,
@@ -312,6 +712,38 @@
      "x": 23.200000000000003,
      "y": -35.64
     }
+   ],
+   "lights": [
+    {
+     "x": -31,
+     "y": 10,
+     "r": 16
+    },
+    {
+     "x": 18,
+     "y": 16,
+     "r": 15
+    },
+    {
+     "x": 18,
+     "y": 19,
+     "r": 15
+    },
+    {
+     "x": -5,
+     "y": 22,
+     "r": 14
+    },
+    {
+     "x": -31,
+     "y": 12,
+     "r": 14
+    },
+    {
+     "x": -5,
+     "y": 25,
+     "r": 14
+    }
    ]
   },
   "b_town_hall_northfolk": {
@@ -323,17 +755,113 @@
      "x": 21.599999999999998,
      "y": -29.14
     }
+   ],
+   "lights": [
+    {
+     "x": -31,
+     "y": 11,
+     "r": 18
+    },
+    {
+     "x": 18,
+     "y": 17,
+     "r": 17
+    },
+    {
+     "x": -5,
+     "y": 23,
+     "r": 16
+    },
+    {
+     "x": -4,
+     "y": 24,
+     "r": 13
+    },
+    {
+     "x": 17,
+     "y": 20,
+     "r": 11
+    },
+    {
+     "x": -5,
+     "y": 26,
+     "r": 11
+    }
    ]
   },
   "b_town_hall_sunfolk": {
    "page": 0,
    "anchorX": 39,
-   "anchorY": 37
+   "anchorY": 37,
+   "lights": [
+    {
+     "x": -5,
+     "y": 24,
+     "r": 16
+    },
+    {
+     "x": 18,
+     "y": 18,
+     "r": 16
+    },
+    {
+     "x": -31,
+     "y": 9,
+     "r": 15
+    },
+    {
+     "x": -31,
+     "y": 12,
+     "r": 15
+    },
+    {
+     "x": 18,
+     "y": 16,
+     "r": 14
+    },
+    {
+     "x": -5,
+     "y": 22,
+     "r": 14
+    }
+   ]
   },
   "b_town_hall_sylvan": {
    "page": 0,
    "anchorX": 39,
-   "anchorY": 61
+   "anchorY": 61,
+   "lights": [
+    {
+     "x": -5,
+     "y": 24,
+     "r": 16
+    },
+    {
+     "x": 18,
+     "y": 18,
+     "r": 16
+    },
+    {
+     "x": -31,
+     "y": 9,
+     "r": 15
+    },
+    {
+     "x": -31,
+     "y": 12,
+     "r": 15
+    },
+    {
+     "x": -25,
+     "y": 15,
+     "r": 15
+    },
+    {
+     "x": -14,
+     "y": 20,
+     "r": 14
+    }
+   ]
   },
   "boat_x": {
    "page": 0,
@@ -344,706 +872,6 @@
    "page": 0,
    "anchorX": 6,
    "anchorY": -1
-  },
-  "c_autumn_left_12": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_autumn_left_16": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_autumn_left_20": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_autumn_left_24": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_autumn_left_28": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_autumn_left_4": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_autumn_left_8": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_autumn_right_12": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_autumn_right_16": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_autumn_right_20": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_autumn_right_24": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_autumn_right_28": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_autumn_right_4": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_autumn_right_8": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_blossom_left_12": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_blossom_left_16": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_blossom_left_20": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_blossom_left_24": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_blossom_left_28": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_blossom_left_4": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_blossom_left_8": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_blossom_right_12": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_blossom_right_16": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_blossom_right_20": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_blossom_right_24": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_blossom_right_28": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_blossom_right_4": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_blossom_right_8": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_crystal_left_12": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_crystal_left_16": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_crystal_left_20": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_crystal_left_24": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_crystal_left_28": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_crystal_left_4": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_crystal_left_8": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_crystal_right_12": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_crystal_right_16": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_crystal_right_20": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_crystal_right_24": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_crystal_right_28": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_crystal_right_4": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_crystal_right_8": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_desert_left_12": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_desert_left_16": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_desert_left_20": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_desert_left_24": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_desert_left_28": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_desert_left_4": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_desert_left_8": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_desert_right_12": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_desert_right_16": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_desert_right_20": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_desert_right_24": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_desert_right_28": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_desert_right_4": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_desert_right_8": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_fungal_left_12": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_fungal_left_16": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_fungal_left_20": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_fungal_left_24": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_fungal_left_28": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_fungal_left_4": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_fungal_left_8": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_fungal_right_12": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_fungal_right_16": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_fungal_right_20": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_fungal_right_24": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_fungal_right_28": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_fungal_right_4": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_fungal_right_8": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_infernal_left_12": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_infernal_left_16": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_infernal_left_20": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_infernal_left_24": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_infernal_left_28": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_infernal_left_4": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_infernal_left_8": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_infernal_right_12": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_infernal_right_16": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_infernal_right_20": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_infernal_right_24": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_infernal_right_28": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_infernal_right_4": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_infernal_right_8": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_jungle_left_12": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_jungle_left_16": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_jungle_left_20": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_jungle_left_24": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_jungle_left_28": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_jungle_left_4": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_jungle_left_8": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_jungle_right_12": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_jungle_right_16": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_jungle_right_20": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_jungle_right_24": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_jungle_right_28": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_jungle_right_4": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_jungle_right_8": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_swamp_left_12": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_swamp_left_16": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_swamp_left_20": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_swamp_left_24": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_swamp_left_28": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_swamp_left_4": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_swamp_left_8": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_swamp_right_12": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_swamp_right_16": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_swamp_right_20": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_swamp_right_24": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_swamp_right_28": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_swamp_right_4": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_swamp_right_8": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_temperate_left_12": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_temperate_left_16": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_temperate_left_20": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_temperate_left_24": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_temperate_left_28": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_temperate_left_4": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_temperate_left_8": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_temperate_right_12": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_temperate_right_16": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_temperate_right_20": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_temperate_right_24": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_temperate_right_28": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_temperate_right_4": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_temperate_right_8": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_tundra_left_12": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_tundra_left_16": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_tundra_left_20": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_tundra_left_24": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_tundra_left_28": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_tundra_left_4": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_tundra_left_8": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_tundra_right_12": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_tundra_right_16": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_tundra_right_20": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_tundra_right_24": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_tundra_right_28": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_tundra_right_4": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "c_tundra_right_8": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
   },
   "carry_crystal": {
    "page": 0,
@@ -1319,406 +1147,6 @@
    "page": 0,
    "anchorX": 6,
    "anchorY": 4
-  },
-  "l_autumn_left_beach": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_autumn_left_dirt": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_autumn_left_ground": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_autumn_left_rock": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_autumn_right_beach": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_autumn_right_dirt": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_autumn_right_ground": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_autumn_right_rock": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_blossom_left_beach": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_blossom_left_dirt": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_blossom_left_ground": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_blossom_left_rock": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_blossom_right_beach": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_blossom_right_dirt": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_blossom_right_ground": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_blossom_right_rock": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_crystal_left_beach": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_crystal_left_dirt": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_crystal_left_ground": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_crystal_left_rock": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_crystal_right_beach": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_crystal_right_dirt": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_crystal_right_ground": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_crystal_right_rock": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_desert_left_beach": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_desert_left_dirt": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_desert_left_ground": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_desert_left_rock": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_desert_right_beach": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_desert_right_dirt": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_desert_right_ground": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_desert_right_rock": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_fungal_left_beach": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_fungal_left_dirt": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_fungal_left_ground": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_fungal_left_rock": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_fungal_right_beach": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_fungal_right_dirt": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_fungal_right_ground": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_fungal_right_rock": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_infernal_left_beach": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_infernal_left_dirt": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_infernal_left_ground": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_infernal_left_rock": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_infernal_right_beach": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_infernal_right_dirt": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_infernal_right_ground": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_infernal_right_rock": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_jungle_left_beach": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_jungle_left_dirt": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_jungle_left_ground": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_jungle_left_rock": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_jungle_right_beach": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_jungle_right_dirt": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_jungle_right_ground": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_jungle_right_rock": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_swamp_left_beach": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_swamp_left_dirt": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_swamp_left_ground": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_swamp_left_rock": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_swamp_right_beach": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_swamp_right_dirt": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_swamp_right_ground": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_swamp_right_rock": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_temperate_left_beach": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_temperate_left_dirt": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_temperate_left_ground": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_temperate_left_rock": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_temperate_right_beach": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_temperate_right_dirt": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_temperate_right_ground": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_temperate_right_rock": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_tundra_left_beach": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_tundra_left_dirt": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_tundra_left_ground": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_tundra_left_rock": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_tundra_right_beach": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_tundra_right_dirt": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_tundra_right_ground": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "l_tundra_right_rock": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
   },
   "mark_axe": {
    "page": 0,
@@ -2190,15 +1618,35 @@
    "anchorX": 42,
    "anchorY": 24
   },
+  "sea_arch_0": {
+   "page": 0,
+   "anchorX": 20,
+   "anchorY": 33
+  },
+  "sea_arch_1": {
+   "page": 0,
+   "anchorX": 36,
+   "anchorY": 30
+  },
   "sea_rock_0": {
    "page": 0,
-   "anchorX": 13,
-   "anchorY": 7
+   "anchorX": 22,
+   "anchorY": 3
   },
   "sea_rock_1": {
    "page": 0,
-   "anchorX": 13,
-   "anchorY": 6
+   "anchorX": 21,
+   "anchorY": 2.8999999999999986
+  },
+  "sea_rock_2": {
+   "page": 0,
+   "anchorX": 25,
+   "anchorY": 7.099999999999994
+  },
+  "sea_rock_3": {
+   "page": 0,
+   "anchorX": 17,
+   "anchorY": 1.7999999999999972
   },
   "ship_0": {
    "page": 0,
@@ -2240,6 +1688,26 @@
    "anchorX": 20,
    "anchorY": 55
   },
+  "shore_rock_0": {
+   "page": 0,
+   "anchorX": 15,
+   "anchorY": 2.200000000000003
+  },
+  "shore_rock_1": {
+   "page": 0,
+   "anchorX": 21,
+   "anchorY": 0.0799999999999983
+  },
+  "shore_rock_2": {
+   "page": 0,
+   "anchorX": 12,
+   "anchorY": 3.299999999999997
+  },
+  "shore_rock_3": {
+   "page": 0,
+   "anchorX": 5,
+   "anchorY": -1
+  },
   "smoke_0": {
    "page": 0,
    "anchorX": 2,
@@ -2275,467 +1743,7 @@
    "anchorX": 2,
    "anchorY": 1
   },
-  "t_autumn_beach_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_autumn_beach_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_autumn_beach_2": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_autumn_ground_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_autumn_ground_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_autumn_ground_2": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_autumn_ground_3": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_autumn_rock_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_autumn_rock_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_blossom_beach_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_blossom_beach_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_blossom_beach_2": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_blossom_ground_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_blossom_ground_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_blossom_ground_2": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_blossom_ground_3": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_blossom_rock_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_blossom_rock_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_crystal_beach_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_crystal_beach_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_crystal_beach_2": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_crystal_ground_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_crystal_ground_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_crystal_ground_2": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_crystal_ground_3": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_crystal_rock_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_crystal_rock_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_desert_beach_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_desert_beach_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_desert_beach_2": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_desert_ground_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_desert_ground_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_desert_ground_2": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_desert_ground_3": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_desert_rock_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_desert_rock_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_dirt_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_dirt_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_fungal_beach_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_fungal_beach_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_fungal_beach_2": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_fungal_ground_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_fungal_ground_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_fungal_ground_2": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_fungal_ground_3": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_fungal_rock_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_fungal_rock_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_infernal_beach_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_infernal_beach_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_infernal_beach_2": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_infernal_ground_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_infernal_ground_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_infernal_ground_2": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_infernal_ground_3": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_infernal_rock_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_infernal_rock_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_jungle_beach_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_jungle_beach_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_jungle_beach_2": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_jungle_ground_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_jungle_ground_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_jungle_ground_2": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_jungle_ground_3": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_jungle_rock_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_jungle_rock_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
   "t_path": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_swamp_beach_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_swamp_beach_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_swamp_beach_2": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_swamp_ground_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_swamp_ground_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_swamp_ground_2": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_swamp_ground_3": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_swamp_rock_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_swamp_rock_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_temperate_beach_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_temperate_beach_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_temperate_beach_2": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_temperate_ground_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_temperate_ground_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_temperate_ground_2": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_temperate_ground_3": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_temperate_rock_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_temperate_rock_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_tundra_beach_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_tundra_beach_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_tundra_beach_2": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_tundra_ground_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_tundra_ground_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_tundra_ground_2": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_tundra_ground_3": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_tundra_rock_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "t_tundra_rock_1": {
    "page": 0,
    "anchorX": 16,
    "anchorY": 0
@@ -4059,41 +3067,6 @@
    "page": 0,
    "anchorX": 4,
    "anchorY": 19
-  },
-  "w_foam_-x": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "w_foam_-y": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "w_foam_+x": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "w_foam_+y": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "w_kelp_0": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "w_kelp_1": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
-  },
-  "w_kelp_2": {
-   "page": 0,
-   "anchorX": 16,
-   "anchorY": 0
   }
  }
 }

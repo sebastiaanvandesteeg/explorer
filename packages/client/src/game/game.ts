@@ -2,6 +2,8 @@ import {
   BIOMES,
   BUILDINGS,
   canPlaceBuilding,
+  dayNumber,
+  dayPhase,
   discoveryName,
   HALF_H,
   HALF_W,
@@ -22,8 +24,9 @@ import type { Atlas } from "../assets";
 import type { Session, SessionStatus } from "../net/session";
 import { AtmosphereLayer } from "../render/atmosphere";
 import { Camera } from "../render/camera";
+import { daylight } from "../render/daylight";
 import { EntityLayer } from "../render/entities";
-import { FogLayer, shallowGlow } from "../render/masks";
+import { FogLayer } from "../render/masks";
 import { Overlay, type Footprint } from "../render/overlay";
 import { TerrainLayer, visibleHeight } from "../render/terrain";
 import { discoveryText, Hud, type Tool } from "../ui/hud";
@@ -46,6 +49,13 @@ const PAN_SPEED = 700;
 
 export class Game {
   private readonly world = new Container();
+  /**
+   * Wraps the world for its colour grade. The world moves and scales with the camera, and a
+   * filter's area is measured in the filtered container's own space, so filtering the world
+   * itself would grade a patch of map far off screen (and Pixi skips a filter that misses the
+   * screen). This wrapper never moves, so a screen-sized area covers exactly what is seen.
+   */
+  private readonly graded = new Container();
   private readonly camera: Camera;
   private readonly terrain: TerrainLayer;
   private readonly entities: EntityLayer;
@@ -67,6 +77,11 @@ export class Game {
   private minimapTimer = 0;
   private selectionDirty = true;
   private disposers: (() => void)[] = [];
+  /** `?phase=` freezes the time of day, for reviewing art. */
+  private readonly phaseOverride: number | null = (() => {
+    const p = new URLSearchParams(location.search).get("phase");
+    return p !== null && Number.isFinite(Number(p)) ? Number(p) : null;
+  })();
 
   private constructor(
     private readonly app: Application,
@@ -77,14 +92,17 @@ export class Game {
     const state = session.state;
     this.camera = new Camera(state.world.width, state.world.height);
     this.terrain = new TerrainLayer(app.renderer, atlas, state);
-    this.entities = new EntityLayer(atlas, state, (r) =>
-      this.terrain.invalidateRect(r.x, r.y, r.w, r.h),
+    this.entities = new EntityLayer(
+      atlas,
+      state,
+      (r) => this.terrain.invalidateRect(r.x, r.y, r.w, r.h),
+      () => this.terrain.syncBuildings(),
     );
     this.overlay = new Overlay(atlas);
     this.fog = new FogLayer(state);
     this.world.addChild(
       this.terrain.ocean,
-      shallowGlow(state),
+      this.terrain.waves,
       this.terrain.container,
       this.entities.ground,
       this.overlay.under,
@@ -94,9 +112,15 @@ export class Game {
       this.overlay.over,
     );
     this.atmosphere = new AtmosphereLayer(atlas);
-    this.world.filters = [this.atmosphere.filter];
-    this.world.filterArea = new Rectangle(0, 0, app.screen.width, app.screen.height);
-    app.stage.addChild(this.world, this.atmosphere.overlay, this.overlay.screen);
+    this.graded.addChild(this.world);
+    this.graded.filters = [this.atmosphere.filter];
+    this.graded.filterArea = new Rectangle(0, 0, app.screen.width, app.screen.height);
+    app.stage.addChild(
+      this.graded,
+      this.entities.lights,
+      this.atmosphere.overlay,
+      this.overlay.screen,
+    );
 
     const invite = session.worldId ? `${location.origin}/w/${session.worldId}` : null;
     this.hud = new Hud(
@@ -165,7 +189,14 @@ export class Game {
     root.append(app.canvas);
     const game = new Game(app, atlas, session, root);
     (window as unknown as { __game?: Game }).__game = game;
+    await game.preload();
     return game;
+  }
+
+  /** Paint the land in view before the first frame is shown, so the map does not pop in. */
+  private async preload(): Promise<void> {
+    this.camera.resize(this.app.screen.width, this.app.screen.height);
+    await this.terrain.preload(this.camera.view());
   }
 
   dispose(): void {
@@ -546,9 +577,9 @@ export class Game {
     const dt = Math.min(0.1, dtMs / 1000);
     const state = this.session.state;
     this.camera.resize(this.app.screen.width, this.app.screen.height);
-    const area = this.world.filterArea!;
+    const area = this.graded.filterArea!;
     if (area.width !== this.app.screen.width || area.height !== this.app.screen.height) {
-      this.world.filterArea = new Rectangle(0, 0, this.app.screen.width, this.app.screen.height);
+      this.graded.filterArea = new Rectangle(0, 0, this.app.screen.width, this.app.screen.height);
     }
 
     let dx = 0;
@@ -560,6 +591,9 @@ export class Game {
     if (dx || dy) this.camera.panBy(dx * PAN_SPEED * dt, dy * PAN_SPEED * dt);
 
     this.camera.apply(this.world);
+    // The night glows live outside the graded world but must follow the camera exactly.
+    this.entities.lights.position.copyFrom(this.world.position);
+    this.entities.lights.scale.copyFrom(this.world.scale);
     const view = this.camera.view();
     this.terrain.animate(now);
     this.terrain.update(view);
@@ -589,6 +623,11 @@ export class Game {
     }
   }
 
+  /** Where in the day the world is: the same for every player, from the simulation clock. */
+  private phase(): number {
+    return this.phaseOverride ?? dayPhase(this.session.state.time);
+  }
+
   /** The biome under the screen centre sets the mood; it must hold for a moment to switch. */
   private updateAtmosphere(now: number, dt: number): void {
     const state = this.session.state;
@@ -611,7 +650,11 @@ export class Game {
     const pan = { dx: this.world.x - this.lastWorldPos.x, dy: this.world.y - this.lastWorldPos.y };
     this.lastWorldPos = { x: this.world.x, y: this.world.y };
     if (Math.abs(pan.dx) > 200 || Math.abs(pan.dy) > 200) pan.dx = pan.dy = 0;
-    this.atmosphere.update(dt, this.app.screen, this.camera.zoom, pan);
+    const phase = this.phase();
+    const day = daylight(phase);
+    this.atmosphere.update(dt, this.app.screen, this.camera.zoom, pan, day);
+    this.entities.night = day.night;
+    this.hud.setClock(phase, dayNumber(state.time));
   }
 
   private drawOverlay(): void {

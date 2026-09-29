@@ -1,4 +1,4 @@
-// Samples the concept art to seed the curated palette in palette.ts.
+// Samples the concept art to seed the curated palette in packages/art/src/palette.ts.
 // Usage: pnpm sprites:palette [--crops <dir>]
 import { writeFileSync, mkdirSync } from "node:fs";
 import { resolve } from "node:path";
