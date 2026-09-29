@@ -16,7 +16,14 @@ import {
 } from "@explorer/shared";
 import { Container, Graphics, Sprite, type Rectangle } from "pixi.js";
 import type { Atlas } from "../assets";
-import { buildingSprite, markerSprite, nodeSprite, scaffoldSprite, villagerSprite } from "./names";
+import {
+  buildingSprite,
+  markerSprite,
+  nodeSprite,
+  scaffoldSprite,
+  tileJitter,
+  villagerSprite,
+} from "./names";
 
 const INTERP_MS = TICK_SECONDS * 1000;
 /** Pier decks sit a few pixels above the water. */
@@ -58,6 +65,7 @@ abstract class View {
 class BuildingView extends View {
   readonly root = new Container();
   rect = { x: 0, y: 0, w: 0, h: 0 };
+  kind = "";
   private main: Sprite | null = null;
   private scaffold: Sprite | null = null;
   private bar = new Graphics();
@@ -80,6 +88,7 @@ class BuildingView extends View {
     const state = this.layer.state;
     const h = tileHeight(state, b.x, b.y);
     this.rect = { x: b.x, y: b.y, w: b.w, h: b.h };
+    this.kind = b.kind;
     const tribe = state.world.tribe;
     const key = `${buildingSprite(b, tribe)}|${b.complete}|${b.dir ?? ""}`;
     if (key !== this.key) {
@@ -90,9 +99,12 @@ class BuildingView extends View {
       if (b.kind === "dock") {
         this.buildDock(b);
       } else if (b.kind === "path") {
-        const s = this.layer.atlas.sprite("t_path");
-        s.alpha = b.complete ? 1 : 0.45;
-        this.root.addChildAt(s, 0);
+        // A finished path is painted into the ground by the terrain; only the plan is a sprite.
+        if (!b.complete) {
+          const s = this.layer.atlas.sprite("t_path");
+          s.alpha = 0.45;
+          this.root.addChildAt(s, 0);
+        }
       } else {
         const name = buildingSprite(b, tribe);
         this.main = this.layer.atlas.sprite(name);
@@ -193,7 +205,8 @@ class NodeView extends View {
     }
     if (this.marker) this.marker.y = -this.sprite!.height * this.sprite!.anchor.y + HALF_H - 2;
     const h = tileHeight(this.layer.state, n.x, n.y);
-    this.root.position.set(screenX(n.x, n.y), screenY(n.x, n.y) - h);
+    const j = tileJitter(n.x, n.y);
+    this.root.position.set(screenX(n.x, n.y) + j.dx, screenY(n.x, n.y) - h + j.dy);
     this.root.zIndex = n.x + n.y + 1;
     this.root.visible =
       this.layer.state.explored[tileIndex(this.layer.state.world, n.x, n.y)] === 1;
@@ -376,6 +389,8 @@ export class EntityLayer {
       w: number;
       h: number;
     }) => void,
+    /** Finished paths are painted into the terrain, so it repaints when they change. */
+    private readonly onPathsChange: () => void,
   ) {}
 
   rebuild(state: GameState): void {
@@ -395,10 +410,14 @@ export class EntityLayer {
   }
 
   sync(changed: Iterable<number>, removed: Iterable<number>, now: number): void {
+    let paths = false;
     for (const id of removed) {
       const v = this.views.get(id);
       if (!v) continue;
-      if (v instanceof BuildingView) this.onFootprintChange(v.rect);
+      if (v instanceof BuildingView) {
+        this.onFootprintChange(v.rect);
+        if (v.kind === "path") paths = true;
+      }
       v.destroy();
       this.views.delete(id);
     }
@@ -415,7 +434,9 @@ export class EntityLayer {
       }
       v.update(e, now);
       if (e.type === "building" && isNew) this.onFootprintChange(e);
+      if (e.type === "building" && e.kind === "path") paths = true;
     }
+    if (paths) this.onPathsChange();
   }
 
   /** Re-check visibility of nodes on newly explored tiles. */

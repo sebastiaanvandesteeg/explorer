@@ -6,7 +6,7 @@ A co-op, browser-based isometric pixel-art game about exploring a randomly gener
 
 ![Four of the ten biomes: the Infernal Isles, Frostreach, the Fungal Hollows and the Petal Isles](docs/biomes.webp)
 
-The art style follows the concept art below. Every sprite is **generated in code** using a palette sampled from it.
+The art style follows the concept art below. Everything is **generated in code** using a palette sampled from it: objects are baked into a sprite atlas, and the land itself (coasts, beaches, cliffs, foam and shallows) is painted per pixel while the game runs, so it never looks like a grid of tiles.
 
 <details>
 <summary>Concept art</summary>
@@ -95,6 +95,8 @@ packages/shared   @explorer/shared: deterministic core used by client and server
   world/            seeded archipelago generation, A* pathfinding
   sim/              catalogue, state, commands, 10 Hz tick, snapshots and patches
   protocol.ts       WebSocket message types
+packages/art      @explorer/art: the colour palette and the per-pixel terrain painter
+  terrain/          smooth fields from the tile data, ray-marched land, cliffs and water
 packages/server   @explorer/server: node:http + ws, world rooms, JSON persistence
 packages/client   @explorer/client: PixiJS v8 renderer, input, DOM HUD, sessions
 tools/sprites     palette extraction and the sprite generator → client/public/assets
@@ -107,29 +109,34 @@ tools/sprites     palette extraction and the sprite generator → client/public/
 - **Persistence:** each world is saved to `data/worlds/<id>.json` every 30 s, when the last player leaves and on shutdown. Saves are atomic.
   - Players are identified by name plus a random token kept in `localStorage`. Only a hash of the token is stored on the server.
 - **Rendering:**
-  - Terrain is baked into 16×16-tile render-texture chunks on demand.
-  - Buildings, trees, villagers and ships are depth-sorted by `x + y`.
-  - Fog of war and the shallow-water glow are smooth masks projected onto the isometric grid.
+  - Terrain is painted per pixel by `@explorer/art` in a Web Worker, one 16×16-tile chunk at a time, and baked into render-texture chunks together with the decoration. Painted ground is cached, so building something only redraws the decoration.
+  - Buildings, trees, villagers and ships are depth-sorted by `x + y`. Plants and rocks get a small fixed offset inside their tile so they do not stand in rows.
+  - Fog of war is a smooth mask projected onto the isometric grid.
   - Zoom uses integer steps so pixels stay crisp.
 
 ## Pixel art pipeline
 
 `pnpm sprites` regenerates the sprite atlas in `packages/client/public/assets` (a manifest, `atlas.json`, plus as many `atlas-N.png/json` pages as the art needs) and the ocean textures, in about a second:
 
-1. **`extract-palette.ts`** samples `docs/concept-art.webp` into `palette.extracted.json`. The curated ramps in `palette.ts` are hand-picked from those samples.
-2. **Terrain tiles** (`sprites/terrain.ts`) are drawn directly on exact 32×16 diamonds, one set per biome. They use tile-periodic noise so neighbouring tiles join seamlessly. Cliff faces are drawn as a body plus a lip overlay, which keeps the sprite count down.
+1. **`extract-palette.ts`** samples `docs/concept-art.webp` into `palette.extracted.json`. The curated ramps in `packages/art/src/palette.ts` are hand-picked from those samples.
+2. **Terrain** is not made of sprites. The world is still a grid of tiles for the simulation, but `@explorer/art` (`terrain/`) never draws a tile:
+   - It turns the tile data into smooth fields: each tile's level (sea, beach, bank, plateau, hill) is interpolated between tile centres after a wobbling warp, and the contours of those fields become the coasts and cliff edges. Shores come out as curves, not staircases, and agree with the tile grid at over 99.5% of tile centres, so buildings and villagers stand on painted ground.
+   - Each pixel casts a view ray through the fields to find a plateau top, a cliff face or the sea, and is coloured from the biome's materials. Ground, beaches, rock slabs, dirt, paved paths and boulder-and-crevice cliffs are functions of the world position, so nothing repeats per tile.
+   - Water gets the foam line, dithered turquoise shallows tinted by the biome and dark reef shadows, all translucent so the animated ocean shows through.
+   - Chunks are painted independently and join without seams (a unit test paints a world in pieces and in one go and compares every pixel).
 3. **Objects** (`sprites/buildings.ts`, `nature.ts`, `decor.ts`, `units.ts`) are modelled with a tiny isometric ray-caster (`raytrace.ts`) from boxes, gable and hip roofs, prisms, cones and blobs.
    - Buildings take a tribe style: wall material, roof shape and accent colours.
    - Shading snaps to the palette ramps with restrained ordered dithering.
    - Cast shadows and dark outlines make it read as pixel art.
-   - Villagers are drawn pixel by pixel.
+   - Boulders, sea rocks (with surf) and villagers are built the same way; villagers are drawn pixel by pixel.
 4. **Packing:** everything goes into one atlas. Each frame keeps its anchor (a tile's top vertex, or a villager's feet) plus metadata such as chimney smoke emitters.
 
-To **replace or add art**, add or modify a function in `tools/sprites/src/sprites/*` and run `pnpm sprites`. To swap in a hand-painted sprite, draw it into a `Canvas` with the same name and anchor. `packages/client/src/render/names.ts` maps game state to frame names.
+To **replace or add art**, add or modify a function in `tools/sprites/src/sprites/*` and run `pnpm sprites`. To swap in a hand-painted sprite, draw it into a `Canvas` with the same name and anchor. `packages/client/src/render/names.ts` maps game state to frame names. To change how the land looks, edit the biome materials in `packages/art/src/terrain/materials.ts` (ground, beach, rock, path and cliff textures) or the water in `water.ts`; no atlas rebuild is needed.
 
 To **review art**:
 
 - Browse every frame at **http://localhost:5190/sprites.html**, shown next to the concept art.
+- Paint part of a generated world to a PNG without a browser: `pnpm --filter @explorer/art preview out.png <seed> <tribe> <island-id | home | tx,ty> <width> <height> <scale>` (sprites are not drawn).
 - Add `&reveal` to an offline URL to lift the fog.
 - With the dev server running, `node packages/client/scripts/biome-shots.mjs <dir>` screenshots one island of every biome.
 

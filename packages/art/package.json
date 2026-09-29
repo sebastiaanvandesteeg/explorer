@@ -1,0 +1,25 @@
+{
+  "name": "@explorer/art",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./palette": "./src/palette.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "preview": "tsx scripts/preview.ts",
+    "bench": "tsx scripts/bench.ts"
+  },
+  "dependencies": {
+    "@explorer/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "@types/pngjs": "^6.0.5",
+    "pngjs": "^7.0.0",
+    "tsx": "^4.23.15",
+    "vitest": "^5.0.2"
+  }
+}

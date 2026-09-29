@@ -23,7 +23,7 @@ import type { Session, SessionStatus } from "../net/session";
 import { AtmosphereLayer } from "../render/atmosphere";
 import { Camera } from "../render/camera";
 import { EntityLayer } from "../render/entities";
-import { FogLayer, shallowGlow } from "../render/masks";
+import { FogLayer } from "../render/masks";
 import { Overlay, type Footprint } from "../render/overlay";
 import { TerrainLayer, visibleHeight } from "../render/terrain";
 import { discoveryText, Hud, type Tool } from "../ui/hud";
@@ -77,14 +77,16 @@ export class Game {
     const state = session.state;
     this.camera = new Camera(state.world.width, state.world.height);
     this.terrain = new TerrainLayer(app.renderer, atlas, state);
-    this.entities = new EntityLayer(atlas, state, (r) =>
-      this.terrain.invalidateRect(r.x, r.y, r.w, r.h),
+    this.entities = new EntityLayer(
+      atlas,
+      state,
+      (r) => this.terrain.invalidateRect(r.x, r.y, r.w, r.h),
+      () => this.terrain.syncPaths(),
     );
     this.overlay = new Overlay(atlas);
     this.fog = new FogLayer(state);
     this.world.addChild(
       this.terrain.ocean,
-      shallowGlow(state),
       this.terrain.container,
       this.entities.ground,
       this.overlay.under,
@@ -165,7 +167,14 @@ export class Game {
     root.append(app.canvas);
     const game = new Game(app, atlas, session, root);
     (window as unknown as { __game?: Game }).__game = game;
+    await game.preload();
     return game;
+  }
+
+  /** Paint the land in view before the first frame is shown, so the map does not pop in. */
+  private async preload(): Promise<void> {
+    this.camera.resize(this.app.screen.width, this.app.screen.height);
+    await this.terrain.preload(this.camera.view());
   }
 
   dispose(): void {

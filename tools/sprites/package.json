@@ -10,6 +10,7 @@
     "preview": "tsx src/preview.ts"
   },
   "devDependencies": {
+    "@explorer/art": "workspace:*",
     "@explorer/shared": "workspace:*",
     "@types/node": "^26.6.3",
     "@types/pngjs": "^6.0.5",

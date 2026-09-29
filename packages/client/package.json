@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@explorer/art": "workspace:*",
     "@explorer/shared": "workspace:*",
     "pixi.js": "^8.21.0"
   },

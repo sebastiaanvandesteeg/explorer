@@ -5,7 +5,6 @@ import {
   hash2d,
   NODE_VARIANTS,
   NODES,
-  Terrain,
   tileIndex,
   type BiomeId,
   type BuildingEntity,
@@ -21,34 +20,19 @@ export function biomeOfTile(world: WorldMap, x: number, y: number): BiomeId {
   return BIOMES[world.biome[tileIndex(world, x, y)]!] ?? "temperate";
 }
 
-export function groundSprite(biome: BiomeId, t: number, x: number, y: number): string {
-  const r = hash2d(x, y, 0x77);
-  switch (t) {
-    case Terrain.Sand:
-      return `t_${biome}_beach_${Math.floor(r * 3)}`;
-    case Terrain.Rock:
-      return `t_${biome}_rock_${Math.floor(r * 2)}`;
-    case Terrain.Dirt:
-      return `t_dirt_${Math.floor(r * 2)}`;
-    default:
-      return r < 0.1
-        ? `t_${biome}_ground_3`
-        : `t_${biome}_ground_${Math.floor(hash2d(x, y, 0x78) * 3)}`;
-  }
-}
-
-export function lipKind(t: number): "ground" | "beach" | "rock" | "dirt" {
-  return t === Terrain.Sand
-    ? "beach"
-    : t === Terrain.Rock
-      ? "rock"
-      : t === Terrain.Dirt
-        ? "dirt"
-        : "ground";
+/**
+ * A small fixed offset inside a tile, in pixels, so plants and rocks do not stand in rows on the
+ * grid. The same tile always gets the same offset.
+ */
+export function tileJitter(x: number, y: number, reach = 1): { dx: number; dy: number } {
+  return {
+    dx: Math.round((hash2d(x, y, 0x5a1) - 0.5) * 12 * reach),
+    dy: Math.round((hash2d(x, y, 0x5a2) - 0.5) * 6 * reach),
+  };
 }
 
 export function decorSprite(biome: BiomeId, d: DecoSpawn): string {
-  if (d.kind === "sea_rock") return `sea_rock_${d.variant % 2}`;
+  if (d.kind === "sea_rock") return `sea_rock_${Math.floor(hash2d(d.x, d.y, 0x91) * 4)}`;
   if (d.kind === "tall") return `deco_${biome}_tall`;
   return `deco_${biome}_small_${d.variant % 2}`;
 }
