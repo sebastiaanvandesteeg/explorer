@@ -1,5 +1,6 @@
 import { inBounds, isLandTerrain, tileIndex } from "../world/grid";
 import { hash2d } from "../rng";
+import { DIFFICULTY_DEFS, type Difficulty } from "./difficulty";
 import type { BiomeId } from "../world/biomes";
 import { Terrain, type Dir, type NodeKind, type SiteKind, type WorldMap } from "../world/types";
 import {
@@ -198,6 +199,8 @@ export type GameEvent =
 
 export interface GameState {
   world: WorldMap;
+  /** How hostile the world is; fixed when it is created. */
+  difficulty: Difficulty;
   time: number;
   tick: number;
   nextId: number;
@@ -273,10 +276,11 @@ export function rebuildOccupancy(state: GameState): void {
   for (const e of state.entities.values()) occupy(state, e, true);
 }
 
-export function emptyState(world: WorldMap): GameState {
+export function emptyState(world: WorldMap, difficulty: Difficulty = "normal"): GameState {
   const n = world.width * world.height;
   return {
     world,
+    difficulty,
     time: 0,
     tick: 0,
     nextId: 1,
@@ -285,7 +289,7 @@ export function emptyState(world: WorldMap): GameState {
     outpostsDirty: new Set(),
     upgrades: new Set(),
     upgradesDirty: false,
-    nextRaid: PIRATE.firstRaid,
+    nextRaid: DIFFICULTY_DEFS[difficulty].firstRaid,
     nextBolt: 0,
     entities: new Map(),
     explored: new Uint8Array(n),
@@ -332,6 +336,11 @@ export const hasUpgrade = (state: GameState, id: UpgradeId): boolean => state.up
 /** How far ships see around them, in tiles. */
 export function shipReveal(state: GameState): number {
   return SHIP.reveal * (hasUpgrade(state, "far_sight") ? 1.6 : 1);
+}
+
+/** Hull points of a pirate ship in this world. */
+export function pirateMaxHp(state: GameState): number {
+  return Math.round(PIRATE.hp * DIFFICULTY_DEFS[state.difficulty].pirateHp);
 }
 
 export function shipMaxHp(state: GameState, kind: ShipKind): number {
@@ -455,8 +464,11 @@ export function addSites(state: GameState): void {
   }
 }
 
-export function createInitialState(world: WorldMap): GameState {
-  const state = emptyState(world);
+export function createInitialState(
+  world: WorldMap,
+  opts: { difficulty?: Difficulty } = {},
+): GameState {
+  const state = emptyState(world, opts.difficulty);
   const s = world.start;
   addEntity(state, newBuilding(state, "town_hall", s.townHall.x, s.townHall.y, true));
   addEntity(state, newBuilding(state, "dock", s.dock.x, s.dock.y, true, s.dock.dir));

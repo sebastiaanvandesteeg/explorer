@@ -1,18 +1,11 @@
 import {
-  BIOMES,
   BUILDINGS,
   canAfford,
+  DIFFICULTY_DEFS,
   CARGO,
   cargoCost,
-  cargoCapacity,
-  cargoLoad,
   DIVE,
   PATROL,
-  PIRATE,
-  shipMaxHp,
-  type PirateEntity,
-  type SiteEntity,
-  type WreckEntity,
   CHURCH,
   clockText,
   dayPeriod,
@@ -30,7 +23,6 @@ import {
   shipCost,
   SMITH,
   stockOf,
-  Terrain,
   tileIndex,
   TRIBE_DEFS,
   UPGRADE_IDS,
@@ -40,6 +32,7 @@ import {
   type BuildingEntity,
   type BuildingKind,
   type Command,
+  type Difficulty,
   type Entity,
   type GameState,
   type NodeEntity,
@@ -53,9 +46,13 @@ import {
 } from "@explorer/shared";
 import type { Atlas } from "../assets";
 import type { SessionStatus } from "../net/session";
-import { ATMOSPHERE, OCEAN } from "../render/biomeStyle";
 import { buildingThumb, villagerSprite } from "../render/names";
+import { describeIsland, describePirate, describeShip, goodsText, nearestSite } from "./describe";
 import { h } from "./dom";
+import { currentThreat } from "./mapData";
+import { MapScreen } from "./mapscreen";
+import { abgr, mapColours } from "./mapColours";
+import { ICON, LABEL } from "./resources";
 
 export type Tool =
   { kind: "select" } | { kind: "build"; building: BuildingKind } | { kind: "harvest" };
@@ -65,35 +62,15 @@ export interface HudActions {
   command(cmd: Command): void;
   chat(text: string): void;
   focusTile(x: number, y: number): void;
+  select(id: number): void;
   deselect(): void;
+  state(): GameState;
+  /** The four corners of what the camera shows, in tile coordinates. */
+  view(): { x: number; y: number }[];
 }
 
-const ICON: Record<Resource, string> = {
-  wood: "icon_wood",
-  stone: "icon_stone",
-  food: "icon_food",
-  ore: "icon_ore",
-  tools: "icon_tools",
-  gold: "icon_gold",
-  faith: "icon_faith",
-  crystal: "icon_crystal",
-  relic: "icon_relic",
-};
-
-const LABEL: Record<Resource, string> = {
-  wood: "Wood",
-  stone: "Stone",
-  food: "Food",
-  ore: "Ore",
-  tools: "Tools",
-  gold: "Gold",
-  faith: "Faith",
-  crystal: "Crystal",
-  relic: "Relic",
-};
-
-export function discoveryText(biome: BiomeId): string {
-  return `Discovered ${discoveryName(biome)}!`;
+export function discoveryText(name: string, biome: BiomeId): string {
+  return `Discovered ${name} (${discoveryName(biome)})!`;
 }
 
 export class Hud {
@@ -124,6 +101,10 @@ export class Hud {
   private biomeEl: HTMLElement;
   private biomeTimer: ReturnType<typeof setTimeout> | null = null;
   readonly minimap: Minimap;
+  readonly map: MapScreen;
+  private alertEl: HTMLElement;
+  private titleEl: HTMLElement;
+  private alertKey = "";
 
   constructor(
     parent: HTMLElement,
@@ -208,15 +189,16 @@ export class Hud {
     this.playersEl = h("div");
     this.clockEl = h("div.clock", { title: "Time of day: the same for everyone in the world" });
     const tribeDef = TRIBE_DEFS[tribe];
+    this.titleEl = h(
+      "h3",
+      { title: `${tribeDef.description} ${tribeDef.bonusText}.` },
+      h("span.dot", { style: { background: tribeDef.banner } }),
+      `Expedition · ${tribeDef.name}`,
+    );
     const players = h(
       "div.players.panel",
       {},
-      h(
-        "h3",
-        { title: `${tribeDef.description} ${tribeDef.bonusText}.` },
-        h("span.dot", { style: { background: tribeDef.banner } }),
-        `Expedition · ${tribeDef.name}`,
-      ),
+      this.titleEl,
       this.clockEl,
       this.playersEl,
       inviteUrl
@@ -240,7 +222,18 @@ export class Hud {
     );
 
     this.minimap = new Minimap((x, y) => actions.focusTile(x, y));
-    const minimap = h("div.minimap.panel", {}, this.minimap.canvas);
+    this.map = new MapScreen(atlas, actions);
+    const minimap = h(
+      "div.minimap.panel",
+      {},
+      this.minimap.canvas,
+      h(
+        "button.btn.mini.map-btn",
+        { title: "Open the chart of the archipelago (M)", onclick: () => this.map.toggle() },
+        "Map",
+        h("span.kbd", {}, "M"),
+      ),
+    );
 
     this.chatLog = h("div.chat-log");
     this.chatInput = h("input.field", {
@@ -259,6 +252,8 @@ export class Hud {
     const chat = h("div.chat", {}, this.chatLog, this.chatInput);
 
     this.toastsEl = h("div.toasts");
+    this.alertEl = h("div.alert.panel", { style: { display: "none" } });
+    const notices = h("div.notices", {}, this.alertEl, this.toastsEl);
     this.helpEl = h("div.help.panel");
     this.bannerEl = h("div.banner.panel", { style: { display: "none" } });
     this.biomeEl = h("div.biome-label");
@@ -271,12 +266,20 @@ export class Hud {
       players,
       minimap,
       chat,
-      this.toastsEl,
+      notices,
       this.helpEl,
       this.bannerEl,
       this.biomeEl,
+      this.map.root,
     );
     parent.append(this.root);
+  }
+
+  /** Note the world's difficulty in the expedition title, unless it is the ordinary one. */
+  setDifficulty(difficulty: Difficulty): void {
+    if (difficulty === "normal") return;
+    const def = DIFFICULTY_DEFS[difficulty];
+    this.titleEl.append(h("span.tag", { title: def.description }, def.name));
   }
 
   focusChat(): void {
@@ -351,6 +354,50 @@ export class Hud {
   banner(text: string | null): void {
     this.bannerEl.style.display = text ? "" : "none";
     this.bannerEl.textContent = text ?? "";
+  }
+
+  /** The pirate alert: shown for as long as raiders are at large, with a button to go and look. */
+  setThreat(state: GameState): void {
+    const threat = currentThreat(state);
+    if (!threat) {
+      if (this.alertKey !== "") {
+        this.alertKey = "";
+        this.alertEl.style.display = "none";
+      }
+      return;
+    }
+    const where = threat.target
+      ? describeIsland(state, islandAt(state, threat.target.x, threat.target.y))
+      : null;
+    const text =
+      threat.raiding > 0 && where
+        ? `Pirates are robbing ${where}!`
+        : `${threat.pirates} pirate ship${threat.pirates === 1 ? "" : "s"} approaching from the ${threat.direction}`;
+    const seen =
+      state.explored[
+        tileIndex(state.world, Math.floor(threat.nearest.x), Math.floor(threat.nearest.y))
+      ];
+    const key = `${text}|${seen}`;
+    if (key === this.alertKey) return;
+    this.alertKey = key;
+    this.alertEl.replaceChildren(
+      h("span.siren", {}, "!"),
+      h("span", {}, text),
+      h(
+        "button.btn.mini",
+        {
+          title: seen
+            ? "Go to the nearest pirate ship"
+            : "Go to the settlement they are heading for",
+          onclick: () => {
+            const to = seen ? threat.nearest : (threat.target ?? state.world.start.townHall);
+            this.actions.focusTile(to.x + 0.5, to.y + 0.5);
+          },
+        },
+        "Look",
+      ),
+    );
+    this.alertEl.style.display = "";
   }
 
   toast(text: string, kind: "info" | "error" = "info"): void {
@@ -810,7 +857,7 @@ export class Hud {
     } else if (e.type === "villager") {
       if (refs.status) refs.status.textContent = describeVillager(state, e);
     } else if (e.type === "pirate") {
-      if (refs.status) refs.status.textContent = describePirate(e);
+      if (refs.status) refs.status.textContent = describePirate(state, e);
     } else if (e.type === "wreck") {
       if (refs.status) refs.status.textContent = `Holds ${goodsText(e.loot)}`;
     } else if (e.type === "site") {
@@ -819,71 +866,14 @@ export class Hud {
           ? `Treasure left: ${goodsText(e.loot)}`
           : "Something lies below…";
     } else if (refs.status) {
-      const ship = e as ShipEntity;
-      const hull = `Hull ${Math.ceil(ship.hp)}/${shipMaxHp(state, ship.kind)}`;
-      if (ship.kind === "patrol") {
-        refs.status.textContent = `${ship.hunt ? "Chasing pirates" : ship.dest ? "Sailing…" : "On patrol"} · ${hull}`;
-      } else if (ship.kind === "cargo") {
-        const dock = ship.route === null ? undefined : state.entities.get(ship.route);
-        const where =
-          dock?.type === "building"
-            ? `Route: ${describeIsland(state, islandAt(state, dock.x, dock.y))}`
-            : "No trade route";
-        const doing =
-          ship.route === null
-            ? "Idle"
-            : ship.dest
-              ? ship.leg === "drop"
-                ? "Sailing home"
-                : "Sailing to collect"
-              : ship.leg === "pickup"
-                ? "Waiting for goods"
-                : "In port";
-        refs.status.textContent = `${doing} · ${cargoLoad(ship)}/${cargoCapacity(state)} goods · ${hull}`;
-        if (refs.extra) refs.extra.textContent = where;
-      } else {
-        const aboard = `${ship.passengers.length}/${SHIP.capacity} aboard`;
-        const doing = ship.dive
-          ? "Divers below…"
-          : ship.salvage
-            ? "Salvaging…"
-            : ship.dest
-              ? "Sailing…"
-              : "Anchored";
-        refs.status.textContent = `${doing} · ${aboard} · ${hull}`;
-      }
+      const report = describeShip(state, e as ShipEntity);
+      refs.status.textContent = [report.doing, report.extra, report.hull]
+        .filter((part): part is string => part !== null)
+        .join(" · ");
+      if (refs.extra && report.route) refs.extra.textContent = report.route;
     }
     this.refreshSelectionButtons();
   }
-}
-
-function goodsText(goods: Partial<Stock>): string {
-  const items = RESOURCES.filter((r) => (goods[r] ?? 0) > 0).map((r) => `${goods[r]} ${r}`);
-  return items.length > 0 ? items.join(", ") : "nothing";
-}
-
-function describePirate(p: PirateEntity): string {
-  const what =
-    p.phase === "raid" ? "Robbing a settlement" : p.phase === "flee" ? "Fleeing" : "Hunting";
-  const loot = Object.values(p.loot).reduce((n, v) => n + (v ?? 0), 0);
-  return `${what} · Hull ${Math.ceil(p.hp)}/${PIRATE.hp}${loot > 0 ? ` · ${loot} goods stolen` : ""}`;
-}
-
-/** The closest uncleared sunken site within reach of a ship. */
-export function nearestSite(state: GameState, ship: ShipEntity): SiteEntity | null {
-  let best: SiteEntity | null = null;
-  for (const e of state.entities.values()) {
-    if (e.type !== "site" || !e.found) continue;
-    if (!Object.values(e.loot).some((n) => (n ?? 0) > 0)) continue;
-    const d = Math.hypot(e.x - ship.x, e.y - ship.y);
-    if (d <= 14 && (!best || d < Math.hypot(best.x - ship.x, best.y - ship.y))) best = e;
-  }
-  return best;
-}
-
-function describeIsland(state: GameState, islandId: number): string {
-  const island = state.world.islands[islandId];
-  return island ? discoveryName(island.biome).replace(/^the /, "The ") : "another island";
 }
 
 /** What a dock or storehouse holds on its island, and whether it still needs collecting. */
@@ -932,11 +922,6 @@ export function describeVillager(state: GameState, v: VillagerEntity): string {
 
 // ---------------------------------------------------------------------------- minimap
 
-function abgr(hex: string): number {
-  const v = Number.parseInt(hex.slice(1), 16);
-  return (0xff << 24) | ((v & 0xff) << 16) | (v & 0xff00) | ((v >> 16) & 0xff);
-}
-
 export class Minimap {
   readonly canvas = document.createElement("canvas");
   private ctx: CanvasRenderingContext2D;
@@ -960,32 +945,9 @@ export class Minimap {
     this.canvas.width = w.width;
     this.canvas.height = w.height;
     this.image = this.ctx.createImageData(w.width, w.height);
-    const n = w.width * w.height;
-    this.base = new Uint32Array(n);
-    this.fog = new Uint32Array(n);
-    const deep = abgr("#1b5866");
-    const shallow = abgr("#349f98");
-    const dirt = abgr("#a07650");
-    for (let k = 0; k < n; k++) {
-      const biome = BIOMES[w.biome[k]!];
-      const style = biome ? ATMOSPHERE[biome] : OCEAN;
-      this.fog[k] = abgr(style.fog);
-      const t = w.terrain[k]!;
-      this.base[k] =
-        t === Terrain.Deep
-          ? deep
-          : t === Terrain.Shallow
-            ? shallow
-            : t === Terrain.Dirt
-              ? dirt
-              : abgr(
-                  t === Terrain.Sand
-                    ? style.map.beach
-                    : t === Terrain.Rock
-                      ? style.map.rock
-                      : style.map.ground,
-                );
-    }
+    const colours = mapColours(w);
+    this.base = colours.base;
+    this.fog = colours.fog;
   }
 
   draw(state: GameState, view: { x: number; y: number }[]): void {

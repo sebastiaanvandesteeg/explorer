@@ -1,6 +1,7 @@
 // Threats and treasure at sea: pirate raids, ship combat, wrecks, sunken sites and divers.
 import { hash2d } from "../rng";
 import { DIVE, GUNS, PATROL, PIRATE, RESOURCES, STORM, BUILDINGS, type Stock } from "./catalogue";
+import { DIFFICULTY_DEFS } from "./difficulty";
 import { dockSpawn } from "./ferry";
 import { sailable, seaPath } from "./navigation";
 import { nearestWater } from "./rules";
@@ -9,6 +10,7 @@ import {
   hasUpgrade,
   islandAt,
   markDirty,
+  pirateMaxHp,
   removeEntity,
   shipMaxHp,
   stockOf,
@@ -151,12 +153,13 @@ function nearestLand(
 // Pirates
 
 function spawnRaids(state: GameState): void {
-  if (state.time < state.nextRaid) return;
-  const [lo, hi] = PIRATE.interval;
+  const rules = DIFFICULTY_DEFS[state.difficulty];
+  if (!rules.raids || state.time < state.nextRaid) return;
+  const [lo, hi] = rules.interval;
   state.nextRaid = state.time + lo + hash2d(state.tick, 1, 0x9b) * (hi - lo);
   const alive = all<PirateEntity>(state, "pirate").length;
   const day = Math.floor(state.time / 480);
-  const count = Math.min(PIRATE.maxAtOnce - alive, 1 + Math.floor(day / 3));
+  const count = Math.min(rules.maxAtOnce - alive, 1 + rules.extraRaiders + Math.floor(day / 3));
   let first: PirateEntity | null = null;
   for (let i = 0; i < count; i++) {
     const p = spawnPirate(state, i);
@@ -183,7 +186,7 @@ function spawnPirate(state: GameState, index: number): PirateEntity | null {
       x: x + 0.5,
       y: y + 0.5,
       heading: 0,
-      hp: PIRATE.hp,
+      hp: pirateMaxHp(state),
       path: [],
       phase: "hunt",
       target: null,
@@ -210,7 +213,7 @@ function updatePirate(state: GameState, p: PirateEntity, dt: number): void {
   const foe = shipsNear(state, p, PIRATE.range)[0];
   if (foe && p.cooldown === 0) {
     p.cooldown = PIRATE.cooldown;
-    damageShip(state, foe, PIRATE.damage);
+    damageShip(state, foe, PIRATE.damage * DIFFICULTY_DEFS[state.difficulty].pirateDamage);
     state.events.push({
       type: "shot",
       kind: "cannon",
@@ -312,7 +315,13 @@ function raid(state: GameState, p: PirateEntity, dt: number): void {
   let took = 0;
   for (const r of RESOURCES) {
     const n = pile[r];
-    const take = Math.min(n, Math.max(n >= 8 ? 1 : 0, Math.floor(n * PIRATE.stealShare)));
+    const take = Math.min(
+      n,
+      Math.max(
+        n >= 8 ? 1 : 0,
+        Math.floor(n * PIRATE.stealShare * DIFFICULTY_DEFS[state.difficulty].steal),
+      ),
+    );
     if (take <= 0) continue;
     pile[r] -= take;
     p.loot[r] = (p.loot[r] ?? 0) + take;

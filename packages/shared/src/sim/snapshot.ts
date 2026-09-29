@@ -1,6 +1,7 @@
 // Serialisation: full snapshots (join + persistence) and incremental patches (every tick).
 import type { TribeId } from "../tribes";
 import type { WorldMap } from "../world/types";
+import { isDifficulty, type Difficulty } from "./difficulty";
 import { SHIP_HP, type Stock, type UpgradeId } from "./catalogue";
 import {
   emptyState,
@@ -46,6 +47,8 @@ export interface Snapshot {
   seed: string;
   /** Older saves predate tribes; they load as Islanders. */
   tribe?: TribeId;
+  /** Older saves predate difficulty; they load as Normal. */
+  difficulty?: Difficulty;
   tick: number;
   time: number;
   nextId: number;
@@ -145,6 +148,7 @@ export function toSnapshot(state: GameState): Snapshot {
     version: 1,
     seed: state.world.seed,
     tribe: state.world.tribe,
+    difficulty: state.difficulty,
     tick: state.tick,
     time: state.time,
     nextId: state.nextId,
@@ -163,7 +167,7 @@ export function toSnapshot(state: GameState): Snapshot {
  * the server replans their routes (paths are never serialised).
  */
 export function fromSnapshot(world: WorldMap, snap: Snapshot, resume = false): GameState {
-  const state = emptyState(world);
+  const state = emptyState(world, isDifficulty(snap.difficulty) ? snap.difficulty : "normal");
   state.tick = snap.tick;
   state.time = snap.time;
   state.nextId = snap.nextId;

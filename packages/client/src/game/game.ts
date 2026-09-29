@@ -5,11 +5,11 @@ import {
   dockSite,
   dayNumber,
   dayPhase,
-  discoveryName,
   UPGRADES,
   HALF_H,
   HALF_W,
   inBounds,
+  islandName,
   isLand,
   pickTile,
   RESOURCES,
@@ -34,6 +34,7 @@ import { FogLayer } from "../render/masks";
 import { Overlay, type Footprint } from "../render/overlay";
 import { TerrainLayer, visibleHeight } from "../render/terrain";
 import { discoveryText, Hud, type Tool } from "../ui/hud";
+import { compassFrom } from "../ui/mapData";
 
 interface Drag {
   button: number;
@@ -135,12 +136,16 @@ export class Game {
         command: (cmd) => void this.send(cmd),
         chat: (text) => session.chat(text),
         focusTile: (x, y) => this.centerOnTile(x, y),
+        select: (id) => this.select(id),
         deselect: () => this.select(null),
+        state: () => this.session.state,
+        view: () => this.viewCorners(),
       },
       invite,
       state.world.tribe,
     );
 
+    this.hud.setDifficulty(state.difficulty);
     this.entities.rebuild(state);
     this.hud.setStock(state);
     const th = state.world.start.townHall;
@@ -257,21 +262,7 @@ export class Game {
         );
         break;
       case "pirates": {
-        const hall = this.session.state.world.start.townHall;
-        // The map is drawn isometrically, so compass points follow the screen, not the grid.
-        const sx = ev.x - ev.y - (hall.x - hall.y);
-        const sy = ev.x + ev.y - (hall.x + hall.y);
-        const names = [
-          "east",
-          "south-east",
-          "south",
-          "south-west",
-          "west",
-          "north-west",
-          "north",
-          "north-east",
-        ];
-        const dir = names[(Math.round(Math.atan2(sy, sx) / (Math.PI / 4)) + 8) % 8]!;
+        const dir = compassFrom(this.session.state.world.start.townHall, ev);
         this.hud.toast(
           `Pirates! ${ev.count === 1 ? "A raiding ship approaches" : `${ev.count} raiding ships approach`} from the ${dir}`,
           "error",
@@ -309,11 +300,11 @@ export class Game {
         this.hud.toast(`A cargo ship brought ${ev.amount} goods home`);
         break;
       case "discovered":
-        this.hud.toast(discoveryText(ev.biome));
+        this.hud.toast(discoveryText(islandName(this.session.state.world, ev.islandId), ev.biome));
         break;
       case "landed": {
-        const island = this.session.state.world.islands[ev.islandId];
-        const where = island ? discoveryName(island.biome) : "the shore";
+        const world = this.session.state.world;
+        const where = world.islands[ev.islandId] ? islandName(world, ev.islandId) : "the shore";
         this.hud.toast(
           `${ev.count === 1 ? "A villager" : `${ev.count} villagers`} landed on ${where}`,
         );
@@ -553,8 +544,14 @@ export class Game {
     on(window, "keydown", (e) => {
       if (e.target instanceof HTMLInputElement) return;
       const k = e.key.toLowerCase();
+      if (this.hud.map.isOpen) {
+        // The map covers the game: only its own keys work while it is open.
+        if (k === "escape" || k === "m") this.hud.map.close();
+        return;
+      }
       this.keys.add(k);
-      if (k === "escape") {
+      if (k === "m") this.hud.map.open();
+      else if (k === "escape") {
         if (this.tool.kind !== "select") this.setTool({ kind: "select" });
         else this.select(null);
       } else if (k === "h" || k === "g") this.setTool({ kind: "harvest" });
@@ -707,17 +704,22 @@ export class Game {
     this.minimapTimer -= dt;
     if (this.minimapTimer <= 0) {
       this.minimapTimer = 0.4;
-      const corners = [
-        [0, 0],
-        [this.camera.width, 0],
-        [this.camera.width, this.camera.height],
-        [0, this.camera.height],
-      ].map(([x, y]) => {
-        const p = this.camera.screenToWorld(x!, y!);
-        return { x: (p.x / HALF_W + p.y / HALF_H) / 2, y: (p.y / HALF_H - p.x / HALF_W) / 2 };
-      });
-      this.hud.minimap.draw(state, corners);
+      this.hud.minimap.draw(state, this.viewCorners());
+      this.hud.setThreat(state);
     }
+  }
+
+  /** The four corners of the screen as tile coordinates, for the minimap and the map. */
+  private viewCorners(): { x: number; y: number }[] {
+    return [
+      [0, 0],
+      [this.camera.width, 0],
+      [this.camera.width, this.camera.height],
+      [0, this.camera.height],
+    ].map(([x, y]) => {
+      const p = this.camera.screenToWorld(x!, y!);
+      return { x: (p.x / HALF_W + p.y / HALF_H) / 2, y: (p.y / HALF_H - p.x / HALF_W) / 2 };
+    });
   }
 
   /** Where in the day the world is: the same for every player, from the simulation clock. */

@@ -46,6 +46,7 @@ Pick a tribe, start an expedition, then use **Copy invite link** to bring up to 
 | Order  | With a villager selected, right-click a resource, building, ship, bones or the ground. With a ship selected, right-click the sea, an island, a dock (cargo ships), a shipwreck or a sunken site |
 | Cancel | `Esc` or right-click                                                                                                                                                                            |
 | Chat   | `Enter`                                                                                                                                                                                         |
+| Map    | `M` opens the chart of the archipelago (or use the Map button by the minimap). `M` or `Esc` closes it                                                                                           |
 | Home   | `C` centres on the town hall                                                                                                                                                                    |
 
 ### Tribes
@@ -76,6 +77,17 @@ Every island belongs to one of ten biomes, with its own ground, cliffs, plants, 
 | Infernal Isles  | Far away    | Charred trees, ember fruit, obsidian, hellstone | Dark red, embers, grit     |
 | Crystal Spires  | Far away    | Silverleaf trees, crystal clusters              | Indigo, sparkling motes    |
 
+### The map
+
+Press **M** for the chart of the archipelago. It is drawn in the same isometric view as the game, so north-east on the chart is north-east on screen. Every island you have found has a name (made up from the world seed, so all players see the same ones). The chart shows:
+
+- your settlements: gold rings, the town hall as a star, docks in teal
+- each **trade route** as a dashed line from the dock a cargo ship collects at to the home dock
+- your ships as arrows, pirates as red dots (on water you have explored), shipwrecks and bones as crosses, and sunken sites you have found as diamonds
+- the box the camera is looking at
+
+Hover anything for details and click it to go there. The side list gives each settlement's stockpile (with a warning when goods can't leave: no dock, or no cargo ship serving the island), the whole fleet with hull points and orders, and every wreck and sunken site with the treasure left and its bearing from home.
+
 ### Magic house upgrades
 
 Each is learned once, for the whole team, and paid from the shared treasury with faith (from churches), gold (from the market and gold veins) and crystal (only found in the Crystal Spires).
@@ -92,7 +104,15 @@ Each is learned once, for the whole team, and paid from the shared treasury with
 
 ### Pirates, wrecks and hidden treasure
 
-**Pirates.** After the first seven minutes a raiding ship sails in from the edge of the map every few minutes (more of them as the days pass, up to three at once). It hunts the nearest ship of yours, or beaches beside a storehouse, camp or dock and robs a share of that island's stockpile for eight seconds before sailing off with the loot. You get a toast with the direction it came from.
+**Pirates.** How often they come is the **difficulty** you pick when creating a world (it is saved with the world and shown next to the expedition name):
+
+| Difficulty | Raids                                                                                                                               |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Peaceful   | None: explore, settle and trade in peace                                                                                            |
+| Normal     | First raid after seven minutes, then one every few minutes, up to three ships at once                                               |
+| Hard       | From five minutes, more often, one extra raider each time, 40% tougher hulls, 25% harder-hitting guns and half again as much stolen |
+
+A raiding ship sails in from the edge of the map. It hunts the nearest ship of yours, or beaches beside a storehouse, camp or dock and robs a share of that island's stockpile for eight seconds before sailing off with the loot (more raiders arrive as the days pass). A red alert appears at the top of the screen for as long as raiders are at large, with the direction they come from and a **Look** button that takes the camera to them.
 
 - **Ships have hull points** (scout 30, cargo 45, patrol boat 70) and mend slowly beside a dock. A ship that sinks takes its passengers with it and leaves a wreck.
 - **Defences**, from cheap to grand:
@@ -130,7 +150,7 @@ One day lasts eight minutes of game time and starts in the morning. The HUD cloc
 ```
 packages/shared   @explorer/shared: deterministic core used by client and server
   iso.ts            2:1 isometric projection and elevation-aware picking
-  world/            seeded archipelago generation, A* pathfinding
+  world/            seeded archipelago generation, island names, A* pathfinding
   sim/              catalogue, state, commands, 10 Hz tick, pirates and diving, snapshots and patches
   protocol.ts       WebSocket message types
 packages/art      @explorer/art: the colour palette and the per-pixel terrain painter

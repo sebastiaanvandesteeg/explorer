@@ -12,6 +12,7 @@ import {
   TICK_SECONDS,
   toSnapshot,
   type ClientMessage,
+  type Difficulty,
   type GameState,
   type PlayerInfo,
   type ServerMessage,
@@ -61,9 +62,13 @@ export class WorldRoom {
     private readonly store: WorldStore,
     private readonly onIdle: (room: WorldRoom) => void,
     saved?: SavedWorld,
+    /** Only used for a new world: a saved one keeps the difficulty in its snapshot. */
+    difficulty: Difficulty = "normal",
   ) {
     const world = generateWorld(seed, tribe);
-    this.state = saved ? fromSnapshot(world, saved.snapshot, true) : createInitialState(world);
+    this.state = saved
+      ? fromSnapshot(world, saved.snapshot, true)
+      : createInitialState(world, { difficulty });
     this.slots = (saved?.players ?? []).map((p) => ({ ...p, sockets: new Set() }));
     // A world nobody joins (yet) shouldn't stay in memory; joining cancels this.
     this.scheduleUnload();
@@ -80,6 +85,7 @@ export class WorldRoom {
       id: this.id,
       seed: this.seed,
       tribe: this.tribe,
+      difficulty: this.state.difficulty,
       players: this.slots.length,
       online: this.slots.filter((s) => s.sockets.size > 0).length,
       maxPlayers: MAX_PLAYERS,
@@ -255,11 +261,22 @@ export class RoomManager {
 
   constructor(private readonly store: WorldStore) {}
 
-  async create(seed: string, tribe: TribeId): Promise<WorldRoom> {
+  async create(
+    seed: string,
+    tribe: TribeId,
+    difficulty: Difficulty = "normal",
+  ): Promise<WorldRoom> {
     let id = newWorldId();
     while (this.rooms.has(id) || (await this.store.load(id))) id = newWorldId();
-    const room = new WorldRoom(id, seed, tribe, new Date().toISOString(), this.store, (r) =>
-      this.unload(r),
+    const room = new WorldRoom(
+      id,
+      seed,
+      tribe,
+      new Date().toISOString(),
+      this.store,
+      (r) => this.unload(r),
+      undefined,
+      difficulty,
     );
     this.rooms.set(id, room);
     await room.save();

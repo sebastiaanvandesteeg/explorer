@@ -1,7 +1,7 @@
 import {
   PATROL,
-  PIRATE,
   CARGO,
+  pirateMaxHp,
   SHIP,
   shipMaxHp,
   VILLAGER,
@@ -436,7 +436,7 @@ class PirateView extends MovingView {
     const name = `pirate_${p.heading % 8}`;
     this.sprite.texture = this.layer.atlas.texture(name);
     this.layer.atlas.anchor(this.sprite, name);
-    hullBar(this.bar, p.hp, PIRATE.hp);
+    hullBar(this.bar, p.hp, pirateMaxHp(this.layer.state));
   }
 
   override frame(now: number, dt: number): void {

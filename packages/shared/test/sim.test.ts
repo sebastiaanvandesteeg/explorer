@@ -7,13 +7,18 @@ import {
   BUILDINGS,
   canPlaceBuilding,
   createInitialState,
+  DIFFICULTY_DEFS,
   dockSpawn,
   fromSnapshot,
   generateWorld,
   harvestSeconds,
+  isDifficulty,
   isLandTerrain,
+  islandName,
+  islandNames,
   newShip,
   PIRATE,
+  pirateMaxHp,
   landingBlock,
   population,
   populationCap,
@@ -792,5 +797,61 @@ describe("pirates, wrecks and sunken sites", () => {
     const restored = fromSnapshot(world, JSON.parse(JSON.stringify(toSnapshot(s))), true);
     expect(restored.nextRaid).toBe(777);
     expect(of(restored, "site")).toHaveLength(world.sites.length);
+  });
+});
+
+describe("difficulty", () => {
+  it("starts the first raid on the difficulty's schedule", () => {
+    expect(createInitialState(world).nextRaid).toBe(DIFFICULTY_DEFS.normal.firstRaid);
+    expect(createInitialState(world, { difficulty: "hard" }).nextRaid).toBe(
+      DIFFICULTY_DEFS.hard.firstRaid,
+    );
+    expect(DIFFICULTY_DEFS.hard.firstRaid).toBeLessThan(DIFFICULTY_DEFS.normal.firstRaid);
+  });
+
+  it("never sends pirates in a peaceful world", () => {
+    const s = createInitialState(world, { difficulty: "peaceful" });
+    s.nextRaid = 0;
+    run(s, 900);
+    expect(of(s, "pirate")).toHaveLength(0);
+    expect(s.events.some((e) => e.type === "pirates")).toBe(false);
+  });
+
+  it("makes hard raids bigger and tougher than normal ones", () => {
+    const raid = (difficulty: "normal" | "hard") => {
+      const s = createInitialState(world, { difficulty });
+      s.time = 3 * 480; // a few days in: raids grow with the days
+      s.nextRaid = 0;
+      tick(s);
+      return { s, pirates: of<PirateEntity>(s, "pirate") };
+    };
+    const normal = raid("normal");
+    const hard = raid("hard");
+    expect(hard.pirates.length).toBeGreaterThan(normal.pirates.length);
+    expect(hard.pirates[0]!.hp).toBeGreaterThan(normal.pirates[0]!.hp);
+    expect(hard.pirates[0]!.hp).toBe(pirateMaxHp(hard.s));
+  });
+
+  it("is saved with the world, and old saves count as normal", () => {
+    const hard = createInitialState(world, { difficulty: "hard" });
+    const snap = JSON.parse(JSON.stringify(toSnapshot(hard)));
+    expect(fromSnapshot(world, snap, true).difficulty).toBe("hard");
+    delete snap.difficulty;
+    expect(fromSnapshot(world, snap, true).difficulty).toBe("normal");
+    expect(isDifficulty("hard")).toBe(true);
+    expect(isDifficulty("nightmare")).toBe(false);
+  });
+});
+
+describe("island names", () => {
+  it("names every island, uniquely and the same way every time", () => {
+    const names = islandNames(world);
+    expect(names).toHaveLength(world.islands.length);
+    expect(new Set(names).size).toBe(names.length);
+    expect(names.every((n) => n.length > 3)).toBe(true);
+    expect(islandNames(generateWorld("sim-tests"))).toEqual(names);
+    expect(islandNames(generateWorld("another-seed"))).not.toEqual(names);
+    expect(islandName(world, world.start.islandId)).toBe(names[world.start.islandId]);
+    expect(islandName(world, 9999)).toBe("Uncharted waters");
   });
 });

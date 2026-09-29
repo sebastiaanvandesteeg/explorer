@@ -31,11 +31,15 @@ afterEach(async () => {
 
 const base = () => `http://127.0.0.1:${app.port}`;
 
-async function createWorld(seed = "server-test", tribe?: string): Promise<WorldInfo> {
+async function createWorld(
+  seed = "server-test",
+  tribe?: string,
+  difficulty?: string,
+): Promise<WorldInfo> {
   const res = await fetch(`${base()}/api/worlds`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ seed, tribe }),
+    body: JSON.stringify({ seed, tribe, difficulty }),
   });
   expect(res.status).toBe(201);
   return (await res.json()) as WorldInfo;
@@ -131,6 +135,24 @@ describe("HTTP API", () => {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ tribe: "vikings" }),
+    });
+    expect(bad.status).toBe(400);
+  });
+});
+
+describe("difficulty", () => {
+  it("creates worlds at a chosen difficulty and remembers it", async () => {
+    expect((await createWorld("diff-default")).difficulty).toBe("normal");
+    const info = await createWorld("diff-hard", undefined, "hard");
+    expect(info.difficulty).toBe("hard");
+    const p = new Player();
+    const welcome = await p.join(info.id, "Dana", token(4));
+    expect(welcome.t === "welcome" && welcome.snapshot.difficulty).toBe("hard");
+    expect(mirror(welcome).difficulty).toBe("hard");
+    const bad = await fetch(`${base()}/api/worlds`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ difficulty: "nightmare" }),
     });
     expect(bad.status).toBe(400);
   });

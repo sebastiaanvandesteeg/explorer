@@ -354,15 +354,11 @@ export const PIRATE = {
   range: 4.5,
   cooldown: 2.5,
   speed: 3.2,
-  /** Seconds of game time before the first raid, then between raids. */
-  firstRaid: 420,
-  interval: [200, 320] as const,
   /** Seconds spent looting a beached settlement, and the share of each pile taken per second. */
   raidSeconds: 8,
   stealShare: 0.04,
-  /** A raider never comes closer than this to the town it is heading for, and only spawns this far out. */
+  /** A raider only spawns this far from the town hall. See DIFFICULTY_DEFS for the timings. */
   spawnDistance: 45,
-  maxAtOnce: 3,
 };
 
 export const STORM = { interval: 6, damage: 14, range: 16 };

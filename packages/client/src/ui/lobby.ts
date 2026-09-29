@@ -1,8 +1,11 @@
 import {
+  DIFFICULTIES,
+  DIFFICULTY_DEFS,
   MAX_NAME_LENGTH,
   MAX_PLAYERS,
   TRIBE_DEFS,
   TRIBES,
+  type Difficulty,
   type TribeId,
   type WorldInfo,
 } from "@explorer/shared";
@@ -15,7 +18,7 @@ export interface LobbyOptions {
   joinId?: string;
   error?: string;
   onEnter(name: string, worldId: string): void;
-  onOffline(name: string, seed: string, tribe: TribeId): void;
+  onOffline(name: string, seed: string, tribe: TribeId, difficulty: Difficulty): void;
   /** Loads sprites for the tribe previews (the lobby shows before they're ready). */
   atlas: Promise<Atlas>;
 }
@@ -97,6 +100,34 @@ export function showLobby(root: HTMLElement, opts: LobbyOptions): () => void {
       pic.append(icon);
     });
   }
+  let difficulty: Difficulty = "normal";
+  const difficultyHint = h("small", {}, DIFFICULTY_DEFS[difficulty].description);
+  const difficultyButtons = new Map<Difficulty, HTMLElement>();
+  const difficulties = h("div.segmented", { role: "radiogroup", "aria-label": "Difficulty" });
+  for (const id of DIFFICULTIES) {
+    const def = DIFFICULTY_DEFS[id];
+    const btn = h(
+      "button.seg",
+      {
+        type: "button",
+        role: "radio",
+        "aria-checked": String(id === difficulty),
+        title: def.description,
+        onclick: () => {
+          difficulty = id;
+          difficultyHint.textContent = def.description;
+          for (const [d, el] of difficultyButtons) {
+            el.classList.toggle("active", d === id);
+            el.setAttribute("aria-checked", String(d === id));
+          }
+        },
+      },
+      def.name,
+    );
+    if (id === difficulty) btn.classList.add("active");
+    difficultyButtons.set(id, btn);
+    difficulties.append(btn);
+  }
   const code = h("input.field", { placeholder: "Invite code or link" }) as HTMLInputElement;
 
   const needName = (): string | null => {
@@ -119,7 +150,7 @@ export function showLobby(root: HTMLElement, opts: LobbyOptions): () => void {
       const res = await fetch("/api/worlds", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ seed: seed.value.trim() || randomSeed(), tribe }),
+        body: JSON.stringify({ seed: seed.value.trim() || randomSeed(), tribe, difficulty }),
       });
       if (!res.ok) throw new Error(await res.text());
       const info = (await res.json()) as WorldInfo;
@@ -173,6 +204,7 @@ export function showLobby(root: HTMLElement, opts: LobbyOptions): () => void {
       ),
       h("label", {}, "Your name", name),
       h("div.field", {}, h("span", {}, "Choose your tribe"), tribes),
+      h("div.field", {}, h("span", {}, "Pirates"), difficulties, difficultyHint),
       h("label", {}, "World seed (optional)", seed),
       createBtn,
       h("div.divider"),
@@ -194,7 +226,7 @@ export function showLobby(root: HTMLElement, opts: LobbyOptions): () => void {
             onclick: (e: Event) => {
               e.preventDefault();
               const n = needName();
-              if (n) opts.onOffline(n, seed.value.trim() || randomSeed(), tribe);
+              if (n) opts.onOffline(n, seed.value.trim() || randomSeed(), tribe, difficulty);
             },
           },
           "Play offline",
