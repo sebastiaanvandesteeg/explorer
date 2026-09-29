@@ -11,6 +11,7 @@ import {
   dayPeriod,
   discoveryName,
   FARM,
+  greatWorkStages,
   islandAt,
   MARKET_BUYABLE,
   MARKET_LOT,
@@ -50,11 +51,12 @@ import type { Atlas } from "../assets";
 import type { SessionStatus } from "../net/session";
 import { buildingThumb, villagerSprite } from "../render/names";
 import { describeIsland, describePirate, describeShip, goodsText, nearestSite } from "./describe";
+import { chronicleRows, stageRows } from "./greatWork";
 import { h } from "./dom";
 import { currentStorm, currentThreat, pirateSpotted } from "./mapData";
 import { MapScreen } from "./mapscreen";
 import { abgr, mapColours } from "./mapColours";
-import { ICON, LABEL } from "./resources";
+import { ICON, LABEL, RARE } from "./resources";
 
 export type Tool =
   { kind: "select" } | { kind: "build"; building: BuildingKind } | { kind: "harvest" };
@@ -88,6 +90,10 @@ export class Hud {
     extra?: HTMLElement;
     /** Magic house: one row per upgrade, restyled when it is learned. */
     upgrades?: { id: UpgradeId; row: HTMLElement; btn: HTMLButtonElement }[];
+    /** The Great Work: the stage list, redrawn when it changes, and its own buttons. */
+    great?: HTMLElement;
+    greatKey?: string;
+    greatButtons?: { el: HTMLButtonElement; enabled: () => boolean }[];
     bar?: HTMLElement;
     buttons: { el: HTMLButtonElement; enabled: () => boolean }[];
   } = { buttons: [] };
@@ -275,6 +281,10 @@ export class Hud {
       this.map.root,
     );
     parent.append(this.root);
+    // Everything under the resource bar makes room when the bar wraps onto a second row.
+    const fit = () => this.root.style.setProperty("--hud-top", `${resources.offsetHeight + 24}px`);
+    fit();
+    if (typeof ResizeObserver !== "undefined") new ResizeObserver(fit).observe(resources);
   }
 
   /** Note the world's difficulty in the expedition title, unless it is the ordinary one. */
@@ -305,7 +315,7 @@ export class Hud {
       const el = this.resEls.get(r)!;
       el.textContent = String(stock[r]);
       // Advanced resources stay hidden until the settlement has some.
-      if (["ore", "tools", "gold", "faith", "crystal", "relic"].includes(r)) {
+      if (RARE.includes(r as Resource)) {
         el.parentElement!.classList.toggle(
           "empty",
           stock[r] === 0 && !(this.lastStock && this.lastStock[r] > 0),
@@ -489,8 +499,125 @@ export class Hud {
     this.updateSelection(state, e);
   }
 
+  /** The Great Work's stage list: what each stage needs, what the treasury holds, and Fund. */
+  private renderGreatWork(
+    state: GameState,
+    gw: BuildingEntity,
+    refs: typeof this.selectionRefs,
+  ): void {
+    const rows = stageRows(state, gw);
+    const key = JSON.stringify([
+      gw.stage,
+      gw.complete,
+      rows.map((r) => r.cost.map((c) => c.have)),
+      state.discovered.size,
+    ]);
+    if (key === refs.greatKey || !refs.great) return;
+    refs.greatKey = key;
+    refs.greatButtons = [];
+    const icon = (res: Resource) => {
+      const el = h("span.icon");
+      if (this.atlas.has(ICON[res])) Object.assign(el.style, this.atlas.iconStyle(ICON[res], 1));
+      return el;
+    };
+    const stateLabel = { done: "Complete", building: "Being built…", next: "", later: "" } as const;
+    const nodes: HTMLElement[] = rows.map((r) => {
+      const head = h(
+        "div.gw-head",
+        {},
+        h("strong", {}, `${r.index + 1}. ${r.name}`),
+        h("small", {}, stateLabel[r.state]),
+      );
+      if (r.state === "done") return h("div.gw-stage.done", {}, head);
+      const goods = h(
+        "div.gw-goods",
+        {},
+        ...r.cost.map((c) =>
+          h(
+            `div.gw-good${c.have >= c.need ? ".ok" : ""}`,
+            { title: LABEL[c.res] },
+            icon(c.res),
+            h("span.n", {}, `${Math.min(c.have, c.need)}/${c.need}`),
+            c.hint ? h("small", {}, c.hint) : null,
+          ),
+        ),
+      );
+      const fund =
+        r.state === "next" && gw.complete
+          ? (() => {
+              const el = h(
+                "button.btn.primary",
+                {
+                  title: "Spends these goods from the treasury; villagers then raise the stage",
+                  onclick: () =>
+                    this.actions.command({ kind: "fund-great-work", buildingId: gw.id }),
+                },
+                `Fund ${r.name}`,
+              ) as HTMLButtonElement;
+              refs.greatButtons!.push({
+                el,
+                enabled: () => {
+                  const live = stageRows(this.actions.state(), gw).find((x) => x.index === r.index);
+                  return !!live?.ready;
+                },
+              });
+              return el;
+            })()
+          : null;
+      return h(`div.gw-stage.${r.state}`, {}, head, h("small.gw-blurb", {}, r.blurb), goods, fund);
+    });
+    const finished = (gw.stage ?? 0) >= rows.length && gw.complete;
+    if (finished) {
+      const el = h(
+        "button.btn",
+        { onclick: () => this.showChronicle(this.actions.state()) },
+        "Read the chronicle",
+      ) as HTMLButtonElement;
+      nodes.push(el);
+    }
+    refs.great.replaceChildren(...nodes);
+  }
+
+  /** The end-of-expedition screen: the story of the voyage in numbers. */
+  showChronicle(state: GameState): void {
+    this.root.querySelector(".chronicle")?.remove();
+    const close = () => this.root.querySelector(".chronicle")?.remove();
+    const thumb = buildingThumb("great_work", this.tribe);
+    const pic = h("span.icon");
+    if (this.atlas.has(thumb)) Object.assign(pic.style, this.atlas.iconStyle(thumb, 1.4));
+    const done = state.stats.wonderAt !== null;
+    this.root.append(
+      h(
+        "div.chronicle",
+        { onclick: close },
+        h(
+          "div.chronicle-card.panel",
+          { onclick: (e: Event) => e.stopPropagation() },
+          pic,
+          h("h2", {}, done ? "The Great Work is complete" : "Chronicle of the expedition"),
+          h(
+            "p",
+            {},
+            done
+              ? "The archipelago will remember this expedition. Here is how it went:"
+              : "How the expedition has gone so far:",
+          ),
+          h(
+            "div.chronicle-rows",
+            {},
+            ...chronicleRows(state).map((r) =>
+              h("div.row", {}, h("span", {}, r.label), h("strong", {}, r.value)),
+            ),
+          ),
+          h("button.btn.primary", { onclick: close }, "Keep exploring"),
+        ),
+      ),
+    );
+  }
+
   private refreshSelectionButtons(): void {
     for (const b of this.selectionRefs.buttons) b.el.disabled = !b.enabled();
+    for (const b of this.selectionRefs.greatButtons ?? []) b.el.disabled = !b.enabled();
   }
 
   private buildSelection(state: GameState, e: Entity): void {
@@ -563,6 +690,10 @@ export class Hud {
       }
       if (e.kind === "market" && e.complete)
         parts.push(this.marketPanel(state, button, small, cmd));
+      if (e.kind === "great_work") {
+        refs.great = h("div.great");
+        parts.push(refs.great);
+      }
       if ((e.kind === "magic_house" || e.kind === "dock") && e.complete) {
         refs.upgrades = [];
         const list = h("div.upgrades", {});
@@ -590,7 +721,8 @@ export class Hud {
         }
         parts.push(list);
       }
-      if (def.buildable) {
+      // Once a stage of the Great Work stands, it stays.
+      if (def.buildable && !(e.kind === "great_work" && (e.stage ?? 0) >= 1)) {
         actions.append(
           button(
             e.complete ? "Demolish" : "Cancel",
@@ -849,6 +981,12 @@ export class Hud {
         status = "Staffed by a villager";
       } else if (e.kind === "town_hall") {
         status = `Population ${population(state)}/${populationCap(state)}`;
+      } else if (e.kind === "great_work") {
+        const stages = greatWorkStages(state.world).length;
+        status =
+          (e.stage ?? 0) >= stages
+            ? "The Great Work is complete"
+            : `Stage ${e.stage ?? 0} of ${stages} complete`;
       } else if (e.kind === "lighthouse") {
         status = `Its beam watches ${WATCH.lighthouse} tiles of sea, day and night`;
       } else if (e.kind === "magic_house") {
@@ -858,6 +996,7 @@ export class Hud {
       }
       if (refs.status) refs.status.textContent = status;
       if (refs.extra) refs.extra.textContent = stockpileText(state, e);
+      if (refs.great) this.renderGreatWork(state, e, refs);
       for (const u of refs.upgrades ?? []) {
         const owned = state.upgrades.has(u.id);
         u.row.classList.toggle("owned", owned);

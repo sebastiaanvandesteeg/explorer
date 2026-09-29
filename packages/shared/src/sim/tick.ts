@@ -23,6 +23,7 @@ import {
   type WorkerJob,
 } from "./catalogue";
 import { releaseTask } from "./commands";
+import { greatWorkStages } from "./greatwork";
 import { collectWreck, updateThreats } from "./pirates";
 import { stormOnRoute, updateWeather } from "./weather";
 import { disembark, dockSpawn, embark, hasRoom, shipMoving, shoreBeside } from "./ferry";
@@ -45,6 +46,7 @@ import {
   shipReveal,
   cargoCapacity,
   stockOf,
+  tally,
   touchStock,
   walkable,
   type BuildingEntity,
@@ -184,6 +186,12 @@ function depleteNode(state: GameState, n: NodeEntity): void {
   markDirty(state, n.id);
 }
 
+/** Builder-seconds the current construction of a building needs. */
+export function workFor(state: GameState, b: BuildingEntity): number {
+  if (b.kind !== "great_work") return BUILDINGS[b.kind].work;
+  return greatWorkStages(state.world)[b.stage ?? 0]?.work ?? BUILDINGS[b.kind].work;
+}
+
 export function completeBuilding(state: GameState, b: BuildingEntity): void {
   b.complete = true;
   b.progress = 1;
@@ -194,7 +202,17 @@ export function completeBuilding(state: GameState, b: BuildingEntity): void {
     b.y + b.h / 2,
     b.kind === "lighthouse" ? LIGHTHOUSE.reveal : BUILDING_REVEAL,
   );
-  state.events.push({ type: "built", kind: b.kind, x: b.x, y: b.y });
+  if (b.kind !== "great_work") {
+    state.events.push({ type: "built", kind: b.kind, x: b.x, y: b.y });
+    return;
+  }
+  b.stage = (b.stage ?? 0) + 1;
+  const final = b.stage >= greatWorkStages(state.world).length;
+  state.events.push({ type: "wonder", stage: b.stage, final });
+  if (final) {
+    state.stats.wonderAt = state.time;
+    state.statsDirty = true;
+  }
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -424,7 +442,7 @@ function work(state: GameState, v: VillagerEntity, dt: number): void {
   }
   if (t.kind === "build") {
     const b = state.entities.get(t.buildingId) as BuildingEntity;
-    b.progress = Math.min(1, b.progress + dt / Math.max(0.5, BUILDINGS[b.kind].work));
+    b.progress = Math.min(1, b.progress + dt / Math.max(0.5, workFor(state, b)));
     markDirty(state, b.id);
     if (b.progress >= 1) {
       completeBuilding(state, b);
@@ -756,6 +774,9 @@ function runRoute(state: GameState, s: ShipEntity): void {
   }
   s.cargo = {};
   s.leg = "pickup";
-  if (delivered > 0) state.events.push({ type: "cargo", amount: delivered, x: spot.x, y: spot.y });
+  if (delivered > 0) {
+    tally(state, "hauled", delivered);
+    state.events.push({ type: "cargo", amount: delivered, x: spot.x, y: spot.y });
+  }
   rest(1);
 }

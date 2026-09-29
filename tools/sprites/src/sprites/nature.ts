@@ -580,6 +580,67 @@ function glossy(ramp: RampName, highlight: RampName): Material {
       : shade(ramp, lit(c, -0.05), c.px, c.py, 0.25);
 }
 
+/**
+ * A far biome's signature deposit: amber gems, icy shards, pearls or glowing caps, on a base of
+ * the local rock. Each is a small cluster that catches the light, so it reads as treasure.
+ */
+function signatureDeposit(kind: "sunstone" | "rimeglass" | "mirepearl" | "glowcap"): Sprite {
+  const s = new Scene();
+  s.groundShadow = { x0: -0.2, y0: -0.2, x1: 1.2, y1: 1.2 };
+  const rand = prng(4100 + kind.length * 17);
+  const shine =
+    (ramp: RampName, bias = 0.35): Material =>
+    (c) =>
+      shade(ramp, bias + 0.8 * c.light + (c.n[2] > 0.3 ? 0.1 : 0), c.px, c.py, 0.2);
+  if (kind === "sunstone") {
+    rock(s, rand, [0.5, 0.5, 1], [0.34, 0.3, 4], rocky("sandstone", 7, 0), 14);
+    const gem = shine("sunflower", 0.3);
+    for (const [x, y, r, h] of [
+      [0.5, 0.5, 0.15, 24],
+      [0.3, 0.6, 0.1, 15],
+      [0.68, 0.4, 0.11, 17],
+      [0.6, 0.68, 0.08, 11],
+      [0.36, 0.34, 0.08, 12],
+    ] as const)
+      s.cone([x, y, 3], r, h, gem, 6);
+  } else if (kind === "rimeglass") {
+    rock(s, rand, [0.5, 0.5, 1], [0.34, 0.3, 4], glossy("ice", "snow"), 14);
+    const shard = shine("ice", 0.4);
+    for (const [x, y, r, h] of [
+      [0.5, 0.5, 0.09, 40],
+      [0.36, 0.44, 0.07, 28],
+      [0.64, 0.56, 0.07, 32],
+      [0.5, 0.7, 0.06, 20],
+      [0.28, 0.66, 0.05, 15],
+    ] as const)
+      s.cone([x, y, 3], r, h, shard, 5);
+  } else if (kind === "mirepearl") {
+    rock(s, rand, [0.5, 0.5, 1], [0.38, 0.32, 3], rocky("swampGround", 7, 0.3), 14);
+    const pearl = shine("glow", 0.25);
+    for (const [x, y, z, r] of [
+      [0.42, 0.46, 6, 0.13],
+      [0.62, 0.52, 5, 0.11],
+      [0.5, 0.64, 4.5, 0.09],
+      [0.34, 0.62, 4, 0.07],
+    ] as const)
+      s.ellipsoid([x, y, z], [r, r, r * 22], pearl);
+  } else {
+    rock(s, rand, [0.5, 0.5, 1], [0.34, 0.3, 3], rocky("basalt", 7, 0), 12);
+    const cap = shine("glow", 0.3);
+    const stalk = flat("stalk", 0.05);
+    for (const [x, y, h, r] of [
+      [0.5, 0.5, 16, 0.17],
+      [0.32, 0.56, 10, 0.12],
+      [0.68, 0.42, 12, 0.13],
+      [0.56, 0.7, 7, 0.09],
+    ] as const) {
+      s.prism("z", [x, y, 3 + h / 2], 0.03, h / 2, stalk, 6);
+      s.ellipsoid([x, y, 3 + h], [r, r, 4], cap);
+    }
+  }
+  return renderSprite(`n_${kind}_0`, s, 1, 1, 52, 10);
+}
+
 function crystalCluster(v: number): Sprite {
   const s = new Scene();
   s.groundShadow = { x0: -0.2, y0: -0.2, x1: 1.2, y1: 1.2 };
@@ -861,6 +922,10 @@ export function natureSprites(): Sprite[] {
     shroomPatch("n_glowshroom_bare", "glow", true, true, 6600),
     ...range(V.silver_tree).map(silverTree),
     ...range(V.crystal).map(crystalCluster),
+    signatureDeposit("sunstone"),
+    signatureDeposit("rimeglass"),
+    signatureDeposit("mirepearl"),
+    signatureDeposit("glowcap"),
     ...range(V.autumn_tree).map(autumn),
     pumpkinPatch(false),
     pumpkinPatch(true),

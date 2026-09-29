@@ -195,17 +195,46 @@ function villagerSprites(): Sprite[] {
   return out;
 }
 
+type CarriedKind =
+  | "wood"
+  | "stone"
+  | "food"
+  | "ore"
+  | "gold"
+  | "crystal"
+  | "sunstone"
+  | "rimeglass"
+  | "mirepearl"
+  | "glowcap"
+  | "hellstone";
+
+/** The ramp each carried mineral is drawn in. */
+const MINERAL_RAMP = {
+  ore: "rock",
+  gold: "gold",
+  crystal: "crystal",
+  sunstone: "sunflower",
+  rimeglass: "ice",
+  mirepearl: "glow",
+  glowcap: "glow",
+  hellstone: "lava",
+} as const;
+
 /** Items carried above the head while hauling. Anchor = top of the villager's head. */
-function carried(kind: "wood" | "stone" | "food" | "ore" | "gold" | "crystal"): Sprite {
+function carried(kind: CarriedKind): Sprite {
   const c = new Canvas(12, 8);
-  if (kind === "ore" || kind === "gold" || kind === "crystal") {
-    const ramp = kind === "ore" ? "rock" : kind === "gold" ? "gold" : "crystal";
+  if (kind in MINERAL_RAMP) {
+    const ramp = MINERAL_RAMP[kind as keyof typeof MINERAL_RAMP];
     c.fill(3, 3, 6, 4, rampColor(ramp, 2));
     c.fill(3, 3, 4, 2, rampColor(ramp, 3));
     c.set(4, 3, rampColor(ramp, 5));
     if (kind === "ore") (c.set(6, 4, rampColor("fruit", 2)), c.set(7, 5, rampColor("fruit", 2)));
     if (kind === "crystal")
       (c.fill(5, 0, 2, 3, rampColor("crystal", 4)), c.set(5, 0, rampColor("crystal", 6)));
+    if (kind === "sunstone" || kind === "rimeglass") c.fill(5, 1, 2, 2, rampColor(ramp, 5));
+    if (kind === "mirepearl") c.fill(4, 2, 4, 4, rampColor("glow", 4));
+    if (kind === "hellstone")
+      (c.set(5, 4, rampColor("lava", 4)), c.set(7, 5, rampColor("lava", 3)));
   } else if (kind === "wood") {
     for (let i = 0; i < 3; i++) {
       c.fill(1, 2 + i * 2, 10, 2, rampColor("timber", 2 + (i % 2)));
@@ -601,6 +630,66 @@ function icons(): Sprite[] {
       }
       c.set(6, 3, rampColor("crystal", 6));
     }),
+    icon("sunstone", (c) => {
+      // A faceted amber gem: a wide crown over a pointed pavilion.
+      const widths = [4, 6, 8, 10, 10, 9, 8, 6, 5, 3, 2];
+      widths.forEach((w, y) =>
+        c.fill(
+          7 - Math.floor(w / 2),
+          y + 1,
+          w,
+          1,
+          rampColor("sunflower", y < 4 ? 4 : y < 6 ? 3 : 2),
+        ),
+      );
+      c.fill(4, 2, 3, 2, rampColor("sunflower", 5));
+      c.fill(3, 4, 8, 1, rampColor("wheat", 2));
+    }),
+    icon("rimeglass", (c) => {
+      // A pale, tall shard with a bright edge.
+      for (let y = 0; y < 12; y++) {
+        const w = y < 3 ? 2 : y < 9 ? 4 : 3;
+        c.fill(7 - Math.floor(w / 2), y + 1, w, 1, rampColor("ice", y % 3 === 0 ? 5 : 4));
+      }
+      c.fill(6, 2, 1, 8, rampColor("snow", 5));
+      c.fill(9, 5, 2, 5, rampColor("ice", 2));
+    }),
+    icon("mirepearl", (c) => {
+      // A pearl with a bright glint, in a dark setting.
+      c.fill(3, 8, 8, 4, rampColor("willow", 1));
+      c.fill(4, 3, 6, 6, rampColor("glow", 3));
+      c.fill(5, 2, 4, 8, rampColor("glow", 3));
+      c.fill(5, 3, 2, 2, rampColor("glow", 5));
+      c.set(9, 8, rampColor("glow", 1));
+    }),
+    icon("glowcap", (c) => {
+      // A glowing mushroom cap on a pale stalk.
+      c.fill(6, 6, 2, 6, rampColor("stalk", 4));
+      c.fill(2, 3, 10, 4, rampColor("glow", 3));
+      c.fill(4, 1, 6, 3, rampColor("glow", 4));
+      c.fill(5, 2, 2, 1, rampColor("glow", 5));
+      c.set(4, 5, rampColor("glow", 5));
+      c.set(9, 4, rampColor("glow", 5));
+    }),
+    icon("hellstone", (c) => {
+      // Black rock split by glowing cracks.
+      c.fill(2, 5, 10, 7, rampColor("basalt", 2));
+      c.fill(4, 2, 6, 4, rampColor("basalt", 3));
+      c.fill(3, 5, 8, 2, rampColor("basalt", 4));
+      for (const [x, y] of [
+        [6, 3],
+        [7, 4],
+        [6, 5],
+        [5, 6],
+        [6, 7],
+        [7, 8],
+        [8, 9],
+        [4, 9],
+        [9, 6],
+      ] as const)
+        c.set(x, y, rampColor("lava", y < 6 ? 5 : 4));
+      c.set(6, 8, rampColor("lava", 3));
+    }),
     icon("villager", (c) => {
       c.fill(4, 2, 6, 5, rampColor("skin", 2));
       c.fill(4, 1, 6, 2, rampColor("hair", 1));
@@ -720,6 +809,11 @@ export function unitSprites(): Sprite[] {
     carried("ore"),
     carried("gold"),
     carried("crystal"),
+    carried("sunstone"),
+    carried("rimeglass"),
+    carried("mirepearl"),
+    carried("glowcap"),
+    carried("hellstone"),
     ...particles(),
     ...Array.from({ length: 8 }, (_, h) => ship(h)),
     ...Array.from({ length: 8 }, (_, h) => ship(h, "cargo")),

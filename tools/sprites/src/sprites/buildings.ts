@@ -730,6 +730,92 @@ function lighthouse(st: Style): Sprite {
   });
 }
 
+/** What the Great Work's pillars are made of, in each tribe's own material. */
+function pillarMaterial(st: Style): Material {
+  switch (st.tribe) {
+    case "islanders":
+      return (c) => shade("plaster", lit(c, 0.05), c.px, c.py, 0.2);
+    case "northfolk":
+      return withOpenings(logSurface("logs"), { frame: "darkwood", plinthPx: 0 });
+    case "sunfolk":
+      return (c) =>
+        shade("sandstone", lit(c, (c.lp[2] / 7) % 1 < 0.12 ? -0.15 : 0.06), c.px, c.py, 0.2);
+    case "sylvan":
+      return withOpenings(barkSurface(), { frame: "bark", plinthPx: 0 });
+  }
+}
+
+/** The pillars stand in a ring round the middle of the platform. */
+const RING: [number, number][] = Array.from({ length: 8 }, (_, i) => {
+  const a = (i * Math.PI) / 4 + Math.PI / 8;
+  return [2 + Math.cos(a) * 1.5, 2 + Math.sin(a) * 1.5];
+});
+
+/**
+ * The Great Work, in three stages: a stepped platform with plinths and an altar; a ring of tall
+ * pillars round a glowing crystal; and the crown: lintels joining the pillars under a spire of
+ * crystal. Each tribe raises it in its own material.
+ */
+function greatWork(st: Style, stage: 1 | 2 | 3): Sprite {
+  const s = new Scene();
+  s.groundShadow = { x0: -0.2, y0: -0.2, x1: 4.3, y1: 4.3 };
+  const pillar = pillarMaterial(st);
+  // A stepped platform.
+  s.box([0.1, 0.1, 0], [3.9, 3.9, 3], st.base);
+  s.box([0.45, 0.45, 3], [3.55, 3.55, 6], st.base);
+  const gem: Material = (c) => shade("crystal", 0.35 + 0.8 * c.light, c.px, c.py, 0.2);
+  const glowing: Material = (c) => rampColor("glass", c.light > 0.5 ? 3 : 2);
+  // Banners on the corners of the lower step.
+  for (const [x, y] of [
+    [0.3, 0.3],
+    [3.7, 0.3],
+    [0.3, 3.7],
+    [3.7, 3.7],
+  ] as const)
+    banner(s, st, x, y, 3, 16);
+  if (stage === 1) {
+    // Plinths and an altar slab where the pillars will stand.
+    for (const [x, y] of RING) s.prism("z", [x, y, 10], 0.24, 4, pillar, 10);
+    s.box([1.55, 1.55, 6], [2.45, 2.45, 10], st.base);
+    s.box([1.7, 1.7, 10], [2.3, 2.3, 11], flat("gold", 0.1));
+    return renderSprite(`b_great_work_1_${st.tribe}`, s, 4, 4, 60, 10);
+  }
+  const height = stage === 3 ? 52 : 46;
+  for (const [x, y] of RING) {
+    s.prism("z", [x, y, 6 + height / 2], 0.2, height / 2, pillar, 10);
+    s.prism("z", [x, y, 8], 0.27, 2, st.trim, 10);
+    s.prism("z", [x, y, 6 + height + 1], 0.25, 1.5, st.trim, 10);
+    if (stage === 3) {
+      // A lamp on each pillar, and the tribe's own finial.
+      s.ellipsoid([x, y, 6 + height + 5], [0.08, 0.08, 3], glowing);
+    }
+  }
+  // The heart of the monument: a crystal on a dais.
+  s.box([1.45, 1.45, 6], [2.55, 2.55, 9], st.base);
+  if (stage === 2) {
+    s.cone([2, 2, 9], 0.3, 26, gem, 8);
+    s.cone([2.25, 1.85, 9], 0.14, 14, gem, 6);
+    s.cone([1.75, 2.2, 9], 0.14, 11, gem, 6);
+    return renderSprite(`b_great_work_2_${st.tribe}`, s, 4, 4, 80, 10, {
+      sparkle: [at(2, 2, 40)],
+    });
+  }
+  // Stage three: lintels between the pillars, and a spire of crystal rising from the dais.
+  for (let i = 0; i < RING.length; i++) {
+    const [x0, y0] = RING[i]!;
+    const [x1, y1] = RING[(i + 1) % RING.length]!;
+    strand(s, [x0, y0, 6 + height + 4], [x1, y1, 6 + height + 4], 0.07, 1, st.trim, 6);
+  }
+  s.cone([2, 2, 9], 0.5, 84, gem, 10);
+  s.cone([2.35, 1.75, 9], 0.18, 40, gem, 7);
+  s.cone([1.65, 2.25, 9], 0.16, 34, gem, 7);
+  s.cone([1.8, 1.65, 9], 0.14, 28, gem, 6);
+  s.ellipsoid([2, 2, 96], [0.14, 0.14, 5], glowing);
+  return renderSprite(`b_great_work_3_${st.tribe}`, s, 4, 4, 128, 10, {
+    sparkle: [at(2, 2, 96)],
+  });
+}
+
 // ---------------------------------------------------------------------------------------------
 // Shared pieces
 
@@ -847,6 +933,9 @@ export function buildingSprites(): Sprite[] {
       church(st),
       magicHouse(st),
       lighthouse(st),
+      greatWork(st, 1),
+      greatWork(st, 2),
+      greatWork(st, 3),
     );
   }
   out.push(dockTile("x", false), dockTile("x", true), dockTile("y", false), dockTile("y", true));
@@ -856,6 +945,7 @@ export function buildingSprites(): Sprite[] {
     [3, 3],
     [3, 2],
     [2, 3],
+    [4, 4],
   ] as const) {
     out.push(scaffold(w, h));
   }

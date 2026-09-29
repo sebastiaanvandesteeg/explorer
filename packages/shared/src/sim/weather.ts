@@ -10,6 +10,7 @@ import {
   hasUpgrade,
   markDirty,
   removeEntity,
+  tally,
   type GameState,
   type PirateEntity,
   type ShipEntity,
@@ -124,5 +125,6 @@ function spawnStorm(state: GameState): void {
     life: WEATHER.life[0] + r(7) * (WEATHER.life[1] - WEATHER.life[0]),
   };
   addEntity(state, storm);
+  tally(state, "storms");
   state.events.push({ type: "storm", x: storm.x, y: storm.y });
 }

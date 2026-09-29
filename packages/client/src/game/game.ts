@@ -8,6 +8,7 @@ import {
   UPGRADES,
   HALF_H,
   HALF_W,
+  greatWorkStages,
   inBounds,
   islandName,
   isLand,
@@ -266,6 +267,17 @@ export class Game {
       case "pirates":
         // Raiders are announced when the lookouts first sight them, not when they set sail.
         break;
+      case "wonder": {
+        const stages = greatWorkStages(this.session.state.world);
+        const name = stages[ev.stage - 1]?.name ?? "stage";
+        this.hud.toast(
+          ev.final
+            ? "The Great Work is complete!"
+            : `The Great Work: stage ${ev.stage}, ${name}, is done`,
+        );
+        if (ev.final) this.hud.showChronicle(this.session.state);
+        break;
+      }
       case "storm":
         this.hud.toast(
           `A storm is rolling in from the ${compassFrom(this.session.state.world.start.townHall, ev)}`,

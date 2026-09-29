@@ -26,6 +26,7 @@ import {
   removeEntity,
   shipMaxHp,
   stockOf,
+  tally,
   touchStock,
   walkable,
   type BuildingEntity,
@@ -72,6 +73,7 @@ export function updateThreats(state: GameState, dt: number): void {
 /** Take everything a wreck holds into the treasury and remove it. */
 export function collectWreck(state: GameState, w: WreckEntity): void {
   addToTreasury(state, w.loot);
+  tally(state, "salvaged");
   state.events.push({
     type: "salvaged",
     what: w.kind === "skeleton" ? "the bones of a raider" : "a shipwreck",
@@ -128,6 +130,7 @@ export function damageShip(state: GameState, s: ShipEntity, dmg: number): void {
   add(loot, { gold: 4 });
   leaveWreck(state, "shipwreck", Math.floor(s.x), Math.floor(s.y), loot);
   state.events.push({ type: "sunk", kind: s.kind, x: s.x, y: s.y });
+  tally(state, "shipsLost");
   removeEntity(state, s.id);
 }
 
@@ -136,6 +139,7 @@ function sinkPirate(state: GameState, p: PirateEntity): void {
   const tile = tileOf(p);
   const loot = bounty(state, p);
   state.events.push({ type: "sunk", kind: "pirate", x: p.x, y: p.y });
+  tally(state, "pirates");
   removeEntity(state, p.id);
   if (raiding) {
     // The crew was ashore when the ship went down: they leave bones on the beach.
@@ -344,8 +348,10 @@ function raid(state: GameState, p: PirateEntity, dt: number): void {
   if (took === 0) return;
   touchStock(state, island);
   markDirty(state, p.id);
-  if (total(p.loot) === took)
+  if (total(p.loot) === took) {
+    tally(state, "raids");
     state.events.push({ type: "robbed", islandId: island, x: b.x, y: b.y });
+  }
 }
 
 /** Advance along a sea path (pirates and patrol boats share the ship's stepping). */
@@ -522,6 +528,7 @@ function dive(state: GameState, s: ShipEntity, dt: number): void {
     site.loot[r] = have - take;
   }
   addToTreasury(state, haul);
+  tally(state, "salvaged");
   markDirty(state, site.id);
   state.events.push({
     type: "salvaged",

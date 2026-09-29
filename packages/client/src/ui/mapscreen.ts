@@ -298,6 +298,7 @@ export class MapScreen {
       const p = this.project(e.x + e.w / 2, e.y + e.h / 2);
       if (e.kind === "town_hall") this.star(p.x, p.y, 7, GOLD);
       else if (e.kind === "lighthouse") this.diamond(p.x, p.y, 5, "#ffec9a");
+      else if (e.kind === "great_work") this.star(p.x, p.y, 9, "#e8dcff");
       else
         this.square(p.x, p.y, e.kind === "dock" ? 4 : 3, e.kind === "dock" ? "#4fc1b0" : "#a07650");
     }

@@ -11,6 +11,11 @@ export const ICON: Record<Resource, string> = {
   faith: "icon_faith",
   crystal: "icon_crystal",
   relic: "icon_relic",
+  sunstone: "icon_sunstone",
+  rimeglass: "icon_rimeglass",
+  mirepearl: "icon_mirepearl",
+  glowcap: "icon_glowcap",
+  hellstone: "icon_hellstone",
 };
 
 export const LABEL: Record<Resource, string> = {
@@ -23,4 +28,24 @@ export const LABEL: Record<Resource, string> = {
   faith: "Faith",
   crystal: "Crystal",
   relic: "Relic",
+  sunstone: "Sunstone",
+  rimeglass: "Rimeglass",
+  mirepearl: "Mirepearl",
+  glowcap: "Glowcap",
+  hellstone: "Hellstone",
 };
+
+/** Goods that only turn up once the settlement has some: the top bar hides them until then. */
+export const RARE: readonly Resource[] = [
+  "ore",
+  "tools",
+  "gold",
+  "faith",
+  "crystal",
+  "relic",
+  "sunstone",
+  "rimeglass",
+  "mirepearl",
+  "glowcap",
+  "hellstone",
+];

@@ -59,6 +59,11 @@ export function markerSprite(n: NodeEntity): string {
 
 export function buildingSprite(b: BuildingEntity, tribe: TribeId): string {
   if (b.kind === "farm") return `b_farm_${farmStage(b)}_${tribe}`;
+  if (b.kind === "great_work") {
+    // A finished stage stands as it is; while the next is under construction, its ghost shows.
+    const stage = b.stage ?? 0;
+    return `b_great_work_${Math.min(3, Math.max(1, b.complete ? stage : stage + 1))}_${tribe}`;
+  }
   return buildingThumb(b.kind, tribe);
 }
 
@@ -67,13 +72,14 @@ export function buildingThumb(kind: BuildingKind, tribe: TribeId): string {
   if (kind === "path") return "t_path";
   if (kind === "dock") return "dock_x_end";
   if (kind === "farm") return `b_farm_2_${tribe}`;
+  if (kind === "great_work") return `b_great_work_3_${tribe}`;
   return `b_${kind}_${tribe}`;
 }
 
-const SCAFFOLDS = new Set(["1x1", "2x2", "3x3", "3x2", "2x3"]);
+const SCAFFOLDS = new Set(["1x1", "2x2", "3x3", "3x2", "2x3", "4x4"]);
 
 export function scaffoldSprite(w: number, h: number): string {
-  const key = `${Math.min(3, w)}x${Math.min(3, h)}`;
+  const key = w >= 4 && h >= 4 ? "4x4" : `${Math.min(3, w)}x${Math.min(3, h)}`;
   return `scaffold_${SCAFFOLDS.has(key) ? key : "2x2"}`;
 }
 

@@ -39,6 +39,8 @@ export interface BuildingEntity {
   queue: { what: "villager" | "ship" | "cargo" | "patrol"; remaining: number }[];
   /** Villager staffing a workplace (camps, quarry, mine, farm, blacksmith, church). */
   workerId: number | null;
+  /** The Great Work: how many of its stages are finished. */
+  stage?: number;
   /** Production timer in seconds (farm growth, forging, prayer). */
   growth: number;
 }
@@ -157,6 +159,31 @@ export interface WreckEntity {
   loot: Partial<Stock>;
 }
 
+/** How the expedition is going, for the chronicle shown when the Great Work is complete. */
+export interface Stats {
+  /** Pirate ships sunk, our ships lost, and raids that reached a settlement. */
+  pirates: number;
+  shipsLost: number;
+  raids: number;
+  /** Goods cargo ships have brought home. */
+  hauled: number;
+  /** Wrecks looted and sunken sites dived. */
+  salvaged: number;
+  storms: number;
+  /** Game time the Great Work was finished, or null. */
+  wonderAt: number | null;
+}
+
+export const emptyStats = (): Stats => ({
+  pirates: 0,
+  shipsLost: 0,
+  raids: 0,
+  hauled: 0,
+  salvaged: 0,
+  storms: 0,
+  wonderAt: null,
+});
+
 /** A storm front: it drifts across the sea and hurts ships outside harbour. */
 export interface StormEntity {
   id: number;
@@ -212,6 +239,7 @@ export type GameEvent =
       to: { x: number; y: number };
     }
   | { type: "storm"; x: number; y: number }
+  | { type: "wonder"; stage: number; final: boolean }
   | { type: "found"; site: SiteKind; x: number; y: number }
   | { type: "salvaged"; what: string; goods: Partial<Stock>; x: number; y: number };
 
@@ -234,6 +262,8 @@ export interface GameState {
   nextBolt: number;
   /** Game time the next storm forms. */
   nextStorm: number;
+  stats: Stats;
+  statsDirty: boolean;
   /** Outpost islands whose stockpile changed since the last patch. */
   outpostsDirty: Set<number>;
   entities: Map<number, Entity>;
@@ -312,6 +342,8 @@ export function emptyState(world: WorldMap, difficulty: Difficulty = "normal"): 
     nextRaid: DIFFICULTY_DEFS[difficulty].firstRaid,
     nextBolt: 0,
     nextStorm: WEATHER.first,
+    stats: emptyStats(),
+    statsDirty: false,
     entities: new Map(),
     explored: new Uint8Array(n),
     discovered: new Set(),
@@ -349,6 +381,7 @@ export function newBuilding(
     queue: [],
     workerId: null,
     growth: 0,
+    ...(kind === "great_work" ? { stage: 0 } : {}),
   };
 }
 
@@ -392,6 +425,12 @@ export function stockOf(state: GameState, islandId: number): Stock {
 }
 
 /** Record that an island's stockpile changed so it goes out with the next patch. */
+/** Count something for the chronicle. */
+export function tally(state: GameState, key: Exclude<keyof Stats, "wonderAt">, n = 1): void {
+  state.stats[key] += n;
+  state.statsDirty = true;
+}
+
 export function touchStock(state: GameState, islandId: number): void {
   if (islandId === state.world.start.islandId || islandId < 0) state.stockDirty = true;
   else state.outpostsDirty.add(islandId);

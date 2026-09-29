@@ -10,14 +10,18 @@ import {
   createInitialState,
   DIFFICULTY_DEFS,
   dockSpawn,
+  fetchedGoods,
   fromSnapshot,
+  GATHER_JOBS,
   generateWorld,
+  greatWorkStages,
   harvestSeconds,
   isDifficulty,
   isLandTerrain,
   islandName,
   islandNames,
   newBuilding,
+  NODES,
   newShip,
   nightAtPhase,
   nightLevel,
@@ -29,20 +33,26 @@ import {
   populationCap,
   sailable,
   removeEntity,
+  RESOURCES,
   sailSpeedFactor,
   sightFactor,
   shipCost,
   shipMaxHp,
   shipReveal,
+  SIGNATURE,
+  SIGNATURE_NODES,
+  signatureGoods,
   stormAt,
   STORMCALLER,
   stormOnRoute,
   stormStrength,
   stockOf,
   takePatch,
+  tally,
   tick,
   toSnapshot,
   toWire,
+  TRIBES,
   type BuildingEntity,
   type BuildingKind,
   type GameState,
@@ -117,6 +127,11 @@ describe("initial state", () => {
       faith: 0,
       crystal: 0,
       relic: 0,
+      sunstone: 0,
+      rimeglass: 0,
+      mirepearl: 0,
+      glowcap: 0,
+      hellstone: 0,
     });
     expect(of(s, "node").length).toBe(world.nodes.length);
     const th = world.start.townHall;
@@ -1211,5 +1226,226 @@ describe("storms", () => {
     const restored = fromSnapshot(world, JSON.parse(JSON.stringify(toSnapshot(s))), true);
     expect(restored.nextStorm).toBe(s.nextStorm);
     expect(of(restored, "storm")).toHaveLength(1);
+  });
+});
+
+describe("signature goods", () => {
+  it("puts enough of every far biome's good on its islands, in every world", () => {
+    for (const tribe of TRIBES) {
+      for (const seed of ["goods-a", "goods-b", "sim-tests"]) {
+        const w = generateWorld(seed, tribe);
+        for (const [biome, sig] of Object.entries(SIGNATURE)) {
+          const islands = w.islands.filter((i) => i.biome === biome && i.flavor !== "islet");
+          if (islands.length === 0) continue;
+          const ids = new Set(islands.map((i) => i.id));
+          const deposits = w.nodes.filter(
+            (n) => n.kind === sig.node && ids.has(w.island[n.y * w.width + n.x]!),
+          );
+          expect(deposits.length, `${tribe}/${seed}: ${sig.node}`).toBeGreaterThanOrEqual(
+            sig.deposits,
+          );
+          const units = deposits.length * NODES[sig.node].amount;
+          expect(units, `${tribe}/${seed}: ${sig.node}`).toBeGreaterThanOrEqual(130);
+        }
+        const tiles = w.nodes.map((n) => n.y * w.width + n.x);
+        expect(new Set(tiles).size).toBe(tiles.length);
+      }
+    }
+  });
+
+  it("gives each far biome a good only it can yield", () => {
+    const goods = signatureGoods();
+    expect(goods).toHaveLength(6);
+    expect(new Set(goods.map((g) => g.resource)).size).toBe(6);
+    expect(NODES.hellstone.resource).toBe("hellstone");
+    for (const g of goods) expect(GATHER_JOBS.mine).toContain(g.resource);
+    // Only that biome's node kind yields each good.
+    for (const g of goods) {
+      const yielding = Object.entries(NODES).filter(([, def]) => def.resource === g.resource);
+      expect(yielding.map(([kind]) => kind)).toEqual([SIGNATURE[g.biome]!.node]);
+    }
+  });
+});
+
+describe("the Great Work", () => {
+  const rich = (s: GameState) => {
+    s.stock = {
+      ...s.stock,
+      wood: 9999,
+      stone: 9999,
+      tools: 999,
+      gold: 999,
+      faith: 999,
+      relic: 99,
+      sunstone: 99,
+      rimeglass: 99,
+      mirepearl: 99,
+      glowcap: 99,
+      hellstone: 99,
+      crystal: 99,
+    };
+  };
+
+  it("asks for the goods of the far biomes, except the home biome's own", () => {
+    const stages = greatWorkStages(world);
+    expect(stages).toHaveLength(3);
+    expect(stages[0]!.cost).toEqual(BUILDINGS.great_work.cost);
+    const homeBiome = world.islands[world.start.islandId]!.biome;
+    expect(homeBiome).toBe("temperate");
+    expect(stages[1]!.cost).toMatchObject({
+      sunstone: 40,
+      rimeglass: 40,
+      mirepearl: 40,
+      glowcap: 40,
+    });
+    expect(stages[2]!.cost).toMatchObject({ hellstone: 60, crystal: 60, relic: 6 });
+    // Northfolk live among the frost: they need no rimeglass.
+    const north = greatWorkStages(generateWorld("sim-tests", "northfolk"));
+    expect(north[1]!.cost.rimeglass).toBeUndefined();
+    expect(north[1]!.cost.sunstone).toBe(40);
+    expect(
+      fetchedGoods(generateWorld("sim-tests", "sunfolk")).map((g) => g.resource),
+    ).not.toContain("sunstone");
+  });
+
+  it("can be raised once, on the home island only", () => {
+    const s = fresh();
+    rich(s);
+    const at = spotFor(s, "great_work");
+    expect(world.island[at.y * world.width + at.x]).toBe(world.start.islandId);
+    expect(applyCommand(s, { kind: "place-building", building: "great_work", ...at })).toEqual({
+      ok: true,
+    });
+    expect(applyCommand(s, { kind: "place-building", building: "great_work", ...at }).ok).toBe(
+      false,
+    );
+    const elsewhere = fresh();
+    rich(elsewhere);
+    const { islandId, at: shore } = (() => {
+      const island = world.islands.find(
+        (i) => i.id !== world.start.islandId && i.flavor !== "islet",
+      )!;
+      const k = Array.from(world.island).findIndex(
+        (id, i) => id === island.id && isLandTerrain(world.terrain[i]!),
+      );
+      return { islandId: island.id, at: { x: k % world.width, y: Math.floor(k / world.width) } };
+    })();
+    elsewhere.explored.fill(1);
+    addEntity(elsewhere, {
+      ...of<VillagerEntity>(elsewhere, "villager")[0]!,
+      id: elsewhere.nextId++,
+      x: shore.x + 0.5,
+      y: shore.y + 0.5,
+    });
+    const check = canPlaceBuilding(elsewhere, "great_work", shore.x, shore.y);
+    expect(check.ok).toBe(false);
+    expect(islandId).not.toBe(world.start.islandId);
+  });
+
+  it("is founded by villagers, funded stage by stage and finished with a chronicle", () => {
+    const s = fresh();
+    rich(s);
+    s.nextRaid = s.nextStorm = 1e9;
+    const at = spotFor(s, "great_work");
+    applyCommand(s, { kind: "place-building", building: "great_work", ...at });
+    const gw = of<BuildingEntity>(s, "building").find((b) => b.kind === "great_work")!;
+    expect(gw.stage).toBe(0);
+    expect(applyCommand(s, { kind: "fund-great-work", buildingId: gw.id }).ok).toBe(false);
+    // The villagers found it on their own.
+    run(s, 90);
+    expect(gw.complete).toBe(true);
+    expect(gw.stage).toBe(1);
+    expect(s.events.some((e) => e.type === "wonder" && e.stage === 1 && !e.final)).toBe(true);
+    expect(applyCommand(s, { kind: "remove-building", buildingId: gw.id }).ok).toBe(false);
+
+    // Stage two needs its goods first.
+    const kept = { ...s.stock };
+    s.stock.sunstone = 0;
+    expect(applyCommand(s, { kind: "fund-great-work", buildingId: gw.id }).ok).toBe(false);
+    s.stock = kept;
+    const before = s.stock.rimeglass;
+    expect(applyCommand(s, { kind: "fund-great-work", buildingId: gw.id })).toEqual({ ok: true });
+    expect(s.stock.rimeglass).toBe(before - 40);
+    expect(gw.complete).toBe(false);
+    expect(applyCommand(s, { kind: "fund-great-work", buildingId: gw.id }).ok).toBe(false);
+    run(s, 120);
+    expect(gw.stage).toBe(2);
+
+    expect(applyCommand(s, { kind: "fund-great-work", buildingId: gw.id })).toEqual({ ok: true });
+    run(s, 150);
+    expect(gw.stage).toBe(3);
+    expect(gw.complete).toBe(true);
+    expect(s.stats.wonderAt).not.toBeNull();
+    expect(s.events.some((e) => e.type === "wonder" && e.final)).toBe(true);
+    expect(applyCommand(s, { kind: "fund-great-work", buildingId: gw.id }).ok).toBe(false);
+    expect(applyCommand(s, { kind: "remove-building", buildingId: gw.id }).ok).toBe(false);
+  });
+
+  it("tallies the expedition's story for the chronicle", () => {
+    const s = fresh();
+    s.nextRaid = s.nextStorm = 1e9;
+    const dockSpot = dockSpawn(of<BuildingEntity>(s, "building").find((b) => b.kind === "dock")!);
+    const patrol = addEntity(s, newShip(s, "patrol", dockSpot.x + 6, dockSpot.y, 0));
+    addEntity(s, {
+      id: s.nextId++,
+      type: "pirate",
+      x: dockSpot.x + 12,
+      y: dockSpot.y,
+      heading: 0,
+      hp: 20,
+      path: [],
+      phase: "hunt",
+      target: null,
+      timer: 0,
+      cooldown: 0,
+      loot: {},
+      home: { x: 0, y: 0 },
+    });
+    run(s, 60);
+    expect(s.stats.pirates).toBe(1);
+    expect(s.entities.has(patrol.id)).toBe(true);
+    const wreck = of<WreckEntity>(s, "wreck")[0]!;
+    const scout = addEntity(s, newShip(s, "scout", wreck.x + 0.5, wreck.y + 0.5, 0));
+    applyCommand(s, { kind: "salvage", shipId: scout.id, wreckId: wreck.id });
+    run(s, 20);
+    expect(s.stats.salvaged).toBe(1);
+    expect(s.statsDirty).toBe(true);
+  });
+
+  it("travels through snapshots and patches, and seeds deposits into old saves once", () => {
+    const s = fresh();
+    tally(s, "hauled", 42);
+    s.stats.wonderAt = 1234;
+    const client = fromSnapshot(world, JSON.parse(JSON.stringify(toSnapshot(s))));
+    expect(client.stats).toEqual(s.stats);
+    takePatch(s);
+    tally(s, "raids", 2);
+    applyPatch(client, JSON.parse(JSON.stringify(takePatch(s))));
+    expect(client.stats.raids).toBe(2);
+
+    const signatures = (state: GameState) =>
+      of<NodeEntity>(state, "node").filter((n) => SIGNATURE_NODES.includes(n.kind));
+    expect(signatures(s).length).toBeGreaterThan(20);
+    // A save from before signature deposits existed: no deposits, no flag.
+    const old = JSON.parse(JSON.stringify(toSnapshot(s)));
+    delete old.depositsSeeded;
+    old.entities = old.entities.filter(
+      (e: { type: string; kind: string }) =>
+        !(e.type === "node" && ["sunstone", "rimeglass", "mirepearl", "glowcap"].includes(e.kind)),
+    );
+    const migrated = fromSnapshot(world, old, true);
+    expect(
+      signatures(migrated)
+        .map((n) => n.kind)
+        .filter((k) => k === "sunstone").length,
+    ).toBeGreaterThan(5);
+    // A current save whose deposits were mined out stays mined out.
+    const mined = JSON.parse(JSON.stringify(toSnapshot(s)));
+    mined.entities = mined.entities.filter(
+      (e: { type: string; kind: string }) => !(e.type === "node" && e.kind === "sunstone"),
+    );
+    expect(signatures(fromSnapshot(world, mined, true)).some((n) => n.kind === "sunstone")).toBe(
+      false,
+    );
   });
 });

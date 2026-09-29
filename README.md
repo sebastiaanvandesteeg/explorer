@@ -125,6 +125,29 @@ A raiding ship sails in from the edge of the map. It hunts the nearest ship of y
 
 **Under the sea.** Sunken ruins and a few fortresses lie in deep water, far from home. They stay hidden until a ship sails within three tiles, then show as a faint shape under the waves. Load a scout ship with villagers (they are the divers), sail over the site and press **Send divers** (or right-click the site). After 15 seconds each diver has brought up 30% of what is left. Fortresses hold gold, crystal, tools and several relics. Relics are a new resource that only wrecks and sites give; they pay for Stormcaller.
 
+### Signature goods and the Great Work
+
+Six far biomes each yield a good found nowhere else. They are deposits on that biome's islands (every world has enough), gathered like ore: a mine worker takes any of them within its radius, and villagers can be sent to mark and mine them by hand.
+
+| Good      | Biome           | Deposit                                              |
+| --------- | --------------- | ---------------------------------------------------- |
+| Sunstone  | Sunscorch Dunes | amber gems in the sand                               |
+| Rimeglass | Frostreach      | tall shards of ice                                   |
+| Mirepearl | Murkmire        | pearl beds in the bog                                |
+| Glowcap   | Fungal Hollows  | glowing mushroom caps                                |
+| Hellstone | Infernal Isles  | black rock veined with lava (it no longer gives ore) |
+| Crystal   | Crystal Spires  | crystal clusters                                     |
+
+Goods gathered on another island wait in its pile until a cargo ship brings them home, which is what the trade routes are for.
+
+**The Great Work** is the monument the expedition is building towards. It takes 4×4 tiles on the home island, and only one can be built. Every stage is paid from the treasury when you press **Fund**, and then villagers raise it, so the monument grows through the game:
+
+1. **Foundation**: 120 wood, 160 stone, 15 tools (paid when you place it).
+2. **Pillars**: 120 stone, 40 gold, 15 tools and 40 each of sunstone, rimeglass, mirepearl and glowcap.
+3. **The Crown**: 40 faith, 100 gold, 20 tools, 6 relics, 60 hellstone and 60 crystal.
+
+Your own home biome's good is not asked for (Northfolk need no rimeglass, Sunfolk no sunstone). The panel shows what each stage needs, what the treasury holds and where to look for each good, including the islands you have found for it. When the last stage is done everyone sees the **chronicle**: days at sea, islands found and settled, goods hauled home, wrecks salvaged, pirates sunk, ships lost, raids, storms and upgrades. The game carries on afterwards, and the chronicle can be read again from the monument. A tiered top bar wraps onto a second row when you hold a lot of different goods.
+
 ### Day and night
 
 One day lasts eight minutes of game time and starts in the morning. The HUD clock under the expedition name shows the day, the part of the day and the time. Dawn is warm, dusk golden, and night deep blue with fireflies, while houses, churches, the town hall and forges light their windows.
