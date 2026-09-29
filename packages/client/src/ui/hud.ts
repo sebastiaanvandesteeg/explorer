@@ -4,7 +4,7 @@ import {
   DIFFICULTY_DEFS,
   CARGO,
   cargoCost,
-  DIVE,
+  diveSeconds,
   PATROL,
   CHURCH,
   clockText,
@@ -21,8 +21,10 @@ import {
   populationCap,
   RESOURCES,
   SHIP,
+  sellPrice,
   shipCost,
   SMITH,
+  smithSeconds,
   stockOf,
   stormStrength,
   tileIndex,
@@ -899,7 +901,7 @@ export class Hud {
               const live = state.entities.get(ship.id) as ShipEntity | undefined;
               return !!live && live.passengers.length > 0 && !!nearestSite(state, live);
             },
-            `Villagers aboard dive for ${DIVE.seconds} seconds and bring up part of the treasure`,
+            `Villagers aboard dive for ${diveSeconds(this.tribe)} seconds and bring up part of the treasure`,
           ),
           button(
             "Take a villager aboard",
@@ -938,13 +940,14 @@ export class Hud {
       const price = MARKET_PRICES[res];
       if (price === undefined) continue;
       const buyable = MARKET_BUYABLE.includes(res);
+      const pays = sellPrice(res, this.tribe);
       rows.append(
         h("span.trade-name", {}, small(res, MARKET_LOT)),
         button(
-          h("span", {}, "Sell → ", small("gold", price)),
+          h("span", {}, "Sell → ", small("gold", pays)),
           cmd({ kind: "trade", resource: res, action: "sell" }),
           () => state.stock[res] >= MARKET_LOT,
-          `Sell ${MARKET_LOT} ${res} for ${price} gold`,
+          `Sell ${MARKET_LOT} ${res} for ${pays} gold`,
         ),
         buyable
           ? button(
@@ -988,10 +991,11 @@ export class Hud {
         progress = e.growth / FARM.cycle;
       } else if (e.kind === "blacksmith") {
         const enough = state.stock.ore >= SMITH.ore;
+        const seconds = smithSeconds(this.tribe);
         status = enough
-          ? `Forging: ${SMITH.ore} ore → ${SMITH.tools} tools every ${SMITH.seconds}s`
+          ? `Forging: ${SMITH.ore} ore → ${SMITH.tools} tools every ${seconds}s`
           : `Waiting for ore (needs ${SMITH.ore}); build a mine near ore deposits`;
-        progress = e.growth / SMITH.seconds;
+        progress = e.growth / seconds;
       } else if (e.kind === "church") {
         status = `A priest gathers ${CHURCH.faith} faith every ${CHURCH.seconds}s`;
         progress = e.growth / CHURCH.seconds;

@@ -248,3 +248,46 @@ export function barkSurface(): Surface {
     return shade("bark", lit(c, 0.1 + grain), c.px, c.py, 0.2);
   };
 }
+
+/** Pale mushroom stalk with fine vertical fibres, darker near the ground (Glowkin). */
+export function stalkSurface(): Surface {
+  return (c, u, z) => {
+    const fibre = hash3(Math.floor(u * 44), 0, 0, 17) < 0.25 ? -0.12 : 0;
+    const damp = z < 5 ? -0.12 : 0;
+    return shade("stalk", lit(c, 0.04 + fibre + damp), c.px, c.py, 0.2);
+  };
+}
+
+/** Upright bamboo canes with dark joints (Freebooters). */
+export function bambooSurface(): Surface {
+  return (c, u, z) => {
+    const k = u / 0.075;
+    const edge = k - Math.floor(k) < 0.22 ? -0.2 : 0;
+    const joint = (z + hash3(Math.floor(k), 0, 0, 18) * 5) % 6 < 0.9 ? -0.18 : 0;
+    return shade("sand", lit(c, -0.08 + edge + joint), c.px, c.py, 0.2);
+  };
+}
+
+/** Weathered upright boards, dark and mossy where the bog water reaches (Mirefolk). */
+export function boardSurface(ramp: RampName = "darkwood"): Surface {
+  return (c, u, z) => {
+    const k = u / 0.09;
+    const seam = k - Math.floor(k) < 0.18 ? -0.18 : 0;
+    const grain = (hash3(Math.floor(k), 0, 0, 19) - 0.5) * 0.16;
+    if (z < 6 && noise3(u * 22, z, 0.3, 20) > 0.45) return shade("moss", lit(c, -0.1), c.px, c.py);
+    return shade(ramp, lit(c, 0.12 + seam + grain), c.px, c.py, 0.2);
+  };
+}
+
+/** Rough basalt blocks with lava glowing in the joints (Cinderborn). */
+export function basaltSurface(rowPx = 4, width = 0.24): Surface {
+  return (c, u, z) => {
+    const row = Math.floor(z / rowPx);
+    const v = u + (row % 2) * width * 0.5;
+    const col = Math.floor(v / width);
+    const joint = z - row * rowPx < 0.8 || (v / width) % 1 < 0.08;
+    if (joint) return rampColor("lava", hash3(col, row, 0, 21) > 0.6 ? 4 : 3);
+    const tint = (hash3(col, row, 0, 22) - 0.5) * 0.25;
+    return shade("basalt", lit(c, 0.18 + tint), c.px, c.py, 0.25);
+  };
+}

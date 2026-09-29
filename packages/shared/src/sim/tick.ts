@@ -18,6 +18,7 @@ import {
   SHIP,
   shipSpeed,
   SMITH,
+  smithSeconds,
   TICK_SECONDS,
   VILLAGER,
   type WorkerJob,
@@ -130,7 +131,7 @@ function updateBuilding(state: GameState, b: BuildingEntity, dt: number): void {
     // The forge only burns while there is ore to work.
     if (stock.ore < SMITH.ore) return;
     b.growth += dt;
-    if (b.growth >= SMITH.seconds) {
+    if (b.growth >= smithSeconds(state.world.tribe)) {
       b.growth = 0;
       stock.ore -= SMITH.ore;
       stock.tools += SMITH.tools;

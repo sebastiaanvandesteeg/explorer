@@ -1,6 +1,6 @@
 // Who can see what at sea. By day a settlement's lookouts and ships watch a wide stretch of water;
 // after dark they only see what their own lamps light. A lighthouse's beam reaches far in both.
-import { NIGHT, WATCH } from "./catalogue";
+import { NIGHT, seesInTheDark, WATCH } from "./catalogue";
 import { nightLevel } from "./daylight";
 import type { GameState } from "./state";
 
@@ -15,7 +15,8 @@ const cache = new WeakMap<GameState, { key: string; watchers: Watcher[] }>();
 
 /** Everything that keeps watch right now, with how far it sees. Rebuilt when the world changes. */
 function watchers(state: GameState): Watcher[] {
-  const dark = nightLevel(state.time) >= NIGHT.dark;
+  // The Glowkin keep their daytime sight after dark.
+  const dark = nightLevel(state.time) >= NIGHT.dark && !seesInTheDark(state.world.tribe);
   const key = `${state.tick}:${state.entities.size}:${dark}`;
   const hit = cache.get(state);
   if (hit && hit.key === key) return hit.watchers;
@@ -49,7 +50,7 @@ export function watched(state: GameState, x: number, y: number): boolean {
  */
 export function sightFactor(state: GameState, x: number, y: number): number {
   const night = nightLevel(state.time);
-  if (night <= 0) return 1;
+  if (night <= 0 || seesInTheDark(state.world.tribe)) return 1;
   for (const w of watchers(state)) {
     if (w.lighthouse && Math.hypot(w.x - x, w.y - y) <= w.r) return 1;
   }

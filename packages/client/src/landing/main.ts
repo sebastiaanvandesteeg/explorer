@@ -73,6 +73,12 @@ function plot(name: string, tiles: number, biome: BiomeId, scale: number): HTMLE
   return el;
 }
 
+// Counts in the copy come from the game itself.
+const COUNTS: Record<string, number> = { tribes: TRIBES.length, biomes: BIOMES.length };
+for (const el of document.querySelectorAll<HTMLElement>("[data-count]")) {
+  el.textContent = String(COUNTS[el.dataset.count!]);
+}
+
 // The README's pictures, imported so both Vite's dev server and the build can serve them.
 const SHOTS: Record<string, string> = { screenshot, biomes, daynight };
 for (const img of document.querySelectorAll<HTMLImageElement>("img[data-shot]")) {

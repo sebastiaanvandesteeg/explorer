@@ -1,27 +1,31 @@
-// Buildings in four tribal styles. Each style supplies wall and roof materials and a roof shape;
+// Buildings in each tribe's style. Each style supplies wall and roof materials and a roof shape;
 // the building recipes below compose walls, roofs, towers and props from the style.
 // Names: b_<kind>_<tribe> (farms: b_farm_<stage>_<tribe>); docks and scaffolds are shared.
 import { TRIBES, type TribeId } from "@explorer/shared";
 import {
   adobeSurface,
+  bambooSurface,
   barkSurface,
+  basaltSurface,
+  boardSurface,
   bricks,
   logSurface,
   planks,
   rocky,
   shingles,
+  stalkSurface,
   straw,
   timberFrame,
   withOpenings,
   type Opening,
 } from "../materials";
-import { hash3, prng } from "../noise3";
+import { hash3, noise3, prng } from "../noise3";
 import { RAMPS, hexToRgba, rampColor, shade, type RampName } from "../palette";
 import { flat, lit, project, Scene, type Material, type Vec3 } from "../raytrace";
 import { renderSprite, type Sprite } from "../sprite";
 import { canopy, dots, foliage, strand } from "./nature";
 
-type RoofKind = "gable" | "steep" | "flat" | "leafy";
+type RoofKind = "gable" | "steep" | "flat" | "leafy" | "cap" | "hip";
 
 interface Style {
   tribe: TribeId;
@@ -37,6 +41,29 @@ interface Style {
   /** Awning stripes. */
   accent: RampName;
   chimney: boolean;
+  /** Hip roofs: how steep they rise (1 is a low reed roof; more makes a spire). */
+  pitch?: number;
+}
+
+/** Old sailcloth stretched over a roof and patched here and there (Freebooters). */
+const patchedSail: Material = (c) => {
+  const patch =
+    hash3(Math.floor(c.lp[0] * 4), Math.floor(c.lp[1] * 4), Math.floor(c.lp[2] / 7), 23) > 0.8;
+  const seam = (c.lp[2] / 4) % 1 < 0.2 ? -0.1 : 0;
+  return shade(patch ? "berry" : "sail", lit(c, 0.02 + seam), c.px, c.py, 0.2);
+};
+
+/** A mushroom-cap roof: glowing flecks on top, pale gills with a faint glow underneath. */
+function capRoof(ramp: RampName): Material {
+  return (c) => {
+    if (c.n[2] < -0.1)
+      return (c.px + c.py) % 3 === 0
+        ? rampColor("glow", 3)
+        : shade("stalk", 0.25 + c.light * 0.3, c.px, c.py);
+    if (noise3(c.p[0] * 14, c.p[1] * 14, c.p[2] / 2, 56) > 0.74)
+      return rampColor("glow", c.light > 0.4 ? 5 : 4);
+    return shade(ramp, lit(c, 0.08), c.px, c.py, 0.3);
+  };
 }
 
 const STYLES: Record<TribeId, Style> = {
@@ -98,13 +125,92 @@ const STYLES: Record<TribeId, Style> = {
     accent: "clothGreen",
     chimney: false,
   },
+  glowkin: {
+    tribe: "glowkin",
+    wall: (_top, openings) =>
+      withOpenings(stalkSurface(), { openings, frame: "fungalGround", plinth: "fungalGround" }),
+    roofKind: "cap",
+    roof: capRoof("arcane"),
+    hallRoof: capRoof("capRed"),
+    gableFill: () => withOpenings(stalkSurface(), { frame: "fungalGround" }),
+    trim: flat("stalk", -0.1),
+    wood: "stalk",
+    base: rocky("fungalGround", 8, 0),
+    banner: "arcane",
+    accent: "glow",
+    chimney: false,
+  },
+  freebooters: {
+    tribe: "freebooters",
+    wall: (_top, openings) =>
+      withOpenings(bambooSurface(), { openings, frame: "timber", plinth: "rock" }),
+    roofKind: "gable",
+    roof: straw("jungle", 2.5),
+    hallRoof: patchedSail,
+    gableFill: () => withOpenings(bambooSurface(), { frame: "timber" }),
+    trim: flat("timber"),
+    wood: "plank",
+    base: planks("plank", "x", 0.1),
+    banner: "hull",
+    accent: "berry",
+    chimney: false,
+  },
+  mirefolk: {
+    tribe: "mirefolk",
+    wall: (_top, openings) =>
+      withOpenings(boardSurface("darkwood"), { openings, frame: "logs", plinth: "swampGround" }),
+    roofKind: "hip",
+    pitch: 1.15,
+    roof: straw("thatch", 2.5),
+    hallRoof: straw("thatch", 2.5),
+    gableFill: () => withOpenings(boardSurface("darkwood"), { frame: "logs" }),
+    trim: flat("logs", 0.05),
+    wood: "logs",
+    base: planks("logs", "x", 0.1),
+    banner: "shallow",
+    accent: "shallow",
+    chimney: false,
+  },
+  amberwrights: {
+    tribe: "amberwrights",
+    wall: (top, openings, posts) =>
+      timberFrame({ top, posts, braces: true, openings, wall: "sand", frame: "darkwood" }),
+    roofKind: "gable",
+    roof: shingles("autumnLeaf", 2.5, 0.14),
+    hallRoof: shingles("pumpkin", 2.5, 0.14),
+    gableFill: (top) =>
+      timberFrame({ top, posts: [0.7, 1.3, 1.9], wall: "sand", frame: "darkwood" }),
+    trim: flat("darkwood", 0.05),
+    wood: "plank",
+    base: bricks("sandstone", 2.5, 0.22),
+    banner: "gold",
+    accent: "autumnLeaf",
+    chimney: true,
+  },
+  cinderborn: {
+    tribe: "cinderborn",
+    wall: (_top, openings) =>
+      withOpenings(basaltSurface(), { openings, frame: "basalt", plinth: "obsidian" }),
+    roofKind: "hip",
+    pitch: 1.9,
+    roof: shingles("obsidian", 2.5, 0.14),
+    hallRoof: shingles("obsidian", 2.5, 0.14),
+    gableFill: () => withOpenings(basaltSurface(), { frame: "basalt" }),
+    trim: flat("basalt", 0.1),
+    wood: "charred",
+    base: bricks("obsidian", 3, 0.22),
+    banner: "lava",
+    accent: "lava",
+    chimney: true,
+  },
 };
 
 const at = (x: number, y: number, z: number) => project(x, y, z);
 
 /**
  * A roof over a wall rectangle, shaped by the tribe: gable, steep gable with carved ridge
- * horns, flat with a crenellated parapet, or a leafy mound. Returns the roof's top (px).
+ * horns, flat with a crenellated parapet, a leafy mound, a mushroom cap or a hip roof that can
+ * rise to a spire. Returns the roof's top (px).
  */
 function roof(
   s: Scene,
@@ -161,6 +267,29 @@ function roof(
       }
       return h + 2;
     }
+    case "cap": {
+      // A broad mushroom cap that droops over the top of the walls.
+      const h = rise * 0.6;
+      s.ellipsoid(
+        [(x0 + x1) / 2, (y0 + y1) / 2, zBase + h * 0.2],
+        [(x1 - x0) / 2 + 0.28, (y1 - y0) / 2 + 0.28, h],
+        mat,
+      );
+      return zBase + h * 1.2;
+    }
+    case "hip": {
+      const r = rise * (st.pitch ?? 1);
+      s.pyramid(
+        (x0 + x1) / 2,
+        (y0 + y1) / 2,
+        (x1 - x0) / 2 + oh,
+        (y1 - y0) / 2 + oh,
+        zBase - 1,
+        zBase + r,
+        mat,
+      );
+      return zBase + r;
+    }
     case "leafy": {
       const rand = prng(Math.floor(x0 * 100 + y1 * 37 + zBase));
       const cx = (x0 + x1) / 2;
@@ -203,6 +332,33 @@ function dome(s: Scene, cx: number, cy: number, z: number, r: number, h: number)
 
 function lantern(s: Scene, x: number, y: number, z: number): void {
   s.ellipsoid([x, y, z], [0.05, 0.05, 1.8], () => rampColor("glass", 3));
+}
+
+/** A lantern hung from a post. */
+function lanternPost(s: Scene, st: Style, x: number, y: number, height = 14): void {
+  s.prism("z", [x, y, height / 2], 0.025, height / 2, st.trim, 6);
+  s.box([x - 0.02, y - 0.1, height - 1], [x + 0.02, y + 0.02, height], st.trim);
+  lantern(s, x, y - 0.1, height - 3.5);
+}
+
+/** A flame burning in an iron bowl. */
+function brazier(s: Scene, x: number, y: number, z: number): void {
+  s.prism("z", [x, y, z + 1.2], 0.13, 1.2, flat("basalt", 0.1), 8);
+  s.ellipsoid([x, y, z + 4], [0.09, 0.09, 3], (c) => rampColor("fire", c.light > 0.3 ? 4 : 3), {
+    castsShadow: false,
+  });
+}
+
+/** A ship's cannon on a little wooden carriage, its muzzle facing +y. */
+function cannon(s: Scene, x: number, y: number): void {
+  s.box([x - 0.1, y - 0.12, 0], [x + 0.1, y + 0.1, 2.5], planks("plank", "y", 0.06));
+  s.prism("y", [x, y + 0.04, 4], 0.065, 0.2, flat("hull", 0.15), 8);
+}
+
+/** A mushroom stalk topped with a small glowing cap. */
+function toadstool(s: Scene, x: number, y: number, z: number, h: number, r: number): void {
+  s.prism("z", [x, y, z + h / 2], r * 0.3, h / 2, flat("stalk", 0.1), 10);
+  s.ellipsoid([x, y, z + h], [r, r, r * 16], capRoof("arcane"));
 }
 
 /** Awning cloth striped in the tribe's colour and white. */
@@ -270,6 +426,49 @@ function townHall(st: Style): Sprite {
       lantern(s, 1.15, 2.72, 16);
       lantern(s, 1.85, 2.72, 16);
       break;
+    case "glowkin":
+      // A second, smaller cap on a tall stalk, and toadstools crowding the door.
+      toadstool(s, 1.5, 1.5, peak - 6, 22, 0.5);
+      toadstool(s, 0.55, 2.8, 0, 9, 0.2);
+      toadstool(s, 2.5, 2.85, 0, 6, 0.15);
+      banner(s, st, 2.8, 1.2, 0, 24);
+      break;
+    case "freebooters":
+      // A mast with a crow's nest and the black flag, and a cannon guarding the door.
+      s.prism("z", [2.2, 0.8, peak + 8], 0.035, 22, flat("timber", 0.05), 6);
+      s.prism("z", [2.2, 0.8, peak + 22], 0.16, 2, planks("plank", "z", 0.05), 10);
+      banner(s, st, 2.2, 0.8, peak + 24, 12);
+      cannon(s, 0.75, 2.9);
+      cannon(s, 2.25, 2.9);
+      break;
+    case "mirefolk":
+      // A pearl on the ridge, and lanterns on posts either side of the boardwalk.
+      s.ellipsoid([1.5, 1.5, peak + 1.5], [0.09, 0.09, 2.2], (c) =>
+        shade("plaster", 0.55 + c.light * 0.5, c.px, c.py, 0.2),
+      );
+      lanternPost(s, st, 1.0, 2.95, 16);
+      lanternPost(s, st, 2.0, 2.95, 16);
+      banner(s, st, 0.35, 2.4, 0, 22);
+      break;
+    case "amberwrights":
+      // A clock-tower cupola with a gold vane, and a chimney.
+      s.box([1.3, 1.3, peak - 10], [1.7, 1.7, peak + 6], planks("plank", "z", 0.09));
+      s.box([1.38, 1.7, peak - 3], [1.62, 1.71, peak + 3], flat("gold", 0.1));
+      s.pyramid(1.5, 1.5, 0.3, 0.3, peak + 5, peak + 18, shingles("autumnLeaf", 2.5, 0.12));
+      s.prism("z", [1.5, 1.5, peak + 21], 0.02, 3, flat("gold", 0.2), 6);
+      chimney(s, 2.2, 0.75, 30, peak - 2);
+      meta.smoke = [at(2.31, 0.86, peak + 1)];
+      banner(s, st, 0.4, 2.7, 0, 20);
+      break;
+    case "cinderborn":
+      // A fire burning at the spire's foot, obelisks at the door and smoking vents.
+      brazier(s, 1.5, 1.5, peak - 3);
+      s.pyramid(0.95, 2.95, 0.09, 0.09, 0, 20, shingles("obsidian", 2.5, 0.12));
+      s.pyramid(2.05, 2.95, 0.09, 0.09, 0, 20, shingles("obsidian", 2.5, 0.12));
+      chimney(s, 2.25, 0.8, 30, 58);
+      meta.smoke = [at(2.36, 0.91, 61)];
+      banner(s, st, 0.4, 2.6, 0, 22);
+      break;
   }
   s.box([1.2, 2.6, 0], [1.8, 2.85, 3], st.base);
   return renderSprite(`b_town_hall_${st.tribe}`, s, 3, 3, 110, 10, meta);
@@ -287,8 +486,8 @@ function house(st: Style): Sprite {
     { face: "+x", u0: 1.12, u1: 1.3, z0: 8, z1: 13, kind: "lit-window" },
   ];
   const meta: Record<string, unknown> = {};
-  if (st.tribe === "sylvan") {
-    // A round treehouse under a leafy dome.
+  if (st.tribe === "sylvan" || st.roofKind === "cap") {
+    // A round treehouse under a leafy dome, or a mushroom house under its cap.
     s.prism("z", [1, 1, top / 2], 0.62, top / 2, st.wall(top, openings, []), 14);
     roof(s, st, 0.3, 0.3, 1.7, 1.7, top, 16, "x");
     lantern(s, 1.25, 1.66, 12);
@@ -621,6 +820,25 @@ function church(st: Style): Sprite {
       s.prism("z", [1.0, 2.45, towerTop + 20], 0.03, 6, st.trim, 6);
       lantern(s, 1.0, 2.45, towerTop + 27);
       break;
+    case "glowkin":
+      toadstool(s, 1.0, 2.45, towerTop - 4, 18, 0.46);
+      break;
+    case "freebooters":
+      s.pyramid(1.0, 2.45, 0.46, 0.42, towerTop, towerTop + 16, straw("jungle", 2.5));
+      banner(s, st, 1.0, 2.45, towerTop + 14, 12);
+      break;
+    case "mirefolk":
+      s.cone([1.0, 2.45, towerTop], 0.5, 22, straw("thatch", 2.5), 12);
+      lantern(s, 1.0, 2.86, towerTop - 3);
+      break;
+    case "amberwrights":
+      s.pyramid(1.0, 2.45, 0.45, 0.42, towerTop, towerTop + 28, shingles("autumnLeaf", 2.5, 0.12));
+      s.prism("z", [1.0, 2.45, towerTop + 32], 0.02, 4, flat("gold", 0.2), 6);
+      break;
+    case "cinderborn":
+      s.pyramid(1.0, 2.45, 0.42, 0.4, towerTop, towerTop + 36, shingles("obsidian", 2.5, 0.12));
+      brazier(s, 1.0, 2.45, towerTop + 34);
+      break;
   }
   return renderSprite(`b_church_${st.tribe}`, s, 2, 3, 100, 10);
 }
@@ -708,21 +926,18 @@ function lighthouse(st: Style): Sprite {
   // The cap.
   const capBase = gallery + 13;
   s.prism("z", [1, 1, capBase + 0.75], 0.34, 0.75, st.trim, 12);
-  if (st.roofKind === "flat") {
+  if (st.roofKind === "cap") {
+    s.ellipsoid([1, 1, capBase + 3], [0.5, 0.5, 7], st.hallRoof);
+  } else if (st.roofKind === "flat") {
     s.ellipsoid([1, 1, capBase + 1.5], [0.32, 0.32, 9], (c) =>
       shade("dome", lit(c, ((c.p[0] + c.p[1]) * 12) % 1 < 0.15 ? -0.1 : 0.1), c.px, c.py, 0.25),
     );
     s.prism("z", [1, 1, capBase + 13], 0.02, 3, flat("gold", 0.2), 6);
   } else {
-    s.cone([1, 1, capBase + 1.5], 0.4, st.roofKind === "steep" ? 22 : 16, st.hallRoof, 14);
-    s.prism(
-      "z",
-      [1, 1, capBase + (st.roofKind === "steep" ? 26 : 20)],
-      0.02,
-      3,
-      flat("gold", 0.2),
-      6,
-    );
+    const spire =
+      st.roofKind === "steep" ? 22 : st.roofKind === "hip" ? 10 + 8 * (st.pitch ?? 1) : 16;
+    s.cone([1, 1, capBase + 1.5], 0.4, spire, st.hallRoof, 14);
+    s.prism("z", [1, 1, capBase + spire + 4], 0.02, 3, flat("gold", 0.2), 6);
   }
   banner(s, st, 1.32, 0.78, plinth + 2, 10);
   return renderSprite(`b_lighthouse_${st.tribe}`, s, 2, 2, 112, 10, {
@@ -742,6 +957,17 @@ function pillarMaterial(st: Style): Material {
         shade("sandstone", lit(c, (c.lp[2] / 7) % 1 < 0.12 ? -0.15 : 0.06), c.px, c.py, 0.2);
     case "sylvan":
       return withOpenings(barkSurface(), { frame: "bark", plinthPx: 0 });
+    case "glowkin":
+      return withOpenings(stalkSurface(), { frame: "fungalGround", plinthPx: 0 });
+    case "freebooters":
+      return withOpenings(bambooSurface(), { frame: "timber", plinthPx: 0 });
+    case "mirefolk":
+      return withOpenings(boardSurface("logs"), { frame: "logs", plinthPx: 0 });
+    case "amberwrights":
+      return (c) =>
+        shade("autumnLeaf", lit(c, (c.lp[2] / 7) % 1 < 0.14 ? -0.2 : 0.1), c.px, c.py, 0.2);
+    case "cinderborn":
+      return withOpenings(basaltSurface(), { frame: "basalt", plinthPx: 0 });
   }
 }
 

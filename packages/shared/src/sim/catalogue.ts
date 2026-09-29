@@ -638,3 +638,34 @@ export function cargoCost(tribe: TribeId): Partial<Stock> {
     Object.entries(CARGO.cost).map(([r, n]) => [r, Math.round((n ?? 0) * 0.75)]),
   );
 }
+
+/** Seconds a blacksmith of this tribe needs to forge one batch of tools. */
+export function smithSeconds(tribe: TribeId): number {
+  return SMITH.seconds / (TRIBE_DEFS[tribe].bonus === "forging" ? 2 : 1);
+}
+
+/** Seconds a dive at a sunken site takes. */
+export function diveSeconds(tribe: TribeId): number {
+  return DIVE.seconds / (TRIBE_DEFS[tribe].bonus === "diving" ? 2 : 1);
+}
+
+/** Share of a site's remaining treasure that each diver brings up. */
+export function diveShare(tribe: TribeId): number {
+  return DIVE.share * (TRIBE_DEFS[tribe].bonus === "diving" ? 1.5 : 1);
+}
+
+/** Gold the market pays for a lot of this resource. Buying still costs twice the base price. */
+export function sellPrice(resource: Resource, tribe: TribeId): number {
+  const price = MARKET_PRICES[resource] ?? 0;
+  return TRIBE_DEFS[tribe].bonus === "trade" ? Math.round(price * 1.3) : price;
+}
+
+/** How many times over a sunk raider's hoard and bounty are paid out. */
+export function plunderFactor(tribe: TribeId): number {
+  return TRIBE_DEFS[tribe].bonus === "privateering" ? 2 : 1;
+}
+
+/** Whether this tribe's lookouts and ships see as far by night as by day. */
+export function seesInTheDark(tribe: TribeId): boolean {
+  return TRIBE_DEFS[tribe].bonus === "nightsight";
+}

@@ -771,8 +771,9 @@ function ensureHomeResources(world: WorldMap, base: number, reserved: Set<number
     }
     return true;
   };
-  // Ore for the blacksmith must exist at home: every tribe's home biome has a plain "ore" deposit.
-  const ore: NodeKind[] = def.deposits.includes("ore") ? ["ore"] : [def.deposits[0]!];
+  // Ore for the blacksmith must exist at home: the biome's own iron (plain ore or bog iron), or
+  // plain ore where the biome has none (the Infernal Isles only yield hellstone).
+  const ore: NodeKind[] = [def.deposits.find((k) => k === "ore" || k === "bog_ore") ?? "ore"];
   return add(def.trees, 30) && add([def.stone], 8) && add(def.food, 5) && add(ore, 5);
 }
 

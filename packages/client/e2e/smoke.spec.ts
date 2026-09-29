@@ -18,7 +18,8 @@ test("the landing page shows the game and sets sail to /play", async ({ page }) 
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Explorer");
   // Tribes and biomes come from the game's own definitions.
-  await expect(page.locator(".tribe-card")).toHaveCount(4);
+  await expect(page.locator(".tribe-card")).toHaveCount(9);
+  await expect(page.locator(".stats")).toContainText("9 tribes");
   await expect(page.locator(".tribe-card").first()).toContainText("Islanders");
   await expect(page.locator(".biome")).toHaveCount(10);
   await page.getByRole("link", { name: "Set sail" }).first().click();
@@ -86,4 +87,14 @@ test("offline mode plays without a server connection", async ({ page }) => {
   await expect(page.locator('.resource[data-res="pop"]')).toHaveText("3/5");
   // The world has a time of day, which every player sees on the HUD clock.
   await expect(page.locator(".clock")).toContainText(/Day 1 · \w+ · \d\d:\d\d/);
+});
+
+test("a newer tribe starts on its own home biome with its own buildings", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto("/play?offline&seed=e2e&tribe=cinderborn");
+  await expect(page.locator("#app > canvas")).toBeVisible();
+  await expect(page.locator(".players")).toContainText("Cinderborn");
+  await expect(page.locator(".clock")).toContainText(/Day 1/);
+  expect(errors).toEqual([]);
 });

@@ -14,7 +14,7 @@ export type VillagerPose = (typeof VILLAGER_POSES)[number];
 export const TOOLS = ["axe", "pick", "hammer", "hoe"] as const;
 export type Tool = (typeof TOOLS)[number];
 
-type Hat = "none" | "helmet" | "wrap" | "hood";
+type Hat = "none" | "helmet" | "wrap" | "hood" | "mushroom" | "bandana" | "reed" | "cap" | "cowl";
 
 /** Clothing per tribe: three tunic colours (dark, mid, light) and a headwear style. */
 const OUTFITS: Record<TribeId, { tunics: [string, string, string][]; hat: Hat }> = {
@@ -49,6 +49,46 @@ const OUTFITS: Record<TribeId, { tunics: [string, string, string][]; hat: Hat }>
       ["#3a4a14", "#5a6e1e", "#7e9430"],
     ],
     hat: "hood",
+  },
+  glowkin: {
+    tunics: [
+      ["#2e1a4a", "#4a2a6e", "#6a44a0"],
+      ["#12404a", "#1a6a78", "#2aa0a8"],
+      ["#4a2a3a", "#6e3e56", "#94607a"],
+    ],
+    hat: "mushroom",
+  },
+  freebooters: {
+    tunics: [
+      ["#8d816e", "#d6cbb4", "#f7f1e1"],
+      ["#5a1a2e", "#9a2e4e", "#d0507a"],
+      ["#1c2230", "#26304a", "#3e4d6a"],
+    ],
+    hat: "bandana",
+  },
+  mirefolk: {
+    tunics: [
+      ["#22261a", "#3c4428", "#5a6438"],
+      ["#26361e", "#445a30", "#6a8646"],
+      ["#1e3a3a", "#2e5e58", "#4a8a80"],
+    ],
+    hat: "reed",
+  },
+  amberwrights: {
+    tunics: [
+      ["#5a3e18", "#9a6c28", "#d0a444"],
+      ["#6a200c", "#9a3410", "#c85018"],
+      ["#3a2a14", "#5a4028", "#7a5a3a"],
+    ],
+    hat: "cap",
+  },
+  cinderborn: {
+    tunics: [
+      ["#1a1414", "#2a2020", "#3a2c28"],
+      ["#3a0e0e", "#6a1a18", "#9a2a22"],
+      ["#2a2024", "#3a2c30", "#4c3a3c"],
+    ],
+    hat: "cowl",
   },
 };
 
@@ -147,6 +187,45 @@ function villager(
     R(8, 2, 1, 3, tDark!);
     P(6, -1, tLight!);
     if (facing === "back") R(4, 2, 4, 4, tMid!);
+  } else if (outfit.hat === "mushroom") {
+    // A broad spotted cap with glowing flecks and pale gills underneath.
+    const cap = rampColor("arcane", 3);
+    const glow = rampColor("glow", 4);
+    R(4, -2, 4, 1, cap);
+    R(2, -1, 8, 2, cap);
+    R(3, 1, 6, 1, rampColor("stalk", 4));
+    P(4, -1, glow);
+    P(7, -2, glow);
+    P(8, 0, glow);
+  } else if (outfit.hat === "bandana") {
+    const band = rampColor("berry", 2);
+    R(4, 0, 4, 2, band);
+    P(4, 0, rampColor("berry", 3));
+    // The knot's tails hang behind the head.
+    P(3, 1, band);
+    P(2, 2, band);
+    P(3, 2, rampColor("berry", 1));
+  } else if (outfit.hat === "reed") {
+    // A wide conical reed hat.
+    R(1, 1, 10, 1, rampColor("thatch", 3));
+    R(3, 0, 6, 1, rampColor("thatch", 4));
+    R(4, -1, 4, 1, rampColor("thatch", 3));
+    R(5, -2, 2, 1, rampColor("thatch", 5));
+    R(1, 1, 2, 1, rampColor("thatch", 2));
+  } else if (outfit.hat === "cap") {
+    // A flat craftsman's cap with its peak towards the facing side.
+    R(3, 0, 6, 2, tDark!);
+    R(4, 0, 4, 1, tMid!);
+    if (facing === "front") R(7, 2, 3, 1, tDark!);
+  } else if (outfit.hat === "cowl") {
+    // A soot-dark cowl edged with glowing embers.
+    const soot = rampColor("basalt", 2);
+    R(3, 0, 6, 2, soot);
+    R(3, 2, 1, 4, soot);
+    R(8, 2, 1, 4, soot);
+    R(4, 1, 4, 1, rampColor("lava", 3));
+    P(6, -1, rampColor("lava", 4));
+    if (facing === "back") R(4, 2, 4, 4, soot);
   }
 
   // Tools.

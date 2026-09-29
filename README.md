@@ -53,14 +53,23 @@ The site root is the landing page; the game itself lives at **/play** (http://lo
 
 ### Tribes
 
-You choose a tribe when you start a world, and the whole co-op team plays it. The tribe sets how buildings and villagers look, which biome the home island is, and one bonus.
+You choose one of nine tribes when you start a world, and the whole co-op team plays it. The tribe sets how buildings and villagers look, which biome the home island is, and one bonus.
 
-| Tribe     | Style                                             | Home biome      | Bonus                                     |
-| --------- | ------------------------------------------------- | --------------- | ----------------------------------------- |
-| Islanders | Timber frames, thatch and slate                   | Greenlands      | Ships cost 25% less and sail 25% faster   |
-| Northfolk | Log halls with steep roofs and carved ridge horns | Frostreach      | Woodcutting is 30% faster                 |
-| Sunfolk   | Adobe with flat roofs, parapets and blue domes    | Sunscorch Dunes | Quarrying and mining are 30% faster       |
-| Sylvan    | Living bark under leafy and blossom roofs         | Petal Isles     | Food gathering and farming are 30% faster |
+| Tribe        | Style                                                   | Home biome      | Bonus                                                             |
+| ------------ | ------------------------------------------------------- | --------------- | ----------------------------------------------------------------- |
+| Islanders    | Timber frames, thatch and slate                         | Greenlands      | Ships cost 25% less and sail 25% faster                           |
+| Northfolk    | Log halls with steep roofs and carved ridge horns       | Frostreach      | Woodcutting is 30% faster                                         |
+| Sunfolk      | Adobe with flat roofs, parapets and blue domes          | Sunscorch Dunes | Quarrying and mining are 30% faster                               |
+| Sylvan       | Living bark under leafy and blossom roofs               | Petal Isles     | Food gathering and farming are 30% faster                         |
+| Glowkin      | Mushroom houses under glowing, spotted caps             | Fungal Hollows  | Lookouts and ships see as far by night as by day                  |
+| Freebooters  | Bamboo, palm thatch, patched sailcloth and ships' masts | Verdant Wilds   | Every ship carries cannons, and sunk raiders leave twice the loot |
+| Mirefolk     | Weathered boards under steep reed roofs, lantern-lit    | Murkmire        | Divers work twice as fast and bring up 50% more                   |
+| Amberwrights | Timber frames under russet shingles, clock towers       | Amberwood       | Markets pay 30% more gold for your goods                          |
+| Cinderborn   | Basalt with glowing lava joints under obsidian spires   | Infernal Isles  | Blacksmiths forge twice as fast, and no Ember Ward is needed      |
+
+- The Freebooters start with the dock's **Cannons** fitting, and the Cinderborn with the **Ember Ward**, as if already learned.
+- The Cinderborn are the hard start: their home is the grim Infernal Isles, with little food and no ore of its own (the home island always gets enough ore for a blacksmith). The gentle biomes still lie nearest home.
+- A tribe's home biome never asks for its own signature good in the Great Work, so the Glowkin need no glowcap, the Mirefolk no mirepearl and the Cinderborn no hellstone.
 
 ### Biomes
 

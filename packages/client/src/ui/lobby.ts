@@ -61,6 +61,8 @@ export function showLobby(root: HTMLElement, opts: LobbyOptions): () => void {
   const error = h("div.error", {}, opts.error ?? "");
   const seed = h("input.field", { placeholder: "Random" }) as HTMLInputElement;
   let tribe: TribeId = "islanders";
+  const tribeText = (id: TribeId) => `${TRIBE_DEFS[id].description} ${TRIBE_DEFS[id].bonusText}.`;
+  const tribeHint = h("small", {}, tribeText(tribe));
   const tribeCards = new Map<TribeId, HTMLElement>();
   const tribes = h("div.tribes", { role: "radiogroup", "aria-label": "Tribe" });
   for (const id of TRIBES) {
@@ -75,6 +77,7 @@ export function showLobby(root: HTMLElement, opts: LobbyOptions): () => void {
         title: def.description,
         onclick: () => {
           tribe = id;
+          tribeHint.textContent = tribeText(id);
           for (const [t, el] of tribeCards) {
             el.classList.toggle("active", t === id);
             el.setAttribute("aria-checked", String(t === id));
@@ -82,12 +85,7 @@ export function showLobby(root: HTMLElement, opts: LobbyOptions): () => void {
         },
       },
       pic,
-      h(
-        "span",
-        {},
-        h("strong", { style: { color: def.banner } }, def.name),
-        h("small", {}, def.bonusText),
-      ),
+      h("strong", { style: { color: def.banner } }, def.name),
     );
     if (id === tribe) card.classList.add("active");
     tribeCards.set(id, card);
@@ -204,7 +202,7 @@ export function showLobby(root: HTMLElement, opts: LobbyOptions): () => void {
         `Sail a randomly generated archipelago of ten biomes, from blossom isles to infernal shores, and build a settlement with up to ${MAX_PLAYERS - 1} friends.`,
       ),
       h("label", {}, "Your name", name),
-      h("div.field", {}, h("span", {}, "Choose your tribe"), tribes),
+      h("div.field", {}, h("span", {}, "Choose your tribe"), tribes, tribeHint),
       h("div.field", {}, h("span", {}, "Pirates"), difficulties, difficultyHint),
       h("label", {}, "World seed (optional)", seed),
       createBtn,
