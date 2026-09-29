@@ -246,8 +246,9 @@ tools/sprites     palette extraction and the sprite generator → client/public/
    - Buildings take a tribe style: wall material, roof shape and accent colours.
    - Shading snaps to the palette ramps with restrained ordered dithering.
    - Cast shadows and dark outlines make it read as pixel art.
-   - Boulders, sea rocks (with surf) and villagers are built the same way; villagers are drawn pixel by pixel.
-4. **Packing:** everything goes into one atlas. Each frame keeps its anchor (a tile's top vertex, or a villager's feet) plus metadata such as chimney smoke emitters.
+   - Boulders and sea rocks (with surf) are built the same way.
+   - Villagers and the goods they carry are drawn pixel by pixel at **double resolution** (a 32×48 canvas per frame, `res: 2` in the manifest). The game shows them at half scale, so they stand as tall as before but with twice the detail; at the default zoom each of their pixels is one screen pixel.
+4. **Packing:** everything goes into one atlas. Each frame keeps its anchor (a tile's top vertex, or a villager's feet) plus metadata such as chimney smoke emitters and, for double-resolution frames, `res`.
 
 To **replace or add art**, add or modify a function in `tools/sprites/src/sprites/*` and run `pnpm sprites`. To swap in a hand-painted sprite, draw it into a `Canvas` with the same name and anchor. `packages/client/src/render/names.ts` maps game state to frame names. To change how the land looks, edit the biome materials in `packages/art/src/terrain/materials.ts` (ground, beach, rock, path and cliff textures) or the water in `water.ts`; no atlas rebuild is needed.
 

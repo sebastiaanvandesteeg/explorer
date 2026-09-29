@@ -19,11 +19,20 @@ export class Atlas {
     return t;
   }
 
-  /** A sprite whose anchor is the generator's pixel anchor (a tile's top vertex, feet, …). */
+  /**
+   * A sprite whose anchor is the generator's pixel anchor (a tile's top vertex, feet, …), scaled
+   * so a double-resolution frame covers as much of the world as an ordinary one.
+   */
   sprite(name: string): Sprite {
     const s = new Sprite(this.texture(name));
     this.anchor(s, name);
+    s.scale.set(1 / this.res(name));
     return s;
+  }
+
+  /** Texels per world pixel for a frame (villagers are drawn at double resolution). */
+  res(name: string): number {
+    return this.meta[name]?.res ?? 1;
   }
 
   anchor(s: Sprite, name: string): void {
@@ -37,9 +46,9 @@ export class Atlas {
     return page.json.frames[name]!.frame;
   }
 
-  /** CSS for showing a frame as a pixelated DOM icon. */
+  /** CSS for showing a frame as a pixelated DOM icon, `scale` CSS pixels per world pixel. */
   iconStyle(name: string, scale = 2): Partial<CSSStyleDeclaration> {
-    return frameStyle(this.pages[this.meta[name]!.page]!, name, scale);
+    return frameStyle(this.pages[this.meta[name]!.page]!, name, scale / this.res(name));
   }
 }
 

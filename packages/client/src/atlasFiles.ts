@@ -12,6 +12,8 @@ export interface SpriteMeta {
   lights?: { x: number; y: number; r: number }[];
   /** A lighthouse's lamp: where its beam starts. */
   beam?: { x: number; y: number }[];
+  /** Texels per world pixel: 2 for figures drawn at double resolution. Absent means 1. */
+  res?: number;
 }
 
 export interface AtlasPage {
@@ -39,7 +41,10 @@ export async function fetchAtlasFiles(): Promise<AtlasFiles> {
   return { sprites: manifest.sprites, pages };
 }
 
-/** CSS for showing a frame of a page as a pixelated DOM icon. */
+/**
+ * CSS for showing a frame of a page as a pixelated DOM icon. `scale` is CSS pixels per texel; a
+ * double-resolution frame should get half the scale of the world's sprites to match their size.
+ */
 export function frameStyle(page: AtlasPage, name: string, scale = 2): Partial<CSSStyleDeclaration> {
   const f = page.json.frames[name]!.frame;
   const size = page.json.meta.size!;

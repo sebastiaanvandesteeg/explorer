@@ -459,7 +459,8 @@ class VillagerView extends MovingView {
       this.body.texture = tex;
       this.layer.atlas.anchor(this.body, name);
     }
-    this.body.scale.x = flip ? -1 : 1;
+    const k = 1 / this.layer.atlas.res(name);
+    this.body.scale.set(flip ? -k : k, k);
     if (this.carry) this.carry.y = -21 + (this.moving ? phase : 0);
     this.root.position.set(
       Math.round(screenX(this.x, this.y)),

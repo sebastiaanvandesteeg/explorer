@@ -28,7 +28,8 @@ function sprite(name: string, scale: number): HTMLElement {
   const el = h("span.sprite");
   void atlas.then((a) => {
     const meta = a.sprites[name];
-    if (meta) Object.assign(el.style, frameStyle(a.pages[meta.page]!, name, scale));
+    if (meta)
+      Object.assign(el.style, frameStyle(a.pages[meta.page]!, name, scale / (meta.res ?? 1)));
   });
   return el;
 }
