@@ -5,6 +5,7 @@ import type { Tile } from "../world/pathfind";
 import {
   BUILDING_REVEAL,
   BUILDINGS,
+  CARGO,
   CHURCH,
   FARM,
   farmRate,
@@ -20,11 +21,13 @@ import {
   type WorkerJob,
 } from "./catalogue";
 import { releaseTask } from "./commands";
-import { disembark, embark, hasRoom, shipMoving, shoreBeside } from "./ferry";
-import { landPath, sailable } from "./navigation";
+import { disembark, dockSpawn, embark, hasRoom, shipMoving, shoreBeside } from "./ferry";
+import { landPath, sailable, seaPath } from "./navigation";
 import { buildingAround, isAdjacentTo, tilesAround } from "./rules";
 import {
   addEntity,
+  addGoods,
+  islandAt,
   isPathTile,
   markDirty,
   newVillager,
@@ -32,6 +35,8 @@ import {
   populationCap,
   removeEntity,
   reveal,
+  stockOf,
+  touchStock,
   walkable,
   type BuildingEntity,
   type GameState,
@@ -74,7 +79,7 @@ function updateBuilding(state: GameState, b: BuildingEntity, dt: number): void {
           state.events.push({ type: "villager", x: spot.x, y: spot.y });
           b.queue.shift();
         }
-      } else if (job.what === "ship") {
+      } else if (job.what === "ship" || job.what === "cargo") {
         const at = shipSpawn(b);
         if (sailable(state, Math.floor(at.x), Math.floor(at.y))) {
           const ship: ShipEntity = {
@@ -87,10 +92,15 @@ function updateBuilding(state: GameState, b: BuildingEntity, dt: number): void {
             dest: null,
             passengers: [],
             unload: false,
+            kind: job.what === "cargo" ? "cargo" : "scout",
+            route: null,
+            leg: null,
+            cargo: {},
+            waitUntil: 0,
           };
           addEntity(state, ship);
           reveal(state, ship.x, ship.y, SHIP.reveal);
-          state.events.push({ type: "ship", x: ship.x, y: ship.y });
+          state.events.push({ type: "ship", kind: ship.kind, x: ship.x, y: ship.y });
           b.queue.shift();
         }
       }
@@ -100,32 +110,34 @@ function updateBuilding(state: GameState, b: BuildingEntity, dt: number): void {
   const v = state.entities.get(b.workerId);
   const tending = v?.type === "villager" && v.action === "work" && v.task?.kind === "staff";
   if (!tending) return;
+  const island = islandAt(state, b.x, b.y);
+  const stock = stockOf(state, island);
   if (b.kind === "farm") {
     const stageBefore = farmStage(b);
     b.growth += dt * farmRate(state.world.tribe);
     if (b.growth >= FARM.cycle) {
       b.growth = 0;
-      state.stock.food += FARM.yield;
-      state.stockDirty = true;
+      stock.food += FARM.yield;
+      touchStock(state, island);
     }
     if (farmStage(b) !== stageBefore) markDirty(state, b.id);
   } else if (b.kind === "blacksmith") {
     // The forge only burns while there is ore to work.
-    if (state.stock.ore < SMITH.ore) return;
+    if (stock.ore < SMITH.ore) return;
     b.growth += dt;
     if (b.growth >= SMITH.seconds) {
       b.growth = 0;
-      state.stock.ore -= SMITH.ore;
-      state.stock.tools += SMITH.tools;
-      state.stockDirty = true;
+      stock.ore -= SMITH.ore;
+      stock.tools += SMITH.tools;
+      touchStock(state, island);
       markDirty(state, b.id);
     }
   } else if (b.kind === "church") {
     b.growth += dt;
     if (b.growth >= CHURCH.seconds) {
       b.growth = 0;
-      state.stock.faith += CHURCH.faith;
-      state.stockDirty = true;
+      stock.faith += CHURCH.faith;
+      touchStock(state, island);
     }
   }
 }
@@ -140,18 +152,7 @@ export function farmStage(b: BuildingEntity): 0 | 1 | 2 {
 }
 
 /** Where a dock launches ships: just past the end of the pier. */
-export function shipSpawn(b: BuildingEntity): { x: number; y: number } {
-  switch (b.dir) {
-    case "-x":
-      return { x: b.x - 0.5, y: b.y + 1 };
-    case "+y":
-      return { x: b.x + 1, y: b.y + b.h + 0.5 };
-    case "-y":
-      return { x: b.x + 1, y: b.y - 0.5 };
-    default:
-      return { x: b.x + b.w + 0.5, y: b.y + 1 };
-  }
-}
+export const shipSpawn = dockSpawn;
 
 function updateNode(state: GameState, n: NodeEntity, dt: number): void {
   n.timer -= dt;
@@ -433,8 +434,9 @@ function startDelivery(state: GameState, v: VillagerEntity): boolean {
 
 function finishDelivery(state: GameState, v: VillagerEntity): void {
   if (v.carrying) {
-    state.stock[v.carrying.resource] += v.carrying.amount;
-    state.stockDirty = true;
+    // Goods go into the pile of the island the villager stands on.
+    const here = tileOf(v);
+    addGoods(state, islandAt(state, here.x, here.y), v.carrying.resource, v.carrying.amount);
     v.carrying = null;
   }
   v.action = "idle";
@@ -592,8 +594,11 @@ function wander(state: GameState, v: VillagerEntity): void {
 // Ships
 
 function updateShip(state: GameState, s: ShipEntity, dt: number): void {
-  if (s.path.length === 0) return;
-  let budget = shipSpeed(state.world.tribe) * dt;
+  if (s.path.length === 0) {
+    if (s.kind === "cargo" && s.route !== null) runRoute(state, s);
+    return;
+  }
+  let budget = shipSpeed(state.world.tribe, s.kind) * dt;
   while (budget > 1e-6 && s.path.length > 0) {
     const next = s.path[0]!;
     const tx = next.x + 0.5;
@@ -622,4 +627,98 @@ function updateShip(state: GameState, s: ShipEntity, dt: number): void {
     }
   }
   markDirty(state, s.id);
+}
+
+// ---------------------------------------------------------------------------------------------
+// Trade routes
+
+const dockAt = (state: GameState, id: number | null): BuildingEntity | null => {
+  const b = id === null ? undefined : state.entities.get(id);
+  return b?.type === "building" && b.kind === "dock" && b.complete ? b : null;
+};
+
+/** The completed dock on the home island nearest to another dock: where cargo goes ashore. */
+export function homeDockFor(state: GameState, from: BuildingEntity): BuildingEntity | null {
+  const home = state.world.start.islandId;
+  let best: BuildingEntity | null = null;
+  let bestD = Infinity;
+  for (const e of state.entities.values()) {
+    if (e.type !== "building" || e.kind !== "dock" || !e.complete) continue;
+    if (islandAt(state, e.x, e.y) !== home) continue;
+    const d = Math.hypot(e.x - from.x, e.y - from.y);
+    if (d < bestD) {
+      best = e;
+      bestD = d;
+    }
+  }
+  return best;
+}
+
+export function cargoLoad(s: ShipEntity): number {
+  let n = 0;
+  for (const v of Object.values(s.cargo)) n += v ?? 0;
+  return n;
+}
+
+/**
+ * A cargo ship shuttles between the dock it collects from (on another island) and a dock on the
+ * home island: it waits for goods, loads what the outpost has stored, sails home and unloads.
+ */
+function runRoute(state: GameState, s: ShipEntity): void {
+  if (state.time < s.waitUntil) return;
+  const pickup = dockAt(state, s.route);
+  const home = pickup ? homeDockFor(state, pickup) : null;
+  if (!pickup) {
+    s.route = null;
+    s.leg = null;
+    markDirty(state, s.id);
+    return;
+  }
+  const rest = (seconds: number) => {
+    s.waitUntil = state.time + seconds;
+    markDirty(state, s.id);
+  };
+  if (!home) return rest(5);
+  if (s.leg === null) s.leg = cargoLoad(s) > 0 ? "drop" : "pickup";
+  const dock = s.leg === "pickup" ? pickup : home;
+  const spot = dockSpawn(dock);
+  const tile = { x: Math.floor(spot.x), y: Math.floor(spot.y) };
+  if (Math.hypot(s.x - spot.x, s.y - spot.y) > 1.5) {
+    const path = sailable(state, tile.x, tile.y)
+      ? seaPath(state, { x: Math.floor(s.x), y: Math.floor(s.y) }, tile)
+      : null;
+    if (!path) return rest(5);
+    s.path = path;
+    s.dest = tile;
+    markDirty(state, s.id);
+    return;
+  }
+  const island = islandAt(state, pickup.x, pickup.y);
+  if (s.leg === "pickup") {
+    const pile = stockOf(state, island);
+    let room = CARGO.capacity - cargoLoad(s);
+    const available = Object.values(pile).reduce((a, b) => a + b, 0);
+    if (available < Math.min(CARGO.minLoad, room)) return rest(2);
+    for (const r of Object.keys(pile) as (keyof typeof pile)[]) {
+      const take = Math.min(pile[r], room);
+      if (take <= 0) continue;
+      pile[r] -= take;
+      s.cargo[r] = (s.cargo[r] ?? 0) + take;
+      room -= take;
+    }
+    touchStock(state, island);
+    s.leg = "drop";
+    return rest(1);
+  }
+  let delivered = 0;
+  for (const r of Object.keys(s.cargo) as (keyof typeof s.cargo)[]) {
+    const n = s.cargo[r] ?? 0;
+    if (n <= 0) continue;
+    addGoods(state, islandAt(state, home.x, home.y), r, n);
+    delivered += n;
+  }
+  s.cargo = {};
+  s.leg = "pickup";
+  if (delivered > 0) state.events.push({ type: "cargo", amount: delivered, x: spot.x, y: spot.y });
+  rest(1);
 }

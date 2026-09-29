@@ -4,10 +4,12 @@ import { Terrain, type Dir, type NodeKind, type WorldMap } from "../world/types"
 import {
   BUILDINGS,
   NODES,
+  RESOURCES,
   START_STOCK,
   START_VILLAGERS,
   type BuildingKind,
   type Resource,
+  type ShipKind,
   type Stock,
   type Tool,
 } from "./catalogue";
@@ -25,7 +27,7 @@ export interface BuildingEntity {
   complete: boolean;
   dir?: Dir;
   /** Production queue (town hall trains villagers, docks build ships). */
-  queue: { what: "villager" | "ship"; remaining: number }[];
+  queue: { what: "villager" | "ship" | "cargo"; remaining: number }[];
   /** Villager staffing a workplace (camps, quarry, mine, farm, blacksmith, church). */
   workerId: number | null;
   /** Production timer in seconds (farm growth, forging, prayer). */
@@ -90,6 +92,16 @@ export interface ShipEntity {
   passengers: number[];
   /** Put the passengers ashore when the ship arrives. */
   unload: boolean;
+  /** Scouts explore and ferry villagers; cargo ships haul goods along a trade route. */
+  kind: ShipKind;
+  /** Cargo ships: the dock (on another island) this ship collects goods from, or null. */
+  route: number | null;
+  /** Cargo ships: which end of the route the ship is heading for. */
+  leg: "pickup" | "drop" | null;
+  /** Goods on board (cargo ships). */
+  cargo: Partial<Stock>;
+  /** Cargo ships wait at a dock until this time before trying again. */
+  waitUntil: number;
 }
 
 export type Entity = BuildingEntity | NodeEntity | VillagerEntity | ShipEntity;
@@ -97,16 +109,22 @@ export type Entity = BuildingEntity | NodeEntity | VillagerEntity | ShipEntity;
 export type GameEvent =
   | { type: "built"; kind: BuildingKind; x: number; y: number }
   | { type: "villager"; x: number; y: number }
-  | { type: "ship"; x: number; y: number }
+  | { type: "ship"; kind?: ShipKind; x: number; y: number }
   | { type: "discovered"; islandId: number; biome: BiomeId; x: number; y: number }
-  | { type: "landed"; count: number; islandId: number; x: number; y: number };
+  | { type: "landed"; count: number; islandId: number; x: number; y: number }
+  | { type: "cargo"; amount: number; x: number; y: number };
 
 export interface GameState {
   world: WorldMap;
   time: number;
   tick: number;
   nextId: number;
+  /** Goods stored on the home island: what building, training and trading spend. */
   stock: Stock;
+  /** Goods piled up on other islands' storehouses and docks until a cargo ship collects them. */
+  outposts: Map<number, Stock>;
+  /** Outpost islands whose stockpile changed since the last patch. */
+  outpostsDirty: Set<number>;
   entities: Map<number, Entity>;
   /** 1 when a tile has been seen by anyone in the co-op team. */
   explored: Uint8Array;
@@ -175,6 +193,8 @@ export function emptyState(world: WorldMap): GameState {
     tick: 0,
     nextId: 1,
     stock: { ...START_STOCK },
+    outposts: new Map(),
+    outpostsDirty: new Set(),
     entities: new Map(),
     explored: new Uint8Array(n),
     discovered: new Set(),
@@ -213,6 +233,32 @@ export function newBuilding(
     workerId: null,
     growth: 0,
   };
+}
+
+export function emptyStock(): Stock {
+  return Object.fromEntries(RESOURCES.map((r) => [r, 0])) as Stock;
+}
+
+/** The stockpile of an island: the shared treasury at home, a local pile everywhere else. */
+export function stockOf(state: GameState, islandId: number): Stock {
+  if (islandId === state.world.start.islandId || islandId < 0) return state.stock;
+  let s = state.outposts.get(islandId);
+  if (!s) {
+    s = emptyStock();
+    state.outposts.set(islandId, s);
+  }
+  return s;
+}
+
+/** Record that an island's stockpile changed so it goes out with the next patch. */
+export function touchStock(state: GameState, islandId: number): void {
+  if (islandId === state.world.start.islandId || islandId < 0) state.stockDirty = true;
+  else state.outpostsDirty.add(islandId);
+}
+
+export function addGoods(state: GameState, islandId: number, r: Resource, n: number): void {
+  stockOf(state, islandId)[r] += n;
+  touchStock(state, islandId);
 }
 
 export function newVillager(state: GameState, x: number, y: number): VillagerEntity {

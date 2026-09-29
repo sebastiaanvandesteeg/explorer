@@ -265,7 +265,7 @@ function pointedHull(x0: number, x1: number, cy: number, hw: number, topPx: numb
 }
 
 /** Hull, deck cargo, mast and a square sail, heading along +x in the local frame. */
-function shipScene(heading: number): Scene {
+function shipScene(heading: number, cargo = false): Scene {
   const s = new Scene();
   // Modelled around the world origin so the sprite anchor is the ship's centre.
   s.withYaw((heading * Math.PI) / 4, [0, 0], () => {
@@ -307,7 +307,7 @@ function shipScene(heading: number): Scene {
       [cx - L * 0.48, cy + W, hullTop + 6],
       flat("plank", 0.1),
     );
-    // Cargo crates.
+    // Cargo crates: a scout carries a few, a freighter is stacked with them.
     const crate = (x0: number, y0: number, x1: number, y1: number, z0: number, z1: number) =>
       s.box(
         [cx + x0, cy + y0, z0],
@@ -318,6 +318,13 @@ function shipScene(heading: number): Scene {
     crate(-0.34, 0.04, -0.14, 0.22, hullTop, hullTop + 4.5);
     crate(0.22, -0.16, 0.42, 0.06, hullTop, hullTop + 4.5);
     crate(-0.32, -0.17, -0.15, 0, hullTop + 5, hullTop + 9);
+    if (cargo) {
+      crate(0.46, -0.2, 0.66, 0, hullTop, hullTop + 5);
+      crate(0.46, 0.02, 0.64, 0.22, hullTop, hullTop + 4);
+      crate(0.24, 0.1, 0.42, 0.26, hullTop, hullTop + 5);
+      crate(0.5, -0.17, 0.66, -0.02, hullTop + 5, hullTop + 9);
+      crate(-0.1, -0.22, 0.1, -0.06, hullTop, hullTop + 4);
+    }
     // Mast, yard and sail.
     s.prism("z", [cx + 0.05, cy, hullTop + 22], 0.035, 22, flat("timber"), 6);
     s.prism("y", [cx + 0.08, cy, hullTop + 38], 0.02, 0.36, flat("timber"), 6);
@@ -339,9 +346,9 @@ function shipScene(heading: number): Scene {
   return s;
 }
 
-function ship(heading: number): Sprite {
-  const s = shipScene(heading);
-  return renderSprite(`ship_${heading}`, s, 1, 1, 70, 40);
+function ship(heading: number, cargo = false): Sprite {
+  const s = shipScene(heading, cargo);
+  return renderSprite(`${cargo ? "cargo" : "ship"}_${heading}`, s, 1, 1, 70, 40);
 }
 
 function rowboat(dir: "x" | "y"): Sprite {
@@ -564,6 +571,7 @@ export function unitSprites(): Sprite[] {
     carried("crystal"),
     ...particles(),
     ...Array.from({ length: 8 }, (_, h) => ship(h)),
+    ...Array.from({ length: 8 }, (_, h) => ship(h, true)),
     rowboat("x"),
     rowboat("y"),
     ...[0, 1, 2, 3].map(smoke),

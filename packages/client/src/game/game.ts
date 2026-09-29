@@ -2,6 +2,7 @@ import {
   BIOMES,
   BUILDINGS,
   canPlaceBuilding,
+  dockSite,
   dayNumber,
   dayPhase,
   discoveryName,
@@ -229,7 +230,10 @@ export class Game {
       this.hud.setStock(state);
     }
     if (this.selected !== null && !state.entities.has(this.selected)) this.select(null);
-    if (this.selected !== null && (p.entities.some((e) => e.id === this.selected) || p.stock))
+    if (
+      this.selected !== null &&
+      (p.entities.some((e) => e.id === this.selected) || p.stock || p.outposts)
+    )
       this.selectionDirty = true;
     for (const ev of p.events ?? []) this.onEvent(ev);
   }
@@ -243,7 +247,14 @@ export class Game {
         this.hud.toast("A new villager joined the settlement");
         break;
       case "ship":
-        this.hud.toast("A scout ship is ready at the dock");
+        this.hud.toast(
+          ev.kind === "cargo"
+            ? "A cargo ship is ready at the dock"
+            : "A scout ship is ready at the dock",
+        );
+        break;
+      case "cargo":
+        this.hud.toast(`A cargo ship brought ${ev.amount} goods home`);
         break;
       case "discovered":
         this.hud.toast(discoveryText(ev.biome));
@@ -298,6 +309,12 @@ export class Game {
   }
 
   private footprintFor(kind: BuildingKind, tile: { x: number; y: number }): Footprint {
+    if (kind === "dock") {
+      // A dock is placed by its shore tile; the pier is whatever fits out over the water.
+      const site = dockSite(this.session.state, tile.x, tile.y);
+      const z = visibleHeight(this.session.state, tile.x, tile.y) ?? 0;
+      return site ? { ...site, z } : { x: tile.x, y: tile.y, w: 1, h: 1, z };
+    }
     const [w, h] = BUILDINGS[kind].size;
     const x = tile.x - Math.floor((w - 1) / 2);
     const y = tile.y - Math.floor((h - 1) / 2);
@@ -526,7 +543,8 @@ export class Game {
     if (tool.kind === "build") {
       if (tool.building === "path" || !this.hoverTile) return;
       const f = this.footprintFor(tool.building, this.hoverTile);
-      void this.send({ kind: "place-building", building: tool.building, x: f.x, y: f.y }).then(
+      const at = tool.building === "dock" ? this.hoverTile : f;
+      void this.send({ kind: "place-building", building: tool.building, x: at.x, y: at.y }).then(
         (ok) => {
           if (ok && !shift) this.setTool({ kind: "select" });
         },
@@ -561,6 +579,12 @@ export class Game {
         void this.send({ kind: "assign", villagerId: sel.id, target: { building: target.id } });
       else if (tile)
         void this.send({ kind: "assign", villagerId: sel.id, target: { x: tile.x, y: tile.y } });
+    } else if (sel?.type === "ship" && sel.kind === "cargo") {
+      // A dock on another island becomes the ship's trade route; anywhere else steers it by hand.
+      const target = this.entityAt(sx, sy);
+      if (target?.type === "building" && target.kind === "dock")
+        void this.send({ kind: "set-route", shipId: sel.id, dockId: target.id });
+      else if (tile) void this.send({ kind: "move-ship", shipId: sel.id, x: tile.x, y: tile.y });
     } else if (sel?.type === "ship" && tile) {
       // Right-clicking land with passengers aboard means "take them there".
       const unload = isLand(state.world, tile.x, tile.y) && sel.passengers.length > 0;
@@ -666,9 +690,10 @@ export class Game {
     let ghost: { name: string; f: Footprint; ok: boolean } | null = null;
     if (hover && tool.kind === "build") {
       const f = this.footprintFor(tool.building, hover);
-      const ok = canPlaceBuilding(state, tool.building, f.x, f.y).ok;
+      const at = tool.building === "dock" ? hover : f;
+      const ok = canPlaceBuilding(state, tool.building, at.x, at.y).ok;
       o.footprint(f, ok);
-      if (tool.building !== "path")
+      if (tool.building !== "path" && tool.building !== "dock")
         ghost = { name: tool.building === "farm" ? "farm_2" : tool.building, f, ok };
     } else if (
       tool.kind === "harvest" &&

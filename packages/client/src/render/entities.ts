@@ -404,7 +404,7 @@ class ShipView extends MovingView {
     const s = e as ShipEntity;
     this.track(s.x, s.y, now, this.s === null);
     this.s = s;
-    const name = `ship_${s.heading % 8}`;
+    const name = `${s.kind === "cargo" ? "cargo" : "ship"}_${s.heading % 8}`;
     this.sprite.texture = this.layer.atlas.texture(name);
     this.layer.atlas.anchor(this.sprite, name);
   }

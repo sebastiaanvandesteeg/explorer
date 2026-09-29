@@ -1,9 +1,71 @@
 import { inBounds, isLandTerrain, tileIndex } from "../world/grid";
-import { Terrain } from "../world/types";
+import { DIR_VECTORS, Terrain, type Dir } from "../world/types";
 import { BUILDINGS, canAfford, type BuildingKind } from "./catalogue";
+import { dockSpawn } from "./ferry";
+import { sailable } from "./navigation";
 import { settledIslands, walkable, type BuildingEntity, type GameState } from "./state";
 
-export type PlaceCheck = { ok: true } | { ok: false; reason: string };
+/** Where a new dock's pier goes: its footprint and the way it points out to sea. */
+export interface DockSite {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  dir: Dir;
+}
+
+export type PlaceCheck = { ok: true; site?: DockSite } | { ok: false; reason: string };
+
+const PIER_SIDE: Record<Dir, { x: number; y: number }> = {
+  "+x": { x: 0, y: 1 },
+  "-x": { x: 0, y: 1 },
+  "+y": { x: 1, y: 0 },
+  "-y": { x: 1, y: 0 },
+};
+const PIER_DIRS: Dir[] = ["+x", "+y", "-x", "-y"];
+
+/**
+ * A pier that starts at the shore tile (lx, ly) and runs three tiles out to sea, two wide, with
+ * open water past its end for ships. Docks are placed by clicking the shore, not the sea.
+ */
+export function dockSite(state: GameState, lx: number, ly: number): DockSite | null {
+  for (const dir of PIER_DIRS) {
+    const site = dockSiteFacing(state, lx, ly, dir);
+    if (site) return site;
+  }
+  return null;
+}
+
+export function dockSiteFacing(
+  state: GameState,
+  lx: number,
+  ly: number,
+  dir: Dir,
+): DockSite | null {
+  const w = state.world;
+  if (!walkable(state, lx, ly)) return null;
+  const d = DIR_VECTORS[dir];
+  const p = PIER_SIDE[dir];
+  const tiles: { x: number; y: number }[] = [];
+  for (let s = 1; s <= 3; s++)
+    for (let j = 0; j <= 1; j++)
+      tiles.push({ x: lx + d.x * s + p.x * j, y: ly + d.y * s + p.y * j });
+  const alongX = dir === "+x" || dir === "-x";
+  const site: DockSite = {
+    x: Math.min(...tiles.map((t) => t.x)),
+    y: Math.min(...tiles.map((t) => t.y)),
+    w: alongX ? 3 : 2,
+    h: alongX ? 2 : 3,
+    dir,
+  };
+  const spawn = dockSpawn(site);
+  const open = [...tiles, { x: Math.floor(spawn.x), y: Math.floor(spawn.y) }];
+  for (const t of open) {
+    if (!inBounds(w, t.x, t.y) || !state.explored[tileIndex(w, t.x, t.y)]) return null;
+    if (!sailable(state, t.x, t.y)) return null;
+  }
+  return site;
+}
 
 /** Placement rules shared by the server (authoritative) and the client (ghost preview). */
 export function canPlaceBuilding(
@@ -16,6 +78,7 @@ export function canPlaceBuilding(
   const def = BUILDINGS[kind];
   if (!def.buildable) return { ok: false, reason: "That can't be built" };
   const w = state.world;
+  if (kind === "dock") return canPlaceDock(state, x, y, opts);
   const [fw, fh] = def.size;
   let elevation = -1;
   const settled = settledIslands(state);
@@ -113,4 +176,26 @@ export function nearestWater(
     if (best) return { x: best.x, y: best.y };
   }
   return null;
+}
+
+/** Docks are placed on a shore tile; the pier is worked out from the surrounding water. */
+function canPlaceDock(
+  state: GameState,
+  x: number,
+  y: number,
+  opts: { ignoreCost?: boolean },
+): PlaceCheck {
+  const w = state.world;
+  if (!inBounds(w, x, y)) return { ok: false, reason: "Outside the map" };
+  const k = tileIndex(w, x, y);
+  if (!state.explored[k]) return { ok: false, reason: "Unexplored" };
+  if (!isLandTerrain(w.terrain[k]!))
+    return { ok: false, reason: "Click the shore to place a dock" };
+  if (!settledIslands(state).has(w.island[k]!))
+    return { ok: false, reason: "Ferry villagers to this island by ship first" };
+  const site = dockSite(state, x, y);
+  if (!site) return { ok: false, reason: "No open water for a pier here" };
+  if (!opts.ignoreCost && !canAfford(state.stock, BUILDINGS.dock.cost))
+    return { ok: false, reason: "Not enough resources" };
+  return { ok: true, site };
 }

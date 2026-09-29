@@ -873,6 +873,46 @@
    "anchorX": 6,
    "anchorY": -1
   },
+  "cargo_0": {
+   "page": 0,
+   "anchorX": 20,
+   "anchorY": 56
+  },
+  "cargo_1": {
+   "page": 0,
+   "anchorX": 9,
+   "anchorY": 52
+  },
+  "cargo_2": {
+   "page": 0,
+   "anchorX": 15,
+   "anchorY": 56
+  },
+  "cargo_3": {
+   "page": 0,
+   "anchorX": 21,
+   "anchorY": 55
+  },
+  "cargo_4": {
+   "page": 0,
+   "anchorX": 15,
+   "anchorY": 55
+  },
+  "cargo_5": {
+   "page": 0,
+   "anchorX": 9,
+   "anchorY": 53
+  },
+  "cargo_6": {
+   "page": 0,
+   "anchorX": 20,
+   "anchorY": 55
+  },
+  "cargo_7": {
+   "page": 0,
+   "anchorX": 20,
+   "anchorY": 55
+  },
   "carry_crystal": {
    "page": 0,
    "anchorX": 3,

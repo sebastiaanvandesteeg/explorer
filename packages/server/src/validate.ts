@@ -37,9 +37,15 @@ export function parseCommand(v: unknown): Command | null {
       return { kind: "place-building", building: v.building as BuildingKind, x: v.x, y: v.y };
     case "remove-building":
     case "train-villager":
-    case "build-ship":
       if (!isInt(v.buildingId)) return null;
       return { kind: v.kind, buildingId: v.buildingId };
+    case "build-ship":
+      if (!isInt(v.buildingId)) return null;
+      if (v.ship !== undefined && v.ship !== "scout" && v.ship !== "cargo") return null;
+      return { kind: "build-ship", buildingId: v.buildingId, ship: v.ship ?? "scout" };
+    case "set-route":
+      if (!isInt(v.shipId) || !isIntOrNull(v.dockId)) return null;
+      return { kind: "set-route", shipId: v.shipId, dockId: v.dockId };
     case "mark":
       if (!Array.isArray(v.nodeIds) || v.nodeIds.length > 500 || !v.nodeIds.every(isInt))
         return null;

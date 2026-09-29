@@ -1,5 +1,6 @@
 // Ferrying villagers between islands: boarding from the shore or a pier, and landing.
 import { NEIGHBOURS_8 } from "../world/grid";
+import type { Dir } from "../world/types";
 import type { Tile } from "../world/pathfind";
 import { SHIP, VILLAGER } from "./catalogue";
 import {
@@ -22,12 +23,29 @@ export function shoreBeside(state: GameState, ship: ShipEntity): Tile[] {
   return out;
 }
 
+/** Where a dock launches ships and receives them: just past the end of the pier. */
+export function dockSpawn(b: { x: number; y: number; w: number; h: number; dir?: Dir }): {
+  x: number;
+  y: number;
+} {
+  switch (b.dir) {
+    case "-x":
+      return { x: b.x - 0.5, y: b.y + 1 };
+    case "+y":
+      return { x: b.x + 1, y: b.y + b.h + 0.5 };
+    case "-y":
+      return { x: b.x + 1, y: b.y - 0.5 };
+    default:
+      return { x: b.x + b.w + 0.5, y: b.y + 1 };
+  }
+}
+
 export function shipMoving(ship: ShipEntity): boolean {
   return ship.path.length > 0;
 }
 
 export function hasRoom(ship: ShipEntity): boolean {
-  return ship.passengers.length < SHIP.capacity;
+  return ship.kind !== "cargo" && ship.passengers.length < SHIP.capacity;
 }
 
 /** A villager standing beside the ship climbs aboard. */

@@ -92,6 +92,10 @@ One day lasts eight minutes of game time and starts in the morning. The HUD cloc
 - **Advanced buildings** need tools: the market (sell lots of 10 goods for gold, or buy basics), the church and the magic house. The magic house will sell magical upgrades for exploring; for now it shows which are coming.
 - **Exploring:** the dock builds scout ships. Sailing clears the fog for everyone, and each newly found island is announced.
 - **Settling:** select a ship next to the shore (or at the pier) and press **Take a villager aboard**, or right-click the ship with a villager selected. Then right-click another island to sail there and put everyone ashore. Once your villagers stand on an island you can build there. Put up a storehouse first, so they have somewhere to drop off goods.
+- **Trade routes:** each island keeps its own stockpile. Goods gathered at home go into the shared treasury that pays for everything; goods gathered on another island wait in a pile on that island until a cargo ship brings them home.
+  - Build a **dock** on the shore of a settled island (click the shore tile; the pier runs out over open water). The home dock cannot be demolished.
+  - Docks build **cargo ships** as well as scouts (4 at most). Select a cargo ship and right-click a dock on another island to set its route: it waits for goods, loads up to 40, sails to the nearest home dock, unloads and returns, on repeat. Steering it by hand cancels the route.
+  - Farms, forges and churches on other islands produce into that island's pile too. Select a dock or storehouse to see what is waiting.
 
 ## Architecture
 
@@ -168,8 +172,6 @@ Server environment variables: `PORT` (8787), `HOST`, `DATA_DIR` (`data/worlds`),
 ## Not built yet
 
 - Buying the magic house's exploration upgrades
-- Building extra docks on other islands
-- Trade routes and cargo ships
 - Sound
 - Accounts beyond name + token
 - Deployment

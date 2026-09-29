@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   applyCommand,
+  addGoods,
   applyPatch,
   BUILDINGS,
   canPlaceBuilding,
@@ -8,9 +9,11 @@ import {
   fromSnapshot,
   generateWorld,
   harvestSeconds,
+  isLandTerrain,
   population,
   populationCap,
   shipCost,
+  stockOf,
   takePatch,
   tick,
   toSnapshot,
@@ -405,5 +408,130 @@ describe("settling other islands", () => {
     run(s, 40);
     const store = of<BuildingEntity>(s, "building").find((b) => b.kind === "storehouse")!;
     expect(store.complete).toBe(true);
+  });
+});
+
+describe("trade routes", () => {
+  const home = world.start.islandId;
+
+  /** Put a villager ashore on another island and find a shore tile where a dock fits. */
+  function settleOutpost(s: GameState): { islandId: number; at: { x: number; y: number } } {
+    for (const island of world.islands) {
+      if (island.id === home) continue;
+      const tiles: { x: number; y: number }[] = [];
+      for (let y = 0; y < world.height; y++)
+        for (let x = 0; x < world.width; x++) {
+          const k = y * world.width + x;
+          if (world.island[k] === island.id) {
+            s.explored[k] = 1;
+            tiles.push({ x, y });
+          }
+        }
+      for (let y = 0; y < world.height; y++)
+        for (let x = 0; x < world.width; x++) s.explored[y * world.width + x] = 1;
+      const land = tiles.find((t) => isLandTerrain(world.terrain[t.y * world.width + t.x]!));
+      if (!land) continue;
+      s.entities.set(999_000 + island.id, {
+        ...of<VillagerEntity>(s, "villager")[0]!,
+        id: 999_000 + island.id,
+        x: land.x + 0.5,
+        y: land.y + 0.5,
+      });
+      const at = tiles.find((t) => canPlaceBuilding(s, "dock", t.x, t.y, { ignoreCost: true }).ok);
+      if (at) return { islandId: island.id, at };
+      s.entities.delete(999_000 + island.id);
+    }
+    throw new Error("no island with room for a dock");
+  }
+
+  it("refuses a dock on an island nobody has settled", () => {
+    const s = fresh();
+    for (let k = 0; k < s.explored.length; k++) s.explored[k] = 1;
+    const other = world.islands.find((i) => i.id !== home)!;
+    const k = world.island.findIndex((id, i) => id === other.id && world.terrain[i]! > 0);
+    const res = canPlaceBuilding(s, "dock", k % world.width, Math.floor(k / world.width));
+    expect(res.ok).toBe(false);
+  });
+
+  it("lets settlers build a dock on the shore of another island", () => {
+    const s = fresh();
+    const { islandId, at } = settleOutpost(s);
+    s.stock.wood = s.stock.stone = 500;
+    expect(applyCommand(s, { kind: "place-building", building: "dock", ...at })).toEqual({
+      ok: true,
+    });
+    const dock = of<BuildingEntity>(s, "building").find((b) => b.kind === "dock" && !b.complete)!;
+    expect(dock.dir).toBeDefined();
+    expect(world.island[dock.y * world.width + dock.x]).not.toBe(islandId + 1e9);
+    expect(applyCommand(s, { kind: "remove-building", buildingId: dock.id }).ok).toBe(true);
+  });
+
+  it("keeps the home dock", () => {
+    const s = fresh();
+    const dock = of<BuildingEntity>(s, "building").find((b) => b.kind === "dock")!;
+    expect(applyCommand(s, { kind: "remove-building", buildingId: dock.id }).ok).toBe(false);
+  });
+
+  it("keeps goods gathered elsewhere on that island until a cargo ship hauls them home", () => {
+    const s = fresh();
+    const { islandId, at } = settleOutpost(s);
+    s.stock.wood = s.stock.stone = 500;
+    applyCommand(s, { kind: "place-building", building: "dock", ...at });
+    const outDock = of<BuildingEntity>(s, "building").find(
+      (b) => b.kind === "dock" && !b.complete,
+    )!;
+    outDock.complete = true;
+    outDock.progress = 1;
+
+    // A pile on the outpost is not spendable at home.
+    const homeWood = s.stock.wood;
+    addGoods(s, islandId, "wood", 60);
+    expect(s.stock.wood).toBe(homeWood);
+    expect(stockOf(s, islandId).wood).toBe(60);
+
+    const homeDock = of<BuildingEntity>(s, "building").find(
+      (b) => b.kind === "dock" && b !== outDock,
+    )!;
+    expect(applyCommand(s, { kind: "build-ship", buildingId: homeDock.id, ship: "cargo" })).toEqual(
+      { ok: true },
+    );
+    run(s, 31);
+    const ship = of<ShipEntity>(s, "ship").find((e) => e.kind === "cargo")!;
+    expect(ship).toBeDefined();
+    expect(ship.passengers).toHaveLength(0);
+    expect(
+      applyCommand(s, {
+        kind: "assign",
+        villagerId: of<VillagerEntity>(s, "villager")[0]!.id,
+        target: { ship: ship.id },
+      }).ok,
+    ).toBe(false);
+    expect(applyCommand(s, { kind: "set-route", shipId: ship.id, dockId: homeDock.id }).ok).toBe(
+      false,
+    );
+    expect(applyCommand(s, { kind: "set-route", shipId: ship.id, dockId: outDock.id })).toEqual({
+      ok: true,
+    });
+
+    const before = s.stock.wood;
+    let guard = 0;
+    while (s.stock.wood === before && guard++ < 3000) tick(s);
+    // One trip carries at most a shipload; the rest waits for the next.
+    expect(s.stock.wood).toBe(before + 40);
+    expect(stockOf(s, islandId).wood).toBe(20);
+    run(s, 300);
+    expect(stockOf(s, islandId).wood).toBe(0);
+    expect(s.stock.wood).toBe(before + 60);
+  });
+
+  it("survives snapshots and patches", () => {
+    const s = fresh();
+    const { islandId } = settleOutpost(s);
+    const client = fromSnapshot(world, JSON.parse(JSON.stringify(toSnapshot(s))));
+    addGoods(s, islandId, "stone", 12);
+    applyPatch(client, JSON.parse(JSON.stringify(takePatch(s))));
+    expect(stockOf(client, islandId).stone).toBe(12);
+    const restored = fromSnapshot(world, JSON.parse(JSON.stringify(toSnapshot(s))), true);
+    expect(stockOf(restored, islandId).stone).toBe(12);
   });
 });

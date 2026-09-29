@@ -70,12 +70,14 @@ export const BUILDINGS: Record<BuildingKind, BuildingDef> = {
   dock: {
     kind: "dock",
     name: "Dock",
-    description: "Builds scout ships. Villagers can walk out on the pier to board.",
+    description:
+      "Builds scout and cargo ships. Villagers can walk out on the pier to board. Docks on other islands are where cargo ships collect goods.",
     size: [2, 3],
-    cost: {},
-    work: 0,
-    buildable: false,
+    cost: { wood: 60, stone: 20 },
+    work: 16,
+    buildable: true,
     walkable: true,
+    hotkey: "b",
   },
   house: {
     kind: "house",
@@ -307,6 +309,21 @@ export const SHIP = {
   capacity: 4,
 };
 
+/** Cargo ships haul an island's stockpile home along a trade route between two docks. */
+export const CARGO = {
+  cost: { wood: 60, stone: 10 } as Partial<Stock>,
+  buildSeconds: 30,
+  /** Goods carried per trip. */
+  capacity: 40,
+  max: 4,
+  /** Sails slower than a scout. */
+  speedFactor: 0.8,
+  /** A ship waits at the dock until at least this many goods are waiting (or it can fill up). */
+  minLoad: 5,
+};
+
+export type ShipKind = "scout" | "cargo";
+
 export const REGROW = {
   stumpToSapling: 90,
   saplingToTree: 150,
@@ -378,6 +395,14 @@ export function shipCost(tribe: TribeId): Partial<Stock> {
   );
 }
 
-export function shipSpeed(tribe: TribeId): number {
-  return SHIP.speed * (TRIBE_DEFS[tribe].bonus === "sailing" ? 1.25 : 1);
+export function shipSpeed(tribe: TribeId, kind: ShipKind = "scout"): number {
+  const base = SHIP.speed * (TRIBE_DEFS[tribe].bonus === "sailing" ? 1.25 : 1);
+  return kind === "cargo" ? base * CARGO.speedFactor : base;
+}
+
+export function cargoCost(tribe: TribeId): Partial<Stock> {
+  if (TRIBE_DEFS[tribe].bonus !== "sailing") return CARGO.cost;
+  return Object.fromEntries(
+    Object.entries(CARGO.cost).map(([r, n]) => [r, Math.round((n ?? 0) * 0.75)]),
+  );
 }

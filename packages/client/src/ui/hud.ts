@@ -2,11 +2,15 @@ import {
   BIOMES,
   BUILDINGS,
   canAfford,
+  CARGO,
+  cargoCost,
+  cargoLoad,
   CHURCH,
   clockText,
   dayPeriod,
   discoveryName,
   FARM,
+  islandAt,
   MARKET_BUYABLE,
   MARKET_LOT,
   MARKET_PRICES,
@@ -17,6 +21,7 @@ import {
   SHIP,
   shipCost,
   SMITH,
+  stockOf,
   Terrain,
   tileIndex,
   TRIBE_DEFS,
@@ -95,6 +100,8 @@ export class Hud {
   private selectionKey = "";
   private selectionRefs: {
     status?: HTMLElement;
+    /** Extra live lines: an island's stockpile, a cargo ship's route. */
+    extra?: HTMLElement;
     bar?: HTMLElement;
     buttons: { el: HTMLButtonElement; enabled: () => boolean }[];
   } = { buttons: [] };
@@ -452,15 +459,27 @@ export class Hud {
           ),
         );
       }
-      if (e.kind === "dock") {
+      if (e.kind === "dock" && e.complete) {
         const cost = shipCost(state.world.tribe);
+        const cargo = cargoCost(state.world.tribe);
         actions.append(
           button(
             `Build scout ship (${cost.wood} wood)`,
-            cmd({ kind: "build-ship", buildingId: e.id }),
+            cmd({ kind: "build-ship", buildingId: e.id, ship: "scout" }),
             () => canAfford(state.stock, cost),
+            "Explores, and ferries villagers to new islands",
+          ),
+          button(
+            `Build cargo ship (${cargo.wood} wood, ${cargo.stone} stone)`,
+            cmd({ kind: "build-ship", buildingId: e.id, ship: "cargo" }),
+            () => canAfford(state.stock, cargo),
+            "Carries an island's stockpile home along a trade route",
           ),
         );
+      }
+      if (e.complete && (e.kind === "dock" || BUILDINGS[e.kind].dropOff)) {
+        refs.extra = h("div.desc");
+        parts.push(refs.extra);
       }
       if (e.kind === "market" && e.complete)
         parts.push(this.marketPanel(state, button, small, cmd));
@@ -523,6 +542,32 @@ export class Hud {
       );
     } else {
       const ship = e as ShipEntity;
+      if (ship.kind === "cargo") {
+        parts.push(h("div.title", {}, icon("icon_ship"), "Cargo ship"));
+        refs.status = h("div.desc");
+        refs.extra = h("div.desc");
+        parts.push(
+          refs.status,
+          refs.extra,
+          h(
+            "div.desc",
+            {},
+            "Right-click a dock on another island to set a trade route: the ship collects that island's stockpile and sails it home. Right-click the sea to steer by hand.",
+          ),
+          h(
+            "div.actions",
+            {},
+            button(
+              "Cancel route",
+              cmd({ kind: "set-route", shipId: ship.id, dockId: null }),
+              () => (state.entities.get(ship.id) as ShipEntity | undefined)?.route != null,
+            ),
+          ),
+        );
+        this.selectionRefs = refs;
+        this.selectionEl.replaceChildren(...parts.filter((p): p is HTMLElement => !!p));
+        return;
+      }
       parts.push(h("div.title", {}, icon("icon_ship"), "Scout ship"));
       refs.status = h("div.desc");
       parts.push(
@@ -604,10 +649,15 @@ export class Hud {
         status = `Under construction: ${Math.floor(e.progress * 100)}%`;
         progress = e.progress;
       } else if (job) {
-        const total = job.what === "ship" ? SHIP.buildSeconds : VILLAGER.trainSeconds;
+        const total =
+          job.what === "ship"
+            ? SHIP.buildSeconds
+            : job.what === "cargo"
+              ? CARGO.buildSeconds
+              : VILLAGER.trainSeconds;
         progress = 1 - job.remaining / total;
         status =
-          `${job.what === "ship" ? "Building a ship" : "Training a villager"}… ${Math.ceil(job.remaining)}s` +
+          `${job.what === "villager" ? "Training a villager" : job.what === "cargo" ? "Building a cargo ship" : "Building a ship"}… ${Math.ceil(job.remaining)}s` +
           (e.queue.length > 1 ? ` (+${e.queue.length - 1} queued)` : "");
       } else if (worker && e.workerId === null) {
         status = "Waiting for a worker (needs an idle villager)";
@@ -634,6 +684,7 @@ export class Hud {
         status = "Ready";
       }
       if (refs.status) refs.status.textContent = status;
+      if (refs.extra) refs.extra.textContent = stockpileText(state, e);
       if (refs.bar)
         refs.bar.style.width = `${Math.round(Math.max(0, Math.min(1, progress)) * 100)}%`;
     } else if (e.type === "node") {
@@ -651,11 +702,47 @@ export class Hud {
       if (refs.status) refs.status.textContent = describeVillager(state, e);
     } else if (refs.status) {
       const ship = e as ShipEntity;
-      const aboard = `${ship.passengers.length}/${SHIP.capacity} aboard`;
-      refs.status.textContent = `${ship.dest ? "Sailing…" : "Anchored"} · ${aboard}`;
+      if (ship.kind === "cargo") {
+        const dock = ship.route === null ? undefined : state.entities.get(ship.route);
+        const where =
+          dock?.type === "building"
+            ? `Route: ${describeIsland(state, islandAt(state, dock.x, dock.y))}`
+            : "No trade route";
+        const doing =
+          ship.route === null
+            ? "Idle"
+            : ship.dest
+              ? ship.leg === "drop"
+                ? "Sailing home"
+                : "Sailing to collect"
+              : ship.leg === "pickup"
+                ? "Waiting for goods"
+                : "In port";
+        refs.status.textContent = `${doing} · ${cargoLoad(ship)}/${CARGO.capacity} goods`;
+        if (refs.extra) refs.extra.textContent = where;
+      } else {
+        const aboard = `${ship.passengers.length}/${SHIP.capacity} aboard`;
+        refs.status.textContent = `${ship.dest ? "Sailing…" : "Anchored"} · ${aboard}`;
+      }
     }
     this.refreshSelectionButtons();
   }
+}
+
+function describeIsland(state: GameState, islandId: number): string {
+  const island = state.world.islands[islandId];
+  return island ? discoveryName(island.biome).replace(/^the /, "The ") : "another island";
+}
+
+/** What a dock or storehouse holds on its island, and whether it still needs collecting. */
+function stockpileText(state: GameState, b: BuildingEntity): string {
+  const island = islandAt(state, b.x, b.y);
+  if (island === state.world.start.islandId) return "Goods are stored in the shared treasury.";
+  const pile = stockOf(state, island);
+  const items = RESOURCES.filter((r) => pile[r] > 0).map((r) => `${pile[r]} ${r}`);
+  return items.length > 0
+    ? `Waiting on ${describeIsland(state, island)} for a cargo ship: ${items.join(", ")}`
+    : `Nothing stored on ${describeIsland(state, island)}. Goods gathered here need a dock and a cargo ship to reach home.`;
 }
 
 function selectionKey(e: Entity): string {
