@@ -31,11 +31,11 @@ afterEach(async () => {
 
 const base = () => `http://127.0.0.1:${app.port}`;
 
-async function createWorld(seed = "server-test"): Promise<WorldInfo> {
+async function createWorld(seed = "server-test", tribe?: string): Promise<WorldInfo> {
   const res = await fetch(`${base()}/api/worlds`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ seed }),
+    body: JSON.stringify({ seed, tribe }),
   });
   expect(res.status).toBe(201);
   return (await res.json()) as WorldInfo;
@@ -96,7 +96,10 @@ class Player {
 
 function mirror(welcome: ServerMessage): GameState {
   if (welcome.t !== "welcome") throw new Error(`expected welcome, got ${welcome.t}`);
-  return fromSnapshot(generateWorld(welcome.snapshot.seed), welcome.snapshot);
+  return fromSnapshot(
+    generateWorld(welcome.snapshot.seed, welcome.snapshot.tribe),
+    welcome.snapshot,
+  );
 }
 
 function houseSpot(state: GameState): { x: number; y: number } {
@@ -111,11 +114,25 @@ function houseSpot(state: GameState): { x: number; y: number } {
 describe("HTTP API", () => {
   it("creates and describes worlds", async () => {
     const info = await createWorld("abc");
-    expect(info).toMatchObject({ seed: "abc", players: 0, maxPlayers: 8 });
+    expect(info).toMatchObject({ seed: "abc", tribe: "islanders", players: 0, maxPlayers: 8 });
     expect(info.id).toMatch(/^[a-z0-9]{8}$/);
     const res = await fetch(`${base()}/api/worlds/${info.id}`);
     expect(await res.json()).toMatchObject({ id: info.id, seed: "abc" });
     expect((await fetch(`${base()}/api/worlds/nosuchworld`)).status).toBe(404);
+  });
+
+  it("creates worlds for a chosen tribe", async () => {
+    const info = await createWorld("tribe-test", "sylvan");
+    expect(info.tribe).toBe("sylvan");
+    const p = new Player();
+    const welcome = await p.join(info.id, "Anna", token(1));
+    expect(welcome.t === "welcome" && welcome.snapshot.tribe).toBe("sylvan");
+    const bad = await fetch(`${base()}/api/worlds`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ tribe: "vikings" }),
+    });
+    expect(bad.status).toBe(400);
   });
 });
 

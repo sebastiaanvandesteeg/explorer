@@ -2,6 +2,8 @@
 // the server only sends the seed and clients rebuild the terrain themselves.
 import { fbm } from "../noise";
 import { createRng, hash2d, hashSeed, type Rng } from "../rng";
+import { TRIBE_DEFS, type TribeId } from "../tribes";
+import { BIOME_DEFS, BIOMES, biomeIndex, NO_BIOME, type BiomeDef, type BiomeId } from "./biomes";
 import { canStep, inBounds, isLandTerrain, NEIGHBOURS_4, NEIGHBOURS_8, tileIndex } from "./grid";
 import { findPath } from "./pathfind";
 import {
@@ -10,7 +12,7 @@ import {
   type DecoSpawn,
   type Dir,
   type Island,
-  type IslandTheme,
+  type IslandFlavor,
   type NodeKind,
   type NodeSpawn,
   type StartSite,
@@ -27,31 +29,45 @@ interface IslandSeed extends Island {
   noiseSeed: number;
 }
 
-export function generateWorld(seed: string, size = WORLD_SIZE): WorldMap {
+/** Region biome colours spread this far out to sea (tiles). */
+const REGION_REACH = 16;
+
+export function generateWorld(
+  seed: string,
+  tribe: TribeId = "islanders",
+  size = WORLD_SIZE,
+): WorldMap {
   for (let attempt = 0; attempt < 24; attempt++) {
-    const world = attemptWorld(seed, attempt, size);
+    const world = attemptWorld(seed, tribe, attempt, size);
     if (world) return world;
   }
   throw new Error(`could not generate a valid world for seed "${seed}"`);
 }
 
-function attemptWorld(seed: string, attempt: number, size: number): WorldMap | null {
+function attemptWorld(
+  seed: string,
+  tribe: TribeId,
+  attempt: number,
+  size: number,
+): WorldMap | null {
   const genSeed = attempt === 0 ? seed : `${seed}#${attempt}`;
   const base = hashSeed(genSeed);
   const rng = createRng(`${genSeed}:islands`);
-  const islands = placeIslands(rng, size);
+  const islands = placeIslands(rng, size, TRIBE_DEFS[tribe].homeBiome);
   const partial = shapeTerrain(islands, base, size);
   const world: WorldMap = {
     seed,
+    tribe,
     width: size,
     height: size,
     ...partial,
-    islands: islands.map(({ id, cx, cy, radius, theme, tiles }) => ({
+    islands: islands.map(({ id, cx, cy, radius, biome, flavor, tiles }) => ({
       id,
       cx,
       cy,
       radius,
-      theme,
+      biome,
+      flavor,
       tiles,
     })),
     start: undefined as unknown as StartSite,
@@ -71,15 +87,16 @@ function attemptWorld(seed: string, attempt: number, size: number): WorldMap | n
   return world;
 }
 
-function placeIslands(rng: Rng, size: number): IslandSeed[] {
+function placeIslands(rng: Rng, size: number, homeBiome: BiomeId): IslandSeed[] {
   const list: IslandSeed[] = [];
-  const add = (cx: number, cy: number, radius: number, theme: IslandTheme, stretch: number) => {
+  const add = (cx: number, cy: number, radius: number, flavor: IslandFlavor, stretch: number) => {
     list.push({
       id: list.length,
       cx,
       cy,
       radius,
-      theme,
+      biome: homeBiome,
+      flavor,
       tiles: 0,
       sx: rng.float(1 - stretch, 1 + stretch),
       sy: rng.float(1 - stretch, 1 + stretch),
@@ -94,7 +111,7 @@ function placeIslands(rng: Rng, size: number): IslandSeed[] {
     "home",
     0.1,
   );
-  const themes: IslandTheme[] = ["forest", "farmland", "rocky"];
+  const flavors: IslandFlavor[] = ["wooded", "fertile", "rocky"];
   const target = rng.int(10, 14);
   let placed = 0;
   for (let tries = 0; tries < 900 && placed < target; tries++) {
@@ -102,9 +119,10 @@ function placeIslands(rng: Rng, size: number): IslandSeed[] {
     const cx = rng.float(r + 7, size - r - 7);
     const cy = rng.float(r + 7, size - r - 7);
     if (list.some((o) => Math.hypot(o.cx - cx, o.cy - cy) < (o.radius + r) * 1.28 + 6)) continue;
-    add(cx, cy, r, themes[placed % 3 === 0 ? rng.int(0, 2) : placed % 3]!, 0.25);
+    add(cx, cy, r, flavors[rng.int(0, 2)]!, 0.25);
     placed++;
   }
+  assignBiomes(rng, list, homeBiome);
   const islets = rng.int(14, 24);
   let isletCount = 0;
   for (let tries = 0; tries < 900 && isletCount < islets; tries++) {
@@ -113,9 +131,48 @@ function placeIslands(rng: Rng, size: number): IslandSeed[] {
     const cy = rng.float(4, size - 4);
     if (list.some((o) => Math.hypot(o.cx - cx, o.cy - cy) < o.radius * 1.28 + r + 4)) continue;
     add(cx, cy, r, "islet", 0.2);
+    // Islets belong to the nearest real island's biome.
+    const islet = list[list.length - 1]!;
+    let nearest = list[0]!;
+    for (const o of list) {
+      if (o.flavor === "islet") continue;
+      if (
+        Math.hypot(o.cx - cx, o.cy - cy) - o.radius <
+        Math.hypot(nearest.cx - cx, nearest.cy - cy) - nearest.radius
+      )
+        nearest = o;
+    }
+    islet.biome = nearest.biome;
     isletCount++;
   }
   return list;
+}
+
+/**
+ * Spread every biome over the archipelago by distance from home: gentle tier-0 biomes nearby,
+ * tier-1 further out and the hostile or magical tier-2 biomes at the edges.
+ */
+function assignBiomes(rng: Rng, list: IslandSeed[], homeBiome: BiomeId): void {
+  const home = list[0]!;
+  const others = list
+    .slice(1)
+    .sort(
+      (a, b) =>
+        Math.hypot(a.cx - home.cx, a.cy - home.cy) - Math.hypot(b.cx - home.cx, b.cy - home.cy),
+    );
+  const shuffled = (tier: number) => {
+    const ids = BIOMES.filter((b) => BIOME_DEFS[b].tier === tier && b !== homeBiome);
+    for (let i = ids.length - 1; i > 0; i--) {
+      const j = rng.int(0, i);
+      [ids[i], ids[j]] = [ids[j]!, ids[i]!];
+    }
+    return ids;
+  };
+  const sequence = [...shuffled(0), ...shuffled(1), ...shuffled(2)];
+  others.forEach((is, i) => {
+    is.biome =
+      sequence[Math.min(sequence.length - 1, Math.floor((i * sequence.length) / others.length))]!;
+  });
 }
 
 function shapeTerrain(islands: IslandSeed[], base: number, size: number) {
@@ -138,7 +195,7 @@ function shapeTerrain(islands: IslandSeed[], base: number, size: number) {
         const v = (-dx * sin + dy * cos) / is.sy;
         const d = Math.hypot(u, v);
         const wobble = fbm(x * 0.065, y * 0.065, is.noiseSeed);
-        const rEff = is.radius * (is.theme === "islet" ? 0.8 + 0.4 * wobble : 0.6 + 0.8 * wobble);
+        const rEff = is.radius * (is.flavor === "islet" ? 0.8 + 0.4 * wobble : 0.6 + 0.8 * wobble);
         let h = 1 - d / rEff;
         h += (fbm(x * 0.23, y * 0.23, is.noiseSeed ^ 0x5bd1e995) - 0.5) * 0.14;
         const k = y * size + x;
@@ -172,7 +229,7 @@ function shapeTerrain(islands: IslandSeed[], base: number, size: number) {
     }
   }
 
-  const themeOf = (k: number) => islands[island[k]!]?.theme ?? "islet";
+  const flavorOf = (k: number): IslandFlavor => islands[island[k]!]?.flavor ?? "islet";
   const elevation = new Uint8Array(n);
   const cliffSeed = base ^ 0x1234567;
   for (let y = 0; y < size; y++) {
@@ -180,13 +237,13 @@ function shapeTerrain(islands: IslandSeed[], base: number, size: number) {
       const k = y * size + x;
       if (!land[k]) continue;
       const h = heightField[k]!;
-      const theme = themeOf(k);
+      const flavor = flavorOf(k);
       // Islands are one broad plateau, like the concept art: a narrow bank steps down to the
       // beaches, cliffy stretches drop straight into the sea, and outer islands get hills.
       let e: number;
-      if (theme === "islet") e = h > 0.45 ? 1 : 0;
+      if (flavor === "islet") e = h > 0.45 ? 1 : 0;
       else {
-        e = h < 0.1 ? 0 : h < 0.2 ? 1 : theme !== "home" && h > 0.72 ? 3 : 2;
+        e = h < 0.1 ? 0 : h < 0.2 ? 1 : flavor !== "home" && h > 0.72 ? 3 : 2;
         if (e < 2 && fbm(x * 0.13, y * 0.13, cliffSeed) > 0.58) e = 2;
       }
       elevation[k] = e;
@@ -212,12 +269,14 @@ function shapeTerrain(islands: IslandSeed[], base: number, size: number) {
     }
   }
 
-  // Shore distance and island attribution for water, by multi-source BFS from land.
+  // Shore distance, island attribution and biome regions for water, by multi-source BFS.
   const shore = new Uint8Array(n).fill(255);
+  const biome = new Uint8Array(n).fill(NO_BIOME);
   const queue: number[] = [];
   for (let k = 0; k < n; k++) {
     if (land[k]) {
       shore[k] = 0;
+      biome[k] = biomeIndex(islands[island[k]!]!.biome);
       queue.push(k);
     }
   }
@@ -235,6 +294,7 @@ function shapeTerrain(islands: IslandSeed[], base: number, size: number) {
       if (shore[nk]! <= d + 1) continue;
       shore[nk] = d + 1;
       island[nk] = d + 1 <= 6 ? island[k]! : -1;
+      biome[nk] = d + 1 <= REGION_REACH ? biome[k]! : NO_BIOME;
       queue.push(nk);
     }
   }
@@ -266,16 +326,17 @@ function shapeTerrain(islands: IslandSeed[], base: number, size: number) {
       terrain[k] = shore[k]! <= 2 ? Terrain.Shallow : Terrain.Deep;
       continue;
     }
-    const theme = themeOf(k);
+    const flavor = flavorOf(k);
+    const rocky = BIOME_DEFS[islands[island[k]!]!.biome].rocky * (flavor === "rocky" ? 2.2 : 1);
     if (elevation[k] === 0) terrain[k] = Terrain.Sand;
-    else if (theme === "islet") terrain[k] = Terrain.Rock;
-    else if (theme === "rocky" && fbm(x * 0.15, y * 0.15, rockSeed) > 0.5)
+    else if (flavor === "islet") terrain[k] = Terrain.Rock;
+    else if (flavor !== "home" && fbm(x * 0.15, y * 0.15, rockSeed) > 0.72 - rocky * 0.7)
       terrain[k] = Terrain.Rock;
     else terrain[k] = Terrain.Grass;
   }
   for (const is of islands) is.tiles = 0;
   for (let k = 0; k < n; k++) if (land[k]) islands[island[k]!]!.tiles++;
-  return { terrain, elevation, island, shore };
+  return { terrain, elevation, island, shore, biome };
 }
 
 const PERP: Record<Dir, { x: number; y: number }> = {
@@ -423,51 +484,94 @@ function findStartSite(
   };
 }
 
+interface FlavorWeights {
+  tree: number;
+  food: number;
+  stone: number;
+  deposit: number;
+  /** Cluster-noise threshold above which trees grow densely. */
+  woods: number;
+}
+
+const FLAVORS: Record<IslandFlavor, FlavorWeights> = {
+  home: { tree: 1, food: 1.2, stone: 1.2, deposit: 1.2, woods: 0.56 },
+  wooded: { tree: 1.35, food: 0.8, stone: 0.8, deposit: 0.8, woods: 0.46 },
+  fertile: { tree: 0.8, food: 2.2, stone: 0.8, deposit: 0.8, woods: 0.58 },
+  rocky: { tree: 0.6, food: 0.6, stone: 2.2, deposit: 2.2, woods: 0.62 },
+  islet: { tree: 1, food: 0.5, stone: 1, deposit: 1, woods: 1 },
+};
+
+const pick = <T>(list: readonly T[], v: number): T =>
+  list[Math.min(list.length - 1, Math.floor(v * list.length))]!;
+
 function chooseNode(
-  theme: IslandTheme,
+  def: BiomeDef,
+  flavor: IslandFlavor,
   terrain: number,
   cluster: number,
   r: number,
   v: number,
 ): NodeKind | null {
-  if (terrain === Terrain.Sand) return r < 0.02 ? "boulder" : null;
+  const f = FLAVORS[flavor];
+  if (terrain === Terrain.Sand) return r < 0.02 * f.stone ? def.stone : null;
   if (terrain === Terrain.Rock) {
-    if (theme === "islet") return r < 0.22 ? "boulder" : r < 0.27 ? "pine" : null;
-    return r < 0.12 ? "boulder" : r < 0.17 ? "ore" : r < 0.2 ? "pine" : null;
+    if (flavor === "islet") return r < 0.22 ? def.stone : r < 0.3 ? pick(def.trees, v) : null;
+    const stone = 0.08 * f.stone;
+    const deposit = stone + 0.045 * f.deposit;
+    return r < stone
+      ? def.stone
+      : r < deposit
+        ? pick(def.deposits, v)
+        : r < deposit + 0.03
+          ? pick(def.trees, v)
+          : null;
   }
   if (terrain !== Terrain.Grass) return null;
-  switch (theme) {
-    case "home":
-      if (cluster > 0.56) return r < 0.42 ? (v < 0.65 ? "oak" : "pine") : null;
-      return r < 0.035
-        ? "oak"
-        : r < 0.045
-          ? "fruit"
-          : r < 0.06
-            ? "berry"
-            : r < 0.07
-              ? "boulder"
-              : null;
-    case "forest":
-      if (cluster > 0.45) return r < 0.5 ? (v < 0.85 ? "pine" : "oak") : null;
-      return r < 0.12 ? "pine" : r < 0.14 ? "berry" : null;
-    case "farmland":
-      if (cluster > 0.55) return r < 0.32 ? (v < 0.6 ? "oak" : "fruit") : null;
-      return r < 0.04 ? "fruit" : r < 0.08 ? "berry" : r < 0.1 ? "oak" : null;
-    case "rocky":
-      return r < 0.06 ? "pine" : r < 0.09 ? "boulder" : null;
-    case "islet":
-      return r < 0.2 ? "pine" : null;
-  }
+  if (cluster > f.woods) return r < def.cluster * f.tree ? pick(def.trees, v) : null;
+  const s = def.scatter;
+  let edge = s.tree * f.tree;
+  if (r < edge) return pick(def.trees, v);
+  edge += s.food * f.food;
+  if (r < edge) return pick(def.food, v);
+  edge += s.stone * f.stone;
+  if (r < edge) return def.stone;
+  edge += s.deposit * f.deposit;
+  if (r < edge) return pick(def.deposits, v);
+  return null;
 }
 
-const VARIANTS: Record<NodeKind, number> = {
+/** Sprite variants per node kind (the generator draws this many). */
+export const NODE_VARIANTS: Record<NodeKind, number> = {
   oak: 3,
   pine: 3,
   fruit: 1,
   berry: 1,
   boulder: 2,
   ore: 1,
+  palm: 2,
+  cactus: 2,
+  sandstone: 2,
+  gold_vein: 1,
+  charred_tree: 2,
+  ember_fruit: 1,
+  obsidian: 2,
+  hellstone: 1,
+  snow_pine: 2,
+  frost_berry: 1,
+  ice_rock: 2,
+  jungle_tree: 2,
+  banana: 1,
+  willow: 2,
+  swamp_shroom: 1,
+  bog_ore: 1,
+  giant_mushroom: 2,
+  glowshroom: 1,
+  silver_tree: 2,
+  crystal: 2,
+  autumn_tree: 3,
+  pumpkin: 1,
+  blossom_tree: 2,
+  flower_bush: 1,
 };
 
 function placeNodes(world: WorldMap, base: number, reserved: Set<number>): NodeSpawn[] {
@@ -478,20 +582,36 @@ function placeNodes(world: WorldMap, base: number, reserved: Set<number>): NodeS
       const k = tileIndex(world, x, y);
       const t = world.terrain[k]!;
       if (!isLandTerrain(t) || reserved.has(k)) continue;
-      const theme = world.islands[world.island[k]!]?.theme ?? "islet";
+      const island = world.islands[world.island[k]!];
+      if (!island) continue;
       const r = hash2d(x, y, base ^ 0xa1);
       const v = hash2d(x, y, base ^ 0xb2);
-      const kind = chooseNode(theme, t, fbm(x * 0.11, y * 0.11, clusterSeed), r, v);
-      if (kind) nodes.push({ kind, x, y, variant: Math.floor(v * VARIANTS[kind]) });
+      const kind = chooseNode(
+        BIOME_DEFS[island.biome],
+        island.flavor,
+        t,
+        fbm(x * 0.11, y * 0.11, clusterSeed),
+        r,
+        v,
+      );
+      if (kind)
+        nodes.push({
+          kind,
+          x,
+          y,
+          variant: Math.floor(hash2d(x, y, base ^ 0xb3) * NODE_VARIANTS[kind]),
+        });
     }
   }
   return nodes;
 }
 
+/** The home island always has enough of everything to get going, whatever its biome. */
 function ensureHomeResources(world: WorldMap, base: number, reserved: Set<number>): boolean {
   const home = world.start.islandId;
+  const def = BIOME_DEFS[world.islands[home]!.biome];
   const onHome = (n: { x: number; y: number }) => world.island[tileIndex(world, n.x, n.y)] === home;
-  const count = (kinds: NodeKind[]) =>
+  const count = (kinds: readonly NodeKind[]) =>
     world.nodes.filter((n) => kinds.includes(n.kind) && onHome(n)).length;
   const taken = new Set(world.nodes.map((n) => tileIndex(world, n.x, n.y)));
   const hall = world.start.townHall;
@@ -510,19 +630,18 @@ function ensureHomeResources(world: WorldMap, base: number, reserved: Set<number
     const j = rng.int(0, i);
     [free[i], free[j]] = [free[j]!, free[i]!];
   }
-  const add = (kind: NodeKind, want: number, have: number) => {
-    for (let i = have; i < want; i++) {
+  const add = (kinds: readonly NodeKind[], want: number) => {
+    for (let i = count(kinds); i < want; i++) {
       const t = free.pop();
       if (!t) return false;
-      world.nodes.push({ kind, x: t.x, y: t.y, variant: rng.int(0, VARIANTS[kind] - 1) });
+      const kind = kinds[i % kinds.length]!;
+      world.nodes.push({ kind, x: t.x, y: t.y, variant: rng.int(0, NODE_VARIANTS[kind] - 1) });
     }
     return true;
   };
-  return (
-    add("oak", 30, count(["oak", "pine", "fruit"])) &&
-    add("boulder", 8, count(["boulder", "ore"])) &&
-    add("berry", 4, count(["berry", "fruit"]))
-  );
+  // Ore for the blacksmith must exist at home: every tribe's home biome has a plain "ore" deposit.
+  const ore: NodeKind[] = def.deposits.includes("ore") ? ["ore"] : [def.deposits[0]!];
+  return add(def.trees, 30) && add([def.stone], 8) && add(def.food, 5) && add(ore, 5);
 }
 
 function placeDecor(world: WorldMap, base: number, reserved: Set<number>): DecoSpawn[] {
@@ -546,11 +665,10 @@ function placeDecor(world: WorldMap, base: number, reserved: Set<number>): DecoS
         continue;
       }
       if (t !== Terrain.Grass || taken.has(k) || reserved.has(k)) continue;
-      const theme = world.islands[world.island[k]!]?.theme;
-      if (theme === "farmland" && r < 0.035) decor.push({ kind: "sunflowers", x, y, variant: 0 });
-      else if ((theme === "farmland" || theme === "home") && r < 0.09)
-        decor.push({ kind: "flowers", x, y, variant: v < 0.5 ? 0 : 1 });
-      else if (r < 0.15) decor.push({ kind: "grass", x, y, variant: v < 0.5 ? 0 : 1 });
+      const flavor = world.islands[world.island[k]!]?.flavor;
+      const tall = flavor === "fertile" ? 0.04 : 0.018;
+      if (r < tall) decor.push({ kind: "tall", x, y, variant: 0 });
+      else if (r < 0.16) decor.push({ kind: "small", x, y, variant: v < 0.5 ? 0 : 1 });
     }
   }
   return decor;

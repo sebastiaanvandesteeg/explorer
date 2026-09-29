@@ -1,7 +1,7 @@
 import { inBounds, isLandTerrain, tileIndex } from "../world/grid";
 import { Terrain } from "../world/types";
 import { BUILDINGS, canAfford, type BuildingKind } from "./catalogue";
-import { walkable, type BuildingEntity, type GameState } from "./state";
+import { settledIslands, walkable, type BuildingEntity, type GameState } from "./state";
 
 export type PlaceCheck = { ok: true } | { ok: false; reason: string };
 
@@ -18,6 +18,7 @@ export function canPlaceBuilding(
   const w = state.world;
   const [fw, fh] = def.size;
   let elevation = -1;
+  const settled = settledIslands(state);
   for (let ty = y; ty < y + fh; ty++) {
     for (let tx = x; tx < x + fw; tx++) {
       if (!inBounds(w, tx, ty)) return { ok: false, reason: "Outside the map" };
@@ -25,8 +26,8 @@ export function canPlaceBuilding(
       if (!state.explored[k]) return { ok: false, reason: "Unexplored" };
       const t = w.terrain[k]!;
       if (!isLandTerrain(t)) return { ok: false, reason: "Needs dry land" };
-      if (w.island[k] !== w.start.islandId)
-        return { ok: false, reason: "Villagers can't reach other islands yet" };
+      if (!settled.has(w.island[k]!))
+        return { ok: false, reason: "Ferry villagers to this island by ship first" };
       if (kind === "farm" && t !== Terrain.Grass && t !== Terrain.Dirt)
         return { ok: false, reason: "Farms need grass" };
       const e = w.elevation[k]!;

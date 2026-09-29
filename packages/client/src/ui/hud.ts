@@ -1,14 +1,25 @@
 import {
+  BIOMES,
   BUILDINGS,
   canAfford,
+  CHURCH,
+  discoveryName,
+  FARM,
+  MARKET_BUYABLE,
+  MARKET_LOT,
+  MARKET_PRICES,
   NODES,
   population,
   populationCap,
   RESOURCES,
   SHIP,
-  tileIndex,
+  shipCost,
+  SMITH,
   Terrain,
+  tileIndex,
+  TRIBE_DEFS,
   VILLAGER,
+  type BiomeId,
   type BuildingEntity,
   type BuildingKind,
   type Command,
@@ -19,10 +30,13 @@ import {
   type Resource,
   type ShipEntity,
   type Stock,
+  type TribeId,
   type VillagerEntity,
 } from "@explorer/shared";
 import type { Atlas } from "../assets";
 import type { SessionStatus } from "../net/session";
+import { ATMOSPHERE, OCEAN } from "../render/biomeStyle";
+import { buildingThumb, villagerSprite } from "../render/names";
 import { h } from "./dom";
 
 export type Tool =
@@ -40,27 +54,34 @@ const ICON: Record<Resource, string> = {
   wood: "icon_wood",
   stone: "icon_stone",
   food: "icon_food",
+  ore: "icon_ore",
+  tools: "icon_tools",
+  gold: "icon_gold",
+  faith: "icon_faith",
+  crystal: "icon_crystal",
 };
 
-const NODE_NAMES: Record<string, string> = {
-  oak: "Oak tree",
-  pine: "Pine tree",
-  fruit: "Fruit tree",
-  berry: "Berry bush",
-  boulder: "Boulder",
-  ore: "Rich rock",
+const LABEL: Record<Resource, string> = {
+  wood: "Wood",
+  stone: "Stone",
+  food: "Food",
+  ore: "Ore",
+  tools: "Tools",
+  gold: "Gold",
+  faith: "Faith",
+  crystal: "Crystal",
 };
 
-const THEME_NAMES: Record<string, string> = {
-  farmland: "a farmland island",
-  forest: "a forested island",
-  rocky: "a rocky island",
-  islet: "a rocky islet",
-  home: "home",
-};
+/** Upgrades the magic house will sell once they're built (shown as a teaser for now). */
+const COMING_UPGRADES = [
+  ["Far Sight", "Ships reveal twice as far"],
+  ["Swift Sails", "Ships sail 50% faster"],
+  ["Seer's Chart", "Reveal the outline of every island"],
+  ["Calm Waters", "Ships can sail through sea rocks"],
+];
 
-export function discoveryText(theme: string): string {
-  return `Discovered ${THEME_NAMES[theme] ?? "an island"}!`;
+export function discoveryText(biome: BiomeId): string {
+  return `Discovered ${discoveryName(biome)}!`;
 }
 
 export class Hud {
@@ -82,6 +103,8 @@ export class Hud {
   private chatInput: HTMLInputElement;
   private helpEl: HTMLElement;
   private bannerEl: HTMLElement;
+  private biomeEl: HTMLElement;
+  private biomeTimer: ReturnType<typeof setTimeout> | null = null;
   readonly minimap: Minimap;
 
   constructor(
@@ -89,6 +112,7 @@ export class Hud {
     private readonly atlas: Atlas,
     private readonly actions: HudActions,
     private readonly inviteUrl: string | null,
+    private readonly tribe: TribeId,
   ) {
     const icon = (name: string, scale = 2) => {
       const el = h("span.icon");
@@ -97,12 +121,12 @@ export class Hud {
     };
 
     const resources = h("div.resources.panel");
-    for (const r of [...RESOURCES, "pop"]) {
+    for (const r of [...RESOURCES, "pop"] as const) {
       const value = h("span", {}, "0");
       const el = h(
         "div.resource",
-        { title: r === "pop" ? "Villagers / housing" : r },
-        icon(r === "pop" ? "icon_villager" : ICON[r as Resource]),
+        { title: r === "pop" ? "Villagers / housing" : LABEL[r], dataset: { res: r } },
+        icon(r === "pop" ? "icon_villager" : ICON[r]),
         value,
       );
       this.resEls.set(r, value);
@@ -110,6 +134,7 @@ export class Hud {
     }
 
     const menu = h("div.build-menu.panel", {}, h("h3", {}, "Build"));
+    const grid = h("div.build-grid");
     const gather = h(
       "button.build-item",
       {
@@ -121,16 +146,16 @@ export class Hud {
         "span",
         {},
         h("span.name", {}, "Gather", h("span.kbd", {}, "H")),
-        h("span.cost", {}, "Mark resources"),
+        h("span.cost", {}, "Mark goods"),
       ),
     ) as HTMLButtonElement;
     this.buildButtons.set("harvest", gather);
-    menu.append(gather);
+    grid.append(gather);
     for (const def of Object.values(BUILDINGS)) {
       if (!def.buildable) continue;
-      const thumbName = def.kind === "path" ? "t_path" : def.kind === "farm" ? "farm_2" : def.kind;
-      const f = atlas.json.frames[thumbName]!.frame;
-      const scale = Math.min(44 / f.w, 36 / f.h, 1);
+      const thumbName = buildingThumb(def.kind, tribe);
+      const f = atlas.frame(thumbName);
+      const scale = Math.min(40 / f.w, 32 / f.h, 1);
       const thumb = h("span.thumb", {}, icon(thumbName, scale));
       const cost = h("span.cost");
       for (const [res, n] of Object.entries(def.cost)) {
@@ -139,28 +164,40 @@ export class Hud {
       const btn = h(
         "button.build-item",
         {
-          title: def.description,
+          title: `${def.name}: ${def.description}`,
           onclick: () => actions.tool({ kind: "build", building: def.kind }),
         },
         thumb,
         h(
           "span",
           {},
-          h("span.name", {}, def.name, def.hotkey ? h("span.kbd", {}, def.hotkey) : null),
+          h(
+            "span.name",
+            {},
+            def.name,
+            def.hotkey ? h("span.kbd", {}, def.hotkey.toUpperCase()) : null,
+          ),
           cost,
         ),
       ) as HTMLButtonElement;
       this.buildButtons.set(def.kind, btn);
-      menu.append(btn);
+      grid.append(btn);
     }
+    menu.append(grid);
 
     this.selectionEl = h("div.selection.panel");
     this.statusEl = h("div.status");
     this.playersEl = h("div");
+    const tribeDef = TRIBE_DEFS[tribe];
     const players = h(
       "div.players.panel",
       {},
-      h("h3", { style: { margin: "0", fontSize: "13px", opacity: "0.85" } }, "EXPEDITION"),
+      h(
+        "h3",
+        { title: `${tribeDef.description} ${tribeDef.bonusText}.` },
+        h("span.dot", { style: { background: tribeDef.banner } }),
+        `Expedition · ${tribeDef.name}`,
+      ),
       this.playersEl,
       inviteUrl
         ? h(
@@ -204,6 +241,7 @@ export class Hud {
     this.toastsEl = h("div.toasts");
     this.helpEl = h("div.help.panel");
     this.bannerEl = h("div.banner.panel", { style: { display: "none" } });
+    this.biomeEl = h("div.biome-label");
     this.root = h(
       "div.hud",
       {},
@@ -216,6 +254,7 @@ export class Hud {
       this.toastsEl,
       this.helpEl,
       this.bannerEl,
+      this.biomeEl,
     );
     parent.append(this.root);
   }
@@ -224,11 +263,29 @@ export class Hud {
     this.chatInput.focus();
   }
 
+  /** Name the region the camera drifts into, like a map label. */
+  showBiome(biome: BiomeId | null): void {
+    if (this.biomeTimer) clearTimeout(this.biomeTimer);
+    this.biomeEl.classList.remove("show");
+    if (!biome) return;
+    this.biomeEl.textContent = discoveryName(biome).replace(/^the /, "The ");
+    void this.biomeEl.offsetWidth;
+    this.biomeEl.classList.add("show");
+    this.biomeTimer = setTimeout(() => this.biomeEl.classList.remove("show"), 2800);
+  }
+
   setStock(state: GameState): void {
     const stock = state.stock;
     for (const r of RESOURCES) {
       const el = this.resEls.get(r)!;
       el.textContent = String(stock[r]);
+      // Advanced resources stay hidden until the settlement has some.
+      if (["ore", "tools", "gold", "faith", "crystal"].includes(r)) {
+        el.parentElement!.classList.toggle(
+          "empty",
+          stock[r] === 0 && !(this.lastStock && this.lastStock[r] > 0),
+        );
+      }
       if (this.lastStock && stock[r] > this.lastStock[r]) {
         el.parentElement!.classList.remove("flash");
         void el.parentElement!.offsetWidth;
@@ -319,7 +376,7 @@ export class Hud {
 
   setSelection(state: GameState, id: number | null): void {
     const e = id === null ? undefined : state.entities.get(id);
-    if (!e) {
+    if (!e || (e.type === "villager" && e.aboard !== null)) {
       if (this.selectionKey !== "") {
         this.selectionEl.replaceChildren();
         this.selectionKey = "";
@@ -342,35 +399,29 @@ export class Hud {
   private buildSelection(state: GameState, e: Entity): void {
     const refs: typeof this.selectionRefs = { buttons: [] };
     const icon = (name: string) => {
-      const f = this.atlas.json.frames[name]?.frame;
       const el = h("span.icon");
-      if (f) Object.assign(el.style, this.atlas.iconStyle(name, Math.min(2, 40 / f.h, 48 / f.w)));
+      if (this.atlas.has(name)) {
+        const f = this.atlas.frame(name);
+        Object.assign(el.style, this.atlas.iconStyle(name, Math.min(2, 40 / f.h, 48 / f.w)));
+      }
       return el;
     };
-    const button = (label: string, onclick: () => void, enabled: () => boolean, title?: string) => {
+    const button = (
+      label: string | Node,
+      onclick: () => void,
+      enabled: () => boolean,
+      title?: string,
+    ) => {
       const el = h("button.btn", { onclick, title }, label) as HTMLButtonElement;
       refs.buttons.push({ el, enabled });
       return el;
     };
+    const small = (res: Resource, n: number) => h("span.amount", {}, icon(ICON[res]), String(n));
+    const cmd = (c: Command) => () => this.actions.command(c);
     const parts: (HTMLElement | null)[] = [];
     if (e.type === "building") {
       const def = BUILDINGS[e.kind];
-      parts.push(
-        h(
-          "div.title",
-          {},
-          icon(
-            e.kind === "farm"
-              ? "farm_2"
-              : e.kind === "path"
-                ? "t_path"
-                : e.kind === "dock"
-                  ? "dock_x_end"
-                  : e.kind,
-          ),
-          def.name,
-        ),
-      );
+      parts.push(h("div.title", {}, icon(buildingThumb(e.kind, this.tribe)), def.name));
       parts.push(h("div.desc", {}, def.description));
       refs.status = h("div.desc");
       refs.bar = h("div");
@@ -380,17 +431,32 @@ export class Hud {
         actions.append(
           button(
             `Train villager (${VILLAGER.trainCost.food} food)`,
-            () => this.actions.command({ kind: "train-villager", buildingId: e.id }),
+            cmd({ kind: "train-villager", buildingId: e.id }),
             () => canAfford(state.stock, VILLAGER.trainCost),
           ),
         );
       }
       if (e.kind === "dock") {
+        const cost = shipCost(state.world.tribe);
         actions.append(
           button(
-            `Build scout ship (${SHIP.cost.wood} wood)`,
-            () => this.actions.command({ kind: "build-ship", buildingId: e.id }),
-            () => canAfford(state.stock, SHIP.cost),
+            `Build scout ship (${cost.wood} wood)`,
+            cmd({ kind: "build-ship", buildingId: e.id }),
+            () => canAfford(state.stock, cost),
+          ),
+        );
+      }
+      if (e.kind === "market" && e.complete)
+        parts.push(this.marketPanel(state, button, small, cmd));
+      if (e.kind === "magic_house" && e.complete) {
+        parts.push(
+          h(
+            "div.upgrades",
+            {},
+            h("div.desc", {}, "Magical upgrades for exploring the seas are coming soon:"),
+            ...COMING_UPGRADES.map(([name, what]) =>
+              h("div.upgrade", {}, h("strong", {}, name!), ` ${what}`),
+            ),
           ),
         );
       }
@@ -410,7 +476,7 @@ export class Hud {
       if (actions.children.length) parts.push(actions);
     } else if (e.type === "node") {
       const def = NODES[e.kind];
-      parts.push(h("div.title", {}, icon(`icon_${def.resource}`), NODE_NAMES[e.kind] ?? e.kind));
+      parts.push(h("div.title", {}, icon(ICON[def.resource]), def.name));
       refs.status = h("div.desc");
       parts.push(refs.status);
       if (e.stage === "grown") {
@@ -420,7 +486,7 @@ export class Hud {
             {},
             button(
               e.marked ? "Unmark" : "Mark for gathering",
-              () => this.actions.command({ kind: "mark", nodeIds: [e.id], marked: !e.marked }),
+              cmd({ kind: "mark", nodeIds: [e.id], marked: !e.marked }),
               () => true,
             ),
           ),
@@ -428,28 +494,87 @@ export class Hud {
       }
     } else if (e.type === "villager") {
       parts.push(
-        h(
-          "div.title",
-          {},
-          icon(`villager_${["blue", "green", "red"][e.tunic % 3]}_front_stand`),
-          "Villager",
-        ),
+        h("div.title", {}, icon(villagerSprite(this.tribe, e.tunic, false, "stand")), "Villager"),
       );
       refs.status = h("div.desc");
       parts.push(
         refs.status,
-        h("div.desc", {}, "Right-click a tree, rock, building or the ground to give orders."),
+        h(
+          "div.desc",
+          {},
+          "Right-click a tree, rock, building or the ground to give orders. Right-click a ship to board it.",
+        ),
       );
     } else {
+      const ship = e as ShipEntity;
       parts.push(h("div.title", {}, icon("icon_ship"), "Scout ship"));
       refs.status = h("div.desc");
       parts.push(
         refs.status,
-        h("div.desc", {}, "Right-click the sea to sail. Ships reveal the map as they go."),
+        h(
+          "div.desc",
+          {},
+          "Right-click the sea to sail, or an island to sail there and put your passengers ashore.",
+        ),
+        h(
+          "div.actions",
+          {},
+          button(
+            "Take a villager aboard",
+            cmd({ kind: "call-aboard", shipId: ship.id }),
+            () =>
+              (state.entities.get(ship.id) as ShipEntity | undefined)?.passengers.length !==
+              SHIP.capacity,
+            "The nearest villager on this shore walks over and climbs aboard",
+          ),
+          button(
+            "Land passengers",
+            cmd({ kind: "unload", shipId: ship.id }),
+            () =>
+              ((state.entities.get(ship.id) as ShipEntity | undefined)?.passengers.length ?? 0) > 0,
+          ),
+        ),
       );
     }
     this.selectionRefs = refs;
     this.selectionEl.replaceChildren(...parts.filter((p): p is HTMLElement => !!p));
+  }
+
+  private marketPanel(
+    state: GameState,
+    button: (
+      label: string | Node,
+      onclick: () => void,
+      enabled: () => boolean,
+      title?: string,
+    ) => HTMLButtonElement,
+    small: (res: Resource, n: number) => HTMLElement,
+    cmd: (c: Command) => () => void,
+  ): HTMLElement {
+    const rows = h("div.trade");
+    for (const res of RESOURCES) {
+      const price = MARKET_PRICES[res];
+      if (price === undefined) continue;
+      const buyable = MARKET_BUYABLE.includes(res);
+      rows.append(
+        h("span.trade-name", {}, small(res, MARKET_LOT)),
+        button(
+          h("span", {}, "Sell → ", small("gold", price)),
+          cmd({ kind: "trade", resource: res, action: "sell" }),
+          () => state.stock[res] >= MARKET_LOT,
+          `Sell ${MARKET_LOT} ${res} for ${price} gold`,
+        ),
+        buyable
+          ? button(
+              h("span", {}, "Buy for ", small("gold", price * 2)),
+              cmd({ kind: "trade", resource: res, action: "buy" }),
+              () => state.stock.gold >= price * 2,
+              `Buy ${MARKET_LOT} ${res} for ${price * 2} gold`,
+            )
+          : h("span"),
+      );
+    }
+    return rows;
   }
 
   private updateSelection(state: GameState, e: Entity): void {
@@ -458,6 +583,7 @@ export class Hud {
       const job = e.queue[0];
       let status = "";
       let progress = 1;
+      const worker = BUILDINGS[e.kind].worker;
       if (!e.complete) {
         status = `Under construction: ${Math.floor(e.progress * 100)}%`;
         progress = e.progress;
@@ -467,19 +593,33 @@ export class Hud {
         status =
           `${job.what === "ship" ? "Building a ship" : "Training a villager"}… ${Math.ceil(job.remaining)}s` +
           (e.queue.length > 1 ? ` (+${e.queue.length - 1} queued)` : "");
-      } else if (BUILDINGS[e.kind].worker) {
-        status =
-          e.workerId !== null
-            ? "Staffed by a villager"
-            : "Waiting for a worker (needs an idle villager)";
-        progress = e.kind === "farm" ? e.growth / 30 : e.workerId !== null ? 1 : 0;
+      } else if (worker && e.workerId === null) {
+        status = "Waiting for a worker (needs an idle villager)";
+        progress = 0;
+      } else if (e.kind === "farm") {
+        status = "A farmer tends the wheat";
+        progress = e.growth / FARM.cycle;
+      } else if (e.kind === "blacksmith") {
+        const enough = state.stock.ore >= SMITH.ore;
+        status = enough
+          ? `Forging: ${SMITH.ore} ore → ${SMITH.tools} tools every ${SMITH.seconds}s`
+          : `Waiting for ore (needs ${SMITH.ore}); build a mine near ore deposits`;
+        progress = e.growth / SMITH.seconds;
+      } else if (e.kind === "church") {
+        status = `A priest gathers ${CHURCH.faith} faith every ${CHURCH.seconds}s`;
+        progress = e.growth / CHURCH.seconds;
+      } else if (worker) {
+        status = "Staffed by a villager";
       } else if (e.kind === "town_hall") {
         status = `Population ${population(state)}/${populationCap(state)}`;
+      } else if (e.kind === "magic_house") {
+        status = `Treasury: ${state.stock.gold} gold · ${state.stock.faith} faith · ${state.stock.crystal} crystal`;
       } else {
         status = "Ready";
       }
       if (refs.status) refs.status.textContent = status;
-      if (refs.bar) refs.bar.style.width = `${Math.round(progress * 100)}%`;
+      if (refs.bar)
+        refs.bar.style.width = `${Math.round(Math.max(0, Math.min(1, progress)) * 100)}%`;
     } else if (e.type === "node") {
       const def = NODES[e.kind];
       if (refs.status)
@@ -494,7 +634,9 @@ export class Hud {
     } else if (e.type === "villager") {
       if (refs.status) refs.status.textContent = describeVillager(state, e);
     } else if (refs.status) {
-      refs.status.textContent = (e as ShipEntity).dest ? "Sailing…" : "Anchored";
+      const ship = e as ShipEntity;
+      const aboard = `${ship.passengers.length}/${SHIP.capacity} aboard`;
+      refs.status.textContent = `${ship.dest ? "Sailing…" : "Anchored"} · ${aboard}`;
     }
     this.refreshSelectionButtons();
   }
@@ -509,20 +651,22 @@ function selectionKey(e: Entity): string {
 export function describeVillager(state: GameState, v: VillagerEntity): string {
   const carrying = v.carrying ? ` · carrying ${v.carrying.amount} ${v.carrying.resource}` : "";
   const t = v.task;
+  if (v.aboard !== null) return "At sea";
   if (v.action === "deliver")
     return `Taking ${v.carrying?.amount ?? 0} ${v.carrying?.resource ?? "goods"} to storage`;
   if (!t) return `Idle${carrying}`;
   if (t.kind === "move") return `Walking${carrying}`;
+  if (t.kind === "board") return "Heading to the ship";
   if (t.kind === "harvest") {
     const n = state.entities.get(t.nodeId) as NodeEntity | undefined;
-    const what = n ? (NODE_NAMES[n.kind] ?? n.kind).toLowerCase() : "resources";
+    const what = n ? NODES[n.kind].name.toLowerCase() : "resources";
     const verb =
       n && NODES[n.kind].tool === "axe"
         ? "Chopping"
         : n && NODES[n.kind].tool === "pick"
           ? "Mining"
           : "Gathering";
-    return `${v.action === "work" ? verb : "Heading to"} a ${what}${carrying}`;
+    return `${v.action === "work" ? verb : "Heading to"} ${what}${carrying}`;
   }
   const b = state.entities.get(t.buildingId) as BuildingEntity | undefined;
   const name = b ? BUILDINGS[b.kind].name : "a building";
@@ -531,8 +675,6 @@ export function describeVillager(state: GameState, v: VillagerEntity): string {
 }
 
 // ---------------------------------------------------------------------------- minimap
-
-const FOG = 0xff302710;
 
 function abgr(hex: string): number {
   const v = Number.parseInt(hex.slice(1), 16);
@@ -543,6 +685,7 @@ export class Minimap {
   readonly canvas = document.createElement("canvas");
   private ctx: CanvasRenderingContext2D;
   private base: Uint32Array | null = null;
+  private fog: Uint32Array | null = null;
   private image: ImageData | null = null;
 
   constructor(onClick: (x: number, y: number) => void) {
@@ -561,19 +704,31 @@ export class Minimap {
     this.canvas.width = w.width;
     this.canvas.height = w.height;
     this.image = this.ctx.createImageData(w.width, w.height);
-    const grass = ["#8a8f38", "#717b31", "#556128", "#3c522c"].map(abgr);
-    const rock = ["#8a8a86", "#9a9890", "#a8a69c", "#bdb8a8"].map(abgr);
-    const colours: Record<number, number> = {
-      [Terrain.Deep]: abgr("#1b5866"),
-      [Terrain.Shallow]: abgr("#349f98"),
-      [Terrain.Sand]: abgr("#eed099"),
-      [Terrain.Dirt]: abgr("#a07650"),
-    };
-    this.base = new Uint32Array(w.width * w.height);
-    for (let k = 0; k < this.base.length; k++) {
+    const n = w.width * w.height;
+    this.base = new Uint32Array(n);
+    this.fog = new Uint32Array(n);
+    const deep = abgr("#1b5866");
+    const shallow = abgr("#349f98");
+    const dirt = abgr("#a07650");
+    for (let k = 0; k < n; k++) {
+      const biome = BIOMES[w.biome[k]!];
+      const style = biome ? ATMOSPHERE[biome] : OCEAN;
+      this.fog[k] = abgr(style.fog);
       const t = w.terrain[k]!;
-      const e = w.elevation[k]!;
-      this.base[k] = t === Terrain.Grass ? grass[e]! : t === Terrain.Rock ? rock[e]! : colours[t]!;
+      this.base[k] =
+        t === Terrain.Deep
+          ? deep
+          : t === Terrain.Shallow
+            ? shallow
+            : t === Terrain.Dirt
+              ? dirt
+              : abgr(
+                  t === Terrain.Sand
+                    ? style.map.beach
+                    : t === Terrain.Rock
+                      ? style.map.rock
+                      : style.map.ground,
+                );
     }
   }
 
@@ -582,8 +737,9 @@ export class Minimap {
     const img = this.image!;
     const px = new Uint32Array(img.data.buffer);
     const base = this.base!;
+    const fog = this.fog!;
     const explored = state.explored;
-    for (let k = 0; k < px.length; k++) px[k] = explored[k] ? base[k]! : FOG;
+    for (let k = 0; k < px.length; k++) px[k] = explored[k] ? base[k]! : fog[k]!;
     const w = state.world;
     const dot = (x: number, y: number, c: number, r = 1) => {
       for (let dy = -r + 1; dy < r; dy++)
@@ -597,7 +753,7 @@ export class Minimap {
       if (e.type === "building") {
         for (let y = e.y; y < e.y + e.h; y++)
           for (let x = e.x; x < e.x + e.w; x++) dot(x, y, abgr("#5b4028"));
-      } else if (e.type === "villager") dot(e.x, e.y, abgr("#fbf0cf"));
+      } else if (e.type === "villager" && e.aboard === null) dot(e.x, e.y, abgr("#fbf0cf"));
       else if (e.type === "ship") dot(e.x, e.y, abgr("#e98a3a"), 2);
     }
     this.ctx.putImageData(img, 0, 0);

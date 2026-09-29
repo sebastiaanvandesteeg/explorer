@@ -64,8 +64,9 @@ export class NetSession extends Emitter implements Session {
         this.retry = 0;
         this.you = msg.you;
         this.players = msg.players;
-        if (!this.world || this.world.seed !== msg.snapshot.seed)
-          this.world = generateWorld(msg.snapshot.seed);
+        const tribe = msg.snapshot.tribe ?? "islanders";
+        if (!this.world || this.world.seed !== msg.snapshot.seed || this.world.tribe !== tribe)
+          this.world = generateWorld(msg.snapshot.seed, tribe);
         const first = !this.state;
         this.state = fromSnapshot(this.world, msg.snapshot);
         this.emit("status", "online");

@@ -3,9 +3,11 @@ import {
   BUILDINGS,
   MAX_CHAT_LENGTH,
   MAX_NAME_LENGTH,
+  RESOURCES,
   type BuildingKind,
   type ClientMessage,
   type Command,
+  type Resource,
 } from "@explorer/shared";
 
 type Obj = Record<string, unknown>;
@@ -45,7 +47,17 @@ export function parseCommand(v: unknown): Command | null {
       return { kind: "mark", nodeIds: v.nodeIds, marked: v.marked };
     case "move-ship":
       if (!isInt(v.shipId) || !isInt(v.x) || !isInt(v.y)) return null;
-      return { kind: "move-ship", shipId: v.shipId, x: v.x, y: v.y };
+      if (v.unload !== undefined && typeof v.unload !== "boolean") return null;
+      return { kind: "move-ship", shipId: v.shipId, x: v.x, y: v.y, unload: v.unload === true };
+    case "call-aboard":
+    case "unload":
+      if (!isInt(v.shipId)) return null;
+      return { kind: v.kind, shipId: v.shipId };
+    case "trade":
+      if (typeof v.resource !== "string" || !(RESOURCES as readonly string[]).includes(v.resource))
+        return null;
+      if (v.action !== "sell" && v.action !== "buy") return null;
+      return { kind: "trade", resource: v.resource as Resource, action: v.action };
     case "assign": {
       if (!isInt(v.villagerId) || !isObj(v.target)) return null;
       const t = v.target;
@@ -53,6 +65,8 @@ export function parseCommand(v: unknown): Command | null {
         return { kind: "assign", villagerId: v.villagerId, target: { node: t.node } };
       if ("building" in t && isInt(t.building))
         return { kind: "assign", villagerId: v.villagerId, target: { building: t.building } };
+      if ("ship" in t && isInt(t.ship))
+        return { kind: "assign", villagerId: v.villagerId, target: { ship: t.ship } };
       if (isInt(t.x) && isInt(t.y))
         return { kind: "assign", villagerId: v.villagerId, target: { x: t.x, y: t.y } };
       return null;

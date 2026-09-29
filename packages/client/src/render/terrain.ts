@@ -12,6 +12,7 @@ import {
 } from "@explorer/shared";
 import { Container, Rectangle, RenderTexture, Sprite, TilingSprite, type Renderer } from "pixi.js";
 import type { Atlas } from "../assets";
+import { biomeOfTile, decorSprite, groundSprite, lipKind } from "./names";
 
 export const CHUNK = 16;
 const TOP_MARGIN = 64; // tall decoration and raised land poke above a chunk's diamond
@@ -210,32 +211,22 @@ export class TerrainLayer {
             )
               add(`w_foam_${side}`, sx, sy);
           }
-          if (deco?.kind === "sea_rock") add(`sea_rock_${deco.variant}`, sx, sy);
+          if (deco?.kind === "sea_rock") add(decorSprite("temperate", deco), sx, sy);
         } else {
-          add(groundSprite(t, x, y), sx, sy - h);
-          const lip =
-            t === Terrain.Sand
-              ? "sand"
-              : t === Terrain.Rock
-                ? "rock"
-                : t === Terrain.Dirt
-                  ? "dirt"
-                  : "grass";
+          const biome = biomeOfTile(w, x, y);
+          add(groundSprite(biome, t, x, y), sx, sy - h);
+          const lip = lipKind(t);
           const hl = h - (heightOf(this.state, x, y + 1) ?? 0);
-          if (hl > 0) add(`c_left_${hl}_${lip}`, sx, sy - h);
-          const hr = h - (heightOf(this.state, x + 1, y) ?? 0);
-          if (hr > 0) add(`c_right_${hr}_${lip}`, sx, sy - h);
-          if (deco && occupancy[k] === 0) {
-            const name =
-              deco.kind === "flowers"
-                ? `deco_flowers_${deco.variant}`
-                : deco.kind === "grass"
-                  ? `deco_grass_${deco.variant}`
-                  : deco.kind === "sunflowers"
-                    ? "deco_sunflowers"
-                    : null;
-            if (name) add(name, sx, sy - h);
+          if (hl > 0) {
+            add(`c_${biome}_left_${hl}`, sx, sy - h);
+            add(`l_${biome}_left_${lip}`, sx, sy - h);
           }
+          const hr = h - (heightOf(this.state, x + 1, y) ?? 0);
+          if (hr > 0) {
+            add(`c_${biome}_right_${hr}`, sx, sy - h);
+            add(`l_${biome}_right_${lip}`, sx, sy - h);
+          }
+          if (deco && occupancy[k] === 0) add(decorSprite(biome, deco), sx, sy - h);
         }
       }
     }
@@ -274,18 +265,4 @@ function heightOf(state: GameState, x: number, y: number): number | null {
   if (!inBounds(w, x, y)) return null;
   const k = tileIndex(w, x, y);
   return surfaceHeight(isLandTerrain(w.terrain[k]!), w.elevation[k]!);
-}
-
-function groundSprite(t: number, x: number, y: number): string {
-  const r = hash2d(x, y, 0x77);
-  switch (t) {
-    case Terrain.Sand:
-      return `t_sand_${Math.floor(r * 3)}`;
-    case Terrain.Rock:
-      return `t_rock_${Math.floor(r * 2)}`;
-    case Terrain.Dirt:
-      return `t_dirt_${Math.floor(r * 2)}`;
-    default:
-      return r < 0.08 ? "t_grass_3" : `t_grass_${Math.floor(hash2d(x, y, 0x78) * 3)}`;
-  }
 }

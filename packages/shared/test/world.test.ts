@@ -34,10 +34,10 @@ describe("generateWorld", () => {
     const w = generateWorld(seed);
     expect(w.width).toBe(WORLD_SIZE);
     const home = w.islands[w.start.islandId]!;
-    expect(home.theme).toBe("home");
+    expect(home.flavor).toBe("home");
     expect(home.tiles).toBeGreaterThan(450);
     expect(
-      w.islands.filter((i) => i.theme !== "islet" && i.theme !== "home").length,
+      w.islands.filter((i) => i.flavor !== "islet" && i.flavor !== "home").length,
     ).toBeGreaterThanOrEqual(8);
 
     // Town hall sits on flat land.

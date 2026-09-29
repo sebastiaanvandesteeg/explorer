@@ -1,6 +1,6 @@
-// Generates the sprite atlas and ocean textures into packages/client/public/assets.
-// `--check` verifies the committed files match the generator instead of writing them.
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+// Generates the sprite atlas pages, their manifest and the ocean textures into
+// packages/client/public/assets. `--check` verifies the committed files instead of writing them.
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { PNG } from "pngjs";
 import type { Canvas } from "./canvas";
@@ -12,12 +12,17 @@ import { oceanFrame } from "./sprites/terrain";
 const OUT = resolve(import.meta.dirname, "../../../packages/client/public/assets");
 const check = process.argv.includes("--check");
 
-const { image, json } = pack(allSprites());
+const { pages, manifest } = pack(allSprites());
 const outputs: { file: string; canvas?: Canvas; text?: string }[] = [
-  { file: "atlas.png", canvas: image },
-  { file: "atlas.json", text: JSON.stringify(json, null, 1) + "\n" },
+  { file: "atlas.json", text: JSON.stringify(manifest, null, 1) + "\n" },
+  ...pages.flatMap((p, i) => [
+    { file: `atlas-${i}.png`, canvas: p.image },
+    { file: `atlas-${i}.json`, text: JSON.stringify(p.json, null, 1) + "\n" },
+  ]),
   ...[0, 1, 2].map((f) => ({ file: `ocean_${f}.png`, canvas: oceanFrame(f) })),
 ];
+const expected = new Set(outputs.map((o) => o.file));
+const isGenerated = (f: string) => /^(atlas(-\d+)?\.(png|json)|ocean_\d\.png)$/.test(f);
 
 if (check) {
   const stale: string[] = [];
@@ -42,18 +47,23 @@ if (check) {
       stale.push(o.file);
     }
   }
+  for (const f of existsSync(OUT) ? readdirSync(OUT) : []) {
+    if (isGenerated(f) && !expected.has(f)) stale.push(`${f} (leftover)`);
+  }
   if (stale.length > 0) {
     console.error(`Sprite assets are out of date: ${stale.join(", ")}. Run \`pnpm sprites\`.`);
     process.exit(1);
   }
-  console.log(`sprite assets up to date (${Object.keys(json.frames).length} frames)`);
+  console.log(
+    `sprite assets up to date (${Object.keys(manifest.sprites).length} frames, ${pages.length} pages)`,
+  );
 } else {
   mkdirSync(OUT, { recursive: true });
-  for (const o of outputs) {
-    const path = resolve(OUT, o.file);
-    writeFileSync(path, o.text ?? encodePng(o.canvas!));
-  }
+  for (const f of readdirSync(OUT)) if (isGenerated(f) && !expected.has(f)) rmSync(resolve(OUT, f));
+  for (const o of outputs) writeFileSync(resolve(OUT, o.file), o.text ?? encodePng(o.canvas!));
   console.log(
-    `wrote ${Object.keys(json.frames).length} frames into a ${json.meta.size.w}×${json.meta.size.h} atlas → ${OUT}`,
+    `wrote ${Object.keys(manifest.sprites).length} frames on ${pages.length} page(s) (${pages
+      .map((p) => `${p.image.width}×${p.image.height}`)
+      .join(", ")}) → ${OUT}`,
   );
 }

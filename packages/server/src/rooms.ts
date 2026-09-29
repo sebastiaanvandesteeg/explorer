@@ -15,6 +15,7 @@ import {
   type GameState,
   type PlayerInfo,
   type ServerMessage,
+  type TribeId,
   type WorldInfo,
 } from "@explorer/shared";
 import type { WebSocket } from "ws";
@@ -55,12 +56,13 @@ export class WorldRoom {
   constructor(
     readonly id: string,
     readonly seed: string,
+    readonly tribe: TribeId,
     readonly createdAt: string,
     private readonly store: WorldStore,
     private readonly onIdle: (room: WorldRoom) => void,
     saved?: SavedWorld,
   ) {
-    const world = generateWorld(seed);
+    const world = generateWorld(seed, tribe);
     this.state = saved ? fromSnapshot(world, saved.snapshot, true) : createInitialState(world);
     this.slots = (saved?.players ?? []).map((p) => ({ ...p, sockets: new Set() }));
     // A world nobody joins (yet) shouldn't stay in memory; joining cancels this.
@@ -77,6 +79,7 @@ export class WorldRoom {
     return {
       id: this.id,
       seed: this.seed,
+      tribe: this.tribe,
       players: this.slots.length,
       online: this.slots.filter((s) => s.sockets.size > 0).length,
       maxPlayers: MAX_PLAYERS,
@@ -215,6 +218,7 @@ export class WorldRoom {
       version: 1,
       id: this.id,
       seed: this.seed,
+      tribe: this.tribe,
       createdAt: this.createdAt,
       players: this.slots.map(({ sockets: _sockets, ...p }) => p),
       snapshot: toSnapshot(this.state),
@@ -251,10 +255,10 @@ export class RoomManager {
 
   constructor(private readonly store: WorldStore) {}
 
-  async create(seed: string): Promise<WorldRoom> {
+  async create(seed: string, tribe: TribeId): Promise<WorldRoom> {
     let id = newWorldId();
     while (this.rooms.has(id) || (await this.store.load(id))) id = newWorldId();
-    const room = new WorldRoom(id, seed, new Date().toISOString(), this.store, (r) =>
+    const room = new WorldRoom(id, seed, tribe, new Date().toISOString(), this.store, (r) =>
       this.unload(r),
     );
     this.rooms.set(id, room);
@@ -272,6 +276,7 @@ export class RoomManager {
         const room = new WorldRoom(
           saved.id,
           saved.seed,
+          saved.tribe ?? saved.snapshot.tribe ?? "islanders",
           saved.createdAt,
           this.store,
           (r) => this.unload(r),

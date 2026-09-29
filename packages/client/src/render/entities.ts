@@ -1,5 +1,4 @@
 import {
-  farmStage,
   SHIP,
   VILLAGER,
   HALF_H,
@@ -17,50 +16,27 @@ import {
 } from "@explorer/shared";
 import { Container, Graphics, Sprite, type Rectangle } from "pixi.js";
 import type { Atlas } from "../assets";
+import { buildingSprite, markerSprite, nodeSprite, scaffoldSprite, villagerSprite } from "./names";
 
-const TUNICS = ["blue", "green", "red"] as const;
 const INTERP_MS = TICK_SECONDS * 1000;
+/** Pier decks sit a few pixels above the water. */
+const DECK_PX = 5;
 
 function tileHeight(state: GameState, x: number, y: number): number {
   const w = state.world;
   const tx = Math.min(w.width - 1, Math.max(0, Math.floor(x)));
   const ty = Math.min(w.height - 1, Math.max(0, Math.floor(y)));
   const k = tileIndex(w, tx, ty);
-  return surfaceHeight(isLandTerrain(w.terrain[k]!), w.elevation[k]!);
+  const land = isLandTerrain(w.terrain[k]!);
+  if (!land) {
+    const e = state.entities.get(state.occupancy[k]!);
+    if (e?.type === "building" && e.kind === "dock") return DECK_PX;
+  }
+  return surfaceHeight(land, w.elevation[k]!);
 }
 
 const screenX = (x: number, y: number) => (x - y) * HALF_W;
 const screenY = (x: number, y: number) => (x + y) * HALF_H;
-
-export function nodeSprite(n: NodeEntity): string {
-  if (n.stage === "stump") return "tree_stump";
-  if (n.stage === "sapling") return "tree_sapling";
-  switch (n.kind) {
-    case "oak":
-      return `tree_oak_${n.variant % 3}`;
-    case "pine":
-      return `tree_pine_${n.variant % 3}`;
-    case "fruit":
-      return n.stage === "bare" ? "tree_oak_1" : "tree_fruit";
-    case "berry":
-      return n.stage === "bare" ? "bush_bare" : "bush_berry";
-    case "boulder":
-      return `rock_boulder_${n.variant % 2}`;
-    case "ore":
-      return "rock_ore";
-  }
-}
-
-export function markerSprite(n: NodeEntity): string {
-  if (n.kind === "boulder" || n.kind === "ore") return "mark_pick";
-  if (n.kind === "berry" || n.kind === "fruit") return "mark_basket";
-  return "mark_axe";
-}
-
-export function buildingSprite(b: BuildingEntity): string {
-  if (b.kind === "farm") return `farm_${farmStage(b)}`;
-  return b.kind;
-}
 
 interface Smoke {
   sprite: Sprite;
@@ -87,7 +63,9 @@ class BuildingView extends View {
   private bar = new Graphics();
   private key = "";
   smokeAt: { x: number; y: number }[] = [];
+  sparkleAt: { x: number; y: number }[] = [];
   private smokeTimer = 0;
+  private sparkleTimer = 0;
 
   constructor(
     private readonly layer: EntityLayer,
@@ -102,7 +80,8 @@ class BuildingView extends View {
     const state = this.layer.state;
     const h = tileHeight(state, b.x, b.y);
     this.rect = { x: b.x, y: b.y, w: b.w, h: b.h };
-    const key = `${buildingSprite(b)}|${b.complete}|${b.dir ?? ""}`;
+    const tribe = state.world.tribe;
+    const key = `${buildingSprite(b, tribe)}|${b.complete}|${b.dir ?? ""}`;
     if (key !== this.key) {
       this.key = key;
       for (const c of [...this.root.children]) if (c !== this.bar) c.destroy();
@@ -115,17 +94,17 @@ class BuildingView extends View {
         s.alpha = b.complete ? 1 : 0.45;
         this.root.addChildAt(s, 0);
       } else {
-        const name = buildingSprite(b);
+        const name = buildingSprite(b, tribe);
         this.main = this.layer.atlas.sprite(name);
         this.root.addChildAt(this.main, 0);
         if (!b.complete) {
           this.main.alpha = 0.3;
-          const size = Math.min(3, Math.max(b.w, b.h)) as 1 | 2 | 3;
-          this.scaffold = this.layer.atlas.sprite(`scaffold_${size}`);
+          this.scaffold = this.layer.atlas.sprite(scaffoldSprite(b.w, b.h));
           this.root.addChild(this.scaffold);
         }
         const meta = this.layer.atlas.meta[name];
         this.smokeAt = b.complete && meta?.smoke ? meta.smoke : [];
+        this.sparkleAt = b.complete && meta?.sparkle ? meta.sparkle : [];
       }
     }
     this.root.position.set(screenX(b.x, b.y), screenY(b.x, b.y) - h);
@@ -163,11 +142,26 @@ class BuildingView extends View {
   }
 
   override frame(now: number, dt: number): void {
-    if (this.smokeAt.length === 0 || !this.root.visible) return;
-    this.smokeTimer -= dt;
-    if (this.smokeTimer > 0) return;
-    this.smokeTimer = 0.7 + Math.random() * 0.5;
-    for (const p of this.smokeAt) this.layer.puff(this.root.x + p.x, this.root.y + p.y, now);
+    if (!this.root.visible) return;
+    if (this.smokeAt.length > 0) {
+      this.smokeTimer -= dt;
+      if (this.smokeTimer <= 0) {
+        this.smokeTimer = 0.7 + Math.random() * 0.5;
+        for (const p of this.smokeAt) this.layer.puff(this.root.x + p.x, this.root.y + p.y, now);
+      }
+    }
+    if (this.sparkleAt.length > 0) {
+      this.sparkleTimer -= dt;
+      if (this.sparkleTimer <= 0) {
+        this.sparkleTimer = 0.25 + Math.random() * 0.3;
+        for (const p of this.sparkleAt)
+          this.layer.sparkle(
+            this.root.x + p.x + (Math.random() - 0.5) * 14,
+            this.root.y + p.y + (Math.random() - 0.5) * 10,
+            now,
+          );
+      }
+    }
   }
 }
 
@@ -257,13 +251,16 @@ class VillagerView extends MovingView {
 
   constructor(private readonly layer: EntityLayer) {
     super();
-    this.body = layer.atlas.sprite("villager_blue_front_stand");
+    this.body = layer.atlas.sprite(villagerSprite(layer.state.world.tribe, 0, false, "stand"));
     this.root.addChild(this.body);
   }
 
   update(e: Entity, now: number): void {
     const v = e as VillagerEntity;
-    this.track(v.x, v.y, now, this.v === null);
+    // Villagers at sea ride inside the ship.
+    this.root.visible = v.aboard === null;
+    const boarding = this.v !== null && this.v.aboard !== v.aboard;
+    this.track(v.x, v.y, now, this.v === null || boarding);
     if (this.v === null) this.height = tileHeight(this.layer.state, v.x, v.y);
     this.v = v;
     const carryName = v.carrying ? `carry_${v.carrying.resource}` : "";
@@ -294,7 +291,7 @@ class VillagerView extends MovingView {
     }
     const back = v.facing === 2 || v.facing === 3;
     const flip = v.facing === 1 || v.facing === 2;
-    const name = `villager_${TUNICS[v.tunic % 3]}_${back ? "back" : "front"}_${pose}`;
+    const name = villagerSprite(this.layer.state.world.tribe, v.tunic, back, pose);
     const tex = this.layer.atlas.texture(name);
     if (this.body.texture !== tex) {
       this.body.texture = tex;

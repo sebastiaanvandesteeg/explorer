@@ -1,4 +1,12 @@
-import { MAX_NAME_LENGTH, MAX_PLAYERS, type WorldInfo } from "@explorer/shared";
+import {
+  MAX_NAME_LENGTH,
+  MAX_PLAYERS,
+  TRIBE_DEFS,
+  TRIBES,
+  type TribeId,
+  type WorldInfo,
+} from "@explorer/shared";
+import type { Atlas } from "../assets";
 import { playerName, savePlayerName } from "../net/identity";
 import { h } from "./dom";
 
@@ -7,7 +15,9 @@ export interface LobbyOptions {
   joinId?: string;
   error?: string;
   onEnter(name: string, worldId: string): void;
-  onOffline(name: string, seed: string): void;
+  onOffline(name: string, seed: string, tribe: TribeId): void;
+  /** Loads sprites for the tribe previews (the lobby shows before they're ready). */
+  atlas: Promise<Atlas>;
 }
 
 function randomSeed(): string {
@@ -46,6 +56,47 @@ export function showLobby(root: HTMLElement, opts: LobbyOptions): () => void {
   }) as HTMLInputElement;
   const error = h("div.error", {}, opts.error ?? "");
   const seed = h("input.field", { placeholder: "Random" }) as HTMLInputElement;
+  let tribe: TribeId = "islanders";
+  const tribeCards = new Map<TribeId, HTMLElement>();
+  const tribes = h("div.tribes", { role: "radiogroup", "aria-label": "Tribe" });
+  for (const id of TRIBES) {
+    const def = TRIBE_DEFS[id];
+    const pic = h("span.pic");
+    const card = h(
+      "button.tribe",
+      {
+        type: "button",
+        role: "radio",
+        "aria-checked": String(id === tribe),
+        title: def.description,
+        onclick: () => {
+          tribe = id;
+          for (const [t, el] of tribeCards) {
+            el.classList.toggle("active", t === id);
+            el.setAttribute("aria-checked", String(t === id));
+          }
+        },
+      },
+      pic,
+      h(
+        "span",
+        {},
+        h("strong", { style: { color: def.banner } }, def.name),
+        h("small", {}, def.bonusText),
+      ),
+    );
+    if (id === tribe) card.classList.add("active");
+    tribeCards.set(id, card);
+    tribes.append(card);
+    void opts.atlas.then((atlas) => {
+      const name = `b_town_hall_${id}`;
+      if (!atlas.has(name)) return;
+      const f = atlas.frame(name);
+      const icon = h("span.icon");
+      Object.assign(icon.style, atlas.iconStyle(name, Math.min(56 / f.w, 52 / f.h)));
+      pic.append(icon);
+    });
+  }
   const code = h("input.field", { placeholder: "Invite code or link" }) as HTMLInputElement;
 
   const needName = (): string | null => {
@@ -68,7 +119,7 @@ export function showLobby(root: HTMLElement, opts: LobbyOptions): () => void {
       const res = await fetch("/api/worlds", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ seed: seed.value.trim() || randomSeed() }),
+        body: JSON.stringify({ seed: seed.value.trim() || randomSeed(), tribe }),
       });
       if (!res.ok) throw new Error(await res.text());
       const info = (await res.json()) as WorldInfo;
@@ -118,9 +169,10 @@ export function showLobby(root: HTMLElement, opts: LobbyOptions): () => void {
       h(
         "p",
         {},
-        `Sail a randomly generated archipelago, gather wood and stone, and build a settlement with up to ${MAX_PLAYERS - 1} friends.`,
+        `Sail a randomly generated archipelago of ten biomes, from blossom isles to infernal shores, and build a settlement with up to ${MAX_PLAYERS - 1} friends.`,
       ),
       h("label", {}, "Your name", name),
+      h("div.field", {}, h("span", {}, "Choose your tribe"), tribes),
       h("label", {}, "World seed (optional)", seed),
       createBtn,
       h("div.divider"),
@@ -142,7 +194,7 @@ export function showLobby(root: HTMLElement, opts: LobbyOptions): () => void {
             onclick: (e: Event) => {
               e.preventDefault();
               const n = needName();
-              if (n) opts.onOffline(n, seed.value.trim() || randomSeed());
+              if (n) opts.onOffline(n, seed.value.trim() || randomSeed(), tribe);
             },
           },
           "Play offline",

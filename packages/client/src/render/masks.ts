@@ -1,8 +1,17 @@
 // Soft, smooth overlays drawn from per-tile masks: fog of war and the shallow-water glow around
 // islands. A small canvas (a few pixels per tile) is blurred and mapped onto the isometric grid
 // with an affine transform, which gives the gentle gradients of the concept art without tile steps.
-import { HALF_H, HALF_W, isLandTerrain, type GameState } from "@explorer/shared";
+// Both take their colour from the biome region, so fog around the Infernal Isles is dark red.
+import {
+  BIOMES,
+  HALF_H,
+  HALF_W,
+  isLandTerrain,
+  type GameState,
+  type WorldMap,
+} from "@explorer/shared";
 import { Matrix, Sprite, Texture } from "pixi.js";
+import { ATMOSPHERE, OCEAN } from "./biomeStyle";
 
 const PX_PER_TILE = 2;
 
@@ -24,12 +33,35 @@ function blurInto(target: HTMLCanvasElement, source: HTMLCanvasElement, radius: 
   ctx.filter = "none";
 }
 
+function rgb(hex: string): [number, number, number] {
+  const v = Number.parseInt(hex.slice(1), 16);
+  return [(v >> 16) & 255, (v >> 8) & 255, v & 255];
+}
+
+/** Per-tile fog colour from the world's biome regions (open ocean gets the default). */
+function fogColours(world: WorldMap): Uint8Array {
+  const out = new Uint8Array(world.width * world.height * 3);
+  const cache = new Map<number, [number, number, number]>();
+  for (let k = 0; k < world.biome.length; k++) {
+    const idx = world.biome[k]!;
+    let c = cache.get(idx);
+    if (!c) {
+      const b = BIOMES[idx];
+      c = rgb((b ? ATMOSPHERE[b] : OCEAN).fog);
+      cache.set(idx, c);
+    }
+    out.set(c, k * 3);
+  }
+  return out;
+}
+
 /** Fog of war: opaque over unexplored tiles, fading softly into explored ones. */
 export class FogLayer {
   readonly sprite: Sprite;
   private readonly texture: Texture;
   private readonly raw = document.createElement("canvas");
   private readonly soft = document.createElement("canvas");
+  private colours: Uint8Array;
   private dirty = true;
   private cooldown = 0;
 
@@ -40,6 +72,7 @@ export class FogLayer {
       c.width = (w.width + 2) * PX_PER_TILE;
       c.height = (w.height + 2) * PX_PER_TILE;
     }
+    this.colours = fogColours(w);
     const { sprite, texture } = isoSprite(this.soft);
     this.sprite = sprite;
     this.texture = texture;
@@ -49,6 +82,7 @@ export class FogLayer {
 
   reset(state: GameState): void {
     this.state = state;
+    this.colours = fogColours(state.world);
     this.dirty = true;
   }
 
@@ -63,31 +97,32 @@ export class FogLayer {
     this.cooldown = 0.2;
     const w = this.state.world;
     const ctx = this.raw.getContext("2d")!;
-    ctx.fillStyle = "#0d222a";
-    ctx.fillRect(0, 0, this.raw.width, this.raw.height);
-    const explored = this.state.explored;
-    for (let y = 0; y < w.height; y++) {
-      let run = -1;
-      for (let x = 0; x <= w.width; x++) {
-        const open = x < w.width && explored[y * w.width + x] === 1;
-        if (open && run < 0) run = x;
-        if (!open && run >= 0) {
-          ctx.clearRect(
-            (run + 1) * PX_PER_TILE,
-            (y + 1) * PX_PER_TILE,
-            (x - run) * PX_PER_TILE,
-            PX_PER_TILE,
-          );
-          run = -1;
-        }
+    const img = ctx.createImageData(this.raw.width, this.raw.height);
+    const data = img.data;
+    const edge = rgb(OCEAN.fog);
+    const stride = this.raw.width;
+    for (let py = 0; py < this.raw.height; py++) {
+      const ty = Math.floor(py / PX_PER_TILE) - 1;
+      for (let px = 0; px < stride; px++) {
+        const tx = Math.floor(px / PX_PER_TILE) - 1;
+        const i = (py * stride + px) * 4;
+        const inside = tx >= 0 && ty >= 0 && tx < w.width && ty < w.height;
+        const k = ty * w.width + tx;
+        if (inside && this.state.explored[k]) continue;
+        const c = inside ? this.colours.subarray(k * 3, k * 3 + 3) : edge;
+        data[i] = c[0]!;
+        data[i + 1] = c[1]!;
+        data[i + 2] = c[2]!;
+        data[i + 3] = 255;
       }
     }
+    ctx.putImageData(img, 0, 0);
     blurInto(this.soft, this.raw, 1.6);
     this.texture.source.update();
   }
 }
 
-/** Turquoise glow in the shallows around every coast (static per world). */
+/** Glow in the shallows around every coast, tinted by the island's biome (static per world). */
 export function shallowGlow(state: GameState): Sprite {
   const w = state.world;
   const raw = document.createElement("canvas");
@@ -104,7 +139,9 @@ export function shallowGlow(state: GameState): Sprite {
       const d = isLandTerrain(w.terrain[k]!) ? 1 : w.shore[k]!;
       const a = alpha[d] ?? 0;
       if (a <= 0) continue;
-      ctx.fillStyle = `rgba(67, 161, 151, ${a})`;
+      const biome = BIOMES[w.biome[k]!];
+      const [r, g, b] = (biome ? ATMOSPHERE[biome] : OCEAN).glow;
+      ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${a})`;
       ctx.fillRect(x * PX_PER_TILE, y * PX_PER_TILE, PX_PER_TILE, PX_PER_TILE);
     }
   }

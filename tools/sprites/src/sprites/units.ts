@@ -4,26 +4,65 @@ import { cloth, planks } from "../materials";
 import { bayer, hexToRgba, rampColor, shade, type Rgba } from "../palette";
 import { flat, lit, Scene, type Material } from "../raytrace";
 import { renderSprite, trimmed, type Sprite } from "../sprite";
+import { TRIBES, type TribeId } from "@explorer/shared";
 import { boulder } from "./nature";
 
-export const TUNICS = ["blue", "green", "red"] as const;
+export const TUNICS = [0, 1, 2] as const;
 export type Tunic = (typeof TUNICS)[number];
 export const VILLAGER_POSES = ["stand", "walk0", "walk1", "work0", "work1"] as const;
 export type VillagerPose = (typeof VILLAGER_POSES)[number];
 export const TOOLS = ["axe", "pick", "hammer", "hoe"] as const;
 export type Tool = (typeof TOOLS)[number];
 
-const TUNIC_COLOURS: Record<Tunic, [string, string, string]> = {
-  blue: ["#2a3446", "#3e4d6a", "#5a6f94"],
-  green: ["#2f4a26", "#4a6b30", "#6f8f42"],
-  red: ["#5a2a1c", "#8a3d22", "#b85a34"],
+type Hat = "none" | "helmet" | "wrap" | "hood";
+
+/** Clothing per tribe: three tunic colours (dark, mid, light) and a headwear style. */
+const OUTFITS: Record<TribeId, { tunics: [string, string, string][]; hat: Hat }> = {
+  islanders: {
+    tunics: [
+      ["#2a3446", "#3e4d6a", "#5a6f94"],
+      ["#2f4a26", "#4a6b30", "#6f8f42"],
+      ["#5a2a1c", "#8a3d22", "#b85a34"],
+    ],
+    hat: "none",
+  },
+  northfolk: {
+    tunics: [
+      ["#3a2a1c", "#5a4430", "#7a5e44"],
+      ["#3a3c40", "#5a5e64", "#7c8288"],
+      ["#4a1a14", "#7a2a1e", "#a4402e"],
+    ],
+    hat: "helmet",
+  },
+  sunfolk: {
+    tunics: [
+      ["#8a8274", "#c8c0ae", "#eee8d8"],
+      ["#8a6a3a", "#b89058", "#dcb880"],
+      ["#1a3a6a", "#2a5a9a", "#4a7ec4"],
+    ],
+    hat: "wrap",
+  },
+  sylvan: {
+    tunics: [
+      ["#1e3a1e", "#2e5a2a", "#4a7e3c"],
+      ["#16403e", "#1e605a", "#2e8a80"],
+      ["#3a4a14", "#5a6e1e", "#7e9430"],
+    ],
+    hat: "hood",
+  },
 };
 
 /**
  * Draw a 12×20 villager. Feet rest on (6, 19). "front" faces the viewer's lower right (+x);
  * the renderer mirrors it for +y, and uses "back" (mirrored or not) for the other two headings.
  */
-function villager(facing: "front" | "back", pose: VillagerPose, tunic: Tunic, tool?: Tool): Canvas {
+function villager(
+  tribe: TribeId,
+  facing: "front" | "back",
+  pose: VillagerPose,
+  tunic: Tunic,
+  tool?: Tool,
+): Canvas {
   const c = new Canvas(16, 24);
   const ox = 2; // extra room on the left for raised tools
   const oy = 4; // and on top
@@ -31,7 +70,8 @@ function villager(facing: "front" | "back", pose: VillagerPose, tunic: Tunic, to
   const R = (x: number, y: number, w: number, h: number, col: Rgba) => {
     for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) P(x + i, y + j, col);
   };
-  const [tDark, tMid, tLight] = TUNIC_COLOURS[tunic].map((h) => hexToRgba(h));
+  const outfit = OUTFITS[tribe];
+  const [tDark, tMid, tLight] = outfit.tunics[tunic]!.map((h) => hexToRgba(h));
   const skin = rampColor("skin", 2);
   const skinShade = rampColor("skin", 1);
   const hair = rampColor("hair", 1);
@@ -88,6 +128,27 @@ function villager(facing: "front" | "back", pose: VillagerPose, tunic: Tunic, to
     P(7, 6, skinShade);
   }
 
+  // Headwear.
+  if (outfit.hat === "helmet") {
+    const steel = rampColor("stone", 3);
+    R(4, 0, 4, 2, steel);
+    R(4, 0, 2, 1, rampColor("stone", 5));
+    P(3, 0, rampColor("plaster", 4));
+    P(8, 0, rampColor("plaster", 4));
+    P(3, -1, rampColor("plaster", 4));
+    P(8, -1, rampColor("plaster", 4));
+  } else if (outfit.hat === "wrap") {
+    R(3, 0, 6, 2, tLight!);
+    R(3, 0, 6, 1, rampColor("plaster", 4));
+    if (facing === "back") R(4, 2, 4, 2, tLight!);
+  } else if (outfit.hat === "hood") {
+    R(3, 0, 6, 2, tMid!);
+    R(3, 2, 1, 3, tMid!);
+    R(8, 2, 1, 3, tDark!);
+    P(6, -1, tLight!);
+    if (facing === "back") R(4, 2, 4, 4, tMid!);
+  }
+
   // Tools.
   if (tool && (pose === "work0" || pose === "work1")) {
     const handle = rampColor("timber", 3);
@@ -117,13 +178,16 @@ function villager(facing: "front" | "back", pose: VillagerPose, tunic: Tunic, to
 
 function villagerSprites(): Sprite[] {
   const out: Sprite[] = [];
-  for (const tunic of TUNICS) {
-    for (const facing of ["front", "back"] as const) {
-      for (const pose of VILLAGER_POSES) {
-        const tools: (Tool | undefined)[] = pose.startsWith("work") ? [...TOOLS] : [undefined];
-        for (const tool of tools) {
-          const name = `villager_${tunic}_${facing}_${pose}${tool ? `_${tool}` : ""}`;
-          out.push({ name, canvas: villager(facing, pose, tunic, tool), anchorX: 8, anchorY: 22 });
+  for (const tribe of TRIBES) {
+    for (const tunic of TUNICS) {
+      for (const facing of ["front", "back"] as const) {
+        for (const pose of VILLAGER_POSES) {
+          const tools: (Tool | undefined)[] = pose.startsWith("work") ? [...TOOLS] : [undefined];
+          for (const tool of tools) {
+            const name = `villager_${tribe}_${tunic}_${facing}_${pose}${tool ? `_${tool}` : ""}`;
+            const canvas = villager(tribe, facing, pose, tunic, tool);
+            out.push({ name, canvas, anchorX: 8, anchorY: 22 });
+          }
         }
       }
     }
@@ -132,9 +196,17 @@ function villagerSprites(): Sprite[] {
 }
 
 /** Items carried above the head while hauling. Anchor = top of the villager's head. */
-function carried(kind: "wood" | "stone" | "food"): Sprite {
+function carried(kind: "wood" | "stone" | "food" | "ore" | "gold" | "crystal"): Sprite {
   const c = new Canvas(12, 8);
-  if (kind === "wood") {
+  if (kind === "ore" || kind === "gold" || kind === "crystal") {
+    const ramp = kind === "ore" ? "rock" : kind === "gold" ? "gold" : "crystal";
+    c.fill(3, 3, 6, 4, rampColor(ramp, 2));
+    c.fill(3, 3, 4, 2, rampColor(ramp, 3));
+    c.set(4, 3, rampColor(ramp, 5));
+    if (kind === "ore") (c.set(6, 4, rampColor("fruit", 2)), c.set(7, 5, rampColor("fruit", 2)));
+    if (kind === "crystal")
+      (c.fill(5, 0, 2, 3, rampColor("crystal", 4)), c.set(5, 0, rampColor("crystal", 6)));
+  } else if (kind === "wood") {
     for (let i = 0; i < 3; i++) {
       c.fill(1, 2 + i * 2, 10, 2, rampColor("timber", 2 + (i % 2)));
       c.set(10, 2 + i * 2, rampColor("wheat", 3));
@@ -339,6 +411,46 @@ function icons(): Sprite[] {
       c.fill(8, 4, 3, 3, rampColor("fruit", 2));
       c.set(9, 4, rampColor("fruit", 3));
     }),
+    icon("ore", (c) => {
+      c.fill(2, 4, 10, 8, rampColor("rock", 2));
+      c.fill(2, 4, 7, 4, rampColor("rock", 3));
+      c.fill(3, 4, 3, 1, rampColor("rock", 5));
+      for (const [x, y] of [
+        [5, 6],
+        [8, 8],
+        [4, 9],
+        [9, 5],
+      ] as const)
+        c.set(x, y, rampColor("fruit", 2));
+    }),
+    icon("tools", (c) => {
+      for (let i = 0; i < 9; i++) c.set(3 + i, 12 - i, rampColor("timber", 3));
+      for (let i = 0; i < 9; i++) c.set(3 + i, 3 + i, rampColor("timber", 2));
+      c.fill(8, 1, 4, 3, rampColor("stone", 2));
+      c.fill(8, 1, 4, 1, rampColor("stone", 4));
+      c.fill(1, 1, 4, 2, rampColor("stone", 4));
+    }),
+    icon("gold", (c) => {
+      for (let i = 0; i < 4; i++) {
+        c.fill(2 + (i % 2), 9 - i * 2, 9, 2, rampColor("gold", 3 - (i % 2)));
+        c.fill(2 + (i % 2), 9 - i * 2, 9, 1, rampColor("gold", 4));
+      }
+      c.set(5, 3, rampColor("gold", 5));
+    }),
+    icon("faith", (c) => {
+      c.fill(6, 1, 2, 12, rampColor("wheat", 4));
+      c.fill(3, 4, 8, 2, rampColor("wheat", 4));
+      c.fill(6, 1, 1, 12, rampColor("wheat", 5));
+      c.set(5, 0, rampColor("sunflower", 4));
+      c.set(8, 0, rampColor("sunflower", 4));
+    }),
+    icon("crystal", (c) => {
+      for (let y = 0; y < 12; y++) {
+        const w = y < 4 ? y + 1 : Math.max(1, 12 - y);
+        c.fill(7 - Math.floor(w / 2), y + 1, w, 1, rampColor("crystal", y < 4 ? 5 : 3));
+      }
+      c.set(6, 3, rampColor("crystal", 6));
+    }),
     icon("villager", (c) => {
       c.fill(4, 2, 6, 5, rampColor("skin", 2));
       c.fill(4, 1, 6, 2, rampColor("hair", 1));
@@ -447,6 +559,10 @@ export function unitSprites(): Sprite[] {
     carried("wood"),
     carried("stone"),
     carried("food"),
+    carried("ore"),
+    carried("gold"),
+    carried("crystal"),
+    ...particles(),
     ...Array.from({ length: 8 }, (_, h) => ship(h)),
     rowboat("x"),
     rowboat("y"),
@@ -459,4 +575,95 @@ export function unitSprites(): Sprite[] {
 
 function trimmedKeep(s: Sprite): Sprite {
   return trimmed(s.name, s.canvas, s.anchorX, s.anchorY, s.meta);
+}
+
+/**
+ * Atmosphere particles, one small sprite per frame: embers, snowflakes, dust, spores, fireflies,
+ * petals, leaves, ash and arcane motes. The client animates and fades them.
+ */
+function particles(): Sprite[] {
+  const px = (name: string, pixels: [number, number, Rgba][]) => {
+    const c = new Canvas(5, 5);
+    for (const [x, y, col] of pixels) c.set(x, y, col);
+    return { name: `p_${name}`, canvas: c, anchorX: 2, anchorY: 2 };
+  };
+  const a = (col: Rgba, alpha: number): Rgba => [col[0], col[1], col[2], alpha];
+  const ember = rampColor("lava", 4);
+  const emberHot = rampColor("lava", 5);
+  const snow = rampColor("snow", 5);
+  const dust = rampColor("dune", 4);
+  const spore = rampColor("glow", 4);
+  const fly = rampColor("sunflower", 4);
+  const petal = rampColor("petal", 4);
+  const leaf = rampColor("autumnLeaf", 4);
+  const ash = rampColor("stone", 2);
+  const mote = rampColor("crystal", 5);
+  return [
+    px("ember_0", [
+      [2, 2, emberHot],
+      [2, 3, a(ember, 160)],
+    ]),
+    px("ember_1", [
+      [2, 2, ember],
+      [1, 2, a(ember, 120)],
+    ]),
+    px("snow_0", [[2, 2, snow]]),
+    px("snow_1", [
+      [2, 2, snow],
+      [1, 2, a(snow, 150)],
+      [3, 2, a(snow, 150)],
+      [2, 1, a(snow, 150)],
+      [2, 3, a(snow, 150)],
+    ]),
+    px("dust_0", [[2, 2, a(dust, 200)]]),
+    px("dust_1", [
+      [2, 2, a(dust, 170)],
+      [3, 2, a(dust, 120)],
+    ]),
+    px("spore_0", [
+      [2, 2, spore],
+      [2, 1, a(spore, 90)],
+      [1, 2, a(spore, 90)],
+      [3, 2, a(spore, 90)],
+      [2, 3, a(spore, 90)],
+    ]),
+    px("spore_1", [[2, 2, a(spore, 200)]]),
+    px("firefly_0", [
+      [2, 2, fly],
+      [1, 2, a(fly, 110)],
+      [3, 2, a(fly, 110)],
+      [2, 1, a(fly, 110)],
+      [2, 3, a(fly, 110)],
+    ]),
+    px("firefly_1", [[2, 2, a(fly, 150)]]),
+    px("petal_0", [
+      [2, 2, petal],
+      [3, 2, a(petal, 200)],
+    ]),
+    px("petal_1", [
+      [2, 2, petal],
+      [2, 3, a(petal, 200)],
+    ]),
+    px("leaf_0", [
+      [2, 2, leaf],
+      [3, 2, rampColor("autumnLeaf", 3)],
+    ]),
+    px("leaf_1", [
+      [2, 2, leaf],
+      [2, 3, rampColor("autumnLeaf", 2)],
+    ]),
+    px("ash_0", [[2, 2, a(ash, 200)]]),
+    px("ash_1", [
+      [2, 2, a(ash, 150)],
+      [3, 3, a(ash, 100)],
+    ]),
+    px("mote_0", [
+      [2, 2, mote],
+      [1, 2, a(mote, 100)],
+      [3, 2, a(mote, 100)],
+      [2, 1, a(mote, 100)],
+      [2, 3, a(mote, 100)],
+    ]),
+    px("mote_1", [[2, 2, rampColor("crystal", 6)]]),
+  ];
 }

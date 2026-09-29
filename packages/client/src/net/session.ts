@@ -11,6 +11,7 @@ import {
   type GameState,
   type Patch,
   type PlayerInfo,
+  type TribeId,
 } from "@explorer/shared";
 
 export type SessionStatus = "connecting" | "online" | "reconnecting" | "offline";
@@ -56,9 +57,9 @@ export class LocalSession extends Emitter implements Session {
   readonly players: PlayerInfo[];
   private timer: ReturnType<typeof setInterval>;
 
-  constructor(seed: string, name: string) {
+  constructor(seed: string, name: string, tribe: TribeId = "islanders") {
     super();
-    this.state = createInitialState(generateWorld(seed));
+    this.state = createInitialState(generateWorld(seed, tribe));
     this.players = [{ id: this.you, name, color: PLAYER_COLORS[0], online: true }];
     this.timer = setInterval(() => {
       tick(this.state);

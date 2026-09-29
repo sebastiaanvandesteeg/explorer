@@ -5,14 +5,22 @@ import type { Tile } from "../world/pathfind";
 import {
   BUILDING_REVEAL,
   BUILDINGS,
+  CHURCH,
   FARM,
+  farmRate,
+  GATHER_JOBS,
+  harvestSeconds,
   NODES,
   REGROW,
   SHIP,
+  shipSpeed,
+  SMITH,
   TICK_SECONDS,
   VILLAGER,
+  type WorkerJob,
 } from "./catalogue";
 import { releaseTask } from "./commands";
+import { disembark, embark, hasRoom, shipMoving, shoreBeside } from "./ferry";
 import { landPath, sailable } from "./navigation";
 import { buildingAround, isAdjacentTo, tilesAround } from "./rules";
 import {
@@ -77,6 +85,8 @@ function updateBuilding(state: GameState, b: BuildingEntity, dt: number): void {
             heading: { "+x": 0, "+y": 2, "-x": 4, "-y": 6 }[b.dir ?? "+x"],
             path: [],
             dest: null,
+            passengers: [],
+            unload: false,
           };
           addEntity(state, ship);
           reveal(state, ship.x, ship.y, SHIP.reveal);
@@ -86,20 +96,43 @@ function updateBuilding(state: GameState, b: BuildingEntity, dt: number): void {
       }
     }
   }
-  if (b.kind === "farm" && b.workerId !== null) {
-    const v = state.entities.get(b.workerId);
-    const tending = v?.type === "villager" && v.action === "work" && v.task?.kind === "staff";
-    if (tending) {
-      const stageBefore = farmStage(b);
-      b.growth += dt;
-      if (b.growth >= FARM.cycle) {
-        b.growth = 0;
-        state.stock.food += FARM.yield;
-        state.stockDirty = true;
-      }
-      if (farmStage(b) !== stageBefore) markDirty(state, b.id);
+  if (b.workerId === null) return;
+  const v = state.entities.get(b.workerId);
+  const tending = v?.type === "villager" && v.action === "work" && v.task?.kind === "staff";
+  if (!tending) return;
+  if (b.kind === "farm") {
+    const stageBefore = farmStage(b);
+    b.growth += dt * farmRate(state.world.tribe);
+    if (b.growth >= FARM.cycle) {
+      b.growth = 0;
+      state.stock.food += FARM.yield;
+      state.stockDirty = true;
+    }
+    if (farmStage(b) !== stageBefore) markDirty(state, b.id);
+  } else if (b.kind === "blacksmith") {
+    // The forge only burns while there is ore to work.
+    if (state.stock.ore < SMITH.ore) return;
+    b.growth += dt;
+    if (b.growth >= SMITH.seconds) {
+      b.growth = 0;
+      state.stock.ore -= SMITH.ore;
+      state.stock.tools += SMITH.tools;
+      state.stockDirty = true;
+      markDirty(state, b.id);
+    }
+  } else if (b.kind === "church") {
+    b.growth += dt;
+    if (b.growth >= CHURCH.seconds) {
+      b.growth = 0;
+      state.stock.faith += CHURCH.faith;
+      state.stockDirty = true;
     }
   }
+}
+
+/** Workplaces where the worker stays put, as opposed to gathering around the building. */
+export function stationaryJob(job: WorkerJob | undefined): boolean {
+  return job === "farm" || job === "smith" || job === "priest";
 }
 
 export function farmStage(b: BuildingEntity): 0 | 1 | 2 {
@@ -181,10 +214,15 @@ function taskValid(state: GameState, v: VillagerEntity, t: Task): boolean {
     }
     case "move":
       return true;
+    case "board": {
+      const ship = state.entities.get(t.shipId);
+      return ship?.type === "ship" && hasRoom(ship) && !shipMoving(ship);
+    }
   }
 }
 
 function updateVillager(state: GameState, v: VillagerEntity, dt: number): void {
+  if (v.aboard !== null) return;
   if (v.task && !taskValid(state, v, v.task)) {
     const auto = v.task.kind === "harvest" ? v.task.auto : undefined;
     if (v.task.kind === "harvest") {
@@ -299,6 +337,14 @@ function arrive(state: GameState, v: VillagerEntity): void {
     markDirty(state, v.id);
     return;
   }
+  if (t.kind === "board") {
+    const ship = state.entities.get(t.shipId);
+    const beside =
+      ship?.type === "ship" &&
+      shoreBeside(state, ship).some((p) => p.x === here.x && p.y === here.y);
+    if (ship?.type === "ship" && beside && hasRoom(ship)) embark(state, v, ship);
+    return;
+  }
   if (t.kind === "harvest") {
     const n = state.entities.get(t.nodeId) as NodeEntity;
     if (!isAdjacentTo(here.x, here.y, n.x, n.y)) return;
@@ -308,14 +354,15 @@ function arrive(state: GameState, v: VillagerEntity): void {
   } else {
     const b = state.entities.get(t.buildingId) as BuildingEntity;
     if (!isAdjacentTo(here.x, here.y, b.x, b.y, b.w, b.h)) return;
-    if (t.kind === "staff" && b.kind !== "farm") {
+    const job = BUILDINGS[b.kind].worker?.job;
+    if (t.kind === "staff" && !stationaryJob(job)) {
       // Nothing in range yet: wait by the camp and look again shortly.
       v.retryAt = state.time + 3;
       markDirty(state, v.id);
       return;
     }
     v.action = "work";
-    v.tool = t.kind === "build" ? "hammer" : b.kind === "farm" ? "hoe" : null;
+    v.tool = t.kind === "build" || job === "smith" ? "hammer" : job === "farm" ? "hoe" : null;
     faceTowards(v, b.x + b.w / 2, b.y + b.h / 2);
   }
   v.workTimer = 0;
@@ -331,9 +378,10 @@ function work(state: GameState, v: VillagerEntity, dt: number): void {
   if (t.kind === "harvest") {
     const n = state.entities.get(t.nodeId) as NodeEntity;
     const def = NODES[n.kind];
+    const seconds = harvestSeconds(n.kind, state.world.tribe);
     v.workTimer += dt;
-    if (v.workTimer < def.secondsPerUnit) return;
-    v.workTimer -= def.secondsPerUnit;
+    if (v.workTimer < seconds) return;
+    v.workTimer -= seconds;
     n.amount -= 1;
     v.carrying = { resource: def.resource, amount: (v.carrying?.amount ?? 0) + 1 };
     markDirty(state, v.id);
@@ -351,13 +399,14 @@ function work(state: GameState, v: VillagerEntity, dt: number): void {
     }
     return;
   }
-  // Staffing a farm: growth is handled by the farm itself while the worker is here.
+  // Staffing a farm, forge or church: the building produces while the worker is here.
 }
 
 function nearestDropOff(state: GameState, v: VillagerEntity): BuildingEntity[] {
   const list: { b: BuildingEntity; d: number }[] = [];
   for (const e of state.entities.values()) {
     if (e.type !== "building" || !e.complete || !BUILDINGS[e.kind].dropOff) continue;
+    if (!sameIsland(state, v, e.x, e.y)) continue;
     list.push({ b: e, d: Math.hypot(e.x + e.w / 2 - v.x, e.y + e.h / 2 - v.y) });
   }
   return list.sort((a, b) => a.d - b.d).map((x) => x.b);
@@ -414,6 +463,7 @@ function findJob(state: GameState, v: VillagerEntity): void {
   };
   for (const e of state.entities.values()) {
     if (e.type === "building") {
+      if (!sameIsland(state, v, e.x, e.y)) continue;
       if (!e.complete && builders(state, e) < VILLAGER.maxBuildersPerSite) {
         consider({ kind: "build", buildingId: e.id }, 0, e.x + e.w / 2, e.y + e.h / 2);
       } else if (e.complete && BUILDINGS[e.kind].worker && e.workerId === null) {
@@ -438,19 +488,18 @@ function findJob(state: GameState, v: VillagerEntity): void {
   markDirty(state, v.id);
 }
 
-/** A worker at a lumber camp or quarry picks the nearest suitable node within its radius. */
+/** A worker at a camp, quarry or mine picks the nearest suitable node within its radius. */
 function autoHarvestTarget(state: GameState, b: BuildingEntity): NodeEntity | null {
   const def = BUILDINGS[b.kind].worker;
-  if (!def || def.job === "farm") return null;
+  const wanted = def ? GATHER_JOBS[def.job] : undefined;
+  if (!def || !wanted) return null;
   const cx = b.x + b.w / 2;
   const cy = b.y + b.h / 2;
   let best: NodeEntity | null = null;
   let bestD = Infinity;
   for (const e of state.entities.values()) {
     if (e.type !== "node" || e.stage !== "grown" || e.claimedBy !== null) continue;
-    const wood = NODES[e.kind].resource === "wood";
-    const stone = NODES[e.kind].resource === "stone";
-    if ((def.job === "lumber" && !wood) || (def.job === "quarry" && !stone)) continue;
+    if (!wanted.includes(NODES[e.kind].resource)) continue;
     if ((state.unreachable.get(e.id) ?? 0) > state.time) continue;
     const d = Math.hypot(e.x + 0.5 - cx, e.y + 0.5 - cy);
     if (d <= def.radius && d < bestD) {
@@ -474,7 +523,10 @@ function planRoute(state: GameState, v: VillagerEntity): void {
       v.task = { kind: "harvest", nodeId: target.id, auto: b.id };
       goals = tilesAround(state, target.x, target.y);
     } else {
-      if (b.kind !== "farm" && isAdjacentTo(here.x, here.y, b.x, b.y, b.w, b.h)) {
+      if (
+        !stationaryJob(BUILDINGS[b.kind].worker?.job) &&
+        isAdjacentTo(here.x, here.y, b.x, b.y, b.w, b.h)
+      ) {
         v.retryAt = state.time + 3;
         return;
       }
@@ -486,6 +538,8 @@ function planRoute(state: GameState, v: VillagerEntity): void {
   } else if (t.kind === "build") {
     const b = state.entities.get(t.buildingId) as BuildingEntity;
     goals = buildingAround(state, b);
+  } else if (t.kind === "board") {
+    goals = shoreBeside(state, state.entities.get(t.shipId) as ShipEntity);
   } else {
     goals = [{ x: t.x, y: t.y }];
   }
@@ -539,7 +593,7 @@ function wander(state: GameState, v: VillagerEntity): void {
 
 function updateShip(state: GameState, s: ShipEntity, dt: number): void {
   if (s.path.length === 0) return;
-  let budget = SHIP.speed * dt;
+  let budget = shipSpeed(state.world.tribe) * dt;
   while (budget > 1e-6 && s.path.length > 0) {
     const next = s.path[0]!;
     const tx = next.x + 0.5;
@@ -560,6 +614,12 @@ function updateShip(state: GameState, s: ShipEntity, dt: number): void {
       budget = 0;
     }
   }
-  if (s.path.length === 0) s.dest = null;
+  if (s.path.length === 0) {
+    s.dest = null;
+    if (s.unload) {
+      s.unload = false;
+      disembark(state, s);
+    }
+  }
   markDirty(state, s.id);
 }
