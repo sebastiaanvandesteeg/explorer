@@ -76,6 +76,19 @@ Every island belongs to one of ten biomes, with its own ground, cliffs, plants, 
 | Infernal Isles  | Far away    | Charred trees, ember fruit, obsidian, hellstone | Dark red, embers, grit     |
 | Crystal Spires  | Far away    | Silverleaf trees, crystal clusters              | Indigo, sparkling motes    |
 
+### Magic house upgrades
+
+Each is learned once, for the whole team, and paid from the shared treasury with faith (from churches), gold (from the market and gold veins) and crystal (only found in the Crystal Spires).
+
+| Upgrade      | Cost                 | Effect                                                                       |
+| ------------ | -------------------- | ---------------------------------------------------------------------------- |
+| Far Sight    | 25 faith, 20 gold    | Ships reveal 60% more of the sea                                             |
+| Swift Sails  | 40 faith, 30 gold    | All ships sail 50% faster                                                    |
+| Ember Ward   | 50 faith, 40 gold    | Lets villagers land on the Infernal Isles (they refuse to go ashore without) |
+| Prism Ward   | 50 faith, 40 gold    | Lets villagers land on the Crystal Spires                                    |
+| Deep Holds   | 40 gold, 5 crystal   | Cargo ships carry 50% more                                                   |
+| Seer's Chart | 60 faith, 10 crystal | Marks every island on the map                                                |
+
 ### Day and night
 
 One day lasts eight minutes of game time and starts in the morning. The HUD clock under the expedition name shows the day, the part of the day and the time. Dawn is warm, dusk golden, and night deep blue with fireflies, while houses, churches, the town hall and forges light their windows. It changes how the world looks, not how it plays.
@@ -89,7 +102,7 @@ One day lasts eight minutes of game time and starts in the morning. The HUD cloc
 - **Workplaces** take one worker each:
   - Lumber camps fell trees, quarries break rocks, and mines dig ore, gold and crystal, all within a radius.
   - Farms grow food. The blacksmith forges 2 ore into 1 set of tools. The church gathers faith.
-- **Advanced buildings** need tools: the market (sell lots of 10 goods for gold, or buy basics), the church and the magic house. The magic house will sell magical upgrades for exploring; for now it shows which are coming.
+- **Advanced buildings** need tools: the market (sell lots of 10 goods for gold, or buy basics), the church and the magic house. The magic house sells upgrades (see below).
 - **Exploring:** the dock builds scout ships. Sailing clears the fog for everyone, and each newly found island is announced.
 - **Settling:** select a ship next to the shore (or at the pier) and press **Take a villager aboard**, or right-click the ship with a villager selected. Then right-click another island to sail there and put everyone ashore. Once your villagers stand on an island you can build there. Put up a storehouse first, so they have somewhere to drop off goods.
 - **Trade routes:** each island keeps its own stockpile. Goods gathered at home go into the shared treasury that pays for everything; goods gathered on another island wait in a pile on that island until a cargo ship brings them home.
@@ -171,7 +184,6 @@ Server environment variables: `PORT` (8787), `HOST`, `DATA_DIR` (`data/worlds`),
 
 ## Not built yet
 
-- Buying the magic house's exploration upgrades
 - Sound
 - Accounts beyond name + token
 - Deployment

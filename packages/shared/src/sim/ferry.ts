@@ -2,8 +2,9 @@
 import { NEIGHBOURS_8 } from "../world/grid";
 import type { Dir } from "../world/types";
 import type { Tile } from "../world/pathfind";
-import { SHIP, VILLAGER } from "./catalogue";
+import { UPGRADES, SHIP, VILLAGER, WARDED_BIOMES } from "./catalogue";
 import {
+  hasUpgrade,
   islandAt,
   markDirty,
   reveal,
@@ -40,6 +41,14 @@ export function dockSpawn(b: { x: number; y: number; w: number; h: number; dir?:
   }
 }
 
+/** Why villagers can't go ashore on an island (its biome is warded), or null when they can. */
+export function landingBlock(state: GameState, islandId: number): string | null {
+  const biome = state.world.islands[islandId]?.biome;
+  const ward = biome ? WARDED_BIOMES[biome] : undefined;
+  if (!ward || hasUpgrade(state, ward)) return null;
+  return `Too dangerous to land: buy ${UPGRADES[ward].name} at the magic house first`;
+}
+
 export function shipMoving(ship: ShipEntity): boolean {
   return ship.path.length > 0;
 }
@@ -69,6 +78,7 @@ export function embark(state: GameState, v: VillagerEntity, ship: ShipEntity): v
 export function disembark(state: GameState, ship: ShipEntity): number {
   const start = shoreBeside(state, ship);
   if (start.length === 0 || ship.passengers.length === 0) return 0;
+  if (landingBlock(state, islandAt(state, start[0]!.x, start[0]!.y))) return 0;
   // Spread out from the landing spot so passengers don't stack on one tile.
   const spots: Tile[] = [];
   const seen = new Set(start.map((t) => `${t.x},${t.y}`));

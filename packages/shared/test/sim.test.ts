@@ -10,9 +10,12 @@ import {
   generateWorld,
   harvestSeconds,
   isLandTerrain,
+  landingBlock,
   population,
   populationCap,
+  sailSpeedFactor,
   shipCost,
+  shipReveal,
   stockOf,
   takePatch,
   tick,
@@ -23,6 +26,7 @@ import {
   type GameState,
   type NodeEntity,
   type ShipEntity,
+  UPGRADES,
   type VillagerEntity,
 } from "../src";
 
@@ -533,5 +537,67 @@ describe("trade routes", () => {
     expect(stockOf(client, islandId).stone).toBe(12);
     const restored = fromSnapshot(world, JSON.parse(JSON.stringify(toSnapshot(s))), true);
     expect(stockOf(restored, islandId).stone).toBe(12);
+  });
+});
+
+describe("magic house upgrades", () => {
+  function withMagicHouse(): GameState {
+    const s = fresh();
+    s.stock = { ...s.stock, wood: 999, stone: 999, tools: 99, gold: 500, faith: 500, crystal: 50 };
+    const at = spotFor(s, "magic_house");
+    applyCommand(s, { kind: "place-building", building: "magic_house", ...at });
+    const b = of<BuildingEntity>(s, "building").find((e) => e.kind === "magic_house")!;
+    b.complete = true;
+    b.progress = 1;
+    return s;
+  }
+
+  it("needs a magic house, and charges for each upgrade once", () => {
+    const s = fresh();
+    s.stock.faith = s.stock.gold = 500;
+    expect(applyCommand(s, { kind: "buy-upgrade", upgrade: "far_sight" }).ok).toBe(false);
+    const m = withMagicHouse();
+    const gold = m.stock.gold;
+    expect(applyCommand(m, { kind: "buy-upgrade", upgrade: "far_sight" })).toEqual({ ok: true });
+    expect(m.stock.gold).toBe(gold - UPGRADES.far_sight.cost.gold!);
+    expect(applyCommand(m, { kind: "buy-upgrade", upgrade: "far_sight" }).ok).toBe(false);
+  });
+
+  it("makes ships faster and see further", () => {
+    const m = withMagicHouse();
+    const before = { reveal: shipReveal(m), speed: sailSpeedFactor(m) };
+    applyCommand(m, { kind: "buy-upgrade", upgrade: "far_sight" });
+    applyCommand(m, { kind: "buy-upgrade", upgrade: "swift_sails" });
+    expect(shipReveal(m)).toBeGreaterThan(before.reveal);
+    expect(sailSpeedFactor(m)).toBeGreaterThan(before.speed);
+  });
+
+  it("keeps villagers off warded biomes until the ward is bought", () => {
+    let found: { w: ReturnType<typeof generateWorld>; id: number } | null = null;
+    for (let n = 0; n < 40 && !found; n++) {
+      const w = generateWorld(`ward-${n}`);
+      const island = w.islands.find((i) => i.biome === "infernal");
+      if (island) found = { w, id: island.id };
+    }
+    expect(found).not.toBeNull();
+    const s = createInitialState(found!.w);
+    expect(landingBlock(s, found!.id)).not.toBeNull();
+    s.upgrades.add("ember_ward");
+    expect(landingBlock(s, found!.id)).toBeNull();
+    expect(landingBlock(s, found!.w.start.islandId)).toBeNull();
+  });
+
+  it("charts every island and travels through snapshots and patches", () => {
+    const m = withMagicHouse();
+    const client = fromSnapshot(world, JSON.parse(JSON.stringify(toSnapshot(m))));
+    takePatch(m);
+    applyCommand(m, { kind: "buy-upgrade", upgrade: "seers_chart" });
+    for (const island of world.islands) {
+      expect(m.explored[Math.floor(island.cy) * world.width + Math.floor(island.cx)]).toBe(1);
+    }
+    applyPatch(client, JSON.parse(JSON.stringify(takePatch(m))));
+    expect(client.upgrades.has("seers_chart")).toBe(true);
+    const restored = fromSnapshot(world, JSON.parse(JSON.stringify(toSnapshot(m))), true);
+    expect(restored.upgrades.has("seers_chart")).toBe(true);
   });
 });

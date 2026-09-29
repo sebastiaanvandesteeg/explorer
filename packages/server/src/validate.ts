@@ -4,10 +4,12 @@ import {
   MAX_CHAT_LENGTH,
   MAX_NAME_LENGTH,
   RESOURCES,
+  UPGRADES,
   type BuildingKind,
   type ClientMessage,
   type Command,
   type Resource,
+  type UpgradeId,
 } from "@explorer/shared";
 
 type Obj = Record<string, unknown>;
@@ -59,6 +61,9 @@ export function parseCommand(v: unknown): Command | null {
     case "unload":
       if (!isInt(v.shipId)) return null;
       return { kind: v.kind, shipId: v.shipId };
+    case "buy-upgrade":
+      if (typeof v.upgrade !== "string" || !(v.upgrade in UPGRADES)) return null;
+      return { kind: "buy-upgrade", upgrade: v.upgrade as UpgradeId };
     case "trade":
       if (typeof v.resource !== "string" || !(RESOURCES as readonly string[]).includes(v.resource))
         return null;

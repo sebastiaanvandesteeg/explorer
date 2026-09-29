@@ -14,8 +14,10 @@ import {
   VILLAGER,
   type BuildingKind,
   type Resource,
+  type UpgradeId,
+  UPGRADES,
 } from "./catalogue";
-import { disembark, hasRoom, shipMoving, shoreBeside } from "./ferry";
+import { disembark, hasRoom, landingBlock, shipMoving, shoreBeside } from "./ferry";
 import { seaPath, sailable } from "./navigation";
 import { canPlaceBuilding, nearestWater } from "./rules";
 import {
@@ -26,6 +28,7 @@ import {
   population,
   populationCap,
   removeEntity,
+  revealIslands,
   walkable,
   type GameState,
   type ShipEntity,
@@ -46,6 +49,7 @@ export type Command =
   | { kind: "assign"; villagerId: number; target: AssignTarget }
   | { kind: "call-aboard"; shipId: number }
   | { kind: "unload"; shipId: number }
+  | { kind: "buy-upgrade"; upgrade: UpgradeId }
   | { kind: "trade"; resource: Resource; action: "sell" | "buy" };
 
 export type CommandResult = { ok: true } | { ok: false; reason: string };
@@ -236,6 +240,11 @@ export function applyCommand(state: GameState, cmd: Command): CommandResult {
         ship.route = null;
         ship.leg = null;
       }
+      if (cmd.unload && ship.passengers.length > 0) {
+        const island = w.island[tileIndex(w, tx, ty)]!;
+        const blocked = island >= 0 && landingBlock(state, island);
+        if (blocked) return fail(blocked);
+      }
       ship.unload = !!cmd.unload && ship.passengers.length > 0;
       if (path.length === 0 && ship.unload) {
         ship.unload = false;
@@ -256,7 +265,29 @@ export function applyCommand(state: GameState, cmd: Command): CommandResult {
       if (ship?.type !== "ship") return fail("No such ship");
       if (ship.passengers.length === 0) return fail("Nobody on board");
       if (shipMoving(ship)) return fail("Wait until the ship stops");
+      const here = shoreBeside(state, ship)[0];
+      const blocked = here && landingBlock(state, islandAt(state, here.x, here.y));
+      if (blocked) return fail(blocked);
       return disembark(state, ship) > 0 ? OK : fail("Sail next to the shore to land");
+    }
+    case "buy-upgrade": {
+      const def = UPGRADES[cmd.upgrade];
+      if (!def) return fail("Unknown upgrade");
+      if (
+        ![...state.entities.values()].some(
+          (e) => e.type === "building" && e.kind === "magic_house" && e.complete,
+        )
+      )
+        return fail("Build a magic house first");
+      if (state.upgrades.has(def.id)) return fail("Already learned");
+      if (!canAfford(state.stock, def.cost)) return fail("Not enough resources");
+      spend(state.stock, def.cost);
+      state.stockDirty = true;
+      state.upgrades.add(def.id);
+      state.upgradesDirty = true;
+      if (def.id === "seers_chart") revealIslands(state);
+      state.events.push({ type: "upgrade", upgrade: def.id });
+      return OK;
     }
     case "trade": {
       if (

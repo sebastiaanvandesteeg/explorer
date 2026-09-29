@@ -183,7 +183,8 @@ export const BUILDINGS: Record<BuildingKind, BuildingDef> = {
   magic_house: {
     kind: "magic_house",
     name: "Magic House",
-    description: "Where magical upgrades for exploring the seas will be sold.",
+    description:
+      "Sells magical upgrades for the seas: faster ships, wider sight and wards for the far biomes.",
     size: [2, 2],
     cost: { wood: 40, stone: 30, tools: 10, gold: 20 },
     work: 24,
@@ -323,6 +324,64 @@ export const CARGO = {
 };
 
 export type ShipKind = "scout" | "cargo";
+
+export type UpgradeId =
+  "far_sight" | "swift_sails" | "deep_holds" | "seers_chart" | "ember_ward" | "prism_ward";
+
+export interface UpgradeDef {
+  id: UpgradeId;
+  name: string;
+  description: string;
+  cost: Partial<Stock>;
+}
+
+/** Magical upgrades sold at the magic house. Each is bought once and applies to the whole team. */
+export const UPGRADES: Record<UpgradeId, UpgradeDef> = {
+  far_sight: {
+    id: "far_sight",
+    name: "Far Sight",
+    description: "Ships reveal 60% more of the sea around them",
+    cost: { faith: 25, gold: 20 },
+  },
+  swift_sails: {
+    id: "swift_sails",
+    name: "Swift Sails",
+    description: "All ships sail 50% faster",
+    cost: { faith: 40, gold: 30 },
+  },
+  ember_ward: {
+    id: "ember_ward",
+    name: "Ember Ward",
+    description:
+      "Protects villagers from the fires of the Infernal Isles, so they can settle there",
+    cost: { faith: 50, gold: 40 },
+  },
+  prism_ward: {
+    id: "prism_ward",
+    name: "Prism Ward",
+    description: "Attunes villagers to the Crystal Spires, so they can settle there",
+    cost: { faith: 50, gold: 40 },
+  },
+  deep_holds: {
+    id: "deep_holds",
+    name: "Deep Holds",
+    description: "Cargo ships carry 50% more goods",
+    cost: { gold: 40, crystal: 5 },
+  },
+  seers_chart: {
+    id: "seers_chart",
+    name: "Seer's Chart",
+    description: "Marks the position of every island on the map",
+    cost: { faith: 60, crystal: 10 },
+  },
+};
+export const UPGRADE_IDS = Object.keys(UPGRADES) as UpgradeId[];
+
+/** Biomes that villagers can only settle once the matching ward has been bought. */
+export const WARDED_BIOMES: Partial<Record<string, UpgradeId>> = {
+  infernal: "ember_ward",
+  crystal: "prism_ward",
+};
 
 export const REGROW = {
   stumpToSapling: 90,

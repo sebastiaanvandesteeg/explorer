@@ -35,6 +35,9 @@ import {
   populationCap,
   removeEntity,
   reveal,
+  sailSpeedFactor,
+  shipReveal,
+  cargoCapacity,
   stockOf,
   touchStock,
   walkable,
@@ -99,7 +102,7 @@ function updateBuilding(state: GameState, b: BuildingEntity, dt: number): void {
             waitUntil: 0,
           };
           addEntity(state, ship);
-          reveal(state, ship.x, ship.y, SHIP.reveal);
+          reveal(state, ship.x, ship.y, shipReveal(state));
           state.events.push({ type: "ship", kind: ship.kind, x: ship.x, y: ship.y });
           b.queue.shift();
         }
@@ -598,7 +601,7 @@ function updateShip(state: GameState, s: ShipEntity, dt: number): void {
     if (s.kind === "cargo" && s.route !== null) runRoute(state, s);
     return;
   }
-  let budget = shipSpeed(state.world.tribe, s.kind) * dt;
+  let budget = shipSpeed(state.world.tribe, s.kind) * sailSpeedFactor(state) * dt;
   while (budget > 1e-6 && s.path.length > 0) {
     const next = s.path[0]!;
     const tx = next.x + 0.5;
@@ -612,7 +615,7 @@ function updateShip(state: GameState, s: ShipEntity, dt: number): void {
       s.y = ty;
       budget -= dist;
       s.path.shift();
-      reveal(state, s.x, s.y, SHIP.reveal);
+      reveal(state, s.x, s.y, shipReveal(state));
     } else {
       s.x += (dx / dist) * budget;
       s.y += (dy / dist) * budget;
@@ -696,7 +699,7 @@ function runRoute(state: GameState, s: ShipEntity): void {
   const island = islandAt(state, pickup.x, pickup.y);
   if (s.leg === "pickup") {
     const pile = stockOf(state, island);
-    let room = CARGO.capacity - cargoLoad(s);
+    let room = cargoCapacity(state) - cargoLoad(s);
     const available = Object.values(pile).reduce((a, b) => a + b, 0);
     if (available < Math.min(CARGO.minLoad, room)) return rest(2);
     for (const r of Object.keys(pile) as (keyof typeof pile)[]) {

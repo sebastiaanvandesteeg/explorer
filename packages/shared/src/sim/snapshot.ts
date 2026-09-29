@@ -1,7 +1,7 @@
 // Serialisation: full snapshots (join + persistence) and incremental patches (every tick).
 import type { TribeId } from "../tribes";
 import type { WorldMap } from "../world/types";
-import type { Stock } from "./catalogue";
+import type { Stock, UpgradeId } from "./catalogue";
 import {
   emptyState,
   emptyStock,
@@ -32,6 +32,8 @@ export interface Patch {
   stock?: Stock;
   /** Changed outpost stockpiles, by island id. */
   outposts?: Record<number, Stock>;
+  /** Every upgrade owned so far, sent when one is bought. */
+  upgrades?: UpgradeId[];
   revealed?: number[];
   events?: GameEvent[];
 }
@@ -47,6 +49,7 @@ export interface Snapshot {
   stock: Stock;
   /** Goods waiting on other islands, by island id. Older saves have none. */
   outposts?: Record<number, Stock>;
+  upgrades?: UpgradeId[];
   entities: WireEntity[];
   /** Run-length encoded explored map: alternating run lengths, starting with unexplored. */
   explored: string;
@@ -135,6 +138,7 @@ export function toSnapshot(state: GameState): Snapshot {
     nextId: state.nextId,
     stock: { ...state.stock },
     outposts: Object.fromEntries([...state.outposts].map(([id, st]) => [id, { ...st }])),
+    upgrades: [...state.upgrades],
     entities: [...state.entities.values()].map(toWire),
     explored: encodeRuns(state.explored),
     discovered: [...state.discovered],
@@ -153,6 +157,7 @@ export function fromSnapshot(world: WorldMap, snap: Snapshot, resume = false): G
   state.stock = { ...emptyStock(), ...snap.stock };
   for (const [id, st] of Object.entries(snap.outposts ?? {}))
     state.outposts.set(Number(id), { ...emptyStock(), ...st });
+  state.upgrades = new Set(snap.upgrades ?? []);
   state.explored = decodeRuns(snap.explored, world.width * world.height);
   state.discovered = new Set(snap.discovered);
   for (const w of snap.entities) {
@@ -181,6 +186,10 @@ export function takePatch(state: GameState): Patch {
     if (e) patch.entities.push(toWire(e));
   }
   if (state.stockDirty) patch.stock = { ...state.stock };
+  if (state.upgradesDirty) {
+    patch.upgrades = [...state.upgrades];
+    state.upgradesDirty = false;
+  }
   if (state.outpostsDirty.size > 0) {
     patch.outposts = {};
     for (const id of state.outpostsDirty) patch.outposts[id] = { ...stockOf(state, id) };
@@ -202,6 +211,7 @@ export function patchIsEmpty(p: Patch): boolean {
     p.removed.length === 0 &&
     !p.stock &&
     !p.outposts &&
+    !p.upgrades &&
     !p.revealed &&
     !p.events
   );
@@ -227,6 +237,7 @@ export function applyPatch(state: GameState, patch: Patch): void {
     }
   }
   if (patch.stock) state.stock = { ...emptyStock(), ...patch.stock };
+  if (patch.upgrades) state.upgrades = new Set(patch.upgrades);
   for (const [id, st] of Object.entries(patch.outposts ?? {}))
     state.outposts.set(Number(id), { ...emptyStock(), ...st });
   if (patch.revealed) {

@@ -6,6 +6,7 @@ import {
   dayNumber,
   dayPhase,
   discoveryName,
+  UPGRADES,
   HALF_H,
   HALF_W,
   inBounds,
@@ -252,6 +253,9 @@ export class Game {
             ? "A cargo ship is ready at the dock"
             : "A scout ship is ready at the dock",
         );
+        break;
+      case "upgrade":
+        this.hud.toast(`${UPGRADES[ev.upgrade].name} learned`);
         break;
       case "cargo":
         this.hud.toast(`A cargo ship brought ${ev.amount} goods home`);

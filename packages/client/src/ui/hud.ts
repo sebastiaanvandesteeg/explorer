@@ -25,6 +25,8 @@ import {
   Terrain,
   tileIndex,
   TRIBE_DEFS,
+  UPGRADE_IDS,
+  UPGRADES,
   VILLAGER,
   type BiomeId,
   type BuildingEntity,
@@ -38,6 +40,7 @@ import {
   type ShipEntity,
   type Stock,
   type TribeId,
+  type UpgradeId,
   type VillagerEntity,
 } from "@explorer/shared";
 import type { Atlas } from "../assets";
@@ -79,14 +82,6 @@ const LABEL: Record<Resource, string> = {
   crystal: "Crystal",
 };
 
-/** Upgrades the magic house will sell once they're built (shown as a teaser for now). */
-const COMING_UPGRADES = [
-  ["Far Sight", "Ships reveal twice as far"],
-  ["Swift Sails", "Ships sail 50% faster"],
-  ["Seer's Chart", "Reveal the outline of every island"],
-  ["Calm Waters", "Ships can sail through sea rocks"],
-];
-
 export function discoveryText(biome: BiomeId): string {
   return `Discovered ${discoveryName(biome)}!`;
 }
@@ -102,6 +97,8 @@ export class Hud {
     status?: HTMLElement;
     /** Extra live lines: an island's stockpile, a cargo ship's route. */
     extra?: HTMLElement;
+    /** Magic house: one row per upgrade, restyled when it is learned. */
+    upgrades?: { id: UpgradeId; row: HTMLElement; btn: HTMLButtonElement }[];
     bar?: HTMLElement;
     buttons: { el: HTMLButtonElement; enabled: () => boolean }[];
   } = { buttons: [] };
@@ -484,16 +481,30 @@ export class Hud {
       if (e.kind === "market" && e.complete)
         parts.push(this.marketPanel(state, button, small, cmd));
       if (e.kind === "magic_house" && e.complete) {
-        parts.push(
-          h(
-            "div.upgrades",
+        refs.upgrades = [];
+        const list = h("div.upgrades", {});
+        for (const id of UPGRADE_IDS) {
+          const up = UPGRADES[id];
+          const cost = h("span.cost");
+          for (const [res, n] of Object.entries(up.cost))
+            cost.append(small(res as Resource, n ?? 0));
+          const btn = button(
+            "Learn",
+            cmd({ kind: "buy-upgrade", upgrade: id }),
+            () => !state.upgrades.has(id) && canAfford(state.stock, up.cost),
+          );
+          const row = h(
+            "div.upgrade",
             {},
-            h("div.desc", {}, "Magical upgrades for exploring the seas are coming soon:"),
-            ...COMING_UPGRADES.map(([name, what]) =>
-              h("div.upgrade", {}, h("strong", {}, name!), ` ${what}`),
-            ),
-          ),
-        );
+            h("strong", {}, up.name),
+            ` ${up.description} `,
+            cost,
+            btn,
+          );
+          refs.upgrades.push({ id, row, btn });
+          list.append(row);
+        }
+        parts.push(list);
       }
       if (def.buildable) {
         actions.append(
@@ -685,6 +696,11 @@ export class Hud {
       }
       if (refs.status) refs.status.textContent = status;
       if (refs.extra) refs.extra.textContent = stockpileText(state, e);
+      for (const u of refs.upgrades ?? []) {
+        const owned = state.upgrades.has(u.id);
+        u.row.classList.toggle("owned", owned);
+        u.btn.textContent = owned ? "Learned" : "Learn";
+      }
       if (refs.bar)
         refs.bar.style.width = `${Math.round(Math.max(0, Math.min(1, progress)) * 100)}%`;
     } else if (e.type === "node") {

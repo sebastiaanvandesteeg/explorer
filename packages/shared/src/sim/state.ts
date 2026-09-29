@@ -3,8 +3,10 @@ import type { BiomeId } from "../world/biomes";
 import { Terrain, type Dir, type NodeKind, type WorldMap } from "../world/types";
 import {
   BUILDINGS,
+  CARGO,
   NODES,
   RESOURCES,
+  SHIP,
   START_STOCK,
   START_VILLAGERS,
   type BuildingKind,
@@ -12,6 +14,7 @@ import {
   type ShipKind,
   type Stock,
   type Tool,
+  type UpgradeId,
 } from "./catalogue";
 
 export interface BuildingEntity {
@@ -112,7 +115,8 @@ export type GameEvent =
   | { type: "ship"; kind?: ShipKind; x: number; y: number }
   | { type: "discovered"; islandId: number; biome: BiomeId; x: number; y: number }
   | { type: "landed"; count: number; islandId: number; x: number; y: number }
-  | { type: "cargo"; amount: number; x: number; y: number };
+  | { type: "cargo"; amount: number; x: number; y: number }
+  | { type: "upgrade"; upgrade: UpgradeId };
 
 export interface GameState {
   world: WorldMap;
@@ -123,6 +127,9 @@ export interface GameState {
   stock: Stock;
   /** Goods piled up on other islands' storehouses and docks until a cargo ship collects them. */
   outposts: Map<number, Stock>;
+  /** Magical upgrades bought at the magic house. */
+  upgrades: Set<UpgradeId>;
+  upgradesDirty: boolean;
   /** Outpost islands whose stockpile changed since the last patch. */
   outpostsDirty: Set<number>;
   entities: Map<number, Entity>;
@@ -195,6 +202,8 @@ export function emptyState(world: WorldMap): GameState {
     stock: { ...START_STOCK },
     outposts: new Map(),
     outpostsDirty: new Set(),
+    upgrades: new Set(),
+    upgradesDirty: false,
     entities: new Map(),
     explored: new Uint8Array(n),
     discovered: new Set(),
@@ -233,6 +242,21 @@ export function newBuilding(
     workerId: null,
     growth: 0,
   };
+}
+
+export const hasUpgrade = (state: GameState, id: UpgradeId): boolean => state.upgrades.has(id);
+
+/** How far ships see around them, in tiles. */
+export function shipReveal(state: GameState): number {
+  return SHIP.reveal * (hasUpgrade(state, "far_sight") ? 1.6 : 1);
+}
+
+export function sailSpeedFactor(state: GameState): number {
+  return hasUpgrade(state, "swift_sails") ? 1.5 : 1;
+}
+
+export function cargoCapacity(state: GameState): number {
+  return Math.round(CARGO.capacity * (hasUpgrade(state, "deep_holds") ? 1.5 : 1));
 }
 
 export function emptyStock(): Stock {
@@ -339,6 +363,14 @@ export function reveal(state: GameState, cx: number, cy: number, r: number): voi
       }
     }
   }
+}
+
+/** Mark the centre of every island as seen, so the whole archipelago shows on the map. */
+export function revealIslands(state: GameState): void {
+  const before = state.events.length;
+  for (const island of state.world.islands) reveal(state, island.cx, island.cy, 3);
+  // Charting the islands isn't the same as finding them: no fanfare for each one.
+  state.events.length = before;
 }
 
 /** Is a tile free for villagers to stand on? Piers count, even though they're over water. */
