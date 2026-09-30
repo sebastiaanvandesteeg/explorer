@@ -10,6 +10,7 @@ import {
   type ServerMessage,
   type WorldMap,
 } from "@explorer/shared";
+import { playerLook } from "./identity";
 import { Emitter, type Session } from "./session";
 
 const CURSOR_INTERVAL = 200;
@@ -55,7 +56,13 @@ export class NetSession extends Emitter implements Session {
     this.ws = ws;
     let welcomed = false;
     ws.onopen = () => {
-      this.send({ t: "join", worldId: this.worldId, name: this.name, token: this.token });
+      this.send({
+        t: "join",
+        worldId: this.worldId,
+        name: this.name,
+        token: this.token,
+        look: playerLook(),
+      });
     };
     ws.onmessage = (ev) => {
       const msg = JSON.parse(String(ev.data)) as ServerMessage;

@@ -10,7 +10,7 @@ import {
 } from "@explorer/shared";
 import { loadAtlas, type Atlas } from "./assets";
 import { Game } from "./game/game";
-import { playerName, playerToken } from "./net/identity";
+import { playerLook, playerName, playerToken } from "./net/identity";
 import { NetSession } from "./net/netSession";
 import { LocalSession } from "./net/session";
 import { h } from "./ui/dom";
@@ -61,7 +61,7 @@ async function startOffline(
   );
   const done = loading("Generating islands…");
   const assets = await atlas();
-  const session = new LocalSession(seed, name, tribe, difficulty);
+  const session = new LocalSession(seed, name, tribe, difficulty, playerLook());
   // Dev aids for reviewing art: `&reveal` lifts the fog in offline games, and `&phase=0.8` freezes
   // the time of day (0 is sunrise, 0.25 noon, 0.5 sunset, 0.8 night).
   if (params.has("reveal")) session.state.explored.fill(1);

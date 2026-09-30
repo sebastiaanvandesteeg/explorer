@@ -8,10 +8,12 @@ import {
   MAX_PLAYERS,
   patchIsEmpty,
   PLAYER_COLORS,
+  setLook,
   takePatch,
   tick,
   TICK_SECONDS,
   toSnapshot,
+  type CharacterLook,
   type ClientMessage,
   type Difficulty,
   type GameState,
@@ -110,7 +112,7 @@ export class WorldRoom {
   }
 
   /** Seat a player (new or returning by token). Returns false when the world is full. */
-  join(ws: WebSocket, name: string, token: string): boolean {
+  join(ws: WebSocket, name: string, token: string, look?: CharacterLook): boolean {
     const tokenHash = hashToken(token);
     let slot = this.slots.find((s) => s.tokenHash === tokenHash);
     if (!slot) {
@@ -128,7 +130,8 @@ export class WorldRoom {
     this.sockets.set(ws, slot);
     // Everyone plays a character: a newcomer gets one, a returning player
     // finds theirs where they left it. It is in the snapshot below and in the next patch.
-    ensureCharacter(this.state, slot.id);
+    ensureCharacter(this.state, slot.id, look);
+    if (look) setLook(this.state, slot.id, look);
     if (this.unloadTimer) {
       clearTimeout(this.unloadTimer);
       this.unloadTimer = null;

@@ -1,12 +1,12 @@
 import { HALF_H, HALF_W } from "@explorer/shared";
 import { Rectangle, type Container } from "pixi.js";
 
-export const MIN_ZOOM = 1;
-export const MAX_ZOOM = 5;
+/** The world is drawn at one fixed zoom; there is no zooming in or out. */
+export const ZOOM = 3.5;
 
-/** Integer zoom and whole-pixel positions keep the pixel art crisp. */
+/** Whole-pixel positions keep the pixel art as crisp as a fractional zoom allows. */
 export class Camera {
-  zoom = 2;
+  readonly zoom = ZOOM;
   /** World pixel at the centre of the screen. */
   x = 0;
   y = 0;
@@ -63,17 +63,6 @@ export class Camera {
   centerOn(wx: number, wy: number): void {
     this.x = wx;
     this.y = wy;
-  }
-
-  /** Step the zoom while keeping the world point under (sx, sy) fixed. */
-  zoomAt(step: number, sx: number, sy: number): void {
-    const next = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, this.zoom + step));
-    if (next === this.zoom) return;
-    const before = this.screenToWorld(sx, sy);
-    this.zoom = next;
-    const after = this.screenToWorld(sx, sy);
-    this.x += before.x - after.x;
-    this.y += before.y - after.y;
   }
 
   private clamp(): void {

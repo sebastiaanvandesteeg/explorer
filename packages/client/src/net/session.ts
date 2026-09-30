@@ -7,6 +7,7 @@ import {
   takePatch,
   tick,
   TICK_SECONDS,
+  type CharacterLook,
   type Command,
   type CommandResult,
   type Difficulty,
@@ -64,10 +65,11 @@ export class LocalSession extends Emitter implements Session {
     name: string,
     tribe: TribeId = "islanders",
     difficulty: Difficulty = "normal",
+    look?: CharacterLook,
   ) {
     super();
     this.state = createInitialState(generateWorld(seed, tribe), { difficulty });
-    ensureCharacter(this.state, this.you);
+    ensureCharacter(this.state, this.you, look);
     this.state.dirty.clear();
     this.players = [{ id: this.you, name, color: PLAYER_COLORS[0], online: true }];
     this.timer = setInterval(() => {

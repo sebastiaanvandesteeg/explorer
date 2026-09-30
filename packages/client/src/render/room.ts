@@ -12,6 +12,7 @@ import {
   roomPieces,
   type BuildingEntity,
   type CharacterEntity,
+  type CharacterLook,
   type GameState,
   type NpcRole,
   type RoomDef,
@@ -21,7 +22,8 @@ import {
 import { Container, Graphics, Sprite, Text } from "pixi.js";
 import type { Atlas } from "../assets";
 import { glowTexture } from "./entities";
-import { heroCapeSprite, heroSprite, villagerSprite } from "./names";
+import { HeroRig } from "./heroRig";
+import { villagerSprite } from "./names";
 import { depthOrder, personBox, type DepthBox } from "./roomDepth";
 
 const screenX = (x: number, y: number) => (x - y) * HALF_W;
@@ -29,9 +31,9 @@ const screenY = (x: number, y: number) => (x + y) * HALF_H;
 
 interface Figure {
   root: Container;
-  body: Sprite;
-  capeUnder: Sprite | null;
-  capeOver: Sprite | null;
+  /** The villager sprite of an NPC; heroes are drawn by `rig` instead. */
+  body: Sprite | null;
+  rig: HeroRig | null;
   tag: Text;
   x: number;
   y: number;
@@ -89,8 +91,6 @@ export class RoomScene {
     private readonly tribe: TribeId,
     private readonly colourOf: (playerId: string) => number,
     private readonly nameOf: (playerId: string) => string,
-    /** The world's zoom: a room is drawn at the same pixel size when it fits on screen. */
-    private readonly zoom: () => number = () => 2,
   ) {
     this.things.sortableChildren = true;
     this.glows.blendMode = "add";
@@ -182,16 +182,9 @@ export class RoomScene {
 
   private makeFigure(name: string, colour: number, hero: boolean): Figure {
     const root = new Container();
-    const body = this.atlas.sprite(
-      hero
-        ? heroSprite(this.tribe, 0, false, "stand")
-        : villagerSprite(this.tribe, 0, false, "stand"),
-    );
-    const capeUnder = hero ? this.atlas.sprite(heroCapeSprite(false, "under", "stand")) : null;
-    const capeOver = hero ? this.atlas.sprite(heroCapeSprite(false, "over", "stand")) : null;
-    if (capeUnder) root.addChild(capeUnder);
-    root.addChild(body);
-    if (capeOver) root.addChild(capeOver);
+    const rig = hero ? new HeroRig(this.atlas) : null;
+    const body = hero ? null : this.atlas.sprite(villagerSprite(this.tribe, 0, false, "stand"));
+    root.addChild(rig ? rig.root : body!);
     const tag = new Text({
       text: name,
       style: {
@@ -203,7 +196,7 @@ export class RoomScene {
     });
     tag.anchor.set(0.5, 1);
     this.tags.addChild(tag);
-    return { root, body, capeUnder, capeOver, tag, x: 0, y: 0, seen: false };
+    return { root, body, rig, tag, x: 0, y: 0, seen: false };
   }
 
   private pose(
@@ -212,31 +205,21 @@ export class RoomScene {
     moving: boolean,
     now: number,
     id: number,
-    tunic: number,
-    playerColour?: number,
+    look: CharacterLook | number,
+    playerColour = 0xffffff,
   ): void {
-    const back = facing === 2 || facing === 3;
-    const flip = facing === 1 || facing === 2;
     const phase = Math.floor(now / 160 + id) % 2;
     const pose = moving ? (phase ? "walk0" : "walk1") : "stand";
-    const show = (sprite: Sprite, name: string) => {
-      this.atlas.setFrame(sprite, name);
-      const k = Math.abs(sprite.scale.x);
-      sprite.scale.x = flip ? -k : k;
-    };
-    if (f.capeOver) {
-      show(f.body, heroSprite(this.tribe, tunic, back, pose));
-      if (f.capeUnder) {
-        f.capeUnder.visible = !back;
-        if (!back) show(f.capeUnder, heroCapeSprite(false, "under", pose));
-      }
-      show(f.capeOver, heroCapeSprite(back, "over", pose));
-      const tint = playerColour ?? 0xffffff;
-      if (f.capeUnder) f.capeUnder.tint = tint;
-      f.capeOver.tint = tint;
-    } else {
-      show(f.body, villagerSprite(this.tribe, tunic, back, pose));
+    if (f.rig && typeof look !== "number") {
+      f.rig.set(look, playerColour, facing, pose);
+      return;
     }
+    if (!f.body || typeof look !== "number") return;
+    const back = facing === 2 || facing === 3;
+    const flip = facing === 1 || facing === 2;
+    this.atlas.setFrame(f.body, villagerSprite(this.tribe, look, back, pose));
+    const k = Math.abs(f.body.scale.x);
+    f.body.scale.x = flip ? -k : k;
   }
 
   /** Highlight the NPC (the pointer is over them), like villagers outside. */
@@ -263,10 +246,10 @@ export class RoomScene {
     };
     const free = width - reserveRight;
     // The biggest whole zoom at which the room fits beside the conversation panel (so it does not
-    // jump when the panel opens), and never blurry: at least the world's own zoom when that fits.
+    // jump when the panel opens), and never blurry: four times when that fits.
     const room = width > 900 ? width - 450 : width;
     const fit = Math.floor(Math.min((room * 0.92) / span.w, (height * 0.8) / span.h));
-    const s = Math.max(1, Math.min(Math.max(this.zoom(), 4), fit));
+    const s = Math.max(1, Math.min(4, fit));
     this.scale = s;
     const cx = ((def.w - def.h) * HALF_W) / 2;
     const cy = ((def.w + def.h) * HALF_H + ROOM_SLAB_PX - wallTop) / 2;
@@ -316,7 +299,7 @@ export class RoomScene {
       const moving = Math.hypot(dx, dy) > 0.04;
       f.x += dx * k;
       f.y += dy * k;
-      this.pose(f, c.facing, moving, now, c.id, c.tunic, this.colourOf(c.playerId));
+      this.pose(f, c.facing, moving, now, c.id, c.look, this.colourOf(c.playerId));
       this.stand(f, f.x, f.y);
     }
     for (const [id, f] of this.figures) {
@@ -368,7 +351,7 @@ export class RoomScene {
   /** The middle of the NPC on screen (for tests). */
   npcPoint(): { x: number; y: number } | null {
     if (!this.npc) return null;
-    const b = this.npc.body.getBounds();
+    const b = this.npc.body!.getBounds();
     return { x: b.x + b.width / 2, y: b.y + b.height / 2 };
   }
 
@@ -376,7 +359,7 @@ export class RoomScene {
   pick(sx: number, sy: number): { npc: true } | { x: number; y: number } | null {
     const def = this.def;
     if (!def) return null;
-    if (this.npc?.body.getBounds().containsPoint(sx, sy)) return { npc: true };
+    if (this.npc?.body?.getBounds().containsPoint(sx, sy)) return { npc: true };
     const lx = (sx - this.scene.x) / this.scale;
     const ly = (sy - this.scene.y) / this.scale;
     const a = lx / HALF_W;

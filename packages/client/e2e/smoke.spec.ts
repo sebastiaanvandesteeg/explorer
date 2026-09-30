@@ -113,6 +113,37 @@ test("offline mode plays without a server connection", async ({ page }) => {
   await expect(page.locator(".clock")).toContainText(/Day 1 · \w+ · \d\d:\d\d/);
 });
 
+test("design your character in the lobby and play it offline", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto("/play");
+  await page.getByPlaceholder("Your name").fill("Mira");
+  await page.getByRole("radio", { name: /Barbarian/ }).click();
+  await page.getByRole("radio", { name: "Sturdy" }).click();
+  await page.locator('.swatch[title="Skin 7"]').click();
+  await page.locator('.swatch[title="Hair 10"]').click();
+  await page.locator('.swatch[title="Eyes 4"]').click();
+  await expect(page.getByRole("radio", { name: /Barbarian/ })).toHaveAttribute(
+    "aria-checked",
+    "true",
+  );
+  await page.getByRole("link", { name: "Play offline" }).click();
+  await expect(page.locator("#app > canvas")).toBeVisible();
+  const look = () =>
+    page.evaluate(() => {
+      const g = (window as unknown as { __game: { myCharacter(): { look: unknown } } }).__game;
+      return g.myCharacter()?.look;
+    });
+  await expect.poll(look).toEqual({ class: "barbarian", build: 2, skin: 6, hair: 9, eyes: 3 });
+  // The choice is remembered for the next visit.
+  await page.goto("/play");
+  await expect(page.getByRole("radio", { name: /Barbarian/ })).toHaveAttribute(
+    "aria-checked",
+    "true",
+  );
+  expect(errors).toEqual([]);
+});
+
 test("a newer tribe starts on its own home biome with its own buildings", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));

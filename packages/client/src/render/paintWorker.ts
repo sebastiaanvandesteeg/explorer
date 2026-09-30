@@ -1,5 +1,5 @@
-// Web worker that paints terrain chunks (see @explorer/art) off the main thread, so panning and
-// zooming never stall while new land comes into view.
+// Web worker that paints terrain chunks (see @explorer/art) off the main thread, so walking and
+// scrolling never stall while new land comes into view.
 import { paintChunk, type PaintOptions, type TerrainWorld } from "@explorer/art";
 import type { PaintInit, PaintMasks, PaintReply, PaintRequest } from "./paintProtocol";
 

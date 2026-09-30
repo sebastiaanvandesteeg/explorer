@@ -256,83 +256,6 @@ function villager(
   return c;
 }
 
-/** How much larger a player's character is drawn than a villager. */
-export const HERO_SCALE = 1.25;
-export const HERO_POSES = ["stand", "walk0", "walk1"] as const;
-type HeroPose = (typeof HERO_POSES)[number];
-
-const grey = (v: number): Rgba => [v, v, v, 255];
-
-/**
- * The tintable part of a hero: a mantle and sash seen from the front, the cape's flare behind them,
- * and a full cape from the back. Drawn in greys, so the game can multiply it by a colour: today
- * the player's own, later whatever they choose. `layer` "under" goes behind the body.
- */
-function heroCape(facing: "front" | "back", layer: "over" | "under", pose: HeroPose): Canvas {
-  const scale = HERO_SCALE;
-  const c = new Canvas(Math.round(32 * scale), Math.round(48 * scale));
-  const ox = 4;
-  const oy = 8;
-  const R = (x: number, y: number, w: number, h: number, col: Rgba) => {
-    const x0 = Math.floor((x + ox) * scale);
-    const y0 = Math.floor((y + oy) * scale);
-    const x1 = Math.max(x0 + 1, Math.floor((x + w + ox) * scale));
-    const y1 = Math.max(y0 + 1, Math.floor((y + h + oy) * scale));
-    for (let j = y0; j < y1; j++) for (let i = x0; i < x1; i++) c.set(i, j, col);
-  };
-  const P = (x: number, y: number, col: Rgba) => R(x, y, 1, 1, col);
-  const dark = grey(120);
-  const mid = grey(170);
-  const light = grey(215);
-  const bright = grey(250);
-  const sway = pose === "walk0" ? 1 : pose === "walk1" ? -1 : 0;
-  if (facing === "front" && layer === "under") {
-    // The cape hangs behind the shoulders and flares out beside the legs.
-    R(2, 15, 4, 14, mid);
-    R(2, 15, 1, 14, light);
-    R(18, 15, 4, 14, dark);
-    R(1 + sway, 28, 5, 4, mid);
-    R(18 + sway, 28, 5, 4, dark);
-    R(1 + sway, 31, 5, 1, dark);
-    R(18 + sway, 31, 5, 1, grey(90));
-  } else if (facing === "front") {
-    // A mantle over the shoulders, open at the throat, and a sash across the chest.
-    R(4, 13, 6, 1, light);
-    R(14, 13, 6, 1, mid);
-    R(3, 14, 7, 3, mid);
-    R(14, 14, 8, 3, dark);
-    R(3, 14, 7, 1, bright);
-    R(3, 17, 7, 1, dark);
-    R(14, 17, 8, 1, grey(90));
-    P(6, 15, light);
-    P(18, 15, mid);
-    for (let x = 7; x <= 16; x++) {
-      const y = 16 + Math.floor(((x - 7) * 9) / 9);
-      R(x, y, 1, 2, x < 11 ? light : mid);
-      P(x, y, bright);
-    }
-    // The sash's knot and tails at the hip.
-    R(15, 25, 3, 3, dark);
-    P(15, 25, light);
-    R(16, 28, 1, 3, mid);
-    R(17, 28, 1, 2, dark);
-  } else {
-    // From behind: a full cape from the shoulders to the knees, swaying as they walk.
-    R(5, 13, 14, 1, bright);
-    R(4, 14, 16, 16, mid);
-    R(4, 14, 2, 16, light);
-    R(17, 14, 3, 16, dark);
-    R(9, 15, 1, 13, dark);
-    R(13, 15, 1, 12, dark);
-    R(10, 15, 1, 8, light);
-    R(4 + sway, 30, 16, 2, mid);
-    R(4 + sway, 31, 16, 1, dark);
-    for (let x = 4; x < 20; x += 3) P(x + sway, 32, dark);
-  }
-  outline(c, 0.4);
-  return c;
-}
-
 type Plot = (x: number, y: number, col: Rgba) => void;
 type Fill = (x: number, y: number, w: number, h: number, col: Rgba) => void;
 
@@ -571,52 +494,6 @@ function drawTool(tool: Tool, pose: "work0" | "work1", P: Plot, R: Fill): void {
       R(26, 30, 3, 1, metalDark);
     }
   }
-}
-
-/**
- * The players' own characters: the villager's figure a quarter larger, in every tribe's dress,
- * plus the cape layers the game tints. Standing and walking only, for now.
- */
-function heroSprites(): Sprite[] {
-  const out: Sprite[] = [];
-  const size = (cv: Canvas) => ({
-    ax: Math.floor(16 * HERO_SCALE),
-    ay: Math.floor(44 * HERO_SCALE),
-    cv,
-  });
-  for (const tribe of TRIBES) {
-    for (const tunic of TUNICS) {
-      for (const facing of ["front", "back"] as const) {
-        for (const pose of HERO_POSES) {
-          const { ax, ay, cv } = size(villager(tribe, facing, pose, tunic, undefined, HERO_SCALE));
-          out.push({
-            name: `hero_${tribe}_${tunic}_${facing}_${pose}`,
-            canvas: cv,
-            anchorX: ax,
-            anchorY: ay,
-            meta: { res: FIGURE_RES },
-          });
-        }
-      }
-    }
-  }
-  for (const pose of HERO_POSES) {
-    for (const [facing, layer] of [
-      ["front", "under"],
-      ["front", "over"],
-      ["back", "over"],
-    ] as const) {
-      const { ax, ay, cv } = size(heroCape(facing, layer, pose));
-      out.push({
-        name: `herocape_${facing}_${layer}_${pose}`,
-        canvas: cv,
-        anchorX: ax,
-        anchorY: ay,
-        meta: { res: FIGURE_RES },
-      });
-    }
-  }
-  return out;
 }
 
 function villagerSprites(): Sprite[] {
@@ -1304,7 +1181,6 @@ function sparkle(frame: number): Sprite {
 export function unitSprites(): Sprite[] {
   return [
     ...villagerSprites(),
-    ...heroSprites(),
     carried("wood"),
     carried("stone"),
     carried("food"),

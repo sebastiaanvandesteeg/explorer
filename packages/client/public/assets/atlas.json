@@ -3363,1030 +3363,3256 @@
    "anchorY": 17,
    "res": 2
   },
-  "hero_amberwrights_0_back_stand": {
+  "hero_face_front": {
    "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_amberwrights_0_back_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_amberwrights_0_back_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_amberwrights_0_front_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_amberwrights_0_front_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_amberwrights_0_front_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_amberwrights_1_back_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_amberwrights_1_back_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_amberwrights_1_back_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_amberwrights_1_front_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_amberwrights_1_front_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_amberwrights_1_front_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_amberwrights_2_back_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_amberwrights_2_back_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_amberwrights_2_back_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_amberwrights_2_front_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_amberwrights_2_front_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_amberwrights_2_front_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_cinderborn_0_back_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_cinderborn_0_back_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_cinderborn_0_back_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_cinderborn_0_front_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_cinderborn_0_front_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_cinderborn_0_front_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_cinderborn_1_back_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_cinderborn_1_back_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_cinderborn_1_back_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_cinderborn_1_front_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_cinderborn_1_front_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_cinderborn_1_front_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_cinderborn_2_back_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_cinderborn_2_back_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_cinderborn_2_back_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_cinderborn_2_front_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_cinderborn_2_front_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_cinderborn_2_front_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_freebooters_0_back_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 44,
-   "res": 2
-  },
-  "hero_freebooters_0_back_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 44,
-   "res": 2
-  },
-  "hero_freebooters_0_back_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 44,
-   "res": 2
-  },
-  "hero_freebooters_0_front_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 44,
-   "res": 2
-  },
-  "hero_freebooters_0_front_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 44,
-   "res": 2
-  },
-  "hero_freebooters_0_front_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 44,
-   "res": 2
-  },
-  "hero_freebooters_1_back_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 44,
-   "res": 2
-  },
-  "hero_freebooters_1_back_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 44,
-   "res": 2
-  },
-  "hero_freebooters_1_back_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 44,
-   "res": 2
-  },
-  "hero_freebooters_1_front_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 44,
-   "res": 2
-  },
-  "hero_freebooters_1_front_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 44,
-   "res": 2
-  },
-  "hero_freebooters_1_front_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 44,
-   "res": 2
-  },
-  "hero_freebooters_2_back_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 44,
-   "res": 2
-  },
-  "hero_freebooters_2_back_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 44,
-   "res": 2
-  },
-  "hero_freebooters_2_back_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 44,
-   "res": 2
-  },
-  "hero_freebooters_2_front_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 44,
-   "res": 2
-  },
-  "hero_freebooters_2_front_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 44,
-   "res": 2
-  },
-  "hero_freebooters_2_front_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 44,
-   "res": 2
-  },
-  "hero_glowkin_0_back_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_glowkin_0_back_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_glowkin_0_back_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_glowkin_0_front_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_glowkin_0_front_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_glowkin_0_front_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_glowkin_1_back_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_glowkin_1_back_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_glowkin_1_back_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_glowkin_1_front_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_glowkin_1_front_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_glowkin_1_front_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_glowkin_2_back_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_glowkin_2_back_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_glowkin_2_back_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_glowkin_2_front_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_glowkin_2_front_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_glowkin_2_front_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_islanders_0_back_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 43,
-   "res": 2
-  },
-  "hero_islanders_0_back_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 43,
-   "res": 2
-  },
-  "hero_islanders_0_back_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 43,
-   "res": 2
-  },
-  "hero_islanders_0_front_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 43,
-   "res": 2
-  },
-  "hero_islanders_0_front_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 43,
-   "res": 2
-  },
-  "hero_islanders_0_front_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 43,
-   "res": 2
-  },
-  "hero_islanders_1_back_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 43,
-   "res": 2
-  },
-  "hero_islanders_1_back_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 43,
-   "res": 2
-  },
-  "hero_islanders_1_back_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 43,
-   "res": 2
-  },
-  "hero_islanders_1_front_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 43,
-   "res": 2
-  },
-  "hero_islanders_1_front_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 43,
-   "res": 2
-  },
-  "hero_islanders_1_front_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 43,
-   "res": 2
-  },
-  "hero_islanders_2_back_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 43,
-   "res": 2
-  },
-  "hero_islanders_2_back_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 43,
-   "res": 2
-  },
-  "hero_islanders_2_back_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 43,
-   "res": 2
-  },
-  "hero_islanders_2_front_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 43,
-   "res": 2
-  },
-  "hero_islanders_2_front_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 43,
-   "res": 2
-  },
-  "hero_islanders_2_front_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 43,
-   "res": 2
-  },
-  "hero_mirefolk_0_back_stand": {
-   "page": 1,
-   "anchorX": 13,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_mirefolk_0_back_walk0": {
-   "page": 1,
-   "anchorX": 13,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_mirefolk_0_back_walk1": {
-   "page": 1,
-   "anchorX": 13,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_mirefolk_0_front_stand": {
-   "page": 1,
-   "anchorX": 13,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_mirefolk_0_front_walk0": {
-   "page": 1,
-   "anchorX": 13,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_mirefolk_0_front_walk1": {
-   "page": 1,
-   "anchorX": 13,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_mirefolk_1_back_stand": {
-   "page": 1,
-   "anchorX": 13,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_mirefolk_1_back_walk0": {
-   "page": 1,
-   "anchorX": 13,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_mirefolk_1_back_walk1": {
-   "page": 1,
-   "anchorX": 13,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_mirefolk_1_front_stand": {
-   "page": 1,
-   "anchorX": 13,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_mirefolk_1_front_walk0": {
-   "page": 1,
-   "anchorX": 13,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_mirefolk_1_front_walk1": {
-   "page": 1,
-   "anchorX": 13,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_mirefolk_2_back_stand": {
-   "page": 1,
-   "anchorX": 13,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_mirefolk_2_back_walk0": {
-   "page": 1,
-   "anchorX": 13,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_mirefolk_2_back_walk1": {
-   "page": 1,
-   "anchorX": 13,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_mirefolk_2_front_stand": {
-   "page": 1,
-   "anchorX": 13,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_mirefolk_2_front_walk0": {
-   "page": 1,
-   "anchorX": 13,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_mirefolk_2_front_walk1": {
-   "page": 1,
-   "anchorX": 13,
-   "anchorY": 50,
-   "res": 2
-  },
-  "hero_northfolk_0_back_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_northfolk_0_back_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_northfolk_0_back_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_northfolk_0_front_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_northfolk_0_front_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_northfolk_0_front_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_northfolk_1_back_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_northfolk_1_back_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_northfolk_1_back_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_northfolk_1_front_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_northfolk_1_front_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_northfolk_1_front_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_northfolk_2_back_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_northfolk_2_back_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_northfolk_2_back_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_northfolk_2_front_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_northfolk_2_front_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_northfolk_2_front_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_sunfolk_0_back_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_sunfolk_0_back_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_sunfolk_0_back_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_sunfolk_0_front_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_sunfolk_0_front_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_sunfolk_0_front_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_sunfolk_1_back_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_sunfolk_1_back_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_sunfolk_1_back_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_sunfolk_1_front_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_sunfolk_1_front_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_sunfolk_1_front_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_sunfolk_2_back_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_sunfolk_2_back_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_sunfolk_2_back_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_sunfolk_2_front_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_sunfolk_2_front_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_sunfolk_2_front_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 47,
-   "res": 2
-  },
-  "hero_sylvan_0_back_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_sylvan_0_back_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_sylvan_0_back_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_sylvan_0_front_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_sylvan_0_front_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_sylvan_0_front_walk1": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_sylvan_1_back_stand": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
-   "res": 2
-  },
-  "hero_sylvan_1_back_walk0": {
-   "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
+   "anchorX": 2,
+   "anchorY": 30,
    "res": 2
   },
-  "hero_sylvan_1_back_walk1": {
+  "hero_gear_archer_0_back": {
    "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
+   "anchorX": 3,
+   "anchorY": 20,
    "res": 2
   },
-  "hero_sylvan_1_front_stand": {
+  "hero_gear_archer_0_front": {
    "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
+   "anchorX": 3,
+   "anchorY": 20,
    "res": 2
   },
-  "hero_sylvan_1_front_walk0": {
+  "hero_gear_archer_1_back": {
    "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
+   "anchorX": 5,
+   "anchorY": 20,
    "res": 2
   },
-  "hero_sylvan_1_front_walk1": {
+  "hero_gear_archer_1_front": {
    "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
+   "anchorX": 5,
+   "anchorY": 20,
    "res": 2
   },
-  "hero_sylvan_2_back_stand": {
+  "hero_gear_archer_2_back": {
    "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
+   "anchorX": 7,
+   "anchorY": 20,
    "res": 2
   },
-  "hero_sylvan_2_back_walk0": {
+  "hero_gear_archer_2_front": {
    "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
+   "anchorX": 7,
+   "anchorY": 20,
    "res": 2
   },
-  "hero_sylvan_2_back_walk1": {
+  "hero_gear_barbarian_0_back": {
    "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
+   "anchorX": 5,
+   "anchorY": 15,
    "res": 2
   },
-  "hero_sylvan_2_front_stand": {
+  "hero_gear_barbarian_0_front": {
    "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
+   "anchorX": 5,
+   "anchorY": 15,
    "res": 2
   },
-  "hero_sylvan_2_front_walk0": {
+  "hero_gear_barbarian_1_back": {
    "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
+   "anchorX": 8,
+   "anchorY": 15,
    "res": 2
   },
-  "hero_sylvan_2_front_walk1": {
+  "hero_gear_barbarian_1_front": {
    "page": 1,
-   "anchorX": 10,
-   "anchorY": 49,
+   "anchorX": 8,
+   "anchorY": 15,
    "res": 2
   },
-  "herocape_back_over_stand": {
+  "hero_gear_barbarian_2_back": {
    "page": 1,
    "anchorX": 10,
-   "anchorY": 29,
+   "anchorY": 15,
    "res": 2
   },
-  "herocape_back_over_walk0": {
+  "hero_gear_barbarian_2_front": {
    "page": 1,
    "anchorX": 10,
-   "anchorY": 29,
+   "anchorY": 15,
    "res": 2
   },
-  "herocape_back_over_walk1": {
+  "hero_gear_bard_0_back": {
    "page": 1,
    "anchorX": 12,
-   "anchorY": 29,
+   "anchorY": 30,
    "res": 2
   },
-  "herocape_front_over_stand": {
+  "hero_gear_bard_0_front": {
    "page": 1,
    "anchorX": 12,
-   "anchorY": 29,
+   "anchorY": 30,
    "res": 2
   },
-  "herocape_front_over_walk0": {
+  "hero_gear_bard_1_back": {
    "page": 1,
    "anchorX": 12,
-   "anchorY": 29,
+   "anchorY": 30,
    "res": 2
   },
-  "herocape_front_over_walk1": {
+  "hero_gear_bard_1_front": {
    "page": 1,
    "anchorX": 12,
-   "anchorY": 29,
+   "anchorY": 30,
    "res": 2
   },
-  "herocape_front_under_stand": {
+  "hero_gear_bard_2_back": {
    "page": 1,
-   "anchorX": 14,
-   "anchorY": 27,
+   "anchorX": 12,
+   "anchorY": 30,
    "res": 2
   },
-  "herocape_front_under_walk0": {
+  "hero_gear_bard_2_front": {
    "page": 1,
-   "anchorX": 13,
-   "anchorY": 27,
+   "anchorX": 12,
+   "anchorY": 30,
    "res": 2
   },
-  "herocape_front_under_walk1": {
+  "hero_gear_cleric_0_back": {
+   "page": 1,
+   "anchorX": 3,
+   "anchorY": 19,
+   "res": 2
+  },
+  "hero_gear_cleric_0_front": {
+   "page": 1,
+   "anchorX": 3,
+   "anchorY": 19,
+   "res": 2
+  },
+  "hero_gear_cleric_1_back": {
+   "page": 1,
+   "anchorX": 3,
+   "anchorY": 19,
+   "res": 2
+  },
+  "hero_gear_cleric_1_front": {
+   "page": 1,
+   "anchorX": 3,
+   "anchorY": 19,
+   "res": 2
+  },
+  "hero_gear_cleric_2_back": {
+   "page": 1,
+   "anchorX": 3,
+   "anchorY": 19,
+   "res": 2
+  },
+  "hero_gear_cleric_2_front": {
+   "page": 1,
+   "anchorX": 3,
+   "anchorY": 19,
+   "res": 2
+  },
+  "hero_gear_knight_0_back": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 20,
+   "res": 2
+  },
+  "hero_gear_knight_0_front": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 20,
+   "res": 2
+  },
+  "hero_gear_knight_1_back": {
    "page": 1,
    "anchorX": 15,
-   "anchorY": 27,
+   "anchorY": 20,
+   "res": 2
+  },
+  "hero_gear_knight_1_front": {
+   "page": 1,
+   "anchorX": 15,
+   "anchorY": 20,
+   "res": 2
+  },
+  "hero_gear_knight_2_back": {
+   "page": 1,
+   "anchorX": 17,
+   "anchorY": 20,
+   "res": 2
+  },
+  "hero_gear_knight_2_front": {
+   "page": 1,
+   "anchorX": 17,
+   "anchorY": 20,
+   "res": 2
+  },
+  "hero_hair_back": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_hair_front": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_hat_archer_back": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 47,
+   "res": 2
+  },
+  "hero_hat_archer_front": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 47,
+   "res": 2
+  },
+  "hero_hat_barbarian_back": {
+   "page": 1,
+   "anchorX": 13,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_hat_barbarian_front": {
+   "page": 1,
+   "anchorX": 13,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_hat_bard_back": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 46,
+   "res": 2
+  },
+  "hero_hat_bard_front": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 46,
+   "res": 2
+  },
+  "hero_hat_cleric_back": {
+   "page": 1,
+   "anchorX": 7,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_hat_cleric_front": {
+   "page": 1,
+   "anchorX": 7,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_hat_druid_back": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 49,
+   "res": 2
+  },
+  "hero_hat_druid_front": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 49,
+   "res": 2
+  },
+  "hero_hat_knight_back": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 42,
+   "res": 2
+  },
+  "hero_hat_knight_front": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 42,
+   "res": 2
+  },
+  "hero_hat_mage_back": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 54,
+   "res": 2
+  },
+  "hero_hat_mage_front": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 54,
+   "res": 2
+  },
+  "hero_hat_thief_back": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 41,
+   "res": 2
+  },
+  "hero_hat_thief_front": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 41,
+   "res": 2
+  },
+  "hero_iris_front": {
+   "page": 1,
+   "anchorX": 1,
+   "anchorY": 29,
+   "res": 2
+  },
+  "hero_outfit_archer_0_back_stand": {
+   "page": 1,
+   "anchorX": 5,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_archer_0_back_walk0": {
+   "page": 1,
+   "anchorX": 6,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_archer_0_back_walk1": {
+   "page": 1,
+   "anchorX": 5,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_archer_0_front_stand": {
+   "page": 1,
+   "anchorX": 5,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_archer_0_front_walk0": {
+   "page": 1,
+   "anchorX": 5,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_archer_0_front_walk1": {
+   "page": 1,
+   "anchorX": 5,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_archer_1_back_stand": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_archer_1_back_walk0": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_archer_1_back_walk1": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_archer_1_front_stand": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_archer_1_front_walk0": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_archer_1_front_walk1": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_archer_2_back_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_archer_2_back_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_archer_2_back_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_archer_2_front_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_archer_2_front_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_archer_2_front_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_barbarian_0_back_stand": {
+   "page": 1,
+   "anchorX": 5,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_barbarian_0_back_walk0": {
+   "page": 1,
+   "anchorX": 6,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_barbarian_0_back_walk1": {
+   "page": 1,
+   "anchorX": 5,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_barbarian_0_front_stand": {
+   "page": 1,
+   "anchorX": 5,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_barbarian_0_front_walk0": {
+   "page": 1,
+   "anchorX": 5,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_barbarian_0_front_walk1": {
+   "page": 1,
+   "anchorX": 5,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_barbarian_1_back_stand": {
+   "page": 1,
+   "anchorX": 7,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_barbarian_1_back_walk0": {
+   "page": 1,
+   "anchorX": 7,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_barbarian_1_back_walk1": {
+   "page": 1,
+   "anchorX": 7,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_barbarian_1_front_stand": {
+   "page": 1,
+   "anchorX": 7,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_barbarian_1_front_walk0": {
+   "page": 1,
+   "anchorX": 7,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_barbarian_1_front_walk1": {
+   "page": 1,
+   "anchorX": 7,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_barbarian_2_back_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_barbarian_2_back_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_barbarian_2_back_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_barbarian_2_front_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_barbarian_2_front_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_barbarian_2_front_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_bard_0_back_stand": {
+   "page": 1,
+   "anchorX": 5,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_bard_0_back_walk0": {
+   "page": 1,
+   "anchorX": 6,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_bard_0_back_walk1": {
+   "page": 1,
+   "anchorX": 5,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_bard_0_front_stand": {
+   "page": 1,
+   "anchorX": 5,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_bard_0_front_walk0": {
+   "page": 1,
+   "anchorX": 5,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_bard_0_front_walk1": {
+   "page": 1,
+   "anchorX": 5,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_bard_1_back_stand": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_bard_1_back_walk0": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_bard_1_back_walk1": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_bard_1_front_stand": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_bard_1_front_walk0": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_bard_1_front_walk1": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_bard_2_back_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_bard_2_back_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_bard_2_back_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_bard_2_front_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_bard_2_front_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_bard_2_front_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_cleric_0_back_stand": {
+   "page": 1,
+   "anchorX": 6,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_cleric_0_back_walk0": {
+   "page": 1,
+   "anchorX": 6,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_cleric_0_back_walk1": {
+   "page": 1,
+   "anchorX": 6,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_cleric_0_front_stand": {
+   "page": 1,
+   "anchorX": 6,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_cleric_0_front_walk0": {
+   "page": 1,
+   "anchorX": 6,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_cleric_0_front_walk1": {
+   "page": 1,
+   "anchorX": 6,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_cleric_1_back_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_cleric_1_back_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_cleric_1_back_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_cleric_1_front_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_cleric_1_front_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_cleric_1_front_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_cleric_2_back_stand": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_cleric_2_back_walk0": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_cleric_2_back_walk1": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_cleric_2_front_stand": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_cleric_2_front_walk0": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_cleric_2_front_walk1": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_druid_0_back_stand": {
+   "page": 1,
+   "anchorX": 6,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_druid_0_back_walk0": {
+   "page": 1,
+   "anchorX": 6,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_druid_0_back_walk1": {
+   "page": 1,
+   "anchorX": 6,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_druid_0_front_stand": {
+   "page": 1,
+   "anchorX": 6,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_druid_0_front_walk0": {
+   "page": 1,
+   "anchorX": 6,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_druid_0_front_walk1": {
+   "page": 1,
+   "anchorX": 6,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_druid_1_back_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_druid_1_back_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_druid_1_back_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_druid_1_front_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_druid_1_front_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_druid_1_front_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_druid_2_back_stand": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_druid_2_back_walk0": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_druid_2_back_walk1": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_druid_2_front_stand": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_druid_2_front_walk0": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_druid_2_front_walk1": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_knight_0_back_stand": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_outfit_knight_0_back_walk0": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_outfit_knight_0_back_walk1": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_outfit_knight_0_front_stand": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_outfit_knight_0_front_walk0": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_outfit_knight_0_front_walk1": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_outfit_knight_1_back_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_outfit_knight_1_back_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_outfit_knight_1_back_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_outfit_knight_1_front_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_outfit_knight_1_front_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_outfit_knight_1_front_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_outfit_knight_2_back_stand": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_outfit_knight_2_back_walk0": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_outfit_knight_2_back_walk1": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_outfit_knight_2_front_stand": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_outfit_knight_2_front_walk0": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_outfit_knight_2_front_walk1": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_outfit_mage_0_back_stand": {
+   "page": 1,
+   "anchorX": 6,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_mage_0_back_walk0": {
+   "page": 1,
+   "anchorX": 6,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_mage_0_back_walk1": {
+   "page": 1,
+   "anchorX": 6,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_mage_0_front_stand": {
+   "page": 1,
+   "anchorX": 6,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_mage_0_front_walk0": {
+   "page": 1,
+   "anchorX": 6,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_mage_0_front_walk1": {
+   "page": 1,
+   "anchorX": 6,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_mage_1_back_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_mage_1_back_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_mage_1_back_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_mage_1_front_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_mage_1_front_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_mage_1_front_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_mage_2_back_stand": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_mage_2_back_walk0": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_mage_2_back_walk1": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_mage_2_front_stand": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_mage_2_front_walk0": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_mage_2_front_walk1": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_thief_0_back_stand": {
+   "page": 1,
+   "anchorX": 5,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_thief_0_back_walk0": {
+   "page": 1,
+   "anchorX": 6,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_thief_0_back_walk1": {
+   "page": 1,
+   "anchorX": 5,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_thief_0_front_stand": {
+   "page": 1,
+   "anchorX": 5,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_thief_0_front_walk0": {
+   "page": 1,
+   "anchorX": 5,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_thief_0_front_walk1": {
+   "page": 1,
+   "anchorX": 5,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_thief_1_back_stand": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_thief_1_back_walk0": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_thief_1_back_walk1": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_thief_1_front_stand": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_thief_1_front_walk0": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_thief_1_front_walk1": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_thief_2_back_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_thief_2_back_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_thief_2_back_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_thief_2_front_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_thief_2_front_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_outfit_thief_2_front_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 21,
+   "res": 2
+  },
+  "hero_prop_archer_0_back": {
+   "page": 1,
+   "anchorX": 7,
+   "anchorY": 35,
+   "res": 2
+  },
+  "hero_prop_archer_0_front": {
+   "page": 1,
+   "anchorX": 7,
+   "anchorY": 35,
+   "res": 2
+  },
+  "hero_prop_archer_1_back": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 35,
+   "res": 2
+  },
+  "hero_prop_archer_1_front": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 35,
+   "res": 2
+  },
+  "hero_prop_archer_2_back": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 35,
+   "res": 2
+  },
+  "hero_prop_archer_2_front": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 35,
+   "res": 2
+  },
+  "hero_prop_barbarian_0_back": {
+   "page": 1,
+   "anchorX": -4,
+   "anchorY": 42,
+   "res": 2
+  },
+  "hero_prop_barbarian_0_front": {
+   "page": 1,
+   "anchorX": -4,
+   "anchorY": 42,
+   "res": 2
+  },
+  "hero_prop_barbarian_1_back": {
+   "page": 1,
+   "anchorX": -7,
+   "anchorY": 42,
+   "res": 2
+  },
+  "hero_prop_barbarian_1_front": {
+   "page": 1,
+   "anchorX": -7,
+   "anchorY": 42,
+   "res": 2
+  },
+  "hero_prop_barbarian_2_back": {
+   "page": 1,
+   "anchorX": -9,
+   "anchorY": 42,
+   "res": 2
+  },
+  "hero_prop_barbarian_2_front": {
+   "page": 1,
+   "anchorX": -9,
+   "anchorY": 42,
+   "res": 2
+  },
+  "hero_prop_cleric_0_back": {
+   "page": 1,
+   "anchorX": 0,
+   "anchorY": 34,
+   "res": 2
+  },
+  "hero_prop_cleric_0_front": {
+   "page": 1,
+   "anchorX": 0,
+   "anchorY": 34,
+   "res": 2
+  },
+  "hero_prop_cleric_1_back": {
+   "page": 1,
+   "anchorX": -3,
+   "anchorY": 34,
+   "res": 2
+  },
+  "hero_prop_cleric_1_front": {
+   "page": 1,
+   "anchorX": -3,
+   "anchorY": 34,
+   "res": 2
+  },
+  "hero_prop_cleric_2_back": {
+   "page": 1,
+   "anchorX": -5,
+   "anchorY": 34,
+   "res": 2
+  },
+  "hero_prop_cleric_2_front": {
+   "page": 1,
+   "anchorX": -5,
+   "anchorY": 34,
+   "res": 2
+  },
+  "hero_prop_druid_0_back": {
+   "page": 1,
+   "anchorX": 1,
+   "anchorY": 53,
+   "res": 2
+  },
+  "hero_prop_druid_0_front": {
+   "page": 1,
+   "anchorX": 1,
+   "anchorY": 53,
+   "res": 2
+  },
+  "hero_prop_druid_1_back": {
+   "page": 1,
+   "anchorX": -2,
+   "anchorY": 53,
+   "res": 2
+  },
+  "hero_prop_druid_1_front": {
+   "page": 1,
+   "anchorX": -2,
+   "anchorY": 53,
+   "res": 2
+  },
+  "hero_prop_druid_2_back": {
+   "page": 1,
+   "anchorX": -4,
+   "anchorY": 53,
+   "res": 2
+  },
+  "hero_prop_druid_2_front": {
+   "page": 1,
+   "anchorX": -4,
+   "anchorY": 53,
+   "res": 2
+  },
+  "hero_prop_knight_0_back": {
+   "page": 1,
+   "anchorX": -1,
+   "anchorY": 40,
+   "res": 2
+  },
+  "hero_prop_knight_0_front": {
+   "page": 1,
+   "anchorX": -1,
+   "anchorY": 40,
+   "res": 2
+  },
+  "hero_prop_knight_1_back": {
+   "page": 1,
+   "anchorX": -4,
+   "anchorY": 40,
+   "res": 2
+  },
+  "hero_prop_knight_1_front": {
+   "page": 1,
+   "anchorX": -4,
+   "anchorY": 40,
+   "res": 2
+  },
+  "hero_prop_knight_2_back": {
+   "page": 1,
+   "anchorX": -6,
+   "anchorY": 40,
+   "res": 2
+  },
+  "hero_prop_knight_2_front": {
+   "page": 1,
+   "anchorX": -6,
+   "anchorY": 40,
+   "res": 2
+  },
+  "hero_prop_mage_0_back": {
+   "page": 1,
+   "anchorX": 1,
+   "anchorY": 56,
+   "res": 2
+  },
+  "hero_prop_mage_0_front": {
+   "page": 1,
+   "anchorX": 1,
+   "anchorY": 56,
+   "res": 2
+  },
+  "hero_prop_mage_1_back": {
+   "page": 1,
+   "anchorX": -2,
+   "anchorY": 56,
+   "res": 2
+  },
+  "hero_prop_mage_1_front": {
+   "page": 1,
+   "anchorX": -2,
+   "anchorY": 56,
+   "res": 2
+  },
+  "hero_prop_mage_2_back": {
+   "page": 1,
+   "anchorX": -4,
+   "anchorY": 56,
+   "res": 2
+  },
+  "hero_prop_mage_2_front": {
+   "page": 1,
+   "anchorX": -4,
+   "anchorY": 56,
+   "res": 2
+  },
+  "hero_prop_thief_0_back": {
+   "page": 1,
+   "anchorX": -3,
+   "anchorY": 13,
+   "res": 2
+  },
+  "hero_prop_thief_0_front": {
+   "page": 1,
+   "anchorX": -3,
+   "anchorY": 13,
+   "res": 2
+  },
+  "hero_prop_thief_1_back": {
+   "page": 1,
+   "anchorX": -6,
+   "anchorY": 13,
+   "res": 2
+  },
+  "hero_prop_thief_1_front": {
+   "page": 1,
+   "anchorX": -6,
+   "anchorY": 13,
+   "res": 2
+  },
+  "hero_prop_thief_2_back": {
+   "page": 1,
+   "anchorX": -8,
+   "anchorY": 13,
+   "res": 2
+  },
+  "hero_prop_thief_2_front": {
+   "page": 1,
+   "anchorX": -8,
+   "anchorY": 13,
+   "res": 2
+  },
+  "hero_rim_archer_0_back_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 47,
+   "res": 2
+  },
+  "hero_rim_archer_0_back_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 47,
+   "res": 2
+  },
+  "hero_rim_archer_0_back_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 47,
+   "res": 2
+  },
+  "hero_rim_archer_0_front_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 47,
+   "res": 2
+  },
+  "hero_rim_archer_0_front_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 47,
+   "res": 2
+  },
+  "hero_rim_archer_0_front_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 47,
+   "res": 2
+  },
+  "hero_rim_archer_1_back_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 47,
+   "res": 2
+  },
+  "hero_rim_archer_1_back_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 47,
+   "res": 2
+  },
+  "hero_rim_archer_1_back_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 47,
+   "res": 2
+  },
+  "hero_rim_archer_1_front_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 47,
+   "res": 2
+  },
+  "hero_rim_archer_1_front_walk0": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 47,
+   "res": 2
+  },
+  "hero_rim_archer_1_front_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 47,
+   "res": 2
+  },
+  "hero_rim_archer_2_back_stand": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 47,
+   "res": 2
+  },
+  "hero_rim_archer_2_back_walk0": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 47,
+   "res": 2
+  },
+  "hero_rim_archer_2_back_walk1": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 47,
+   "res": 2
+  },
+  "hero_rim_archer_2_front_stand": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 47,
+   "res": 2
+  },
+  "hero_rim_archer_2_front_walk0": {
+   "page": 1,
+   "anchorX": 13,
+   "anchorY": 47,
+   "res": 2
+  },
+  "hero_rim_archer_2_front_walk1": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 47,
+   "res": 2
+  },
+  "hero_rim_barbarian_0_back_stand": {
+   "page": 1,
+   "anchorX": 13,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_barbarian_0_back_walk0": {
+   "page": 1,
+   "anchorX": 13,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_barbarian_0_back_walk1": {
+   "page": 1,
+   "anchorX": 13,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_barbarian_0_front_stand": {
+   "page": 1,
+   "anchorX": 13,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_barbarian_0_front_walk0": {
+   "page": 1,
+   "anchorX": 13,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_barbarian_0_front_walk1": {
+   "page": 1,
+   "anchorX": 13,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_barbarian_1_back_stand": {
+   "page": 1,
+   "anchorX": 13,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_barbarian_1_back_walk0": {
+   "page": 1,
+   "anchorX": 13,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_barbarian_1_back_walk1": {
+   "page": 1,
+   "anchorX": 13,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_barbarian_1_front_stand": {
+   "page": 1,
+   "anchorX": 13,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_barbarian_1_front_walk0": {
+   "page": 1,
+   "anchorX": 13,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_barbarian_1_front_walk1": {
+   "page": 1,
+   "anchorX": 13,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_barbarian_2_back_stand": {
+   "page": 1,
+   "anchorX": 13,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_barbarian_2_back_walk0": {
+   "page": 1,
+   "anchorX": 13,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_barbarian_2_back_walk1": {
+   "page": 1,
+   "anchorX": 13,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_barbarian_2_front_stand": {
+   "page": 1,
+   "anchorX": 13,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_barbarian_2_front_walk0": {
+   "page": 1,
+   "anchorX": 13,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_barbarian_2_front_walk1": {
+   "page": 1,
+   "anchorX": 13,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_bard_0_back_stand": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 46,
+   "res": 2
+  },
+  "hero_rim_bard_0_back_walk0": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 46,
+   "res": 2
+  },
+  "hero_rim_bard_0_back_walk1": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 46,
+   "res": 2
+  },
+  "hero_rim_bard_0_front_stand": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 46,
+   "res": 2
+  },
+  "hero_rim_bard_0_front_walk0": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 46,
+   "res": 2
+  },
+  "hero_rim_bard_0_front_walk1": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 46,
+   "res": 2
+  },
+  "hero_rim_bard_1_back_stand": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 46,
+   "res": 2
+  },
+  "hero_rim_bard_1_back_walk0": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 46,
+   "res": 2
+  },
+  "hero_rim_bard_1_back_walk1": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 46,
+   "res": 2
+  },
+  "hero_rim_bard_1_front_stand": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 46,
+   "res": 2
+  },
+  "hero_rim_bard_1_front_walk0": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 46,
+   "res": 2
+  },
+  "hero_rim_bard_1_front_walk1": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 46,
+   "res": 2
+  },
+  "hero_rim_bard_2_back_stand": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 46,
+   "res": 2
+  },
+  "hero_rim_bard_2_back_walk0": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 46,
+   "res": 2
+  },
+  "hero_rim_bard_2_back_walk1": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 46,
+   "res": 2
+  },
+  "hero_rim_bard_2_front_stand": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 46,
+   "res": 2
+  },
+  "hero_rim_bard_2_front_walk0": {
+   "page": 1,
+   "anchorX": 13,
+   "anchorY": 46,
+   "res": 2
+  },
+  "hero_rim_bard_2_front_walk1": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 46,
+   "res": 2
+  },
+  "hero_rim_cleric_0_back_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_cleric_0_back_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_cleric_0_back_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_cleric_0_front_stand": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_cleric_0_front_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_cleric_0_front_walk1": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_cleric_1_back_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_cleric_1_back_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_cleric_1_back_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_cleric_1_front_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_cleric_1_front_walk0": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_cleric_1_front_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_cleric_2_back_stand": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_cleric_2_back_walk0": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_cleric_2_back_walk1": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_cleric_2_front_stand": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_cleric_2_front_walk0": {
+   "page": 1,
+   "anchorX": 13,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_cleric_2_front_walk1": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 48,
+   "res": 2
+  },
+  "hero_rim_druid_0_back_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 53,
+   "res": 2
+  },
+  "hero_rim_druid_0_back_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 53,
+   "res": 2
+  },
+  "hero_rim_druid_0_back_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 53,
+   "res": 2
+  },
+  "hero_rim_druid_0_front_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 53,
+   "res": 2
+  },
+  "hero_rim_druid_0_front_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 53,
+   "res": 2
+  },
+  "hero_rim_druid_0_front_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 53,
+   "res": 2
+  },
+  "hero_rim_druid_1_back_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 53,
+   "res": 2
+  },
+  "hero_rim_druid_1_back_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 53,
+   "res": 2
+  },
+  "hero_rim_druid_1_back_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 53,
+   "res": 2
+  },
+  "hero_rim_druid_1_front_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 53,
+   "res": 2
+  },
+  "hero_rim_druid_1_front_walk0": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 53,
+   "res": 2
+  },
+  "hero_rim_druid_1_front_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 53,
+   "res": 2
+  },
+  "hero_rim_druid_2_back_stand": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 53,
+   "res": 2
+  },
+  "hero_rim_druid_2_back_walk0": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 53,
+   "res": 2
+  },
+  "hero_rim_druid_2_back_walk1": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 53,
+   "res": 2
+  },
+  "hero_rim_druid_2_front_stand": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 53,
+   "res": 2
+  },
+  "hero_rim_druid_2_front_walk0": {
+   "page": 1,
+   "anchorX": 13,
+   "anchorY": 53,
+   "res": 2
+  },
+  "hero_rim_druid_2_front_walk1": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 53,
+   "res": 2
+  },
+  "hero_rim_knight_0_back_stand": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 42,
+   "res": 2
+  },
+  "hero_rim_knight_0_back_walk0": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 42,
+   "res": 2
+  },
+  "hero_rim_knight_0_back_walk1": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 42,
+   "res": 2
+  },
+  "hero_rim_knight_0_front_stand": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 42,
+   "res": 2
+  },
+  "hero_rim_knight_0_front_walk0": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 42,
+   "res": 2
+  },
+  "hero_rim_knight_0_front_walk1": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 42,
+   "res": 2
+  },
+  "hero_rim_knight_1_back_stand": {
+   "page": 1,
+   "anchorX": 15,
+   "anchorY": 42,
+   "res": 2
+  },
+  "hero_rim_knight_1_back_walk0": {
+   "page": 1,
+   "anchorX": 15,
+   "anchorY": 42,
+   "res": 2
+  },
+  "hero_rim_knight_1_back_walk1": {
+   "page": 1,
+   "anchorX": 15,
+   "anchorY": 42,
+   "res": 2
+  },
+  "hero_rim_knight_1_front_stand": {
+   "page": 1,
+   "anchorX": 15,
+   "anchorY": 42,
+   "res": 2
+  },
+  "hero_rim_knight_1_front_walk0": {
+   "page": 1,
+   "anchorX": 15,
+   "anchorY": 42,
+   "res": 2
+  },
+  "hero_rim_knight_1_front_walk1": {
+   "page": 1,
+   "anchorX": 15,
+   "anchorY": 42,
+   "res": 2
+  },
+  "hero_rim_knight_2_back_stand": {
+   "page": 1,
+   "anchorX": 17,
+   "anchorY": 42,
+   "res": 2
+  },
+  "hero_rim_knight_2_back_walk0": {
+   "page": 1,
+   "anchorX": 17,
+   "anchorY": 42,
+   "res": 2
+  },
+  "hero_rim_knight_2_back_walk1": {
+   "page": 1,
+   "anchorX": 17,
+   "anchorY": 42,
+   "res": 2
+  },
+  "hero_rim_knight_2_front_stand": {
+   "page": 1,
+   "anchorX": 17,
+   "anchorY": 42,
+   "res": 2
+  },
+  "hero_rim_knight_2_front_walk0": {
+   "page": 1,
+   "anchorX": 17,
+   "anchorY": 42,
+   "res": 2
+  },
+  "hero_rim_knight_2_front_walk1": {
+   "page": 1,
+   "anchorX": 17,
+   "anchorY": 42,
+   "res": 2
+  },
+  "hero_rim_mage_0_back_stand": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 56,
+   "res": 2
+  },
+  "hero_rim_mage_0_back_walk0": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 56,
+   "res": 2
+  },
+  "hero_rim_mage_0_back_walk1": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 56,
+   "res": 2
+  },
+  "hero_rim_mage_0_front_stand": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 56,
+   "res": 2
+  },
+  "hero_rim_mage_0_front_walk0": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 56,
+   "res": 2
+  },
+  "hero_rim_mage_0_front_walk1": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 56,
+   "res": 2
+  },
+  "hero_rim_mage_1_back_stand": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 56,
+   "res": 2
+  },
+  "hero_rim_mage_1_back_walk0": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 56,
+   "res": 2
+  },
+  "hero_rim_mage_1_back_walk1": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 56,
+   "res": 2
+  },
+  "hero_rim_mage_1_front_stand": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 56,
+   "res": 2
+  },
+  "hero_rim_mage_1_front_walk0": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 56,
+   "res": 2
+  },
+  "hero_rim_mage_1_front_walk1": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 56,
+   "res": 2
+  },
+  "hero_rim_mage_2_back_stand": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 56,
+   "res": 2
+  },
+  "hero_rim_mage_2_back_walk0": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 56,
+   "res": 2
+  },
+  "hero_rim_mage_2_back_walk1": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 56,
+   "res": 2
+  },
+  "hero_rim_mage_2_front_stand": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 56,
+   "res": 2
+  },
+  "hero_rim_mage_2_front_walk0": {
+   "page": 1,
+   "anchorX": 13,
+   "anchorY": 56,
+   "res": 2
+  },
+  "hero_rim_mage_2_front_walk1": {
+   "page": 1,
+   "anchorX": 12,
+   "anchorY": 56,
+   "res": 2
+  },
+  "hero_rim_thief_0_back_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 41,
+   "res": 2
+  },
+  "hero_rim_thief_0_back_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 41,
+   "res": 2
+  },
+  "hero_rim_thief_0_back_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 41,
+   "res": 2
+  },
+  "hero_rim_thief_0_front_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 41,
+   "res": 2
+  },
+  "hero_rim_thief_0_front_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 41,
+   "res": 2
+  },
+  "hero_rim_thief_0_front_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 41,
+   "res": 2
+  },
+  "hero_rim_thief_1_back_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 41,
+   "res": 2
+  },
+  "hero_rim_thief_1_back_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 41,
+   "res": 2
+  },
+  "hero_rim_thief_1_back_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 41,
+   "res": 2
+  },
+  "hero_rim_thief_1_front_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 41,
+   "res": 2
+  },
+  "hero_rim_thief_1_front_walk0": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 41,
+   "res": 2
+  },
+  "hero_rim_thief_1_front_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 41,
+   "res": 2
+  },
+  "hero_rim_thief_2_back_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 41,
+   "res": 2
+  },
+  "hero_rim_thief_2_back_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 41,
+   "res": 2
+  },
+  "hero_rim_thief_2_back_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 41,
+   "res": 2
+  },
+  "hero_rim_thief_2_front_stand": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 41,
+   "res": 2
+  },
+  "hero_rim_thief_2_front_walk0": {
+   "page": 1,
+   "anchorX": 13,
+   "anchorY": 41,
+   "res": 2
+  },
+  "hero_rim_thief_2_front_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 41,
+   "res": 2
+  },
+  "hero_scarf_0_back_stand": {
+   "page": 1,
+   "anchorX": 3,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_scarf_0_back_walk0": {
+   "page": 1,
+   "anchorX": 3,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_scarf_0_back_walk1": {
+   "page": 1,
+   "anchorX": 3,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_scarf_0_front_stand": {
+   "page": 1,
+   "anchorX": 7,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_scarf_0_front_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_scarf_0_front_walk1": {
+   "page": 1,
+   "anchorX": 5,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_scarf_1_back_stand": {
+   "page": 1,
+   "anchorX": 5,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_scarf_1_back_walk0": {
+   "page": 1,
+   "anchorX": 5,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_scarf_1_back_walk1": {
+   "page": 1,
+   "anchorX": 5,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_scarf_1_front_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_scarf_1_front_walk0": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_scarf_1_front_walk1": {
+   "page": 1,
+   "anchorX": 7,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_scarf_2_back_stand": {
+   "page": 1,
+   "anchorX": 7,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_scarf_2_back_walk0": {
+   "page": 1,
+   "anchorX": 7,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_scarf_2_back_walk1": {
+   "page": 1,
+   "anchorX": 7,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_scarf_2_front_stand": {
+   "page": 1,
+   "anchorX": 11,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_scarf_2_front_walk0": {
+   "page": 1,
+   "anchorX": 13,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_scarf_2_front_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 22,
+   "res": 2
+  },
+  "hero_skin_archer_0_back_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_archer_0_back_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_archer_0_back_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_archer_0_front_stand": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_archer_0_front_walk0": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_archer_0_front_walk1": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_archer_1_back_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_archer_1_back_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_archer_1_back_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_archer_1_front_stand": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_archer_1_front_walk0": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_archer_1_front_walk1": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_archer_2_back_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_archer_2_back_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_archer_2_back_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_archer_2_front_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_archer_2_front_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_archer_2_front_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_barbarian_0_back_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_barbarian_0_back_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_barbarian_0_back_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_barbarian_0_front_stand": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_barbarian_0_front_walk0": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_barbarian_0_front_walk1": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_barbarian_1_back_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_barbarian_1_back_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_barbarian_1_back_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_barbarian_1_front_stand": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_barbarian_1_front_walk0": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_barbarian_1_front_walk1": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_barbarian_2_back_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_barbarian_2_back_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_barbarian_2_back_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_barbarian_2_front_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_barbarian_2_front_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_barbarian_2_front_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_bard_0_back_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_bard_0_back_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_bard_0_back_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_bard_0_front_stand": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_bard_0_front_walk0": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_bard_0_front_walk1": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_bard_1_back_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_bard_1_back_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_bard_1_back_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_bard_1_front_stand": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_bard_1_front_walk0": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_bard_1_front_walk1": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_bard_2_back_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_bard_2_back_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_bard_2_back_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_bard_2_front_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_bard_2_front_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_bard_2_front_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_cleric_0_back_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_cleric_0_back_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_cleric_0_back_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_cleric_0_front_stand": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_cleric_0_front_walk0": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_cleric_0_front_walk1": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_cleric_1_back_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_cleric_1_back_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_cleric_1_back_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_cleric_1_front_stand": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_cleric_1_front_walk0": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_cleric_1_front_walk1": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_cleric_2_back_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_cleric_2_back_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_cleric_2_back_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_cleric_2_front_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_cleric_2_front_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_cleric_2_front_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_druid_0_back_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_druid_0_back_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_druid_0_back_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_druid_0_front_stand": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_druid_0_front_walk0": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_druid_0_front_walk1": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_druid_1_back_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_druid_1_back_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_druid_1_back_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_druid_1_front_stand": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_druid_1_front_walk0": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_druid_1_front_walk1": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_druid_2_back_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_druid_2_back_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_druid_2_back_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_druid_2_front_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_druid_2_front_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_druid_2_front_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_knight_0_back_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_knight_0_back_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_knight_0_back_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_knight_0_front_stand": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_knight_0_front_walk0": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_knight_0_front_walk1": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_knight_1_back_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_knight_1_back_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_knight_1_back_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_knight_1_front_stand": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_knight_1_front_walk0": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_knight_1_front_walk1": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_knight_2_back_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_knight_2_back_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_knight_2_back_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_knight_2_front_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_knight_2_front_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_knight_2_front_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_mage_0_back_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_mage_0_back_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_mage_0_back_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_mage_0_front_stand": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_mage_0_front_walk0": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_mage_0_front_walk1": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_mage_1_back_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_mage_1_back_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_mage_1_back_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_mage_1_front_stand": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_mage_1_front_walk0": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_mage_1_front_walk1": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_mage_2_back_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_mage_2_back_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_mage_2_back_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_mage_2_front_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_mage_2_front_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_mage_2_front_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_thief_0_back_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_thief_0_back_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_thief_0_back_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_thief_0_front_stand": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_thief_0_front_walk0": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_thief_0_front_walk1": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_thief_1_back_stand": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_thief_1_back_walk0": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_thief_1_back_walk1": {
+   "page": 1,
+   "anchorX": 9,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_thief_1_front_stand": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_thief_1_front_walk0": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_thief_1_front_walk1": {
+   "page": 1,
+   "anchorX": 8,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_thief_2_back_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_thief_2_back_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_thief_2_back_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_thief_2_front_stand": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_thief_2_front_walk0": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
+   "res": 2
+  },
+  "hero_skin_thief_2_front_walk1": {
+   "page": 1,
+   "anchorX": 10,
+   "anchorY": 36,
    "res": 2
   },
   "icon_axe": {

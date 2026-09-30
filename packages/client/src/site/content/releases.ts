@@ -42,6 +42,36 @@ export const NOTE_LABELS: Record<NoteKind, string> = {
 
 export const RELEASES: Release[] = [
   {
+    slug: "make-your-mark",
+    version: "0.16",
+    title: "Make Your Mark",
+    date: "2026-09-30",
+    theme: "blossom",
+    summary:
+      "Design your own explorer: eight classes, three builds and your own skin, hair and eye colours, in brand-new big-headed pixel art.",
+    intro: [
+      "Everyone now starts with a character creator in the lobby. Pick who you are before you set sail, and everyone on the island sees it.",
+    ],
+    sections: [
+      {
+        kind: "new",
+        items: [
+          "Eight classes to choose from: Mage, Thief, Knight, Archer, Cleric, Barbarian, Bard and Druid, each with their own hat, clothes and something to hold. For now it is all cosmetic.",
+          "Choose your skin tone, hair colour and eye colour, and a slim, average or sturdy build.",
+          "A live preview turns around when you click it, and your choice is remembered for next time.",
+        ],
+      },
+      {
+        kind: "improved",
+        items: [
+          "Explorers are redrawn from scratch: bigger heads, bigger hats, cleaner shading, in layers so clothes, hats, weapons and boots can be swapped in later.",
+          "Your scarf is in your player colour, so you still stand out in a crowd.",
+          "The camera no longer zooms; the world is drawn at one fixed, comfortable size.",
+        ],
+      },
+    ],
+  },
+  {
     slug: "free-roaming",
     version: "0.15",
     title: "Free Roaming",

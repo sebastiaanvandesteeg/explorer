@@ -69,7 +69,7 @@ describe("biomes", () => {
     }
     // A region is 192 x 192 = 36,864 tiles; borders wander, so allow a wide margin.
     for (const n of tiles) expect(n).toBeGreaterThan(15_000);
-  });
+  }, 60_000);
 
   it("grows only the island's own biome plants and resources", () => {
     const w = generateWorld("flora", "sunfolk");

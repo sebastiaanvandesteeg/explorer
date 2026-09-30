@@ -1,5 +1,6 @@
 import type { Sprite } from "./sprite";
 import { buildingSprites } from "./sprites/buildings";
+import { heroSprites } from "./sprites/heroes";
 import { interiorSprites } from "./sprites/interiors";
 import { decorSprites } from "./sprites/decor";
 import { natureSprites } from "./sprites/nature";
@@ -14,5 +15,6 @@ export function allSprites(): Sprite[] {
     ...buildingSprites(),
     ...interiorSprites(),
     ...unitSprites(),
+    ...heroSprites(),
   ];
 }

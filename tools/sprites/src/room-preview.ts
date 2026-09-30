@@ -71,7 +71,17 @@ function preview(room: BuildingKind, tribe: TribeId, out: string): void {
   const entry = roomEntry(def);
   things.push({
     key: entry.x + entry.y + 1,
-    draw: () => put(`hero_${tribe}_0_back_stand`, entry.x + 0.5, entry.y + 0.5),
+    draw: () => {
+      // A mage, untinted (the game multiplies the skin and hair layers by the player's colours).
+      for (const name of [
+        "hero_outfit_mage_1_back_stand",
+        "hero_skin_mage_1_back_stand",
+        "hero_hair_back",
+        "hero_hat_mage_back",
+        "hero_prop_mage_1_back",
+      ])
+        put(name, entry.x + 0.5, entry.y + 0.5);
+    },
   });
   for (const t of things.sort((a, b) => a.key - b.key)) t.draw();
   for (const p of pieces.filter((q) => q.layer === "door")) put(p.sprite, p.x, p.y);

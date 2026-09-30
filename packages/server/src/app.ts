@@ -152,7 +152,7 @@ export async function startApp(opts: AppOptions): Promise<App> {
         return;
       }
       if (ws.readyState !== ws.OPEN) return;
-      if (!target.join(ws, msg.name, msg.token)) {
+      if (!target.join(ws, msg.name, msg.token, msg.look)) {
         ws.send(
           JSON.stringify({
             t: "error",

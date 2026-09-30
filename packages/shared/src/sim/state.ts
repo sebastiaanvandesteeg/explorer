@@ -4,6 +4,7 @@ import { hash2d } from "../rng";
 import { DIFFICULTY_DEFS, type Difficulty } from "./difficulty";
 import { scatterLoot } from "./inventory";
 import type { ItemKind, ItemStack } from "./items";
+import type { CharacterLook } from "./looks";
 import { sightFactor } from "./light";
 import type { BiomeId } from "../world/biomes";
 import { Terrain, type Dir, type NodeKind, type SiteKind, type WorldMap } from "../world/types";
@@ -107,6 +108,8 @@ export interface CharacterEntity extends Walker {
   type: "character";
   /** The player slot that controls this character (see `PlayerInfo.id`). */
   playerId: string;
+  /** Class, build and colours, chosen by the player. */
+  look: CharacterLook;
   /** What this player carries: their own, never shared with the team's stock. */
   pack: ItemStack[];
   /** An item on the ground this character is walking over to pick up. */

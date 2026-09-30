@@ -1,10 +1,12 @@
 // Everything from a socket is untrusted: check shapes before the simulation sees it.
 import {
   BUILDINGS,
+  isLook,
   MAX_CHAT_LENGTH,
   MAX_NAME_LENGTH,
   PACK_SLOTS,
   RESOURCES,
+  sanitizeLook,
   UPGRADES,
   type BuildingKind,
   type ClientMessage,
@@ -144,7 +146,15 @@ export function parseClientMessage(raw: string): ClientMessage | null {
       const name = cleanName(v.name);
       if (typeof v.worldId !== "string" || !WORLD_ID.test(v.worldId)) return null;
       if (typeof v.token !== "string" || !TOKEN.test(v.token) || !name) return null;
-      return { t: "join", worldId: v.worldId, name, token: v.token };
+      if (v.look === undefined) return { t: "join", worldId: v.worldId, name, token: v.token };
+      if (!isLook(v.look)) return null;
+      return {
+        t: "join",
+        worldId: v.worldId,
+        name,
+        token: v.token,
+        look: sanitizeLook(v.look),
+      };
     }
     case "cmd": {
       const cmd = parseCommand(v.cmd);

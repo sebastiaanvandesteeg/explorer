@@ -901,6 +901,96 @@ input.field:focus {
   border-color: var(--parchment);
   background: rgba(238, 208, 153, 0.12);
 }
+.creator {
+  display: grid;
+  gap: 8px;
+}
+.creator-top {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  gap: 10px;
+  align-items: stretch;
+}
+.creator .preview {
+  display: grid;
+  place-items: end center;
+  background:
+    radial-gradient(ellipse at 50% 88%, rgba(238, 208, 153, 0.22), transparent 62%),
+    rgba(0, 0, 0, 0.25);
+  border: 2px solid var(--wood-dark);
+  border-radius: 6px;
+  padding: 6px 0 8px;
+}
+.hero-canvas {
+  image-rendering: pixelated;
+  width: 48px;
+  height: 64px;
+}
+.hero-canvas.big {
+  width: 144px;
+  height: 192px;
+  cursor: pointer;
+}
+.classes {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+}
+.class-card {
+  display: grid;
+  justify-items: center;
+  gap: 0;
+  padding: 2px 2px 4px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.2);
+  border: 2px solid var(--wood-dark);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.class-card .hero-canvas {
+  width: 72px;
+  height: 96px;
+}
+.class-card strong {
+  font-size: 12px;
+}
+.class-card:hover {
+  border-color: var(--wood);
+}
+.class-card.active {
+  border-color: var(--parchment);
+  background: rgba(238, 208, 153, 0.12);
+}
+.creator-rows {
+  display: grid;
+  gap: 6px;
+}
+.creator-rows > label {
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  align-items: center;
+  gap: 8px;
+}
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.swatch {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 2px solid var(--wood-dark);
+  border-radius: 4px;
+}
+.swatch:hover {
+  border-color: var(--wood);
+}
+.swatch.active {
+  border-color: var(--parchment);
+  outline: 2px solid var(--ink);
+  box-shadow: 0 0 0 1px var(--parchment);
+}
 .lobby .field small {
   opacity: 0.75;
   font-size: 12px;

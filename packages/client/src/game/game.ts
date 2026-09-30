@@ -176,7 +176,6 @@ export class Game {
       state.world.tribe,
       (id) => this.entities.playerColour(id),
       (id) => session.players.find((p) => p.id === id)?.name ?? "?",
-      () => this.camera.zoom,
     );
     app.stage.addChild(this.room.layer);
 
@@ -222,7 +221,6 @@ export class Game {
     this.entities.rebuild(state);
     this.hud.setStock(state);
     const th = state.world.start.townHall;
-    this.camera.zoom = window.innerHeight > 1000 ? 3 : 2;
     const me = this.myCharacter();
     if (me) this.centerOnTile(me.x, me.y);
     else this.centerOnTile(th.x + 1.5, th.y + 1.5);
@@ -702,7 +700,7 @@ export class Game {
 
   private bindInput(): void {
     const canvas = this.app.canvas;
-    const local = (e: PointerEvent | WheelEvent) => {
+    const local = (e: PointerEvent) => {
       const r = canvas.getBoundingClientRect();
       return { x: e.clientX - r.left, y: e.clientY - r.top };
     };
@@ -770,16 +768,6 @@ export class Game {
       this.hoverTile = null;
       this.session.cursor(null, null);
     });
-    on(
-      canvas,
-      "wheel",
-      (e) => {
-        e.preventDefault();
-        const p = local(e);
-        this.camera.zoomAt(e.deltaY < 0 ? 1 : -1, p.x, p.y);
-      },
-      { passive: false },
-    );
     on(window, "keydown", (e) => {
       if (e.target instanceof HTMLInputElement) return;
       const k = e.key.toLowerCase();
@@ -805,11 +793,7 @@ export class Game {
           const th = this.session.state.world.start.townHall;
           this.centerOnTile(th.x + 1.5, th.y + 1.5);
         }
-      } else if (k === "+" || k === "=")
-        this.camera.zoomAt(1, this.camera.width / 2, this.camera.height / 2);
-      else if (k === "-" || k === "_")
-        this.camera.zoomAt(-1, this.camera.width / 2, this.camera.height / 2);
-      else if (k === "delete" || k === "backspace") {
+      } else if (k === "delete" || k === "backspace") {
         const e2 =
           this.selected !== null ? this.session.state.entities.get(this.selected) : undefined;
         if (e2?.type === "building" && BUILDINGS[e2.kind].buildable) {

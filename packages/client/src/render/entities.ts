@@ -30,13 +30,12 @@ import {
 } from "@explorer/shared";
 import { Container, Graphics, Sprite, Texture, type Rectangle } from "pixi.js";
 import type { Atlas } from "../assets";
+import { HeroRig } from "./heroRig";
 import { coverAlpha, coverAt } from "./occlusion";
 import {
   buildingSprite,
   markerSprite,
   nodeSprite,
-  heroCapeSprite,
-  heroSprite,
   scaffoldSprite,
   tileJitter,
   villagerSprite,
@@ -483,20 +482,14 @@ class VillagerView extends MovingView {
  */
 class HeroView extends MovingView {
   readonly root = new Container();
-  private readonly body: Sprite;
-  private readonly capeUnder: Sprite;
-  private readonly capeOver: Sprite;
+  private readonly rig: HeroRig;
   private c: CharacterEntity | null = null;
   private height = 0;
 
   constructor(private readonly layer: EntityLayer) {
     super();
-    const tribe = layer.state.world.tribe;
-    const first = heroSprite(tribe, 0, false, "stand");
-    this.capeUnder = layer.atlas.sprite(heroCapeSprite(false, "under", "stand"));
-    this.body = layer.atlas.sprite(first);
-    this.capeOver = layer.atlas.sprite(heroCapeSprite(false, "over", "stand"));
-    this.root.addChild(this.capeUnder, this.body, this.capeOver);
+    this.rig = new HeroRig(layer.atlas);
+    this.root.addChild(this.rig.root);
   }
 
   update(e: Entity, now: number): void {
@@ -516,21 +509,7 @@ class HeroView extends MovingView {
       Math.sign(targetH - this.height) * Math.min(Math.abs(targetH - this.height), dt * 48);
     const phase = Math.floor(now / 160 + c.id) % 2;
     const pose = this.moving ? (phase ? "walk0" : "walk1") : "stand";
-    const back = c.facing === 2 || c.facing === 3;
-    const flip = c.facing === 1 || c.facing === 2;
-    const show = (sprite: Sprite, name: string) => {
-      this.layer.atlas.setFrame(sprite, name);
-      const k = Math.abs(sprite.scale.x);
-      sprite.scale.x = flip ? -k : k;
-    };
-    show(this.body, heroSprite(this.layer.state.world.tribe, c.tunic, back, pose));
-    // From the front the cape hangs behind the body; from the back it covers it.
-    this.capeUnder.visible = !back;
-    if (!back) show(this.capeUnder, heroCapeSprite(false, "under", pose));
-    show(this.capeOver, heroCapeSprite(back, "over", pose));
-    const tint = this.layer.playerColour(c.playerId);
-    this.capeUnder.tint = tint;
-    this.capeOver.tint = tint;
+    this.rig.set(c.look, this.layer.playerColour(c.playerId), c.facing, pose);
     this.root.position.set(
       Math.round(screenX(this.x, this.y)),
       Math.round(screenY(this.x, this.y) - this.height),

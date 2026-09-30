@@ -2,6 +2,7 @@
 import type { TribeId } from "../tribes";
 import type { WorldMap } from "../world/types";
 import { isDifficulty, type Difficulty } from "./difficulty";
+import { defaultLookFor, sanitizeLook } from "./looks";
 import { SIGNATURE_NODES } from "../world/biomes";
 import { NODES, SHIP_HP, type Stock, type UpgradeId } from "./catalogue";
 import {
@@ -111,6 +112,7 @@ export function fromWire(w: WireEntity): Entity {
     e.aboard ??= null;
   } else if (e.type === "character") {
     e.path = [];
+    e.look = e.look ? sanitizeLook(e.look) : defaultLookFor(e.id);
     e.dest ??= null;
     e.aboard ??= null;
     e.pack ??= [];

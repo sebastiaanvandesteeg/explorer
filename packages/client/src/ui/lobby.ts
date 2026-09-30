@@ -11,7 +11,8 @@ import {
   type WorldInfo,
 } from "@explorer/shared";
 import type { Atlas } from "../assets";
-import { playerName, savePlayerName } from "../net/identity";
+import { playerLook, playerName, savePlayerLook, savePlayerName } from "../net/identity";
+import { characterCreator } from "./creator";
 import { h } from "./dom";
 
 export interface LobbyOptions {
@@ -175,6 +176,7 @@ export function showLobby(root: HTMLElement, opts: LobbyOptions): () => void {
     opts.onEnter(n, match[1]!.toLowerCase());
   };
 
+  const creator = characterCreator(opts.atlas, playerLook(), savePlayerLook);
   const card = h("div.lobby-card.panel");
   if (opts.joinId) {
     const go = h(
@@ -190,6 +192,7 @@ export function showLobby(root: HTMLElement, opts: LobbyOptions): () => void {
         "You've been invited to a co-op expedition. Explore the islands and build a settlement together.",
       ),
       h("label", {}, "Your name", name),
+      h("div.field", {}, h("span", {}, "Your character"), creator),
       go,
       error,
       h("p.small", {}, h("a", { href: PLAY_PATH }, "Start your own expedition instead")),
@@ -206,6 +209,7 @@ export function showLobby(root: HTMLElement, opts: LobbyOptions): () => void {
         `Sail a randomly generated archipelago of ten biomes, from blossom isles to infernal shores, and build a settlement with up to ${MAX_PLAYERS - 1} friends.`,
       ),
       h("label", {}, "Your name", name),
+      h("div.field", {}, h("span", {}, "Your character"), creator),
       h("div.field", {}, h("span", {}, "Choose your tribe"), tribes, tribeHint),
       h("div.field", {}, h("span", {}, "Pirates"), difficulties, difficultyHint),
       h("label", {}, "World seed (optional)", seed),

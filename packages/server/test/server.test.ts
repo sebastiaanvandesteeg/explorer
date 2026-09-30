@@ -75,9 +75,9 @@ class Player {
     });
   }
 
-  async join(worldId: string, name: string, tok: string): Promise<ServerMessage> {
+  async join(worldId: string, name: string, tok: string, look?: unknown): Promise<ServerMessage> {
     if (this.ws.readyState !== WebSocket.OPEN) await new Promise((r) => this.ws.once("open", r));
-    this.ws.send(JSON.stringify({ t: "join", worldId, name, token: tok }));
+    this.ws.send(JSON.stringify({ t: "join", worldId, name, token: tok, look }));
     return this.next((m) => m.t === "welcome" || m.t === "error");
   }
 
@@ -342,6 +342,24 @@ describe("characters", () => {
     expect(await anna.next((m) => m.t === "error")).toMatchObject({ code: "bad-request" });
     anna.send({ t: "cmd", seq: 4, cmd: { kind: "steer-character", x: "1", y: 0 } });
     expect(await anna.next((m) => m.t === "error")).toMatchObject({ code: "bad-request" });
+  });
+
+  it("seat a player with the character they designed, and refuse bad looks", async () => {
+    const { id } = await createWorld("adv-look");
+    const look = { class: "thief", build: 0, skin: 6, hair: 11, eyes: 4 };
+    const anna = new Player();
+    const welcome = await anna.join(id, "Anna", token(1), look);
+    const snap = mirror(welcome);
+    expect(characterOf(snap, "p1")!.look).toEqual(look);
+    // Coming back with another look changes the same character.
+    anna.ws.close();
+    const again = new Player();
+    const back = mirror(await again.join(id, "Anna", token(1), { ...look, class: "archer" }));
+    expect(characterOf(back, "p1")!.look.class).toBe("archer");
+    // A malformed look is refused outright.
+    const bad = new Player();
+    const refused = await bad.join(id, "Bo", token(2), { class: "x" });
+    expect(refused).toMatchObject({ t: "error", code: "bad-request" });
   });
 
   it("let a player drop an item for another to pick up, and refuse bad requests", async () => {

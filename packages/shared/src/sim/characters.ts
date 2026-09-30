@@ -2,6 +2,7 @@
 import { inBounds } from "../world/grid";
 import { CHARACTER } from "./catalogue";
 import { STARTER_PACK } from "./items";
+import { defaultLookFor, sanitizeLook, type CharacterLook } from "./looks";
 import { landPath } from "./navigation";
 import { tilesAround } from "./rules";
 import {
@@ -13,6 +14,16 @@ import {
   type GameState,
 } from "./state";
 import { tileOf } from "./walk";
+
+/** Change how a player's character looks (they picked again when joining). */
+export function setLook(state: GameState, playerId: string, look: CharacterLook): void {
+  const c = characterOf(state, playerId);
+  if (!c) return;
+  const next = sanitizeLook(look);
+  if (JSON.stringify(next) === JSON.stringify(c.look)) return;
+  c.look = next;
+  markDirty(state, c.id);
+}
 
 export function characterOf(state: GameState, playerId: string): CharacterEntity | undefined {
   for (const e of state.entities.values())
@@ -30,7 +41,11 @@ export function characters(state: GameState): CharacterEntity[] {
  * The player's character, made on the shore beside the town hall the first time they join and
  * found where it stood every time after. Each newcomer gets a free spot of their own.
  */
-export function ensureCharacter(state: GameState, playerId: string): CharacterEntity {
+export function ensureCharacter(
+  state: GameState,
+  playerId: string,
+  look?: CharacterLook,
+): CharacterEntity {
   const existing = characterOf(state, playerId);
   if (existing) return existing;
   const taken = characters(state);
@@ -39,10 +54,12 @@ export function ensureCharacter(state: GameState, playerId: string): CharacterEn
     .filter((t) => !taken.some((c) => Math.floor(c.x) === t.x && Math.floor(c.y) === t.y))
     .sort((a, b) => b.y + b.x - (a.y + a.x));
   const spot = free[0] ?? state.world.start.spawn[0] ?? { x: hall.x, y: hall.y + hall.h };
+  const id = state.nextId++;
   const c = addEntity(state, {
-    id: state.nextId++,
+    id,
     type: "character",
     playerId,
+    look: look ? sanitizeLook(look) : defaultLookFor(id),
     x: spot.x + 0.5,
     y: spot.y + 0.5,
     tunic: taken.length % 3,

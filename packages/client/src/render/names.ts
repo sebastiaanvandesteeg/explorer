@@ -9,6 +9,7 @@ import {
   type BiomeId,
   type BuildingEntity,
   type BuildingKind,
+  type CharacterLook,
   type DecoSpawn,
   type NodeEntity,
   type NodeKind,
@@ -83,14 +84,51 @@ export function scaffoldSprite(w: number, h: number): string {
   return `scaffold_${SCAFFOLDS.has(key) ? key : "2x2"}`;
 }
 
-/** A player's character: the villager's figure a quarter larger (standing or walking only). */
-export function heroSprite(tribe: TribeId, tunic: number, back: boolean, pose: string): string {
-  return `hero_${tribe}_${tunic % 3}_${back ? "back" : "front"}_${pose}`;
-}
+/** The layers of a hero, bottom to top (see tools/sprites/src/sprites/heroes.ts). */
+export const HERO_LAYER_ORDER = [
+  "prop",
+  "outfit",
+  "skin",
+  "scarf",
+  "gear",
+  "face",
+  "iris",
+  "hair",
+  "hat",
+  "rim",
+] as const;
+export type HeroLayerName = (typeof HERO_LAYER_ORDER)[number];
 
-/** The tintable cape layers of a hero; `under` is only drawn behind a hero seen from the front. */
-export function heroCapeSprite(back: boolean, layer: "over" | "under", pose: string): string {
-  return `herocape_${back ? "back" : "front"}_${layer}_${pose}`;
+/** Layers drawn in greys and multiplied by the look's colours (and the player's, for the scarf). */
+export const TINTED_LAYERS: readonly HeroLayerName[] = ["skin", "scarf", "iris", "hair"];
+
+/** The atlas frame for one layer of a hero, or null when that layer is not drawn (no gear, no face from behind). */
+export function heroLayerSprite(
+  layer: HeroLayerName,
+  look: CharacterLook,
+  back: boolean,
+  pose: string,
+): string | null {
+  const dir = back ? "back" : "front";
+  const key = `${look.class}_${look.build}_${dir}`;
+  switch (layer) {
+    case "prop":
+    case "gear":
+      return `hero_${layer}_${key}`;
+    case "outfit":
+    case "skin":
+    case "rim":
+      return `hero_${layer}_${key}_${pose}`;
+    case "scarf":
+      return `hero_scarf_${look.build}_${dir}_${pose}`;
+    case "face":
+    case "iris":
+      return back ? null : `hero_${layer}_${dir}`;
+    case "hair":
+      return `hero_hair_${dir}`;
+    case "hat":
+      return `hero_hat_${look.class}_${dir}`;
+  }
 }
 
 export function villagerSprite(tribe: TribeId, tunic: number, back: boolean, pose: string): string {

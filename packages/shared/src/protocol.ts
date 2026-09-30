@@ -1,5 +1,6 @@
 // Messages between browser clients and the Node server (JSON over one WebSocket per player).
 import type { Command } from "./sim/commands";
+import type { CharacterLook } from "./sim/looks";
 import type { Difficulty } from "./sim/difficulty";
 import type { TribeId } from "./tribes";
 import type { Patch, Snapshot } from "./sim/snapshot";
@@ -34,7 +35,7 @@ export interface WorldInfo {
 }
 
 export type ClientMessage =
-  | { t: "join"; worldId: string; name: string; token: string }
+  | { t: "join"; worldId: string; name: string; token: string; look?: CharacterLook }
   | { t: "cmd"; seq: number; cmd: Command }
   | { t: "cursor"; x: number | null; y: number | null }
   | { t: "chat"; text: string }
