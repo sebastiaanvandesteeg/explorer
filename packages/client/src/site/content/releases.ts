@@ -42,6 +42,41 @@ export const NOTE_LABELS: Record<NoteKind, string> = {
 
 export const RELEASES: Release[] = [
   {
+    slug: "one-way-to-play",
+    version: "0.13",
+    title: "One Way to Play",
+    date: "2026-09-30",
+    theme: "temperate",
+    summary:
+      "Colony mode is gone: every world is an adventure, with a character of your own, a pack, and villagers who run the settlement.",
+    intro: [
+      "Explorer used to ask how you wanted to play. Now there is one answer. Every world is an adventure: you are a person on the islands, not a hand above them.",
+    ],
+    sections: [
+      {
+        kind: "improved",
+        items: [
+          "The lobby no longer asks for a game mode, and every world gives each player a character, a pack and items to find.",
+          "Villagers always organise themselves: they raise buildings and share out the jobs by balance.",
+          "Hover a building or a villager and a soft glow shows you can click it.",
+        ],
+      },
+      {
+        kind: "fixed",
+        items: [
+          "A villager carrying goods on an island with no storehouse can now still go and build one.",
+        ],
+      },
+      {
+        kind: "new",
+        title: "Gone",
+        items: [
+          "Colony mode, and the Gather tool with its marks: villagers choose what to gather themselves.",
+        ],
+      },
+    ],
+  },
+  {
     slug: "hands-at-work",
     version: "0.12",
     title: "Hands at Work",

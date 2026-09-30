@@ -2,7 +2,6 @@ import { TRIBE_DEFS } from "../tribes";
 import { inBounds, isLandTerrain, tileIndex } from "../world/grid";
 import { hash2d } from "../rng";
 import { DIFFICULTY_DEFS, type Difficulty } from "./difficulty";
-import type { GameMode } from "./mode";
 import { scatterLoot } from "./inventory";
 import type { ItemKind, ItemStack } from "./items";
 import { sightFactor } from "./light";
@@ -291,8 +290,6 @@ export interface GameState {
   world: WorldMap;
   /** How hostile the world is; fixed when it is created. */
   difficulty: Difficulty;
-  /** Whether players command villagers (colony) or each control a character (adventure). */
-  mode: GameMode;
   time: number;
   tick: number;
   nextId: number;
@@ -372,16 +369,11 @@ export function rebuildOccupancy(state: GameState): void {
   for (const e of state.entities.values()) occupy(state, e, true);
 }
 
-export function emptyState(
-  world: WorldMap,
-  difficulty: Difficulty = "normal",
-  mode: GameMode = "colony",
-): GameState {
+export function emptyState(world: WorldMap, difficulty: Difficulty = "normal"): GameState {
   const n = world.width * world.height;
   return {
     world,
     difficulty,
-    mode,
     time: 0,
     tick: 0,
     nextId: 1,
@@ -577,9 +569,9 @@ export function addSites(state: GameState): void {
 
 export function createInitialState(
   world: WorldMap,
-  opts: { difficulty?: Difficulty; mode?: GameMode } = {},
+  opts: { difficulty?: Difficulty } = {},
 ): GameState {
-  const state = emptyState(world, opts.difficulty, opts.mode);
+  const state = emptyState(world, opts.difficulty);
   const s = world.start;
   addEntity(state, newBuilding(state, "town_hall", s.townHall.x, s.townHall.y, true));
   addEntity(state, newBuilding(state, "dock", s.dock.x, s.dock.y, true, s.dock.dir));
@@ -603,7 +595,7 @@ export function createInitialState(
     addEntity(state, newVillager(state, t.x, t.y));
   }
   addSites(state);
-  if (state.mode === "adventure") scatterLoot(state);
+  scatterLoot(state);
   // The home island and the water around it start explored.
   for (let k = 0; k < state.explored.length; k++) {
     if (world.island[k] === s.islandId && world.shore[k]! <= 4) state.explored[k] = 1;

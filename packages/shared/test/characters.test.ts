@@ -12,7 +12,6 @@ import {
   fromSnapshot,
   generateWorld,
   isAdjacentTo,
-  isGameMode,
   isLandTerrain,
   landPath,
   newBuilding,
@@ -29,7 +28,7 @@ import {
 
 const world = generateWorld("character-tests");
 
-const adventure = (): GameState => createInitialState(world, { mode: "adventure" });
+const adventure = (): GameState => createInitialState(world);
 
 function run(state: GameState, seconds: number): void {
   for (let i = 0; i < Math.round(seconds / 0.1); i++) tick(state);
@@ -54,27 +53,6 @@ function nearbyGoal(state: GameState, c: CharacterEntity, minSteps: number, maxS
   }
   throw new Error("no goal found");
 }
-
-describe("world modes", () => {
-  it("recognises the two modes", () => {
-    expect(isGameMode("colony")).toBe(true);
-    expect(isGameMode("adventure")).toBe(true);
-    expect(isGameMode("creative")).toBe(false);
-    expect(isGameMode(undefined)).toBe(false);
-  });
-
-  it("starts as a colony unless asked otherwise", () => {
-    expect(createInitialState(world).mode).toBe("colony");
-    expect(adventure().mode).toBe("adventure");
-  });
-
-  it("colony worlds have no characters and refuse to move one", () => {
-    const state = createInitialState(world);
-    const res = move(state, "p1", 10, 10);
-    expect(res).toEqual({ ok: false, reason: "This world has no characters" });
-    expect(characters(state)).toHaveLength(0);
-  });
-});
 
 describe("characters", () => {
   it("are made once per player, on the home island beside the town hall", () => {
@@ -244,13 +222,12 @@ describe("moving a character", () => {
 });
 
 describe("characters in snapshots and patches", () => {
-  it("keep the mode and the characters through a save", () => {
+  it("keep the characters through a save", () => {
     const state = adventure();
     const c = ensureCharacter(state, "p1");
     ensureCharacter(state, "p2");
     run(state, 0.3);
     const back = fromSnapshot(world, JSON.parse(JSON.stringify(toSnapshot(state))));
-    expect(back.mode).toBe("adventure");
     expect(characters(back)).toHaveLength(2);
     const again = characterOf(back, "p1")!;
     expect([again.x, again.y]).toEqual([c.x, c.y]);
@@ -270,12 +247,6 @@ describe("characters in snapshots and patches", () => {
     expect(again.dest).toBeNull();
     // ...and can be sent on their way again.
     expect(move(back, "p1", goal.x, goal.y).ok).toBe(true);
-  });
-
-  it("load as a colony when the save is from before modes existed", () => {
-    const snap = JSON.parse(JSON.stringify(toSnapshot(createInitialState(world))));
-    delete snap.mode;
-    expect(fromSnapshot(world, snap).mode).toBe("colony");
   });
 
   it("go over the wire without their route, and a mirror follows them", () => {

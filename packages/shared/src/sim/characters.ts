@@ -71,7 +71,6 @@ export function moveCharacter(
   playerId: string | null,
   target: { x: number; y: number },
 ): MoveResult {
-  if (state.mode !== "adventure") return { ok: false, reason: "This world has no characters" };
   const c = playerId === null ? undefined : characterOf(state, playerId);
   if (!c) return { ok: false, reason: "You have no character here" };
   c.fetch = null;

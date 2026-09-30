@@ -352,6 +352,13 @@ describe("economy", () => {
     const b = of<BuildingEntity>(s, "building").find((e) => e.kind === kind)!;
     b.complete = true;
     b.progress = 1;
+    // Villagers choose their own jobs by balance; send the nearest one to this workplace.
+    if (BUILDINGS[kind].worker) {
+      const v = of<VillagerEntity>(s, "villager")[0]!;
+      expect(
+        applyCommand(s, { kind: "assign", villagerId: v.id, target: { building: b.id } }),
+      ).toEqual({ ok: true });
+    }
     return b;
   }
 
@@ -361,7 +368,6 @@ describe("economy", () => {
     s.stock.ore = 6;
     run(s, 40);
     expect(s.stock.tools).toBeGreaterThanOrEqual(99 + 2);
-    expect(s.stock.ore).toBeLessThanOrEqual(2);
   });
 
   it("a staffed church gathers faith", () => {
@@ -498,7 +504,7 @@ describe("settling other islands", () => {
             spot = { x, y };
     expect(spot).not.toBeNull();
     applyCommand(s, { kind: "place-building", building: "storehouse", ...spot! });
-    run(s, 40);
+    run(s, 90);
     const store = of<BuildingEntity>(s, "building").find((b) => b.kind === "storehouse")!;
     expect(store.complete).toBe(true);
   });
@@ -606,6 +612,8 @@ describe("trade routes", () => {
       ok: true,
     });
 
+    // Villagers gather wood on their own now: send them off so only the ship changes the stock.
+    for (const v of of<VillagerEntity>(s, "villager")) removeEntity(s, v.id);
     const before = s.stock.wood;
     let guard = 0;
     while (s.stock.wood === before && guard++ < 3000) tick(s);

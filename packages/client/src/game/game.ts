@@ -185,7 +185,6 @@ export class Game {
           amount === undefined ? { kind: "drop-item", slot } : { kind: "drop-item", slot, amount },
         ),
     });
-    this.pack.setAvailable(state.mode === "adventure");
     this.hud.root.append(this.pack.root);
     this.syncPack();
 
@@ -200,8 +199,7 @@ export class Game {
     const me = this.myCharacter();
     if (me) this.centerOnTile(me.x, me.y);
     else this.centerOnTile(th.x + 1.5, th.y + 1.5);
-    if (state.mode === "adventure")
-      this.hud.toast("Adventure: walk with WASD or right-click. The camera stays on you");
+    this.hud.toast("Walk with WASD or right-click. The camera stays on you");
 
     session.on({
       patch: (p) => this.onPatch(p),
@@ -434,10 +432,9 @@ export class Game {
     this.camera.centerOn((x - y) * HALF_W, (x + y) * HALF_H);
   }
 
-  /** Your own character (adventure worlds only). */
+  /** Your own character (every world has one). */
   private myCharacter(): CharacterEntity | undefined {
     const state = this.session.state;
-    if (state.mode !== "adventure") return undefined;
     const cached = this.myCharacterId !== null ? state.entities.get(this.myCharacterId) : undefined;
     if (cached?.type === "character") return cached;
     const found = characterOf(state, this.session.you);
@@ -445,7 +442,7 @@ export class Game {
     return found;
   }
 
-  /** Adventure worlds bind the camera to your character: it never wanders off on its own. */
+  /** The camera is bound to your character: it never wanders off on its own. */
   private get locked(): boolean {
     return this.myCharacter() !== undefined;
   }
@@ -662,29 +659,6 @@ export class Game {
     else this.hud.toast("Nothing here to pick up");
   }
 
-  /** Harvestable nodes whose base lies inside a screen-aligned rectangle (world pixels). */
-  private nodesInMarquee(
-    a: { x: number; y: number },
-    b: { x: number; y: number },
-    marked: boolean,
-  ): number[] {
-    const x0 = Math.min(a.x, b.x);
-    const x1 = Math.max(a.x, b.x);
-    const y0 = Math.min(a.y, b.y);
-    const y1 = Math.max(a.y, b.y);
-    const state = this.session.state;
-    const ids: number[] = [];
-    for (const e of state.entities.values()) {
-      if (e.type !== "node" || e.stage !== "grown" || e.marked === marked) continue;
-      const view = this.entities.view(e.id);
-      if (!view?.root.visible) continue;
-      const { x, y } = view.root;
-      // Count the trunk and a little of the canopy, so dragging over a tree's top works too.
-      if (x >= x0 && x <= x1 && y + HALF_H >= y0 && y - 12 <= y1) ids.push(e.id);
-    }
-    return ids;
-  }
-
   // ------------------------------------------------------------------------- input
 
   private bindInput(): void {
@@ -748,16 +722,6 @@ export class Game {
       const p = local(e);
       if (d.button === 0) {
         if (!d.moved) this.click(p.x, p.y, e.shiftKey);
-        else if (this.tool.kind === "harvest") {
-          const unmark = e.shiftKey;
-          const ids = this.nodesInMarquee(
-            d.startWorld,
-            this.camera.screenToWorld(p.x, p.y),
-            !unmark,
-          );
-          if (ids.length) void this.send({ kind: "mark", nodeIds: ids, marked: !unmark });
-          else this.hud.toast("Drag across trees, rocks or bushes to mark them");
-        }
       } else if (d.button === 2 && !d.moved) {
         this.rightClick(p.x, p.y);
       }
@@ -787,14 +751,13 @@ export class Game {
       }
       this.keys.add(k);
       if (k === "m") this.hud.map.open();
-      else if (k === "i" && this.session.state.mode === "adventure") this.pack.toggle();
-      else if (k === "e" && this.session.state.mode === "adventure") this.pickUp();
+      else if (k === "i") this.pack.toggle();
+      else if (k === "e") this.pickUp();
       else if (k === "n") this.hud.setSound(this.sound.toggle());
       else if (k === "escape") {
         if (this.tool.kind !== "select") this.setTool({ kind: "select" });
         else this.select(null);
-      } else if (k === "h" || k === "g") this.setTool({ kind: "harvest" });
-      else if (k === "enter") {
+      } else if (k === "enter") {
         e.preventDefault();
         this.hud.focusChat();
       } else if (k === "c") {
@@ -848,12 +811,6 @@ export class Game {
       return;
     }
     const e = this.entityAt(sx, sy);
-    if (tool.kind === "harvest") {
-      if (e?.type === "node" && e.stage === "grown") {
-        void this.send({ kind: "mark", nodeIds: [e.id], marked: shift ? false : !e.marked });
-      }
-      return;
-    }
     this.select(e?.id ?? null);
   }
 
@@ -865,7 +822,7 @@ export class Game {
     const state = this.session.state;
     const sel = this.selected !== null ? state.entities.get(this.selected) : undefined;
     const tile = this.tileAt(sx, sy);
-    if (state.mode === "adventure" && this.itemAt(sx, sy)) {
+    if (this.itemAt(sx, sy)) {
       this.pickUp(sx, sy);
       return;
     }
@@ -893,7 +850,7 @@ export class Game {
       // Right-clicking land with passengers aboard means "take them there".
       const unload = isLand(state.world, tile.x, tile.y) && sel.passengers.length > 0;
       void this.send({ kind: "move-ship", shipId: sel.id, x: tile.x, y: tile.y, unload });
-    } else if (state.mode === "adventure" && tile) {
+    } else if (tile) {
       // Nothing to give orders to: right-click is "walk here" for your own character.
       this.select(null);
       this.walkTo(tile.x, tile.y);
@@ -1100,20 +1057,6 @@ export class Game {
       o.footprint(f, ok);
       if (tool.building !== "path" && tool.building !== "dock")
         ghost = { name: buildingThumb(tool.building, state.world.tribe), f, ok };
-    } else if (
-      tool.kind === "harvest" &&
-      this.drag?.moved &&
-      this.drag.button === 0 &&
-      this.pointer
-    ) {
-      const a = this.drag.startWorld;
-      const b = this.camera.screenToWorld(this.pointer.x, this.pointer.y);
-      const unmark = this.keys.has("shift");
-      o.marquee(a, b);
-      for (const id of this.nodesInMarquee(a, b, !unmark)) {
-        const n = state.entities.get(id)!;
-        o.highlight({ x: n.x, y: n.y, w: 1, h: 1, z: visibleHeight(state, n.x, n.y) ?? 0 });
-      }
     } else if (hover && this.pointer) {
       this.drawBackdrop(o, state);
       o.hover({
@@ -1146,7 +1089,7 @@ export class Game {
         if (sel.dest) o.destination({ x: sel.dest.x, y: sel.dest.y, w: 1, h: 1, z: 0 });
       }
     }
-    if (state.mode === "adventure") this.drawCharacters(o, state);
+    this.drawCharacters(o, state);
     o.drawCursors(this.camera);
   }
 

@@ -124,13 +124,9 @@ export function applyCommand(
     case "move-character":
       return moveCharacter(state, actor, cmd);
     case "drop-item":
-      return state.mode === "adventure"
-        ? dropFromPack(state, actor, cmd)
-        : fail("This world has no characters");
+      return dropFromPack(state, actor, cmd);
     case "pickup-item":
-      return state.mode === "adventure"
-        ? pickUp(state, actor, cmd, (c, x, y) => walkCharacter(state, c, { x, y }))
-        : fail("This world has no characters");
+      return pickUp(state, actor, cmd, (c, x, y) => walkCharacter(state, c, { x, y }));
     case "place-building": {
       if (!(cmd.building in BUILDINGS)) return fail("Unknown building");
       const check = canPlaceBuilding(state, cmd.building, cmd.x, cmd.y);

@@ -22,7 +22,7 @@ import {
 } from "../src";
 
 const world = generateWorld("inventory-tests");
-const adventure = (): GameState => createInitialState(world, { mode: "adventure" });
+const adventure = (): GameState => createInitialState(world);
 /** An adventure world with nothing lying about, so only what a test drops is on the ground. */
 const bare = (): GameState => {
   const s = adventure();
@@ -126,8 +126,6 @@ describe("dropping and picking up", () => {
     ).toBe(false);
     expect(applyCommand(s, { kind: "drop-item", slot: 0 }, "p9").ok).toBe(false);
     expect(applyCommand(s, { kind: "drop-item", slot: 0 }, null).ok).toBe(false);
-    const colony = createInitialState(world);
-    expect(applyCommand(colony, { kind: "drop-item", slot: 0 }, "p1").ok).toBe(false);
   });
 
   it("keeps the pile on the ground when the pack is full", () => {
@@ -173,10 +171,7 @@ describe("finding items in the world", () => {
       expect(s.world.island[tileIndex(s.world, i.x, i.y)]).not.toBe(world.start.islandId);
     }
     expect(found.some((i) => ITEMS[i.kind].rarity === "rare")).toBe(true);
-    expect(items(createInitialState(world))).toHaveLength(0);
-    expect(items(createInitialState(world, { mode: "adventure" })).map((i) => i.id)).toEqual(
-      found.map((i) => i.id),
-    );
+    expect(items(createInitialState(world)).map((i) => i.id)).toEqual(found.map((i) => i.id));
   });
 });
 

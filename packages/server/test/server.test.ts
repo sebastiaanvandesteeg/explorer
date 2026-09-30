@@ -41,12 +41,11 @@ async function createWorld(
   seed = "server-test",
   tribe?: string,
   difficulty?: string,
-  mode?: string,
 ): Promise<WorldInfo> {
   const res = await fetch(`${base()}/api/worlds`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ seed, tribe, difficulty, mode }),
+    body: JSON.stringify({ seed, tribe, difficulty }),
   });
   expect(res.status).toBe(201);
   return (await res.json()) as WorldInfo;
@@ -221,27 +220,12 @@ function goalNear(state: GameState, c: CharacterEntity): { x: number; y: number 
 const settled = (c: CharacterEntity, goal: { x: number; y: number }) =>
   c.action === "idle" && c.x === goal.x + 0.5 && c.y === goal.y + 0.5;
 
-describe("adventure worlds", () => {
-  it("are created in a chosen mode, and colony is the default", async () => {
-    expect((await createWorld("mode-default")).mode).toBe("colony");
-    const info = await createWorld("mode-adventure", undefined, undefined, "adventure");
-    expect(info.mode).toBe("adventure");
-    const res = await fetch(`${base()}/api/worlds/${info.id}`);
-    expect(await res.json()).toMatchObject({ mode: "adventure" });
-    const bad = await fetch(`${base()}/api/worlds`, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ mode: "sandbox" }),
-    });
-    expect(bad.status).toBe(400);
-  });
-
+describe("characters", () => {
   it("give every player a character of their own, and the others see it arrive", async () => {
-    const { id } = await createWorld("adv-join", undefined, undefined, "adventure");
+    const { id } = await createWorld("adv-join");
     const anna = new Player();
     const welcomeA = await anna.join(id, "Anna", token(1));
     const a = mirror(welcomeA);
-    expect(a.mode).toBe("adventure");
     expect(characters(a).map((c) => c.playerId)).toEqual(["p1"]);
     if (welcomeA.t !== "welcome") throw new Error("expected welcome");
     expect(welcomeA.you).toBe("p1");
@@ -260,7 +244,7 @@ describe("adventure worlds", () => {
   });
 
   it("walk when their own player says so, and nobody else's", async () => {
-    const { id } = await createWorld("adv-walk", undefined, undefined, "adventure");
+    const { id } = await createWorld("adv-walk");
     const anna = new Player();
     const ben = new Player();
     const a = mirror(await anna.join(id, "Anna", token(1)));
@@ -288,7 +272,7 @@ describe("adventure worlds", () => {
   });
 
   it("refuse to walk where there is no way, with a reason", async () => {
-    const { id } = await createWorld("adv-refuse", undefined, undefined, "adventure");
+    const { id } = await createWorld("adv-refuse");
     const anna = new Player();
     await anna.join(id, "Anna", token(1));
     anna.send({ t: "cmd", seq: 1, cmd: { kind: "move-character", x: 1, y: 1 } });
@@ -298,7 +282,7 @@ describe("adventure worlds", () => {
   });
 
   it("let a player drop an item for another to pick up, and refuse bad requests", async () => {
-    const { id } = await createWorld("adv-items", undefined, undefined, "adventure");
+    const { id } = await createWorld("adv-items");
     const anna = new Player();
     await anna.join(id, "Anna", token(1));
     const ben = new Player();
@@ -323,22 +307,8 @@ describe("adventure worlds", () => {
     expect(await anna.next((m) => m.t === "error")).toMatchObject({ code: "bad-request" });
   });
 
-  it("have no characters in a colony world, and refuse to move one", async () => {
-    const { id } = await createWorld("adv-colony");
-    const anna = new Player();
-    const a = mirror(await anna.join(id, "Anna", token(1)));
-    expect(characters(a)).toHaveLength(0);
-    anna.send({ t: "cmd", seq: 1, cmd: { kind: "move-character", x: 10, y: 10 } });
-    expect(await anna.next((m) => m.t === "result")).toEqual({
-      t: "result",
-      seq: 1,
-      ok: false,
-      reason: "This world has no characters",
-    });
-  });
-
   it("keep their place when a player leaves, comes back or the server restarts", async () => {
-    const { id } = await createWorld("adv-persist", undefined, undefined, "adventure");
+    const { id } = await createWorld("adv-persist");
     const anna = new Player();
     const a = mirror(await anna.join(id, "Anna", token(1)));
     const goal = goalNear(a, characterOf(a, "p1")!);
@@ -366,7 +336,6 @@ describe("adventure worlds", () => {
     app = await startApp({ port: 0, host: "127.0.0.1", dataDir });
     const later = new Player();
     const c = mirror(await later.join(id, "Anna", token(1)));
-    expect(c.mode).toBe("adventure");
     expect(characters(c)).toHaveLength(1);
     expect(characterOf(c, "p1")).toMatchObject({
       id: originalId,

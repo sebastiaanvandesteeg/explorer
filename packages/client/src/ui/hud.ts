@@ -60,8 +60,7 @@ import { MapScreen } from "./mapscreen";
 import { abgr, mapColours } from "./mapColours";
 import { ICON, LABEL, RARE } from "./resources";
 
-export type Tool =
-  { kind: "select" } | { kind: "build"; building: BuildingKind } | { kind: "harvest" };
+export type Tool = { kind: "select" } | { kind: "build"; building: BuildingKind };
 
 export interface HudActions {
   tool(t: Tool): void;
@@ -147,22 +146,6 @@ export class Hud {
 
     const menu = h("div.build-menu.panel", {}, h("h3", {}, "Build"));
     const grid = h("div.build-grid");
-    const gather = h(
-      "button.build-item",
-      {
-        title: "Mark trees, rocks and bushes for villagers to gather (drag to mark an area)",
-        onclick: () => actions.tool({ kind: "harvest" }),
-      },
-      h("span.thumb", {}, icon("icon_axe", 2)),
-      h(
-        "span",
-        {},
-        h("span.name", {}, "Gather", h("span.kbd", {}, "H")),
-        h("span.cost", {}, "Mark goods"),
-      ),
-    ) as HTMLButtonElement;
-    this.buildButtons.set("harvest", gather);
-    grid.append(gather);
     for (const def of Object.values(BUILDINGS)) {
       if (!def.buildable) continue;
       const thumbName = buildingThumb(def.kind, tribe);
@@ -350,7 +333,6 @@ export class Hud {
     this.resEls.get("pop")!.textContent = `${population(state)}/${populationCap(state)}`;
     this.lastStock = { ...stock };
     for (const [kind, btn] of this.buildButtons) {
-      if (kind === "harvest") continue;
       const def = BUILDINGS[kind as BuildingKind];
       btn.disabled = !canAfford(stock, def.cost);
       for (const span of btn.querySelectorAll<HTMLElement>("[data-res]")) {
@@ -363,9 +345,7 @@ export class Hud {
 
   setTool(tool: Tool): void {
     for (const [kind, btn] of this.buildButtons) {
-      const active =
-        (tool.kind === "harvest" && kind === "harvest") ||
-        (tool.kind === "build" && tool.building === kind);
+      const active = tool.kind === "build" && tool.building === kind;
       btn.classList.toggle("active", active);
     }
     this.help(
@@ -373,9 +353,7 @@ export class Hud {
         ? tool.building === "path"
           ? "Click or drag to lay paths · Right-click or Esc to stop"
           : "Click to place · Shift-click to keep placing · Right-click or Esc to cancel"
-        : tool.kind === "harvest"
-          ? "Click or drag across trees, rocks and bushes to mark them · Shift to unmark · Esc to stop"
-          : "",
+        : "",
     );
   }
 

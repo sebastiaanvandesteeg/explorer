@@ -1020,7 +1020,7 @@ input.field:focus {
   color: var(--parchment);
 }
 
-/* ------------------------------------------------------------------ pack (adventure worlds) */
+/* ------------------------------------------------------------------ pack */
 .pack-wrap {
   position: absolute;
   right: 12px;

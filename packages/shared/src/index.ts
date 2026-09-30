@@ -12,7 +12,6 @@ export * from "./world/names";
 export const GAME_NAME = "Explorer";
 export * from "./sim/catalogue";
 export * from "./sim/difficulty";
-export * from "./sim/mode";
 export * from "./sim/greatwork";
 export * from "./sim/state";
 export * from "./sim/rules";

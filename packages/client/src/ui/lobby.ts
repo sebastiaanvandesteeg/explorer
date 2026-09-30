@@ -1,15 +1,12 @@
 import {
   DIFFICULTIES,
   DIFFICULTY_DEFS,
-  GAME_MODES,
   MAX_NAME_LENGTH,
   MAX_PLAYERS,
-  MODE_DEFS,
   PLAY_PATH,
   TRIBE_DEFS,
   TRIBES,
   type Difficulty,
-  type GameMode,
   type TribeId,
   type WorldInfo,
 } from "@explorer/shared";
@@ -22,13 +19,7 @@ export interface LobbyOptions {
   joinId?: string;
   error?: string;
   onEnter(name: string, worldId: string): void;
-  onOffline(
-    name: string,
-    seed: string,
-    tribe: TribeId,
-    difficulty: Difficulty,
-    mode: GameMode,
-  ): void;
+  onOffline(name: string, seed: string, tribe: TribeId, difficulty: Difficulty): void;
   /** Loads sprites for the tribe previews (the lobby shows before they're ready). */
   atlas: Promise<Atlas>;
 }
@@ -136,34 +127,6 @@ export function showLobby(root: HTMLElement, opts: LobbyOptions): () => void {
     difficultyButtons.set(id, btn);
     difficulties.append(btn);
   }
-  let mode: GameMode = "colony";
-  const modeHint = h("small", {}, MODE_DEFS[mode].description);
-  const modeButtons = new Map<GameMode, HTMLElement>();
-  const modes = h("div.segmented", { role: "radiogroup", "aria-label": "Game mode" });
-  for (const id of GAME_MODES) {
-    const def = MODE_DEFS[id];
-    const btn = h(
-      "button.seg",
-      {
-        type: "button",
-        role: "radio",
-        "aria-checked": String(id === mode),
-        title: def.description,
-        onclick: () => {
-          mode = id;
-          modeHint.textContent = def.description;
-          for (const [m, el] of modeButtons) {
-            el.classList.toggle("active", m === id);
-            el.setAttribute("aria-checked", String(m === id));
-          }
-        },
-      },
-      def.name,
-    );
-    if (id === mode) btn.classList.add("active");
-    modeButtons.set(id, btn);
-    modes.append(btn);
-  }
   const code = h("input.field", { placeholder: "Invite code or link" }) as HTMLInputElement;
 
   const needName = (): string | null => {
@@ -190,7 +153,6 @@ export function showLobby(root: HTMLElement, opts: LobbyOptions): () => void {
           seed: seed.value.trim() || randomSeed(),
           tribe,
           difficulty,
-          mode,
         }),
       });
       if (!res.ok) throw new Error(await res.text());
@@ -245,7 +207,6 @@ export function showLobby(root: HTMLElement, opts: LobbyOptions): () => void {
       ),
       h("label", {}, "Your name", name),
       h("div.field", {}, h("span", {}, "Choose your tribe"), tribes, tribeHint),
-      h("div.field", {}, h("span", {}, "How you play"), modes, modeHint),
       h("div.field", {}, h("span", {}, "Pirates"), difficulties, difficultyHint),
       h("label", {}, "World seed (optional)", seed),
       createBtn,
@@ -268,7 +229,7 @@ export function showLobby(root: HTMLElement, opts: LobbyOptions): () => void {
             onclick: (e: Event) => {
               e.preventDefault();
               const n = needName();
-              if (n) opts.onOffline(n, seed.value.trim() || randomSeed(), tribe, difficulty, mode);
+              if (n) opts.onOffline(n, seed.value.trim() || randomSeed(), tribe, difficulty);
             },
           },
           "Play offline",

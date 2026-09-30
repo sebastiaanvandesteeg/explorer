@@ -1,13 +1,11 @@
 import "./styles.css";
 import {
   isDifficulty,
-  isGameMode,
   isTribe,
   PLAY_PATH,
   worldIdFromPath,
   worldPath,
   type Difficulty,
-  type GameMode,
   type TribeId,
 } from "@explorer/shared";
 import { loadAtlas, type Atlas } from "./assets";
@@ -53,18 +51,17 @@ async function startOffline(
   seed: string,
   tribe: TribeId,
   difficulty: Difficulty,
-  mode: GameMode,
 ): Promise<void> {
   const reveal = params.has("reveal") ? "&reveal" : "";
   const phase = params.has("phase") ? `&phase=${encodeURIComponent(params.get("phase")!)}` : "";
   history.replaceState(
     null,
     "",
-    `${PLAY_PATH}?offline&seed=${encodeURIComponent(seed)}&tribe=${tribe}&difficulty=${difficulty}&mode=${mode}${reveal}${phase}`,
+    `${PLAY_PATH}?offline&seed=${encodeURIComponent(seed)}&tribe=${tribe}&difficulty=${difficulty}${reveal}${phase}`,
   );
   const done = loading("Generating islands…");
   const assets = await atlas();
-  const session = new LocalSession(seed, name, tribe, difficulty, mode);
+  const session = new LocalSession(seed, name, tribe, difficulty);
   // Dev aids for reviewing art: `&reveal` lifts the fog in offline games, and `&phase=0.8` freezes
   // the time of day (0 is sunrise, 0.25 noon, 0.5 sunset, 0.8 night).
   if (params.has("reveal")) session.state.explored.fill(1);
@@ -80,9 +77,9 @@ function lobby(opts: { joinId?: string; error?: string } = {}): void {
       close();
       void startOnline(id, name);
     },
-    onOffline: (name, seed, tribe, difficulty, mode) => {
+    onOffline: (name, seed, tribe, difficulty) => {
       close();
-      void startOffline(name, seed, tribe, difficulty, mode);
+      void startOffline(name, seed, tribe, difficulty);
     },
   });
 }
@@ -93,13 +90,11 @@ void atlas();
 if (params.has("offline")) {
   const tribe = params.get("tribe");
   const difficulty = params.get("difficulty");
-  const mode = params.get("mode");
   void startOffline(
     playerName() || "Explorer",
     params.get("seed") || "offline",
     isTribe(tribe) ? tribe : "islanders",
     isDifficulty(difficulty) ? difficulty : "normal",
-    isGameMode(mode) ? mode : "colony",
   );
 } else if (join && playerName()) {
   void startOnline(join, playerName());

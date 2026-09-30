@@ -71,11 +71,9 @@ export function tick(state: GameState, dt = TICK_SECONDS): void {
     if (e.type === "building") updateBuilding(state, e, dt);
     else if (e.type === "node" && e.stage !== "grown") updateNode(state, e, dt);
   }
-  if (state.mode === "adventure") {
-    // Nobody commands the villagers here: they raise what needs raising and share out the jobs.
-    assignBuilders(state);
-    rebalance(state);
-  }
+  // Nobody commands the villagers: they raise what needs raising and share out the jobs.
+  assignBuilders(state);
+  rebalance(state);
   for (const e of all) {
     if (!state.entities.has(e.id)) continue;
     if (e.type === "villager") updateVillager(state, e, dt);
@@ -259,7 +257,7 @@ function taskValid(state: GameState, v: VillagerEntity, t: Task): boolean {
         n?.type === "node" &&
         n.stage === "grown" &&
         n.amount > 0 &&
-        (n.marked || t.auto !== undefined || (state.mode === "adventure" && n.claimedBy === v.id))
+        (n.marked || t.auto !== undefined || n.claimedBy === v.id)
       );
     }
     case "build": {
@@ -312,7 +310,10 @@ function updateVillager(state: GameState, v: VillagerEntity, dt: number): void {
     const node = t?.kind === "harvest" ? state.entities.get(t.nodeId) : undefined;
     const sameGoods = node?.type === "node" && NODES[node.kind].resource === v.carrying.resource;
     if (v.carrying.amount >= VILLAGER.carry || !sameGoods) {
-      if (!startDelivery(state, v)) {
+      // With nowhere to drop the goods (no storehouse on this island yet), carry on with other
+      // jobs such as raising one; only gathering more has to wait.
+      const free = v.task?.kind === "build" || v.task?.kind === "staff";
+      if (!startDelivery(state, v) && !free) {
         v.action = "idle";
         v.retryAt = state.time + 2;
       }
@@ -492,46 +493,11 @@ function sameIsland(state: GameState, v: VillagerEntity, x: number, y: number): 
   return w.island[tileIndex(w, here.x, here.y)] === w.island[tileIndex(w, x, y)];
 }
 
-/** Idle villagers pick up work: construction first, then staffing, then marked resources. */
-function findJob(state: GameState, v: VillagerEntity): void {
-  if (state.mode === "adventure") return findJobByBalance(state, v);
-  let best: { task: Task; prio: number; d: number } | null = null;
-  const consider = (task: Task, prio: number, x: number, y: number) => {
-    const d = Math.hypot(x - v.x, y - v.y);
-    if (!best || prio < best.prio || (prio === best.prio && d < best.d)) best = { task, prio, d };
-  };
-  for (const e of state.entities.values()) {
-    if (e.type === "building") {
-      if (!sameIsland(state, v, e.x, e.y)) continue;
-      if (!e.complete && builders(state, e) < VILLAGER.maxBuildersPerSite) {
-        consider({ kind: "build", buildingId: e.id }, 0, e.x + e.w / 2, e.y + e.h / 2);
-      } else if (e.complete && BUILDINGS[e.kind].worker && e.workerId === null) {
-        consider({ kind: "staff", buildingId: e.id }, 1, e.x + e.w / 2, e.y + e.h / 2);
-      }
-    } else if (e.type === "node" && e.marked && e.stage === "grown" && e.claimedBy === null) {
-      if ((state.unreachable.get(e.id) ?? 0) > state.time) continue;
-      if (!sameIsland(state, v, e.x, e.y)) continue;
-      consider({ kind: "harvest", nodeId: e.id }, 2, e.x + 0.5, e.y + 0.5);
-    }
-  }
-  const chosen = best as { task: Task } | null;
-  if (!chosen) return;
-  const task = chosen.task;
-  if (task.kind === "harvest") (state.entities.get(task.nodeId) as NodeEntity).claimedBy = v.id;
-  if (task.kind === "staff") {
-    const b = state.entities.get(task.buildingId) as BuildingEntity;
-    b.workerId = v.id;
-    markDirty(state, b.id);
-  }
-  v.task = task;
-  markDirty(state, v.id);
-}
-
 /**
- * Adventure worlds: a building site that still wants builders comes first; after that, whichever
- * job the settlement has the fewest workers on for its needs.
+ * Idle villagers pick up work: a building site that still wants builders comes first; after that,
+ * whichever job the settlement has the fewest workers on for its needs.
  */
-function findJobByBalance(state: GameState, v: VillagerEntity): void {
+function findJob(state: GameState, v: VillagerEntity): void {
   let site: { b: BuildingEntity; d: number } | null = null;
   for (const e of state.entities.values()) {
     if (e.type !== "building" || e.complete || !sameIsland(state, v, e.x, e.y)) continue;

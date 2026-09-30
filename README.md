@@ -31,7 +31,7 @@ pnpm dev
 
 The site root is the landing page; the game itself lives at **/play** (http://localhost:5190/play). Pick a tribe, start an expedition, then use **Copy invite link** to bring up to 7 friends. Invite links look like `/play/w/<id>`.
 
-- **Offline:** "Play offline" in the lobby (or `/play?offline&seed=anything&tribe=northfolk`, plus `&mode=adventure` for an adventure world) runs the whole simulation in your browser. Nothing is saved.
+- **Offline:** "Play offline" in the lobby (or `/play?offline&seed=anything&tribe=northfolk`) runs the whole simulation in your browser. Nothing is saved.
 - **Production:** `pnpm build && pnpm start` builds the client, and the Node server then serves the landing page, the game and the API from one port (8787).
 - **Old links:** invite links (`/w/<id>`) and offline URLs (`/?offline…`) from before the game moved to /play redirect there.
 
@@ -39,9 +39,8 @@ The site root is the landing page; the game itself lives at **/play** (http://lo
 
 | Action | How                                                                                                                                                                                             |
 | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Pan    | Drag the ground, right/middle-drag, or WASD / arrow keys (colony worlds: in an adventure world they walk your character)                                                                        |
+| Walk   | WASD / arrow keys, or right-click the ground with nothing selected. The camera is bound to your character; the wheel zooms                                                                      |
 | Zoom   | Mouse wheel, `+` / `-`                                                                                                                                                                          |
-| Gather | `H`, then click or drag a box across trees, rocks and bushes (Shift to unmark)                                                                                                                  |
 | Build  | `1`–`9`, `0`, `B` (dock), `L` (lighthouse), `P` (path) or the build menu, then click. Shift-click keeps placing. Paths can be dragged                                                           |
 | Select | Click a villager, ship, building or resource                                                                                                                                                    |
 | Order  | With a villager selected, right-click a resource, building, ship, bones or the ground. With a ship selected, right-click the sea, an island, a dock (cargo ships), a shipwreck or a sunken site |
@@ -49,18 +48,17 @@ The site root is the landing page; the game itself lives at **/play** (http://lo
 | Chat   | `Enter`                                                                                                                                                                                         |
 | Map    | `M` opens the chart of the archipelago (or use the Map button by the minimap). `M` or `Esc` closes it                                                                                           |
 | Sound  | `N` mutes or unmutes (or the Sound button in the expedition panel). Your choice is remembered                                                                                                   |
-| Home   | `C` centres on the town hall (in an adventure world it brings the camera back to your character)                                                                                                |
-| Pack   | Adventure worlds only: `I` opens your pack, `E` picks up what lies within reach, right-click an item to walk over and take it                                                                   |
-| Walk   | Adventure worlds only: right-click the ground with nothing selected (see below)                                                                                                                 |
+| Home   | `C` centres on the town hall (it brings the camera back to your character)                                                                                                                      |
+| Pack   | `I` opens your pack, `E` picks up what lies within reach, right-click an item to walk over and take it                                                                                          |
 
-### Adventure mode (early preview)
+### Your character
 
-When you create a world you choose **how you play**. **Colony** is the game as described everywhere else in this file: you command villagers from above. **Adventure** is the start of a different game on the same islands, where each player controls one character of their own instead. The mode is fixed when the world is created and saved with it; older worlds are colonies.
+Every world is an adventure: each player controls one character of their own instead of commanding villagers from above. (There used to be a separate Colony mode; it is gone, and worlds saved by older versions simply load as adventures.)
 
 What works so far:
 
 - **One character per player.** It appears on the shore beside the town hall the first time you join (each of the 8 players gets a spot of their own), and is where you left it when you come back, even after a server restart. Everyone sees everyone's character, drawn with a ring in the player's colour and their name above it, and as a dot in the player's colour on the minimap.
-- **Walk with WASD or the arrow keys** (W is up the screen), or right-click the ground with nothing selected and your character walks there by the shortest way (faster on paths). Right-click a tree, rock or building and you walk to the ground beside it. Keys slide you along walls. Only you can move your character. Selecting a villager or ship first keeps the colony controls: right-click orders that instead.
+- **Walk with WASD or the arrow keys** (W is up the screen), or right-click the ground with nothing selected and your character walks there by the shortest way (faster on paths). Right-click a tree, rock or building and you walk to the ground beside it. Keys slide you along walls. Only you can move your character. Selecting a villager or ship first lets you right-click orders for it instead.
 - **The camera is bound to your character.** It stays on you wherever you go; dragging the ground does not move it (the wheel still zooms).
 - **You stand out.** Your character is drawn a quarter larger than a villager, in your tribe's dress, with a cape and sash in your player colour. The cape is a separate greyscale layer that the game tints, which is where character customization will plug in later.
 - **Your character counts as a foothold** on the island it stands on, sees a little further than a villager (6 tiles, and it uncovers the map as it goes), and keeps buildings from going up on top of it.
@@ -68,7 +66,6 @@ What works so far:
   - When a building needs raising, the nearest villager on its island drops whatever they are doing (a house wants one builder, the Great Work three) and builds it. When it is done they look for a new job.
   - A new job is whichever kind the settlement has the fewest workers on, against target shares: 30% wood, 25% food, 15% stone, 15% ore, 10% tools and 5% faith, with a nudge towards whatever the treasury is short of. They staff a free workplace (lumber camp, farm, quarry, mine, blacksmith, church) if there is one, and otherwise gather trees, berries, rocks and ore by hand.
   - Every few seconds one hand-gatherer from the most over-staffed kind of job moves to a free workplace of a kind that is short of workers, so a newly built farm or mine gets its worker even when everyone is busy.
-  - Colony worlds are unchanged: there villagers only work what you mark or assign.
 
 - **A pack of your own.** Each character carries up to 12 stacks of items (bread to start with), kept apart from the settlement's goods and saved with the world. Press `I` (or the Pack button) to open it, select a stack, and drop one or all of it on the ground where you stand. Anyone can pick an item up: press `E` next to it, or right-click it and your character walks over and takes it. Items lie on land only, never in the sea (dropping into the water is refused, and drops never slide onto water or a pier), and a full pack leaves the item where it is.
 - **Things to find.** Every island but your home one has a few items lying about, always one treasure its biome is known for (amber in the dunes and Amberwood, pearls in the jungle and the glowing caverns, crystal shards on the crystal isles, relic shards on the infernal ones, and so on). `scatterLoot` places them deterministically from the world seed; `grantItem` puts loot straight into a character's pack (overflow falls on the ground), so chests, wrecks and sunken sites can hand out items the same way later.
@@ -182,7 +179,7 @@ A raiding ship sails in from over the horizon of your settlements and ships (see
 
 ### Signature goods and the Great Work
 
-Six far biomes each yield a good found nowhere else. They are deposits on that biome's islands (every world has enough), gathered like ore: a mine worker takes any of them within its radius, and villagers can be sent to mark and mine them by hand.
+Six far biomes each yield a good found nowhere else. They are deposits on that biome's islands (every world has enough), gathered like ore: a mine worker takes any of them within its radius, and idle villagers will mine them by hand.
 
 | Good      | Biome           | Deposit                                              |
 | --------- | --------------- | ---------------------------------------------------- |

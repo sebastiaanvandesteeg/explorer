@@ -3,13 +3,11 @@ import { createServer, type IncomingMessage, type Server, type ServerResponse } 
 import type { AddressInfo } from "node:net";
 import {
   isDifficulty,
-  isGameMode,
   isGamePath,
   isTribe,
   movedPath,
   sitePagePath,
   type Difficulty,
-  type GameMode,
   type TribeId,
 } from "@explorer/shared";
 import sirv from "sirv";
@@ -72,13 +70,11 @@ export async function startApp(opts: AppOptions): Promise<App> {
         let seed = "";
         let tribe: TribeId = "islanders";
         let difficulty: Difficulty = "normal";
-        let mode: GameMode = "colony";
         try {
           const body = JSON.parse((await readBody(req)) || "{}") as {
             seed?: unknown;
             tribe?: unknown;
             difficulty?: unknown;
-            mode?: unknown;
           };
           if (typeof body.seed === "string") seed = body.seed.trim().slice(0, MAX_SEED_LENGTH);
           if (body.tribe !== undefined) {
@@ -90,10 +86,6 @@ export async function startApp(opts: AppOptions): Promise<App> {
               return json(res, 400, { error: "Unknown difficulty" });
             difficulty = body.difficulty;
           }
-          if (body.mode !== undefined) {
-            if (!isGameMode(body.mode)) return json(res, 400, { error: "Unknown mode" });
-            mode = body.mode;
-          }
         } catch {
           return json(res, 400, { error: "Invalid JSON" });
         }
@@ -101,7 +93,6 @@ export async function startApp(opts: AppOptions): Promise<App> {
           seed || Math.random().toString(36).slice(2, 10),
           tribe,
           difficulty,
-          mode,
         );
         return json(res, 201, room.info());
       }

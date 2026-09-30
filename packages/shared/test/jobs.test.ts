@@ -12,15 +12,14 @@ import {
   tick,
   type BuildingEntity,
   type BuildingKind,
-  type GameMode,
   type GameState,
   type VillagerEntity,
 } from "../src";
 
 const world = generateWorld("job-tests");
 
-const fresh = (mode: GameMode = "adventure"): GameState => {
-  const s = createInitialState(world, { mode });
+const fresh = (): GameState => {
+  const s = createInitialState(world);
   Object.assign(s.stock, { wood: 500, stone: 500, food: 100, ore: 40, tools: 20 });
   return s;
 };
@@ -117,11 +116,5 @@ describe("villagers in an adventure world", () => {
     expect(farm.workerId).not.toBeNull();
     const worker = s.entities.get(farm.workerId!) as VillagerEntity;
     expect(jobOf(s, worker)).toBe("food");
-  });
-
-  it("leave the work to players in a colony: nothing is gathered unmarked", () => {
-    const s = fresh("colony");
-    run(s, 30);
-    expect(villagers(s).every((v) => v.task?.kind !== "harvest")).toBe(true);
   });
 });

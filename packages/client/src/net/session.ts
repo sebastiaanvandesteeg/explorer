@@ -10,7 +10,6 @@ import {
   type Command,
   type CommandResult,
   type Difficulty,
-  type GameMode,
   type GameState,
   type Patch,
   type PlayerInfo,
@@ -65,11 +64,10 @@ export class LocalSession extends Emitter implements Session {
     name: string,
     tribe: TribeId = "islanders",
     difficulty: Difficulty = "normal",
-    mode: GameMode = "colony",
   ) {
     super();
-    this.state = createInitialState(generateWorld(seed, tribe), { difficulty, mode });
-    if (mode === "adventure") ensureCharacter(this.state, this.you);
+    this.state = createInitialState(generateWorld(seed, tribe), { difficulty });
+    ensureCharacter(this.state, this.you);
     this.state.dirty.clear();
     this.players = [{ id: this.you, name, color: PLAYER_COLORS[0], online: true }];
     this.timer = setInterval(() => {

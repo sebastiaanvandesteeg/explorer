@@ -2,7 +2,6 @@
 import type { TribeId } from "../tribes";
 import type { WorldMap } from "../world/types";
 import { isDifficulty, type Difficulty } from "./difficulty";
-import { isGameMode, type GameMode } from "./mode";
 import { SIGNATURE_NODES } from "../world/biomes";
 import { NODES, SHIP_HP, type Stock, type UpgradeId } from "./catalogue";
 import {
@@ -58,8 +57,6 @@ export interface Snapshot {
   tribe?: TribeId;
   /** Older saves predate difficulty; they load as Normal. */
   difficulty?: Difficulty;
-  /** Older saves predate adventure worlds; they load as Colony. */
-  mode?: GameMode;
   tick: number;
   time: number;
   nextId: number;
@@ -170,7 +167,6 @@ export function toSnapshot(state: GameState): Snapshot {
     seed: state.world.seed,
     tribe: state.world.tribe,
     difficulty: state.difficulty,
-    mode: state.mode,
     tick: state.tick,
     time: state.time,
     nextId: state.nextId,
@@ -192,11 +188,7 @@ export function toSnapshot(state: GameState): Snapshot {
  * the server replans their routes (paths are never serialised).
  */
 export function fromSnapshot(world: WorldMap, snap: Snapshot, resume = false): GameState {
-  const state = emptyState(
-    world,
-    isDifficulty(snap.difficulty) ? snap.difficulty : "normal",
-    isGameMode(snap.mode) ? snap.mode : "colony",
-  );
+  const state = emptyState(world, isDifficulty(snap.difficulty) ? snap.difficulty : "normal");
   state.tick = snap.tick;
   state.time = snap.time;
   state.nextId = snap.nextId;

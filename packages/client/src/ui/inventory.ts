@@ -43,16 +43,11 @@ export class PackPanel {
       "Pack ",
       this.badge,
     );
-    this.root = h("div.pack-wrap", { style: { display: "none" } }, this.panel, button);
+    this.root = h("div.pack-wrap", {}, this.panel, button);
   }
 
   get isOpen(): boolean {
     return this.opened;
-  }
-
-  /** Adventure worlds only: colony worlds have no pack. */
-  setAvailable(on: boolean): void {
-    this.root.style.display = on ? "" : "none";
   }
 
   toggle(): void {
