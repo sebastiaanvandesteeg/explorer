@@ -98,6 +98,47 @@ export class Overlay {
     g.position.set(sx(f.x, f.y), sy(f.x, f.y) - f.z);
   }
 
+  /**
+   * A soft warm backdrop behind something you can interact with: a glowing pad under a building,
+   * wider than its footprint so it frames the sprite, in a few fading layers.
+   */
+  backdropBuilding(f: Footprint, now: number): void {
+    const pulse = 0.5 + 0.5 * Math.sin(now / 260);
+    for (const [grow, alpha] of [
+      [0.9, 0.2],
+      [0.6, 0.3],
+      [0.3, 0.42],
+    ] as const)
+      diamond(this.g, {
+        x: f.x - grow,
+        y: f.y - grow,
+        w: f.w + grow * 2,
+        h: f.h + grow * 2,
+        z: f.z,
+      }).fill({ color: 0xffe9a8, alpha: alpha + pulse * 0.03 });
+    diamond(this.g, { ...f, x: f.x - 0.3, y: f.y - 0.3, w: f.w + 0.6, h: f.h + 0.6 }).stroke({
+      width: 1,
+      color: 0xfff3c8,
+      alpha: 0.55 + pulse * 0.25,
+      pixelLine: true,
+    });
+  }
+
+  /** The same for a person: a glow at their feet and a pale halo behind the body. */
+  backdropPerson(x: number, y: number, now: number): void {
+    const pulse = 0.5 + 0.5 * Math.sin(now / 260);
+    for (const [rx, ry, alpha] of [
+      [17, 24, 0.14],
+      [13, 18, 0.22],
+      [9, 13, 0.3],
+    ] as const)
+      this.g.ellipse(x, y - 9, rx, ry).fill({ color: 0xffe9a8, alpha });
+    this.g.ellipse(x, y, 11, 5.5).fill({ color: 0xffe9a8, alpha: 0.42 + pulse * 0.1 });
+    this.g
+      .ellipse(x, y, 11, 5.5)
+      .stroke({ width: 1, color: 0xfff3c8, alpha: 0.7, pixelLine: true });
+  }
+
   select(f: Footprint): void {
     diamond(this.g, f).stroke({ width: 1, color: 0xf6d23a, alpha: 1, pixelLine: true });
   }

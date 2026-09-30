@@ -93,6 +93,8 @@ export class Game {
   private readonly pack: PackPanel;
   private tool: Tool = { kind: "select" };
   private selected: number | null = null;
+  private hoverId: number | null = null;
+  private hoverCheckAt = 0;
   private hoverTile: { x: number; y: number } | null = null;
   private pointer: { x: number; y: number } | null = null;
   private drag: Drag | null = null;
@@ -1061,6 +1063,29 @@ export class Game {
     this.hud.setClock(phase, dayNumber(state.time));
   }
 
+  /** Backdrop behind the building or villager under the cursor, so you can see it is clickable. */
+  private drawBackdrop(o: Overlay, state: GameState): void {
+    if (this.drag?.moved || !this.pointer) return;
+    const now = performance.now();
+    // Looking up what is under the cursor is not free: do it a few times a second.
+    if (now - this.hoverCheckAt > 80) {
+      this.hoverCheckAt = now;
+      const e = this.entityAt(this.pointer.x, this.pointer.y);
+      this.hoverId =
+        e && (e.type === "villager" || (e.type === "building" && e.kind !== "path")) ? e.id : null;
+    }
+    const e = this.hoverId === null ? undefined : state.entities.get(this.hoverId);
+    if (e?.type === "building")
+      o.backdropBuilding(
+        { x: e.x, y: e.y, w: e.w, h: e.h, z: visibleHeight(state, e.x, e.y) ?? 0 },
+        now,
+      );
+    else if (e?.type === "villager" && e.aboard === null) {
+      const pos = this.entities.position(e.id);
+      if (pos) o.backdropPerson(pos.x, pos.y, now);
+    }
+  }
+
   private drawOverlay(): void {
     const o = this.overlay;
     const state = this.session.state;
@@ -1090,6 +1115,7 @@ export class Game {
         o.highlight({ x: n.x, y: n.y, w: 1, h: 1, z: visibleHeight(state, n.x, n.y) ?? 0 });
       }
     } else if (hover && this.pointer) {
+      this.drawBackdrop(o, state);
       o.hover({
         x: hover.x,
         y: hover.y,
