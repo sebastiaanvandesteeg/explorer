@@ -271,6 +271,55 @@ describe("characters", () => {
     expect([benNow.x, benNow.y]).toEqual([benBefore.x, benBefore.y]);
   });
 
+  it("let players go into the town hall, see each other there, and only talk business inside", async () => {
+    const { id } = await createWorld("adv-rooms");
+    const anna = new Player();
+    const a = mirror(await anna.join(id, "Anna", token(1)));
+    const ben = new Player();
+    const b = mirror(await ben.join(id, "Ben", token(2)));
+    const room = (await app.rooms.get(id))!;
+    const hall = [...room.state.entities.values()].find(
+      (e) => e.type === "building" && e.kind === "town_hall",
+    )!;
+    const result = async (p: Player, seq: number, cmd: Record<string, unknown>) => {
+      p.send({ t: "cmd", seq, cmd } as never);
+      return p.next((m) => m.t === "result" && m.seq === seq);
+    };
+    // Business from the street is refused.
+    expect(await result(anna, 1, { kind: "train-villager", buildingId: hall.id })).toMatchObject({
+      ok: false,
+    });
+    for (const [seq, p] of [
+      [2, anna],
+      [3, ben],
+    ] as const)
+      expect(await result(p, seq, { kind: "enter-building", buildingId: hall.id })).toEqual({
+        t: "result",
+        seq,
+        ok: true,
+      });
+    // Both end up inside, and each mirror sees the other there.
+    for (const [player, state] of [
+      [anna, a],
+      [ben, b],
+    ] as const) {
+      for (let i = 0; i < 200; i++) {
+        const inside = characters(state).filter((c) => c.inside === hall.id);
+        if (inside.length === 2) break;
+        applyPatch(
+          state,
+          (await player.next<Extract<ServerMessage, { t: "patch" }>>((m) => m.t === "patch")).patch,
+        );
+      }
+      expect(characters(state).map((c) => c.inside)).toEqual([hall.id, hall.id]);
+    }
+    // Walking in the room and bad input are checked like everything else.
+    expect(await result(anna, 4, { kind: "move-in-room", x: 4, y: 4 })).toMatchObject({ ok: true });
+    anna.send({ t: "cmd", seq: 5, cmd: { kind: "move-in-room", x: "4", y: 4 } } as never);
+    expect(await anna.next((m) => m.t === "error")).toMatchObject({ code: "bad-request" });
+    expect(await result(anna, 6, { kind: "leave-building" })).toMatchObject({ ok: true });
+  });
+
   it("refuse to walk where there is no way, with a reason", async () => {
     const { id } = await createWorld("adv-refuse");
     const anna = new Player();

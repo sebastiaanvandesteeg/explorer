@@ -113,6 +113,14 @@ export interface CharacterEntity extends Walker {
   fetch: number | null;
   /** Where the current walk ends, or null when standing still. */
   dest: { x: number; y: number } | null;
+  /** The building this character is inside (its room is drawn instead of the island), or null. */
+  inside: number | null;
+  /** Where they stand in that room, in room tiles. */
+  room: { x: number; y: number };
+  /** Room walk in progress (planning state, not sent over the wire). */
+  rpath: { x: number; y: number }[];
+  /** A building this character is walking over to go into. */
+  enter: number | null;
 }
 
 /** Something lying on the ground, on land, for anyone to pick up. */

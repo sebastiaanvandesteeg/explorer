@@ -22,7 +22,11 @@ import {
   type BiomeId,
   type BuildingKind,
   type CharacterEntity,
+  type BuildingEntity,
   type ItemEntity,
+  isEnterable,
+  ROOMS,
+  roomWalkable,
   ITEMS,
   PICKUP_REACH,
   type Command,
@@ -35,7 +39,10 @@ import {
   type StormEntity,
   type VillagerEntity,
 } from "@explorer/shared";
+import { h } from "../ui/dom";
+import { talkFor } from "../ui/dialog";
 import { PackPanel } from "../ui/inventory";
+import { RoomScene } from "../render/room";
 import { Application, Container, Rectangle } from "pixi.js";
 import type { Atlas } from "../assets";
 import type { Session, SessionStatus } from "../net/session";
@@ -91,6 +98,10 @@ export class Game {
   private lastWorldPos = { x: 0, y: 0 };
   private readonly hud: Hud;
   private readonly pack: PackPanel;
+  private readonly room: RoomScene;
+  private readonly leaveBtn: HTMLButtonElement;
+  /** The building your character is inside right now (its room is on screen), or null. */
+  private indoors: number | null = null;
   private tool: Tool = { kind: "select" };
   private selected: number | null = null;
   private hoverId: number | null = null;
@@ -160,6 +171,14 @@ export class Game {
       this.overlay.screen,
     );
 
+    this.room = new RoomScene(
+      atlas,
+      state.world.tribe,
+      (id) => this.entities.playerColour(id),
+      (id) => session.players.find((p) => p.id === id)?.name ?? "?",
+    );
+    app.stage.addChild(this.room.layer);
+
     const invite = session.worldId ? location.origin + worldPath(session.worldId) : null;
     this.hud = new Hud(
       root,
@@ -186,6 +205,13 @@ export class Game {
         ),
     });
     this.hud.root.append(this.pack.root);
+    this.leaveBtn = h(
+      "button.btn.leave-btn",
+      { title: "Go back outside (Esc)", onclick: () => void this.send({ kind: "leave-building" }) },
+      "Leave",
+    ) as HTMLButtonElement;
+    this.leaveBtn.style.display = "none";
+    this.hud.root.append(this.leaveBtn);
     this.syncPack();
 
     this.sound = new SoundSystem((x, y) => this.heard(x, y));
@@ -550,6 +576,30 @@ export class Game {
     return null;
   }
 
+  /** Test hook: a canvas point on a finished building of this kind, clear of the HUD panels. */
+  findBuildingTarget(kind: BuildingKind): { x: number; y: number } | null {
+    for (const e of this.session.state.entities.values()) {
+      if (e.type !== "building" || e.kind !== kind) continue;
+      const view = this.entities.view(e.id);
+      if (!view) continue;
+      const b = view.root.getBounds();
+      for (let fy = 0.3; fy <= 0.8; fy += 0.1)
+        for (let fx = 0.2; fx <= 0.8; fx += 0.1) {
+          const x = b.x + b.width * fx;
+          const y = b.y + b.height * fy;
+          if (x < 340 || y < 90 || x > this.camera.width - 240 || y > this.camera.height - 160)
+            continue;
+          if (this.entityAt(x, y)?.id === e.id) return { x, y };
+        }
+    }
+    return null;
+  }
+
+  /** Test hook: a canvas point on the NPC of the room you are in. */
+  findNpcTarget(): { x: number; y: number } | null {
+    return this.room.npcPoint();
+  }
+
   /**
    * Test hook (used by the Playwright smoke test): canvas position of a tile a few steps from
    * your character that it can walk to, clear of the HUD panels, and which tile that is.
@@ -572,6 +622,8 @@ export class Game {
           );
           const picked = this.tileAt(p.x, p.y);
           if (picked?.x !== tile.x || picked.y !== tile.y) continue;
+          // Clicking a town building would walk in rather than to the tile.
+          if (this.enterableAt(p.x, p.y)) continue;
           if (
             p.x < 240 ||
             p.y < 90 ||
@@ -756,7 +808,8 @@ export class Game {
       else if (k === "n") this.hud.setSound(this.sound.toggle());
       else if (k === "escape") {
         if (this.tool.kind !== "select") this.setTool({ kind: "select" });
-        else this.select(null);
+        else if (this.selected !== null) this.select(null);
+        else if (this.indoors !== null) void this.send({ kind: "leave-building" });
       } else if (k === "enter") {
         e.preventDefault();
         this.hud.focusChat();
@@ -810,13 +863,27 @@ export class Game {
       );
       return;
     }
+    if (this.indoors !== null) {
+      this.roomClick(sx, sy);
+      return;
+    }
     const e = this.entityAt(sx, sy);
+    // Finished town buildings are entered, not inspected: their business is done inside.
+    if (e?.type === "building" && e.complete && isEnterable(e.kind)) {
+      this.select(null);
+      void this.send({ kind: "enter-building", buildingId: e.id });
+      return;
+    }
     this.select(e?.id ?? null);
   }
 
   private rightClick(sx: number, sy: number): void {
     if (this.tool.kind !== "select") {
       this.setTool({ kind: "select" });
+      return;
+    }
+    if (this.indoors !== null) {
+      this.roomClick(sx, sy);
       return;
     }
     const state = this.session.state;
@@ -850,6 +917,10 @@ export class Game {
       // Right-clicking land with passengers aboard means "take them there".
       const unload = isLand(state.world, tile.x, tile.y) && sel.passengers.length > 0;
       void this.send({ kind: "move-ship", shipId: sel.id, x: tile.x, y: tile.y, unload });
+    } else if (this.enterableAt(sx, sy)) {
+      const b = this.enterableAt(sx, sy)!;
+      this.select(null);
+      void this.send({ kind: "enter-building", buildingId: b.id });
     } else if (tile) {
       // Nothing to give orders to: right-click is "walk here" for your own character.
       this.select(null);
@@ -857,6 +928,12 @@ export class Game {
     } else {
       this.select(null);
     }
+  }
+
+  /** The finished town building under a screen point, if any. */
+  private enterableAt(sx: number, sy: number): BuildingEntity | null {
+    const e = this.entityAt(sx, sy);
+    return e?.type === "building" && e.complete && isEnterable(e.kind) ? e : null;
   }
 
   /** Right-clicking a shipwreck salvages it and a found sunken site sends the passengers diving. */
@@ -880,6 +957,12 @@ export class Game {
     const area = this.graded.filterArea!;
     if (area.width !== this.app.screen.width || area.height !== this.app.screen.height) {
       this.graded.filterArea = new Rectangle(0, 0, this.app.screen.width, this.app.screen.height);
+    }
+
+    const inside = this.myCharacter()?.inside ?? null;
+    if (inside !== null || this.indoors !== null) {
+      this.enterOrLeaveRoom(inside);
+      if (inside !== null && this.roomFrame(now, dt, inside)) return;
     }
 
     if (this.locked) {
@@ -930,6 +1013,111 @@ export class Game {
       this.hud.setAlerts(state);
       this.watchForRaiders(state);
     }
+  }
+
+  /** Switch between the island and the inside of a building when your character goes in or out. */
+  private enterOrLeaveRoom(inside: number | null): void {
+    if (inside === this.indoors) return;
+    const going = inside !== null;
+    this.indoors = inside;
+    this.graded.visible = !going;
+    this.entities.lights.visible = !going;
+    this.atmosphere.overlay.visible = !going;
+    this.overlay.screen.visible = !going;
+    this.hud.root.classList.toggle("indoors", going);
+    this.leaveBtn.style.display = going ? "" : "none";
+    this.walkDir = "";
+    this.select(null);
+    this.hud.setTalk(null);
+    if (!going) {
+      this.room.hide();
+      this.selectionDirty = true;
+      return;
+    }
+    const b = this.session.state.entities.get(inside);
+    if (b?.type === "building") this.hud.toast(`You step into the ${BUILDINGS[b.kind].name}`);
+  }
+
+  /** One frame of a room: its people, the keys, and the conversation. Returns false if there is none. */
+  private roomFrame(now: number, dt: number, inside: number): boolean {
+    const state = this.session.state;
+    const b = state.entities.get(inside);
+    if (b?.type !== "building") return false;
+    this.room.show(state, b);
+    const talking = this.selected === b.id && this.app.screen.width > 900;
+    this.room.frame(
+      now,
+      dt,
+      state,
+      this.app.screen.width,
+      this.app.screen.height,
+      talking ? 450 : 0,
+    );
+    this.walkInRoom(now);
+    const talk = this.selected === b.id ? talkFor(state, b) : null;
+    this.hud.setTalk(talk);
+    if (this.selectionDirty) {
+      this.selectionDirty = false;
+      this.hud.setSelection(state, this.selected);
+    }
+    return true;
+  }
+
+  /** WASD inside a room: walk a few tiles the way the key points, as far as the floor is clear. */
+  private walkInRoom(now: number): void {
+    const me = this.myCharacter();
+    const b = me?.inside != null ? this.session.state.entities.get(me.inside) : undefined;
+    const def = b?.type === "building" ? ROOMS[b.kind] : undefined;
+    if (!me || !def) return;
+    const k = this.keys;
+    const right =
+      (k.has("d") || k.has("arrowright") ? 1 : 0) - (k.has("a") || k.has("arrowleft") ? 1 : 0);
+    const down =
+      (k.has("s") || k.has("arrowdown") ? 1 : 0) - (k.has("w") || k.has("arrowup") ? 1 : 0);
+    const step = { x: Math.sign(right + down), y: Math.sign(-right + down) };
+    const dir = step.x === 0 && step.y === 0 ? "" : `${step.x},${step.y}`;
+    const quiet = (cmd: Command) => void this.session.command(cmd);
+    const here = { x: Math.floor(me.room.x), y: Math.floor(me.room.y) };
+    if (dir === "") {
+      if (this.walkDir !== "") quiet({ kind: "move-in-room", x: here.x, y: here.y });
+      this.walkDir = "";
+      return;
+    }
+    if (dir === this.walkDir && now - this.walkSentAt < 250) return;
+    this.walkDir = dir;
+    this.walkSentAt = now;
+    const reach = (dx: number, dy: number) => {
+      let target: { x: number; y: number } | null = null;
+      for (let i = 1; i <= 4; i++) {
+        const x = here.x + dx * i;
+        const y = here.y + dy * i;
+        if (!roomWalkable(def, x, y)) break;
+        target = { x, y };
+      }
+      return target;
+    };
+    const target =
+      reach(step.x, step.y) ?? (step.x && step.y ? (reach(step.x, 0) ?? reach(0, step.y)) : null);
+    if (target) quiet({ kind: "move-in-room", ...target });
+  }
+
+  /** A click inside a room: talk to the NPC, or walk to the tile (the door leaves). */
+  private roomClick(sx: number, sy: number): void {
+    const hit = this.room.pick(sx, sy);
+    const id = this.indoors;
+    if (!hit || id === null) {
+      this.select(null);
+      return;
+    }
+    if ("npc" in hit) {
+      const b = this.session.state.entities.get(id);
+      const npc = b?.type === "building" ? ROOMS[b.kind]?.npc : undefined;
+      if (npc) void this.session.command({ kind: "move-in-room", x: npc.x, y: npc.y + 1 });
+      this.select(id);
+      return;
+    }
+    this.select(null);
+    void this.send({ kind: "move-in-room", x: hit.x, y: hit.y });
   }
 
   /** Where a sound at a place in the world seems to come from, for the player looking at the screen. */
@@ -1047,6 +1235,7 @@ export class Game {
     const o = this.overlay;
     const state = this.session.state;
     o.begin();
+    if (this.indoors !== null) return;
     const hover = this.hoverTile;
     const tool = this.tool;
     let ghost: { name: string; f: Footprint; ok: boolean } | null = null;
@@ -1097,7 +1286,7 @@ export class Game {
   private drawCharacters(o: Overlay, state: GameState): void {
     const alive = new Set<number>();
     for (const e of state.entities.values()) {
-      if (e.type !== "character" || e.aboard !== null) continue;
+      if (e.type !== "character" || e.aboard !== null || e.inside !== null) continue;
       const pos = this.entities.position(e.id);
       if (!pos) continue;
       const info = this.session.players.find((p) => p.id === e.playerId);

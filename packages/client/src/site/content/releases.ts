@@ -42,6 +42,35 @@ export const NOTE_LABELS: Record<NoteKind, string> = {
 
 export const RELEASES: Release[] = [
   {
+    slug: "come-in",
+    version: "0.14",
+    title: "Come In",
+    date: "2026-09-30",
+    theme: "autumn",
+    summary:
+      "Step through the door of the town hall, houses, market and more: every building has a furnished room and someone inside who does its business.",
+    intro: [
+      "Buildings are no longer things you click for a menu. Walk up and go in: the world goes black around a small, furnished room, and the person inside is who you talk to.",
+    ],
+    sections: [
+      {
+        kind: "new",
+        items: [
+          "Enter the town hall, houses, market, blacksmith, church, magic house, Great Work and dock. Each has its own furniture: beds and hearths, counters and crates, forges, pews, bookshelves, a model of the monument.",
+          "Every room has an NPC with a name. Talk to the steward to welcome villagers, the merchant to trade, the sage to learn upgrades, the harbourmaster to build ships, the architect to fund the Great Work.",
+          "Walk about inside with WASD or a click, see other players in the same room, and leave through the door, the Leave button or Esc.",
+        ],
+      },
+      {
+        kind: "improved",
+        items: [
+          "Building business is now done in person: the server only accepts it from a player standing next to the right NPC.",
+          "Farms, camps, quarries, mines, storehouses and the lighthouse keep their info panel, since there is nobody to talk to there.",
+        ],
+      },
+    ],
+  },
+  {
     slug: "one-way-to-play",
     version: "0.13",
     title: "One Way to Play",

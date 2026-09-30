@@ -96,5 +96,6 @@ describe("biomes", () => {
       );
       expect(ore.length, tribe).toBeGreaterThanOrEqual(5);
     }
-  });
+    // Generates a world per tribe: slow on a busy machine.
+  }, 60_000);
 });

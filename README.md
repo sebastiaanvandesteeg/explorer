@@ -51,6 +51,14 @@ The site root is the landing page; the game itself lives at **/play** (http://lo
 | Home   | `C` centres on the town hall (it brings the camera back to your character)                                                                                                                      |
 | Pack   | `I` opens your pack, `E` picks up what lies within reach, right-click an item to walk over and take it                                                                                          |
 
+### Inside buildings
+
+Finished town buildings can be entered: click one and your character walks to its door and goes in. The screen goes black around a small furnished room (beds and a hearth in a house, a counter and crates in the market, a forge and anvil at the blacksmith, pews and an altar in the church, bookshelves and a cauldron at the magic house, a model of the monument at the Great Work, a chart table at the dock) with one named NPC. Walk about with WASD or a click; other players in the same building are there too. Step onto the door tile, press the Leave button or `Esc` to go back out.
+
+**All of a building's business is done by talking to its NPC** (click them; you walk up first): the steward welcomes new villagers, the merchant trades, the sage teaches upgrades, the harbourmaster builds ships (and teaches the dock upgrades), the architect funds the Great Work, and every NPC will, if asked, pull the building down. The server enforces it: those commands are only accepted from a player inside that building and within reach of its NPC. Buildings you cannot go into (farm, lumber camp, quarry, mine, storehouse, lighthouse, paths) keep their click-to-inspect panel, and so do building sites.
+
+Rooms are plain data in `packages/shared/src/sim/interiors.ts` (size, door, furniture, NPC), drawn by `packages/client/src/render/room.ts` and dressed with the speech in `packages/client/src/ui/dialog.ts`.
+
 ### Your character
 
 Every world is an adventure: each player controls one character of their own instead of commanding villagers from above. (There used to be a separate Colony mode; it is gone, and worlds saved by older versions simply load as adventures.)

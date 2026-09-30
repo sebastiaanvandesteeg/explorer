@@ -501,7 +501,7 @@ class HeroView extends MovingView {
 
   update(e: Entity, now: number): void {
     const c = e as CharacterEntity;
-    this.root.visible = c.aboard === null;
+    this.root.visible = c.aboard === null && c.inside === null;
     this.track(c.x, c.y, now, this.c === null);
     if (this.c === null) this.height = tileHeight(this.layer.state, c.x, c.y);
     this.c = c;

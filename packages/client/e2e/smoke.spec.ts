@@ -1,6 +1,9 @@
 import { expect, test, type Page } from "@playwright/test";
 
 type GameHandle = {
+  findBuildingTarget(kind: string): { x: number; y: number } | null;
+  findNpcTarget(): { x: number; y: number } | null;
+  myCharacter(): { inside: number | null; room: { x: number; y: number } };
   findPlacement(kind: string): { x: number; y: number } | null;
   findWalkTarget(): { x: number; y: number; tile: { x: number; y: number } } | null;
   session: {
@@ -71,7 +74,8 @@ test("start an expedition, build a house, and a friend joins", async ({ page, br
     ),
   ).toBe("northfolk");
   const wood = page.locator(".resource").first();
-  await expect(wood).toHaveText("50");
+  // Villagers gather by themselves, so the stock is a number, not always the starting 50.
+  await expect(wood).toHaveText(/^\d+$/);
 
   // Place a house through the real UI: hotkey, hover, click.
   const spot = await page.evaluate(() =>
@@ -258,5 +262,59 @@ test("offline: drop an item from the pack and pick it up again", async ({ page }
   await expect(page.locator(".toast").last()).toContainText("Picked up Bread");
   await expect.poll(onGround).toBe(before);
   await expect(page.locator(".pack .slot .count")).toHaveText("3");
+  expect(errors).toEqual([]);
+});
+
+test("offline: go into the town hall, talk to the steward, and come out again", async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto("/play?offline&seed=e2e");
+  await expect(page.locator("#app > canvas")).toBeVisible();
+  const game = <T>(fn: (g: GameHandle) => T) => page.evaluate(fn as never, undefined) as Promise<T>;
+  const inside = () =>
+    page.evaluate(() => (window as unknown as { __game: GameHandle }).__game.myCharacter().inside);
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        (window as unknown as { __game: GameHandle }).__game.findBuildingTarget("town_hall"),
+      ),
+    )
+    .not.toBeNull();
+  const door = await page.evaluate(() =>
+    (window as unknown as { __game: GameHandle }).__game.findBuildingTarget("town_hall"),
+  );
+  await page.mouse.move(door!.x, door!.y);
+  await page.mouse.click(door!.x, door!.y);
+  // Clicking a town building walks to its door and goes in: no panel, a room instead.
+  await expect.poll(inside, { timeout: 40_000 }).not.toBeNull();
+  await expect(page.locator(".leave-btn")).toBeVisible();
+  await expect(page.locator(".selection.dialog")).toHaveCount(0);
+  // Talk to the steward: walk up, open the dialog, and welcome a villager.
+  const npc = await page.evaluate(() =>
+    (window as unknown as { __game: GameHandle }).__game.findNpcTarget(),
+  );
+  expect(npc).not.toBeNull();
+  await page.mouse.click(npc!.x, npc!.y);
+  await expect(page.locator(".selection.dialog")).toContainText("Steward");
+  const food = page.locator('.resource[data-res="food"]');
+  const before = Number(await food.innerText());
+  const train = page.getByRole("button", { name: /Train villager/ });
+  await expect
+    .poll(
+      async () => {
+        await train.click();
+        return Number(await food.innerText()) < before;
+      },
+      { timeout: 40_000 },
+    )
+    .toBe(true);
+  // Esc closes the conversation, then leaves the building.
+  await page.keyboard.press("Escape");
+  await expect(page.locator(".selection.dialog")).toHaveCount(0);
+  await page.keyboard.press("Escape");
+  await expect.poll(inside, { timeout: 10_000 }).toBeNull();
+  await expect(page.locator(".leave-btn")).toBeHidden();
   expect(errors).toEqual([]);
 });

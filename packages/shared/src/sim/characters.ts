@@ -55,6 +55,10 @@ export function ensureCharacter(state: GameState, playerId: string): CharacterEn
     dest: null,
     pack: STARTER_PACK.map((i) => ({ ...i })),
     fetch: null,
+    inside: null,
+    room: { x: 0, y: 0 },
+    rpath: [],
+    enter: null,
   } satisfies CharacterEntity);
   lookAround(state, c.x, c.y, CHARACTER.reveal);
   return c;
@@ -73,7 +77,9 @@ export function moveCharacter(
 ): MoveResult {
   const c = playerId === null ? undefined : characterOf(state, playerId);
   if (!c) return { ok: false, reason: "You have no character here" };
+  if (c.inside !== null) return { ok: false, reason: "Leave the building first" };
   c.fetch = null;
+  c.enter = null;
   return walkCharacter(state, c, target);
 }
 

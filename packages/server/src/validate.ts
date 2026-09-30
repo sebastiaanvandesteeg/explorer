@@ -83,6 +83,14 @@ export function parseCommand(v: unknown): Command | null {
       }
       return out;
     }
+    case "enter-building":
+      if (!isInt(v.buildingId)) return null;
+      return { kind: "enter-building", buildingId: v.buildingId };
+    case "leave-building":
+      return { kind: "leave-building" };
+    case "move-in-room":
+      if (!isInt(v.x) || !isInt(v.y)) return null;
+      return { kind: "move-in-room", x: v.x, y: v.y };
     case "pickup-item":
       if (!isInt(v.itemId)) return null;
       return { kind: "pickup-item", itemId: v.itemId };

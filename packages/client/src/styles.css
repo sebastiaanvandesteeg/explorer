@@ -1124,3 +1124,39 @@ input.field:focus {
   gap: 6px;
   margin-top: 8px;
 }
+
+/* ------------------------------------------------------------------ inside buildings */
+.indoors .build-menu,
+.indoors .minimap,
+.indoors .help,
+.indoors .alerts {
+  display: none;
+}
+.leave-btn {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+}
+.selection.dialog {
+  left: auto;
+  right: 12px;
+  top: 148px;
+  bottom: auto;
+  width: min(430px, calc(100vw - 24px));
+  max-width: none;
+  transform: none;
+  max-height: calc(100vh - 230px);
+}
+@media (max-width: 900px) {
+  .selection.dialog {
+    left: 50%;
+    right: auto;
+    top: auto;
+    bottom: 64px;
+    transform: translateX(-50%);
+  }
+}
+.selection.dialog .speech {
+  font-style: italic;
+  opacity: 0.95;
+}

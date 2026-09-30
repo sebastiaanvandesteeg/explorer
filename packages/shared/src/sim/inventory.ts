@@ -101,6 +101,7 @@ export function dropFromPack(
   const c = actor === null ? undefined : characterOf(state, actor);
   if (!c) return fail("You have no character here");
   if (c.aboard !== null) return fail("You can't drop things out at sea");
+  if (c.inside !== null) return fail("Drop things outside");
   const here = { x: Math.floor(c.x), y: Math.floor(c.y) };
   const at = cmd.x === undefined || cmd.y === undefined ? here : { x: cmd.x, y: cmd.y };
   if (!isSolidGround(state, at.x, at.y)) return fail("You can't drop that in the sea");
@@ -184,6 +185,7 @@ export function pickUp(
   const c = actor === null ? undefined : characterOf(state, actor);
   if (!c) return fail("You have no character here");
   if (c.aboard !== null) return fail("You are at sea");
+  if (c.inside !== null) return fail("Leave the building first");
   const item = state.entities.get(cmd.itemId);
   if (item?.type !== "item") return fail("That is gone");
   if (packRoom(c.pack, item.kind) <= 0) return fail("Your pack is full");

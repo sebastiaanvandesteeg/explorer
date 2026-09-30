@@ -23,6 +23,7 @@ import {
   UPGRADES,
 } from "./catalogue";
 import { moveCharacter, walkCharacter } from "./characters";
+import { atNpc, enterBuilding, isEnterable, leaveCommand, moveInRoom } from "./interiors";
 import { dropFromPack, pickUp } from "./inventory";
 import { disembark, hasRoom, landingBlock, shipMoving, shoreBeside } from "./ferry";
 import { seaPath, sailable } from "./navigation";
@@ -68,7 +69,10 @@ export type Command =
   | { kind: "trade"; resource: Resource; action: "sell" | "buy" }
   | { kind: "move-character"; x: number; y: number }
   | { kind: "drop-item"; slot: number; amount?: number; x?: number; y?: number }
-  | { kind: "pickup-item"; itemId: number };
+  | { kind: "pickup-item"; itemId: number }
+  | { kind: "enter-building"; buildingId: number }
+  | { kind: "leave-building" }
+  | { kind: "move-in-room"; x: number; y: number };
 
 export type CommandResult = { ok: true } | { ok: false; reason: string };
 
@@ -110,6 +114,32 @@ function stopDuty(ship: ShipEntity): void {
   ship.dive = null;
 }
 
+/** Which buildings' NPCs a command must be given to, or null when it needs no conversation. */
+function npcGate(state: GameState, actor: string, cmd: Command): CommandResult | null {
+  switch (cmd.kind) {
+    case "train-villager":
+      return atNpc(state, actor, ["town_hall"], cmd.buildingId);
+    case "build-ship":
+      return atNpc(state, actor, ["dock"], cmd.buildingId);
+    case "fund-great-work":
+      return atNpc(state, actor, ["great_work"], cmd.buildingId);
+    case "trade":
+      return atNpc(state, actor, ["market"]);
+    case "buy-upgrade": {
+      const def = UPGRADES[cmd.upgrade];
+      return def ? atNpc(state, actor, [def.at]) : null;
+    }
+    case "remove-building": {
+      const b = state.entities.get(cmd.buildingId);
+      // Building sites and workplaces you cannot enter are still pulled down from outside.
+      if (b?.type !== "building" || !b.complete || !isEnterable(b.kind)) return null;
+      return atNpc(state, actor, [b.kind], b.id);
+    }
+    default:
+      return null;
+  }
+}
+
 /**
  * Apply a command from a player. `actor` is the player slot it came from (null for the
  * simulation's own callers, such as tests): commands about a player's own character act on the
@@ -120,9 +150,20 @@ export function applyCommand(
   cmd: Command,
   actor: string | null = null,
 ): CommandResult {
+  // Doing a building's business means talking to the person inside it.
+  if (actor !== null) {
+    const gate = npcGate(state, actor, cmd);
+    if (gate && !gate.ok) return gate;
+  }
   switch (cmd.kind) {
     case "move-character":
       return moveCharacter(state, actor, cmd);
+    case "enter-building":
+      return enterBuilding(state, actor, cmd.buildingId);
+    case "leave-building":
+      return leaveCommand(state, actor);
+    case "move-in-room":
+      return moveInRoom(state, actor, cmd);
     case "drop-item":
       return dropFromPack(state, actor, cmd);
     case "pickup-item":

@@ -1,3 +1,4 @@
+import type { Talk } from "./dialog";
 import {
   BUILDINGS,
   canAfford,
@@ -87,6 +88,8 @@ export class Hud {
   private buildButtons = new Map<string, HTMLButtonElement>();
   private selectionEl: HTMLElement;
   private selectionKey = "";
+  /** Inside a building: the person you are talking to, who the building's panel speaks for. */
+  private talk: Talk | null = null;
   private selectionRefs: {
     status?: HTMLElement;
     /** Extra live lines: an island's stockpile, a cargo ship's route. */
@@ -479,6 +482,15 @@ export class Hud {
 
   // ------------------------------------------------------------------------- selection
 
+  /** Dress the selection panel as a conversation (or undress it, with null). */
+  setTalk(talk: Talk | null): void {
+    if (talk?.name === this.talk?.name && talk?.line === this.talk?.line) return;
+    this.talk = talk;
+    this.selectionEl.classList.toggle("dialog", talk !== null);
+    // Not "": that would mean an empty panel, and a stale one would never be cleared.
+    if (this.selectionKey !== "") this.selectionKey = "?";
+  }
+
   setSelection(state: GameState, id: number | null): void {
     const e = id === null ? undefined : state.entities.get(id);
     if (!e || (e.type === "villager" && e.aboard !== null)) {
@@ -489,7 +501,7 @@ export class Hud {
       }
       return;
     }
-    const key = selectionKey(e);
+    const key = selectionKey(e) + (this.talk ? `:${this.talk.name}:${this.talk.line}` : "");
     if (key !== this.selectionKey) {
       this.selectionKey = key;
       this.buildSelection(state, e);
@@ -643,8 +655,21 @@ export class Hud {
     const parts: (HTMLElement | null)[] = [];
     if (e.type === "building") {
       const def = BUILDINGS[e.kind];
-      parts.push(h("div.title", {}, icon(buildingThumb(e.kind, this.tribe)), def.name));
-      parts.push(h("div.desc", {}, def.description));
+      const talk = e.complete ? this.talk : null;
+      if (talk) {
+        parts.push(
+          h(
+            "div.title",
+            {},
+            icon(villagerSprite(this.tribe, 1, false, "stand")),
+            `${talk.name}, ${talk.title}`,
+          ),
+        );
+        parts.push(h("div.desc.speech", {}, `“${talk.line}”`));
+      } else {
+        parts.push(h("div.title", {}, icon(buildingThumb(e.kind, this.tribe)), def.name));
+        parts.push(h("div.desc", {}, def.description));
+      }
       refs.status = h("div.desc");
       refs.bar = h("div");
       parts.push(refs.status, h("div.bar", {}, refs.bar));
@@ -723,7 +748,7 @@ export class Hud {
       if (def.buildable && !(e.kind === "great_work" && (e.stage ?? 0) >= 1)) {
         actions.append(
           button(
-            e.complete ? "Demolish" : "Cancel",
+            !e.complete ? "Cancel" : talk ? "Ask to pull the building down" : "Demolish",
             () => {
               this.actions.command({ kind: "remove-building", buildingId: e.id });
               this.actions.deselect();
@@ -1133,7 +1158,7 @@ export class Minimap {
         for (let y = e.y; y < e.y + e.h; y++)
           for (let x = e.x; x < e.x + e.w; x++) dot(x, y, abgr("#5b4028"));
       } else if (e.type === "villager" && e.aboard === null) dot(e.x, e.y, abgr("#fbf0cf"));
-      else if (e.type === "character" && e.aboard === null) {
+      else if (e.type === "character" && e.aboard === null && e.inside === null) {
         const colour = players.find((p) => p.id === e.playerId)?.color ?? "#f0e6d0";
         dot(e.x, e.y, abgr(colour), 2);
       } else if (e.type === "ship") dot(e.x, e.y, abgr("#e98a3a"), 2);

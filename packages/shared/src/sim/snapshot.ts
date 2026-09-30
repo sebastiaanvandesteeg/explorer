@@ -31,7 +31,7 @@ import {
 export type WireEntity =
   | Exclude<Entity, VillagerEntity | CharacterEntity | ShipEntity | PirateEntity>
   | Omit<VillagerEntity, "path" | "retryAt">
-  | Omit<CharacterEntity, "path">
+  | Omit<CharacterEntity, "path" | "rpath">
   | Omit<ShipEntity, "path">
   | Omit<PirateEntity, "path">;
 
@@ -92,7 +92,11 @@ export function toWire(e: Entity): WireEntity {
     const { path: _path, retryAt: _retry, ...rest } = e;
     return clone(rest);
   }
-  if (e.type === "ship" || e.type === "pirate" || e.type === "character") {
+  if (e.type === "character") {
+    const { path: _path, rpath: _rpath, ...rest } = e;
+    return clone(rest);
+  }
+  if (e.type === "ship" || e.type === "pirate") {
     const { path: _path, ...rest } = e;
     return clone(rest);
   }
@@ -111,6 +115,10 @@ export function fromWire(w: WireEntity): Entity {
     e.aboard ??= null;
     e.pack ??= [];
     e.fetch ??= null;
+    e.inside ??= null;
+    e.room ??= { x: 0, y: 0 };
+    e.rpath = [];
+    e.enter ??= null;
   } else if (e.type === "ship") {
     e.path = [];
     e.passengers ??= [];
@@ -209,6 +217,7 @@ export function fromSnapshot(world: WorldMap, snap: Snapshot, resume = false): G
     if (resume && e.type === "character") {
       e.action = "idle";
       e.dest = null;
+      e.enter = null;
     }
     state.entities.set(e.id, e);
   }
