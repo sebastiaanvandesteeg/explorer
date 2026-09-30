@@ -21,6 +21,7 @@ export * from "./sim/characters";
 export * from "./sim/items";
 export * from "./sim/inventory";
 export * from "./sim/interiors";
+export * from "./sim/roomSprites";
 export * from "./sim/jobs";
 export * from "./sim/ferry";
 export * from "./sim/daylight";

@@ -13,6 +13,15 @@ import {
   npcName,
   removeEntity,
   roomEntry,
+  floorKey,
+  furniturePieces,
+  furnitureSprite,
+  roomPieces,
+  roomSpriteNames,
+  TRIBES,
+  wallKinds,
+  WALL_KINDS,
+  FLOOR_KEYS,
   roomPath,
   roomWalkable,
   ROOMS,
@@ -120,6 +129,120 @@ describe("the rooms", () => {
     const b = hall(s);
     expect(npcName(s, b)).toBe(npcName(fresh(), hall(fresh())));
     expect(npcName(s, b)).toMatch(/^\w+ \w+$/);
+  });
+});
+
+/** How tall each piece of furniture stands, in pixels (the sprite generator's models). */
+const HEIGHT: Partial<Record<string, number>> = {
+  bed: 28,
+  shelf: 34,
+  hearth: 44,
+  banner: 45,
+  forge: 44,
+  rack: 30,
+  altar: 34,
+  plinth: 31,
+  brazier: 25,
+  desk: 22,
+  counter: 24,
+  chair: 21,
+};
+
+describe("how the rooms look", () => {
+  const rooms = Object.entries(ROOMS) as [
+    BuildingKind,
+    NonNullable<(typeof ROOMS)[BuildingKind]>,
+  ][];
+
+  it("put windows on inner wall columns, one each, where no tall furniture stands", () => {
+    for (const [kind, def] of rooms) {
+      const seen = new Set<string>();
+      expect(def.windows.length, kind).toBeGreaterThan(0);
+      for (const w of def.windows) {
+        const len = w.wall === "x" ? def.w : def.h;
+        expect(w.at, `${kind} window`).toBeGreaterThanOrEqual(1);
+        expect(w.at, `${kind} window`).toBeLessThanOrEqual(len - 2);
+        expect(seen.has(`${w.wall}${w.at}`), `${kind} duplicate window`).toBe(false);
+        seen.add(`${w.wall}${w.at}`);
+      }
+      for (const item of def.furniture) {
+        const height = HEIGHT[item.kind] ?? 0;
+        // A piece standing against a wall hides the window columns its silhouette covers on
+        // screen: for the back-right wall the columns from x0 - y1 to x1 - y0, for the back-left
+        // wall from y0 - x1 to y1 - x0. Pieces further from the wall only reach up to `height -
+        // 16 * distance` pixels, and windows start at 18.
+        for (const w of def.windows) {
+          const hidden =
+            w.wall === "x"
+              ? height - 16 * item.y > 18 &&
+                w.at + 1 > item.x - (item.y + item.h) &&
+                w.at < item.x + item.w - item.y
+              : height - 16 * item.x > 18 &&
+                w.at + 1 > item.y - (item.x + item.w) &&
+                w.at < item.y + item.h - item.x;
+          expect(hidden, `${kind}: a window behind a ${item.kind}`).toBe(false);
+        }
+      }
+    }
+  });
+
+  it("choose a wall piece for every column and a floor tile for every tile", () => {
+    for (const [kind, def] of rooms) {
+      for (const arm of ["x", "y"] as const) {
+        const kinds = wallKinds(def, arm);
+        expect(kinds, kind).toHaveLength(arm === "x" ? def.w : def.h);
+        expect(kinds[0]).toBe("start");
+        expect(kinds.at(-1)).toBe("end");
+        for (const k of kinds) expect(WALL_KINDS).toContain(k);
+        const windows = kinds.filter((k) => k.startsWith("window")).length;
+        expect(windows, `${kind} ${arm}`).toBe(def.windows.filter((w) => w.wall === arm).length);
+      }
+      for (let y = 0; y < def.h; y++)
+        for (let x = 0; x < def.w; x++) {
+          const key = floorKey(def, x, y);
+          expect(FLOOR_KEYS).toContain(key);
+          expect(typeof key === "string", `${kind} ${x},${y}`).toBe(x === 0);
+        }
+    }
+  });
+
+  it("list every piece of a room, all of them sprites the generator makes", () => {
+    for (const tribe of ["islanders", "cinderborn"] as const) {
+      const names = new Set(roomSpriteNames(tribe));
+      for (const [kind, def] of rooms) {
+        const pieces = roomPieces(kind, def, tribe);
+        for (const p of pieces) expect(names.has(p.sprite), `${kind}: ${p.sprite}`).toBe(true);
+        const count = (layer: string) => pieces.filter((p) => p.layer === layer).length;
+        // One floor tile per tile, plus a slab piece under each front-edge tile.
+        expect(count("floor"), kind).toBe(def.w * def.h + def.w + def.h);
+        expect(count("wall"), kind).toBe(def.w + def.h);
+        expect(count("door"), kind).toBe(1);
+        const solid = def.furniture.filter((i) => i.kind !== "rug").length;
+        expect(count("object"), kind).toBe(solid);
+        for (const p of pieces.filter((q) => q.box)) {
+          expect(p.box!.x1 - p.box!.x0).toBeGreaterThan(0);
+        }
+      }
+    }
+  });
+
+  it("name every sprite once, with the tribe only where it matters", () => {
+    for (const tribe of TRIBES) {
+      const names = roomSpriteNames(tribe);
+      expect(new Set(names).size).toBe(names.length);
+      for (const n of names) expect(n.startsWith("in_")).toBe(true);
+      for (const [room, def] of rooms)
+        for (const item of def.furniture)
+          expect(names).toContain(furnitureSprite(room, item, tribe));
+    }
+    const a = new Set(roomSpriteNames("islanders"));
+    const b = new Set(roomSpriteNames("northfolk"));
+    expect([...a].filter((n) => !b.has(n)).length).toBeGreaterThan(20);
+    // Furniture is shared between tribes: one sprite per (room, kind, size, facing).
+    const pieces = furniturePieces();
+    expect(new Set(pieces.map((p) => p.name)).size).toBe(pieces.length);
+    expect(pieces.length).toBeGreaterThan(25);
+    expect(pieces.every((p) => !p.name.includes("banner"))).toBe(true);
   });
 });
 

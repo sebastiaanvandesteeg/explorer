@@ -8,7 +8,7 @@ import { SPRITE_RES } from "./sprite";
  * Courses of shingles, planks and bricks are this much finer than they were at the world's own
  * pixel density: with `SPRITE_RES` texels to the world pixel the art can carry smaller detail.
  */
-const FINE = 0.6;
+export const FINE = 0.6;
 /** One texel in world pixels: the thinnest line that can be drawn. */
 const TEXEL = 1 / SPRITE_RES;
 const frac = (v: number): number => v - Math.floor(v);
@@ -138,6 +138,39 @@ export function bricks(rampName: RampName = "stone", rowPx = 3.2, width = 0.2): 
     const tint = (hash3(col, row, 0, 9) - 0.5) * 0.22;
     const pit = (noise3(u * 60, z * 1.5, 0.4, 10) - 0.5) * 0.08;
     return shade(rampName, lit(c, glint + chip + tint + pit), c.px, c.py, 0.2);
+  };
+}
+
+/**
+ * Flagstones for floors: slabs in running bond with dark joints, a lit edge on the upper left,
+ * a shaded edge on the lower right, and the odd tint, hairline crack or chipped corner. The
+ * pattern repeats every tile (joints every `slab`, rows offset by half a slab), so floor tiles
+ * made from it line up.
+ */
+export function flagstones(rampName: RampName = "stone", slab = 0.5): Material {
+  const jw = 0.05;
+  return (c) => {
+    if (faceOf(c) !== "top") return shade(rampName, lit(c, -0.12), c.px, c.py, 0.2);
+    const u = c.lp[0];
+    const v = c.lp[1];
+    const row = Math.floor(v / slab);
+    const odd = ((row % 2) + 2) % 2;
+    const uu = u + odd * slab * 0.5;
+    const col = Math.floor(uu / slab);
+    const ju = uu - col * slab;
+    const jv = v - row * slab;
+    if (ju < jw || jv < jw) return shade(rampName, lit(c, -0.34), c.px, c.py, 0.15);
+    const edge =
+      ju < jw * 2.4 || jv < jw * 2.4
+        ? 0.08
+        : slab - ju < jw * 1.8 || slab - jv < jw * 1.8
+          ? -0.08
+          : 0;
+    const tint = (hash3(col, row, 0, 61) - 0.5) * 0.26;
+    const grain = (noise3(u * 44, v * 44, 0.5, 62) - 0.5) * 0.1;
+    const crack = noise3(u * 13 + col, v * 13 + row, 1.3, 63) < 0.05 ? -0.16 : 0;
+    const chip = hash3(col, row, 1, 64) > 0.94 && ju < 0.13 && jv < 0.13 ? -0.2 : 0;
+    return shade(rampName, lit(c, 0.04 + edge + tint + grain + crack + chip), c.px, c.py, 0.25);
   };
 }
 

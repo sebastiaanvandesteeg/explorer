@@ -65,7 +65,7 @@ const screenY = (x: number, y: number) => (x + y) * HALF_H;
 let glow: Texture | null = null;
 
 /** A soft warm blob, the shape of one window's or fire's glow at night. */
-function glowTexture(): Texture {
+export function glowTexture(): Texture {
   if (glow) return glow;
   const c = document.createElement("canvas");
   c.width = c.height = 64;

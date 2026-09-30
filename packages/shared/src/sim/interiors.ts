@@ -47,10 +47,26 @@ export interface Furniture {
   y: number;
   w: number;
   h: number;
+  /**
+   * Which way it faces, for pieces with a front: `+y` (the default, against the back-right wall
+   * or looking at the camera's right) or `+x` (against the back-left wall, or a chair turned
+   * towards its table). Purely visual.
+   */
+  face?: "+x" | "+y";
 }
 
 export type NpcRole =
   "steward" | "resident" | "merchant" | "smith" | "priest" | "sage" | "architect" | "harbourmaster";
+
+/** What the floor is made of: planks, flagstones in the tribe's stone, or dark arcane flags. */
+export type FloorStyle = "boards" | "flags" | "arcane";
+
+/** A window in a back wall: `x` is the back-right wall (run along x), `y` the back-left wall. */
+export interface RoomWindow {
+  wall: "x" | "y";
+  /** The wall column (a tile along the wall). Never the first or last column. */
+  at: number;
+}
 
 export interface RoomDef {
   w: number;
@@ -59,14 +75,25 @@ export interface RoomDef {
   door: { x: number; y: number };
   furniture: Furniture[];
   npc: { x: number; y: number; role: NpcRole; title: string };
+  /** How the room looks (the simulation does not care). */
+  floor: FloorStyle;
+  windows: RoomWindow[];
 }
 
-const f = (kind: FurnitureKind, x: number, y: number, w = 1, h = 1): Furniture => ({
+const f = (
+  kind: FurnitureKind,
+  x: number,
+  y: number,
+  w = 1,
+  h = 1,
+  face?: "+x" | "+y",
+): Furniture => ({
   kind,
   x,
   y,
   w,
   h,
+  ...(face ? { face } : {}),
 });
 
 /** The buildings you can go into, and their rooms. */
@@ -75,12 +102,17 @@ export const ROOMS: Partial<Record<BuildingKind, RoomDef>> = {
     w: 7,
     h: 6,
     door: { x: 3, y: 5 },
+    floor: "boards",
+    windows: [
+      { wall: "x", at: 3 },
+      { wall: "y", at: 4 },
+    ],
     furniture: [
       f("bed", 0, 0, 2, 2),
-      f("shelf", 3, 0),
+      f("shelf", 0, 3, 1, 1, "+x"),
       f("hearth", 5, 0, 2, 1),
       f("table", 3, 2, 2, 1),
-      f("chair", 2, 2),
+      f("chair", 2, 2, 1, 1, "+x"),
       f("rug", 2, 3, 3, 2),
     ],
     npc: { x: 5, y: 3, role: "resident", title: "Resident" },
@@ -89,14 +121,19 @@ export const ROOMS: Partial<Record<BuildingKind, RoomDef>> = {
     w: 11,
     h: 8,
     door: { x: 5, y: 7 },
+    floor: "flags",
+    windows: [
+      { wall: "x", at: 3 },
+      { wall: "x", at: 7 },
+      { wall: "y", at: 5 },
+    ],
     furniture: [
       f("banner", 1, 0),
       f("banner", 9, 0),
       f("desk", 4, 1, 3, 1),
-      f("shelf", 0, 2, 1, 2),
-      f("shelf", 10, 2, 1, 2),
-      f("table", 1, 4, 3, 1),
-      f("table", 7, 4, 3, 1),
+      f("shelf", 0, 2, 1, 2, "+x"),
+      f("table", 2, 4, 2, 1),
+      f("table", 7, 4, 2, 1),
       f("rug", 4, 3, 3, 3),
     ],
     npc: { x: 5, y: 0, role: "steward", title: "Steward" },
@@ -105,6 +142,13 @@ export const ROOMS: Partial<Record<BuildingKind, RoomDef>> = {
     w: 10,
     h: 7,
     door: { x: 4, y: 6 },
+    floor: "boards",
+    windows: [
+      { wall: "x", at: 2 },
+      { wall: "x", at: 7 },
+      { wall: "y", at: 2 },
+      { wall: "y", at: 5 },
+    ],
     furniture: [
       f("counter", 3, 1, 4, 1),
       f("crate", 0, 0, 2, 1),
@@ -120,6 +164,11 @@ export const ROOMS: Partial<Record<BuildingKind, RoomDef>> = {
     w: 9,
     h: 7,
     door: { x: 4, y: 6 },
+    floor: "flags",
+    windows: [
+      { wall: "x", at: 4 },
+      { wall: "y", at: 3 },
+    ],
     furniture: [
       f("forge", 0, 0, 3, 1),
       f("rack", 6, 0, 2, 1),
@@ -134,6 +183,13 @@ export const ROOMS: Partial<Record<BuildingKind, RoomDef>> = {
     w: 9,
     h: 9,
     door: { x: 4, y: 8 },
+    floor: "flags",
+    windows: [
+      { wall: "x", at: 1 },
+      { wall: "x", at: 6 },
+      { wall: "y", at: 2 },
+      { wall: "y", at: 5 },
+    ],
     furniture: [
       f("altar", 3, 0, 3, 1),
       f("brazier", 0, 0),
@@ -150,6 +206,11 @@ export const ROOMS: Partial<Record<BuildingKind, RoomDef>> = {
     w: 8,
     h: 8,
     door: { x: 3, y: 7 },
+    floor: "arcane",
+    windows: [
+      { wall: "x", at: 3 },
+      { wall: "y", at: 4 },
+    ],
     furniture: [
       f("shelf", 0, 0, 3, 1),
       f("shelf", 5, 0, 3, 1),
@@ -163,6 +224,13 @@ export const ROOMS: Partial<Record<BuildingKind, RoomDef>> = {
     w: 10,
     h: 8,
     door: { x: 4, y: 7 },
+    floor: "flags",
+    windows: [
+      { wall: "x", at: 2 },
+      { wall: "x", at: 7 },
+      { wall: "y", at: 2 },
+      { wall: "y", at: 5 },
+    ],
     furniture: [
       f("banner", 0, 0),
       f("banner", 9, 0),
@@ -176,6 +244,12 @@ export const ROOMS: Partial<Record<BuildingKind, RoomDef>> = {
     w: 9,
     h: 6,
     door: { x: 4, y: 5 },
+    floor: "boards",
+    windows: [
+      { wall: "x", at: 2 },
+      { wall: "x", at: 4 },
+      { wall: "y", at: 2 },
+    ],
     furniture: [
       f("chart", 1, 1, 3, 1),
       f("plinth", 6, 0),

@@ -27,7 +27,7 @@ import { canopy, dots, foliage, strand } from "./nature";
 
 type RoofKind = "gable" | "steep" | "flat" | "leafy" | "cap" | "hip";
 
-interface Style {
+export interface Style {
   tribe: TribeId;
   wall(top: number, openings: Opening[], posts: number[]): Material;
   roofKind: RoofKind;
@@ -66,7 +66,7 @@ function capRoof(ramp: RampName): Material {
   };
 }
 
-const STYLES: Record<TribeId, Style> = {
+export const STYLES: Record<TribeId, Style> = {
   islanders: {
     tribe: "islanders",
     wall: (top, openings, posts) => timberFrame({ top, posts, braces: true, openings }),
@@ -1136,7 +1136,7 @@ export function findLights(sprite: Sprite): { x: number; y: number; r: number }[
 }
 
 /** Give a finished building sprite its night lights, if it has any. */
-function withLights(sprite: Sprite): Sprite {
+export function withLights(sprite: Sprite): Sprite {
   if (sprite.name.startsWith("b_farm")) return sprite;
   const lights = findLights(sprite);
   return lights.length === 0 ? sprite : { ...sprite, meta: { ...sprite.meta, lights } };

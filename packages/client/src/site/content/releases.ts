@@ -66,6 +66,7 @@ export const RELEASES: Release[] = [
         items: [
           "Building business is now done in person: the server only accepts it from a player standing next to the right NPC.",
           "Farms, camps, quarries, mines, storehouses and the lighthouse keep their info panel, since there is nobody to talk to there.",
+          "The rooms are drawn in the same pixel art as the island: planked or flagstone floors, walls in your tribe's own architecture (log, adobe, bark, basalt…), shaded and outlined furniture, cast shadows and glowing fires.",
         ],
       },
     ],

@@ -176,6 +176,7 @@ export class Game {
       state.world.tribe,
       (id) => this.entities.playerColour(id),
       (id) => session.players.find((p) => p.id === id)?.name ?? "?",
+      () => this.camera.zoom,
     );
     app.stage.addChild(this.room.layer);
 
@@ -1044,6 +1045,8 @@ export class Game {
     const b = state.entities.get(inside);
     if (b?.type !== "building") return false;
     this.room.show(state, b);
+    const over = this.pointer ? this.room.pick(this.pointer.x, this.pointer.y) : null;
+    this.room.setHover(over !== null && "npc" in over);
     const talking = this.selected === b.id && this.app.screen.width > 900;
     this.room.frame(
       now,

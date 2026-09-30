@@ -1,412 +1,31 @@
-// Inside a building: a small furnished room on a black background. The furniture comes from the
-// shared room definitions (so everyone agrees where it stands) and is drawn here as shaded
-// isometric boxes; the NPC and every player in the building are the usual sprites.
+// Inside a building: a small furnished room on a black background, put together from the same
+// atlas sprites as the rest of the game (floors, walls, furniture and doorway come from the sprite
+// generator, styled by the world's tribe). The layout and sprite names come from @explorer/shared;
+// this file places them, sorts furniture and people by depth, and adds fire glow and name tags.
 import {
-  BUILDINGS,
   HALF_H,
   HALF_W,
   ROOMS,
+  ROOM_SLAB_PX,
+  ROOM_WALL_PX,
   npcName,
+  roomPieces,
   type BuildingEntity,
-  type BuildingKind,
   type CharacterEntity,
-  type Furniture,
   type GameState,
   type NpcRole,
   type RoomDef,
+  type RoomPiece,
   type TribeId,
 } from "@explorer/shared";
 import { Container, Graphics, Sprite, Text } from "pixi.js";
 import type { Atlas } from "../assets";
+import { glowTexture } from "./entities";
 import { heroCapeSprite, heroSprite, villagerSprite } from "./names";
+import { depthOrder, personBox, type DepthBox } from "./roomDepth";
 
-const WALL = 38;
-const SLAB = 8;
-
-interface Palette {
-  floorA: number;
-  floorB: number;
-  wall: number;
-  trim: number;
-  glow: number;
-}
-
-const PALETTES: Partial<Record<BuildingKind, Palette>> = {
-  house: { floorA: 0x7a5432, floorB: 0x6d4a2b, wall: 0x54402d, trim: 0x8a5f33, glow: 0xffc266 },
-  town_hall: { floorA: 0x6c6258, floorB: 0x5f564d, wall: 0x4a4a52, trim: 0xc9a13a, glow: 0xffd27a },
-  market: { floorA: 0x7d6238, floorB: 0x705631, wall: 0x5c4a33, trim: 0xc8552f, glow: 0xffc266 },
-  blacksmith: {
-    floorA: 0x4d4a48,
-    floorB: 0x423f3e,
-    wall: 0x35322f,
-    trim: 0x6d5a52,
-    glow: 0xff7a2f,
-  },
-  church: { floorA: 0x85847f, floorB: 0x777671, wall: 0x5d5e68, trim: 0xe4d9a0, glow: 0xfff0b0 },
-  magic_house: {
-    floorA: 0x443a5e,
-    floorB: 0x3b3254,
-    wall: 0x2f2946,
-    trim: 0x8f7af0,
-    glow: 0xa58cff,
-  },
-  great_work: {
-    floorA: 0x7e755f,
-    floorB: 0x6f6753,
-    wall: 0x54503f,
-    trim: 0xd6b34a,
-    glow: 0xffe08a,
-  },
-  dock: { floorA: 0x6a5a45, floorB: 0x5d4e3b, wall: 0x3f4d52, trim: 0x3c8f94, glow: 0xffd27a },
-};
-
-interface Shade {
-  top: number;
-  front: number;
-  side: number;
-}
-
-const shade = (base: number): Shade => {
-  const mul = (k: number) =>
-    (Math.min(255, Math.round(((base >> 16) & 255) * k)) << 16) |
-    (Math.min(255, Math.round(((base >> 8) & 255) * k)) << 8) |
-    Math.min(255, Math.round((base & 255) * k));
-  return { top: mul(1.15), front: mul(0.88), side: mul(0.68) };
-};
-
-const WOOD = shade(0xa8763f);
-const DARK_WOOD = shade(0x6b4a2b);
-const STONE = shade(0x8d9096);
-const DARK_STONE = shade(0x4a4c52);
-const CLOTH_RED = shade(0xb23a3a);
-const CLOTH_BLUE = shade(0x3d5fa8);
-const CLOTH_CREAM = shade(0xe6d8b0);
-const IRON = shade(0x3b3d44);
-const GOLD = shade(0xd9b338);
-
-const px = (x: number, y: number, z = 0): [number, number] => [
-  (x - y) * HALF_W,
-  (x + y) * HALF_H - z,
-];
-
-/** An isometric box over tile area (x, y, w, h), from height z0 to z1. */
-function box(
-  g: Graphics,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  z0: number,
-  z1: number,
-  c: Shade,
-): void {
-  const flat = (...pts: [number, number][]) => pts.flat();
-  g.poly(flat(px(x, y + h, z1), px(x + w, y + h, z1), px(x + w, y + h, z0), px(x, y + h, z0))).fill(
-    c.front,
-  );
-  g.poly(flat(px(x + w, y, z1), px(x + w, y + h, z1), px(x + w, y + h, z0), px(x + w, y, z0))).fill(
-    c.side,
-  );
-  g.poly(flat(px(x, y, z1), px(x + w, y, z1), px(x + w, y + h, z1), px(x, y + h, z1))).fill(c.top);
-}
-
-const tileDiamond = (g: Graphics, x: number, y: number, w: number, h: number, z = 0) =>
-  g.poly([...px(x, y, z), ...px(x + w, y, z), ...px(x + w, y + h, z), ...px(x, y + h, z)]);
-
-function flame(g: Graphics, x: number, y: number, z: number): void {
-  const [sx, sy] = px(x, y, z);
-  g.poly([sx, sy - 7, sx + 3, sy - 2, sx, sy, sx - 3, sy - 2]).fill(0xffa12b);
-  g.poly([sx, sy - 4, sx + 1.5, sy - 1, sx, sy, sx - 1.5, sy - 1]).fill(0xfff2a0);
-}
-
-/** One piece of furniture, drawn as a stack of boxes and details. */
-function drawFurniture(g: Graphics, f: Furniture, room: Palette, kind: BuildingKind): void {
-  const { x, y, w, h } = f;
-  switch (f.kind) {
-    case "bed": {
-      box(g, x, y, w, h, 0, 7, DARK_WOOD);
-      box(g, x + 0.08, y + 0.08, w - 0.16, h - 0.16, 7, 10, CLOTH_CREAM);
-      box(g, x + 0.08, y + h * 0.42, w - 0.16, h * 0.58 - 0.08, 10, 12, CLOTH_BLUE);
-      box(g, x + 0.14, y + 0.12, w - 0.28, 0.36, 10, 14, CLOTH_CREAM);
-      box(g, x, y, w, 0.12, 7, 20, DARK_WOOD);
-      break;
-    }
-    case "table":
-    case "desk": {
-      const top = f.kind === "desk" ? DARK_WOOD : WOOD;
-      for (const [lx, ly] of [
-        [x + 0.08, y + 0.1],
-        [x + w - 0.2, y + 0.1],
-        [x + 0.08, y + h - 0.22],
-        [x + w - 0.2, y + h - 0.22],
-      ] as const)
-        box(g, lx, ly, 0.12, 0.12, 0, 10, DARK_WOOD);
-      box(g, x, y, w, h, 10, 13, top);
-      if (f.kind === "desk") {
-        tileDiamond(g, x + w * 0.3, y + 0.2, 0.5, 0.5, 13.2).fill(0xf1e7c8);
-        tileDiamond(g, x + w * 0.65, y + 0.25, 0.3, 0.4, 13.2).fill(0xb23a3a);
-        box(g, x + w * 0.75, y + 0.15, 0.1, 0.1, 13, 19, GOLD);
-      } else {
-        tileDiamond(g, x + 0.3, y + 0.25, 0.35, 0.35, 13.2).fill(0xd9b56a);
-        tileDiamond(g, x + w - 0.75, y + 0.3, 0.3, 0.3, 13.2).fill(0xe6d8b0);
-      }
-      break;
-    }
-    case "chair":
-      box(g, x + 0.15, y + 0.15, 0.7, 0.7, 0, 8, DARK_WOOD);
-      box(g, x + 0.15, y + 0.15, 0.7, 0.12, 8, 18, DARK_WOOD);
-      break;
-    case "hearth": {
-      box(g, x, y, w, h, 0, 26, DARK_STONE);
-      const [sx, sy] = px(x + w / 2, y + h, 0);
-      g.poly([sx - 10, sy, sx + 10, sy, sx + 10, sy - 14, sx - 10, sy - 14]).fill(0x1d1512);
-      flame(g, x + w / 2 - 0.15, y + h, 3);
-      flame(g, x + w / 2 + 0.2, y + h, 2);
-      box(g, x - 0.05, y, w + 0.1, h + 0.05, 26, 29, STONE);
-      break;
-    }
-    case "shelf": {
-      box(g, x, y, w, h, 0, 30, DARK_WOOD);
-      const colours = [0xb23a3a, 0x3d5fa8, 0xd9b338, 0x4f8f4a, 0x8f5ab0, 0xe6d8b0];
-      for (let i = 0; i < 3; i++) {
-        const z = 6 + i * 8;
-        const n = Math.max(3, Math.round(w * 5));
-        for (let k = 0; k < n; k++) {
-          const bx = x + ((k + 0.3) / n) * w;
-          box(
-            g,
-            bx,
-            y + h - 0.12,
-            (w / n) * 0.6,
-            0.1,
-            z,
-            z + 6,
-            shade(colours[(k + i * 2) % colours.length]!),
-          );
-        }
-      }
-      break;
-    }
-    case "counter": {
-      box(g, x, y, w, h, 0, 14, DARK_WOOD);
-      box(g, x - 0.04, y - 0.04, w + 0.08, h + 0.08, 14, 17, WOOD);
-      box(g, x + 0.3, y + 0.15, 0.3, 0.3, 17, 22, shade(0xc8552f));
-      box(g, x + w - 0.8, y + 0.2, 0.4, 0.3, 17, 20, CLOTH_CREAM);
-      break;
-    }
-    case "crate":
-      box(g, x + 0.05, y + 0.05, w - 0.1, h - 0.1, 0, 14, WOOD);
-      box(g, x + 0.05, y + h - 0.12, w - 0.1, 0.08, 6, 8, DARK_WOOD);
-      break;
-    case "barrel": {
-      box(g, x + 0.12, y + 0.12, w - 0.24, h - 0.24, 0, 18, DARK_WOOD);
-      box(g, x + 0.1, y + 0.1, w - 0.2, h - 0.2, 4, 6, IRON);
-      box(g, x + 0.1, y + 0.1, w - 0.2, h - 0.2, 12, 14, IRON);
-      break;
-    }
-    case "anvil":
-      box(g, x + 0.25, y + 0.25, 0.5, 0.5, 0, 9, DARK_WOOD);
-      box(g, x + 0.1, y + 0.2, 0.8, 0.6, 9, 15, IRON);
-      box(g, x + 0.75, y + 0.35, 0.3, 0.3, 11, 14, IRON);
-      break;
-    case "forge": {
-      box(g, x, y, w, h, 0, 24, DARK_STONE);
-      const [sx, sy] = px(x + w / 2, y + h, 0);
-      g.poly([sx - 14, sy - 3, sx + 14, sy - 3, sx + 14, sy - 14, sx - 14, sy - 14]).fill(0xff7a2f);
-      g.poly([sx - 10, sy - 6, sx + 10, sy - 6, sx + 10, sy - 12, sx - 10, sy - 12]).fill(0xffd27a);
-      box(g, x + 0.2, y + 0.15, 0.4, 0.3, 24, 38, IRON);
-      break;
-    }
-    case "rack": {
-      box(g, x, y, w, h, 0, 26, DARK_WOOD);
-      for (let i = 0; i < Math.round(w * 2); i++)
-        box(g, x + 0.2 + i * 0.5, y + h - 0.1, 0.08, 0.06, 6, 22, IRON);
-      break;
-    }
-    case "altar":
-      box(g, x, y, w, h, 0, 16, STONE);
-      box(g, x - 0.05, y - 0.05, w + 0.1, h + 0.1, 16, 19, CLOTH_CREAM);
-      box(g, x + 0.2, y + 0.3, 0.12, 0.12, 19, 26, GOLD);
-      box(g, x + w - 0.32, y + 0.3, 0.12, 0.12, 19, 26, GOLD);
-      flame(g, x + 0.26, y + 0.36, 26);
-      flame(g, x + w - 0.26, y + 0.36, 26);
-      box(g, x + w / 2 - 0.05, y + 0.35, 0.1, 0.1, 19, 30, GOLD);
-      break;
-    case "pew": {
-      box(g, x, y + 0.2, w, 0.6, 0, 9, WOOD);
-      box(g, x, y + 0.2, w, 0.12, 9, 20, DARK_WOOD);
-      break;
-    }
-    case "brazier": {
-      box(g, x + 0.3, y + 0.3, 0.4, 0.4, 0, 14, IRON);
-      box(g, x + 0.2, y + 0.2, 0.6, 0.6, 14, 18, DARK_STONE);
-      flame(g, x + 0.5, y + 0.5, 18);
-      flame(g, x + 0.4, y + 0.6, 17);
-      break;
-    }
-    case "cauldron":
-      box(g, x + 0.1, y + 0.1, 0.8, 0.8, 0, 14, IRON);
-      tileDiamond(g, x + 0.2, y + 0.2, 0.6, 0.6, 14.2).fill(0x5fd07a);
-      tileDiamond(g, x + 0.35, y + 0.35, 0.2, 0.2, 14.4).fill(0xc9ffd2);
-      break;
-    case "plinth": {
-      const big = w > 1;
-      box(g, x + 0.1, y + 0.1, w - 0.2, h - 0.2, 0, big ? 12 : 16, STONE);
-      const cx = x + w / 2;
-      const cy = y + h / 2;
-      if (kind === "magic_house") {
-        const [sx, sy] = px(cx, cy, 16);
-        g.poly([sx, sy - 14, sx + 5, sy - 6, sx, sy, sx - 5, sy - 6]).fill(0x8f7af0);
-        g.poly([sx, sy - 14, sx - 5, sy - 6, sx, sy - 6]).fill(0xc8c0ff);
-      } else if (kind === "great_work") {
-        for (let i = 0; i < 3; i++)
-          box(
-            g,
-            cx - 0.45 + i * 0.12,
-            cy - 0.45 + i * 0.12,
-            0.9 - i * 0.24,
-            0.9 - i * 0.24,
-            12 + i * 6,
-            18 + i * 6,
-            STONE,
-          );
-        box(g, cx - 0.06, cy - 0.06, 0.12, 0.12, 30, 40, GOLD);
-      } else {
-        box(g, cx - 0.3, cy - 0.12, 0.6, 0.24, 16, 20, WOOD);
-        box(g, cx - 0.04, cy - 0.04, 0.08, 0.08, 20, 32, DARK_WOOD);
-        tileDiamond(g, cx + 0.04, cy - 0.3, 0.3, 0.05, 28).fill(0xe6d8b0);
-      }
-      break;
-    }
-    case "banner": {
-      box(g, x + 0.4, y + 0.4, 0.14, 0.14, 0, 44, DARK_WOOD);
-      box(g, x + 0.05, y + 0.42, 0.9, 0.08, 34, 38, DARK_WOOD);
-      box(
-        g,
-        x + 0.12,
-        y + 0.44,
-        0.76,
-        0.04,
-        14,
-        34,
-        kind === "great_work" ? CLOTH_BLUE : CLOTH_RED,
-      );
-      break;
-    }
-    case "chart": {
-      box(g, x, y, w, h, 0, 11, DARK_WOOD);
-      box(g, x - 0.03, y - 0.03, w + 0.06, h + 0.06, 11, 13, WOOD);
-      tileDiamond(g, x + 0.25, y + 0.15, w - 0.5, h - 0.3, 13.2).fill(0xe6d8b0);
-      tileDiamond(g, x + 0.5, y + 0.25, 0.5, 0.25, 13.4).fill(0x6fae8a);
-      tileDiamond(g, x + w - 1, y + 0.3, 0.4, 0.2, 13.4).fill(0x3c8f94);
-      break;
-    }
-    case "rug": {
-      const rug = room.trim;
-      tileDiamond(g, x + 0.05, y + 0.05, w - 0.1, h - 0.1, 0.5).fill(shade(rug).front);
-      tileDiamond(g, x + 0.3, y + 0.3, w - 0.6, h - 0.6, 0.6).fill(shade(rug).top);
-      if (w >= 3 && h >= 3)
-        tileDiamond(g, x + w / 2 - 0.4, y + h / 2 - 0.4, 0.8, 0.8, 0.7).fill(room.glow);
-      break;
-    }
-  }
-}
-
-/** The furniture and walls, drawn once per building. */
-function drawRoom(def: RoomDef, kind: BuildingKind): { floor: Container; things: Container } {
-  const pal = PALETTES[kind]!;
-  const floor = new Container();
-  const slab = new Graphics();
-  // The floor slab's thick front edges, then the boards.
-  slab
-    .poly([
-      ...px(0, def.h),
-      ...px(def.w, def.h),
-      ...px(def.w, def.h, -SLAB),
-      ...px(0, def.h, -SLAB),
-    ])
-    .fill(shade(pal.floorA).side);
-  slab
-    .poly([
-      ...px(def.w, 0),
-      ...px(def.w, def.h),
-      ...px(def.w, def.h, -SLAB),
-      ...px(def.w, 0, -SLAB),
-    ])
-    .fill(0x1f1a16);
-  floor.addChild(slab);
-  const boards = new Graphics();
-  for (let y = 0; y < def.h; y++)
-    for (let x = 0; x < def.w; x++)
-      tileDiamond(boards, x, y, 1, 1).fill((x + y) % 2 ? pal.floorA : pal.floorB);
-  floor.addChild(boards);
-  // Back walls along the two far edges, with a trim and a couple of windows.
-  const walls = new Graphics();
-  const wallPoly = (a: [number, number], b: [number, number], z: number) => [
-    ...px(a[0], a[1], 0),
-    ...px(b[0], b[1], 0),
-    ...px(b[0], b[1], z),
-    ...px(a[0], a[1], z),
-  ];
-  walls.poly(wallPoly([0, 0], [def.w, 0], WALL)).fill(pal.wall);
-  walls.poly(wallPoly([0, 0], [0, def.h], WALL)).fill(shade(pal.wall).side);
-  walls.poly(wallPoly([0, 0], [def.w, 0], 6)).fill(shade(pal.wall).side);
-  walls.poly(wallPoly([0, 0], [0, def.h], 6)).fill(0x161210);
-  walls.poly(wallPoly([0, 0], [def.w, 0], WALL)).stroke({
-    width: 1,
-    color: pal.trim,
-    alpha: 0.6,
-  });
-  const window = (x: number, y: number, alongX: boolean) => {
-    const a = alongX ? px(x, 0, 18) : px(0, y, 18);
-    const b = alongX ? px(x + 0.9, 0, 18) : px(0, y + 0.9, 18);
-    const c = alongX ? px(x + 0.9, 0, 32) : px(0, y + 0.9, 32);
-    const d = alongX ? px(x, 0, 32) : px(0, y, 32);
-    walls
-      .poly([...a, ...b, ...c, ...d])
-      .fill(pal.glow)
-      .stroke({ width: 1.5, color: pal.trim });
-  };
-  for (let x = 1.5; x < def.w - 1; x += 3) window(x, 0, true);
-  if (def.h > 6) window(0, def.h / 2 - 0.4, false);
-  floor.addChild(walls);
-  // A doorway in the front edge: two posts and a lintel around a warm light.
-  const door = new Graphics();
-  const dx = def.door.x;
-  const [lx, ly] = px(dx + 0.5, def.h, 0);
-  door.ellipse(lx, ly - 2, 22, 9).fill({ color: pal.glow, alpha: 0.25 });
-  box(door, dx + 0.05, def.h - 0.05, 0.1, 0.1, 0, 36, DARK_WOOD);
-  box(door, dx + 0.85, def.h - 0.05, 0.1, 0.1, 0, 36, DARK_WOOD);
-  box(door, dx, def.h - 0.05, 1, 0.1, 36, 40, DARK_WOOD);
-  floor.addChild(door);
-  door.zIndex = 1e3;
-
-  const things = new Container();
-  things.sortableChildren = true;
-  const glow = new Graphics();
-  glow.blendMode = "add";
-  for (const f of def.furniture) {
-    const g = new Graphics();
-    drawFurniture(g, f, pal, kind);
-    g.zIndex = f.kind === "rug" ? -1 : f.x + f.w / 2 + f.y + f.h / 2;
-    things.addChild(g);
-    if (["hearth", "brazier", "forge", "altar", "cauldron"].includes(f.kind)) {
-      const [gx, gy] = px(f.x + f.w / 2, f.y + f.h / 2 + 0.6, 0);
-      for (const [rx, a] of [
-        [90, 0.05],
-        [60, 0.06],
-        [34, 0.08],
-      ] as const)
-        glow
-          .ellipse(gx, gy, rx, rx / 2)
-          .fill({ color: f.kind === "cauldron" ? 0x5fd07a : pal.glow, alpha: a });
-    }
-  }
-  floor.addChild(glow);
-  floor.addChild(things);
-  // Everything in the room is sorted together with the people: one container for both.
-  return { floor, things };
-}
+const screenX = (x: number, y: number) => (x - y) * HALF_W;
+const screenY = (x: number, y: number) => (x + y) * HALF_H;
 
 interface Figure {
   root: Container;
@@ -416,11 +35,22 @@ interface Figure {
   tag: Text;
   x: number;
   y: number;
-  moving: boolean;
   seen: boolean;
 }
 
-const tunics: Record<NpcRole, number> = {
+/** A fire or lantern in the room: a soft additive glow over the sprite that holds it. */
+interface Glow {
+  sprite: Sprite;
+  phase: number;
+}
+
+/** One piece of furniture that people can walk in front of and behind. */
+interface Thing {
+  sprite: Sprite;
+  box: DepthBox;
+}
+
+const TUNIC: Record<NpcRole, number> = {
   steward: 1,
   resident: 0,
   merchant: 2,
@@ -437,19 +67,43 @@ export class RoomScene {
   private readonly bg = new Graphics();
   private readonly scene = new Container();
   private readonly tags = new Container();
+  private readonly floor = new Container();
+  private readonly rugs = new Container();
+  private readonly walls = new Container();
+  private readonly under = new Container();
+  private readonly things = new Container();
+  private readonly door = new Container();
+  private readonly glows = new Container();
+  private readonly hover = new Graphics();
   private current: number | null = null;
   private def: RoomDef | null = null;
-  private things: Container | null = null;
+  private furniture: Thing[] = [];
+  private lights: Glow[] = [];
   private npc: Figure | null = null;
+  private hovered = false;
   private readonly figures = new Map<number, Figure>();
-  private scale = 3;
+  private scale = 2;
 
   constructor(
     private readonly atlas: Atlas,
     private readonly tribe: TribeId,
     private readonly colourOf: (playerId: string) => number,
     private readonly nameOf: (playerId: string) => string,
+    /** The world's zoom: a room is drawn at the same pixel size when it fits on screen. */
+    private readonly zoom: () => number = () => 2,
   ) {
+    this.things.sortableChildren = true;
+    this.glows.blendMode = "add";
+    this.scene.addChild(
+      this.floor,
+      this.rugs,
+      this.walls,
+      this.under,
+      this.things,
+      this.door,
+      this.glows,
+    );
+    this.under.addChild(this.hover);
     this.layer.addChild(this.bg, this.scene, this.tags);
     this.layer.visible = false;
   }
@@ -473,13 +127,11 @@ export class RoomScene {
     if (!def) return;
     this.current = b.id;
     this.def = def;
-    const { floor, things } = drawRoom(def, b.kind);
-    this.things = things;
-    this.scene.addChild(floor);
+    for (const piece of roomPieces(b.kind, def, this.tribe)) this.place(piece);
     this.npc = this.makeFigure(`${npcName(state, b)} · ${def.npc.title}`, 0xf3d08f, false);
     this.npc.x = def.npc.x + 0.5;
     this.npc.y = def.npc.y + 0.5;
-    things.addChild(this.npc.root);
+    this.things.addChild(this.npc.root);
     this.layer.visible = true;
   }
 
@@ -488,15 +140,44 @@ export class RoomScene {
     this.clear();
   }
 
+  /** The sprite of one piece of the room, in the layer it belongs to. */
+  private place(piece: RoomPiece): void {
+    const sprite = this.atlas.sprite(piece.sprite);
+    sprite.position.set(screenX(piece.x, piece.y), screenY(piece.x, piece.y));
+    const into = {
+      floor: this.floor,
+      rug: this.rugs,
+      wall: this.walls,
+      object: this.things,
+      door: this.door,
+    }[piece.layer];
+    into.addChild(sprite);
+    if (piece.box) this.furniture.push({ sprite, box: piece.box });
+    // Fires and lanterns in the sprite shine; the windows do not (it is daytime outside).
+    if (piece.layer === "object" || piece.layer === "door") {
+      for (const l of this.atlas.meta[piece.sprite]?.lights ?? []) {
+        const glow = new Sprite(glowTexture());
+        glow.anchor.set(0.5);
+        glow.position.set(sprite.x + l.x, sprite.y + l.y);
+        glow.scale.set((l.r * 1.25) / 64);
+        this.glows.addChild(glow);
+        this.lights.push({ sprite: glow, phase: sprite.x * 0.013 + l.x });
+      }
+    }
+  }
+
   private clear(): void {
     for (const f of this.figures.values()) f.tag.destroy();
     this.figures.clear();
     this.npc?.tag.destroy();
     this.npc = null;
-    this.scene.removeChildren().forEach((c) => c.destroy({ children: true }));
+    for (const c of [this.floor, this.rugs, this.walls, this.things, this.door, this.glows])
+      c.removeChildren().forEach((child) => child.destroy({ children: true }));
+    this.hover.clear();
+    this.furniture = [];
+    this.lights = [];
     this.current = null;
     this.def = null;
-    this.things = null;
   }
 
   private makeFigure(name: string, colour: number, hero: boolean): Figure {
@@ -522,7 +203,7 @@ export class RoomScene {
     });
     tag.anchor.set(0.5, 1);
     this.tags.addChild(tag);
-    return { root, body, capeUnder, capeOver, tag, x: 0, y: 0, moving: false, seen: false };
+    return { root, body, capeUnder, capeOver, tag, x: 0, y: 0, seen: false };
   }
 
   private pose(
@@ -533,7 +214,7 @@ export class RoomScene {
     id: number,
     tunic: number,
     playerColour?: number,
-  ) {
+  ): void {
     const back = facing === 2 || facing === 3;
     const flip = facing === 1 || facing === 2;
     const phase = Math.floor(now / 160 + id) % 2;
@@ -558,7 +239,12 @@ export class RoomScene {
     }
   }
 
-  /** Update the people, fit the room to the screen and keep the backdrop black. */
+  /** Highlight the NPC (the pointer is over them), like villagers outside. */
+  setHover(on: boolean): void {
+    this.hovered = on;
+  }
+
+  /** Update the people, fit the room to the screen, sort everything by depth and let the fires flicker. */
   frame(
     now: number,
     dt: number,
@@ -568,23 +254,31 @@ export class RoomScene {
     reserveRight = 0,
   ): void {
     const def = this.def;
-    if (!def || !this.things) return;
+    if (!def) return;
     this.bg.clear().rect(0, 0, width, height).fill(0x000000);
-    const span = { w: (def.w + def.h) * HALF_W, h: (def.w + def.h) * HALF_H + WALL + SLAB };
+    const wallTop = ROOM_WALL_PX + 4;
+    const span = {
+      w: (def.w + def.h) * HALF_W + 16,
+      h: (def.w + def.h) * HALF_H + wallTop + ROOM_SLAB_PX,
+    };
     const free = width - reserveRight;
-    let s = Math.min((free * 0.84) / span.w, (height * 0.7) / span.h);
-    s = s >= 2 ? Math.min(6, Math.floor(s)) : Math.max(1, s);
+    // The biggest whole zoom at which the room fits beside the conversation panel (so it does not
+    // jump when the panel opens), and never blurry: at least the world's own zoom when that fits.
+    const room = width > 900 ? width - 450 : width;
+    const fit = Math.floor(Math.min((room * 0.92) / span.w, (height * 0.8) / span.h));
+    const s = Math.max(1, Math.min(Math.max(this.zoom(), 4), fit));
     this.scale = s;
     const cx = ((def.w - def.h) * HALF_W) / 2;
-    const cy = ((def.w + def.h) * HALF_H) / 2 - (WALL - SLAB) / 2;
+    const cy = ((def.w + def.h) * HALF_H + ROOM_SLAB_PX - wallTop) / 2;
     this.scene.scale.set(s);
-    this.scene.position.set(Math.round(free / 2 - cx * s), Math.round(height / 2 - cy * s - 24));
+    this.scene.position.set(Math.round(free / 2 - cx * s), Math.round(height / 2 - cy * s - 20));
 
-    // The NPC looks towards whoever is nearest.
-    const npc = this.npc;
     const here: CharacterEntity[] = [];
     for (const e of state.entities.values())
       if (e.type === "character" && e.inside === this.current) here.push(e);
+
+    // The NPC looks towards whoever is nearest.
+    const npc = this.npc;
     if (npc) {
       let facing = 1;
       let best = Infinity;
@@ -602,8 +296,8 @@ export class RoomScene {
                 : 3;
         }
       }
-      this.pose(npc, facing, false, now, 0, tunics[def.npc.role]);
-      this.place(npc, npc.x, npc.y, 0.01);
+      this.pose(npc, facing, false, now, 0, TUNIC[def.npc.role]);
+      this.stand(npc, npc.x, npc.y);
     }
     for (const f of this.figures.values()) f.seen = false;
     for (const c of here) {
@@ -619,11 +313,11 @@ export class RoomScene {
       const k = 1 - Math.exp(-dt * 16);
       const dx = c.room.x - f.x;
       const dy = c.room.y - f.y;
-      f.moving = Math.hypot(dx, dy) > 0.04;
+      const moving = Math.hypot(dx, dy) > 0.04;
       f.x += dx * k;
       f.y += dy * k;
-      this.pose(f, c.facing, f.moving, now, c.id, c.tunic, this.colourOf(c.playerId));
-      this.place(f, f.x, f.y, 0.02);
+      this.pose(f, c.facing, moving, now, c.id, c.tunic, this.colourOf(c.playerId));
+      this.stand(f, f.x, f.y);
     }
     for (const [id, f] of this.figures) {
       if (f.seen) continue;
@@ -631,12 +325,42 @@ export class RoomScene {
       f.root.destroy({ children: true });
       this.figures.delete(id);
     }
+
+    // Furniture and people, back to front.
+    const items: { box: DepthBox; node: Container | Sprite }[] = this.furniture.map((t) => ({
+      box: t.box,
+      node: t.sprite,
+    }));
+    if (npc) items.push({ box: personBox(npc.x, npc.y), node: npc.root });
+    for (const f of this.figures.values()) items.push({ box: personBox(f.x, f.y), node: f.root });
+    depthOrder(items.map((i) => i.box)).forEach((index, rank) => {
+      items[index]!.node.zIndex = rank;
+    });
+
+    this.hover.clear();
+    if (this.hovered && npc) {
+      const x = screenX(npc.x, npc.y);
+      const y = screenY(npc.x, npc.y);
+      const pulse = 0.5 + 0.5 * Math.sin(now / 260);
+      for (const [rx, ry, alpha] of [
+        [17, 24, 0.14],
+        [13, 18, 0.22],
+        [9, 13, 0.3],
+      ] as const)
+        this.hover.ellipse(x, y - 9, rx, ry).fill({ color: 0xffe9a8, alpha });
+      this.hover.ellipse(x, y, 11, 5.5).fill({ color: 0xffe9a8, alpha: 0.42 + pulse * 0.1 });
+      this.hover
+        .ellipse(x, y, 11, 5.5)
+        .stroke({ width: 1, color: 0xfff3c8, alpha: 0.7, pixelLine: true });
+    }
+    for (const l of this.lights) l.sprite.alpha = 0.34 + 0.1 * Math.sin(now / 230 + l.phase * 2.1);
   }
 
-  private place(f: Figure, x: number, y: number, bias: number): void {
-    const [sx, sy] = px(x, y);
+  /** Put a person's feet on a spot of the floor and their name above their head. */
+  private stand(f: Figure, x: number, y: number): void {
+    const sx = screenX(x, y);
+    const sy = screenY(x, y);
     f.root.position.set(Math.round(sx), Math.round(sy));
-    f.root.zIndex = x + y + bias;
     const p = this.scene.toGlobal({ x: sx, y: sy - 38 });
     f.tag.position.set(Math.round(p.x), Math.round(p.y));
   }
@@ -663,5 +387,3 @@ export class RoomScene {
     return { x, y };
   }
 }
-
-export const roomTitle = (kind: BuildingKind): string => BUILDINGS[kind].name;
