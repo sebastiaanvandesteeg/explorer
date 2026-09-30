@@ -22,7 +22,7 @@ import {
   type UpgradeId,
   UPGRADES,
 } from "./catalogue";
-import { moveCharacter, walkCharacter } from "./characters";
+import { moveCharacter, steerCharacter, walkCharacter } from "./characters";
 import { atNpc, enterBuilding, isEnterable, leaveCommand, moveInRoom } from "./interiors";
 import { dropFromPack, pickUp } from "./inventory";
 import { disembark, hasRoom, landingBlock, shipMoving, shoreBeside } from "./ferry";
@@ -68,6 +68,7 @@ export type Command =
   | { kind: "fund-great-work"; buildingId: number }
   | { kind: "trade"; resource: Resource; action: "sell" | "buy" }
   | { kind: "move-character"; x: number; y: number }
+  | { kind: "steer-character"; x: number; y: number }
   | { kind: "drop-item"; slot: number; amount?: number; x?: number; y?: number }
   | { kind: "pickup-item"; itemId: number }
   | { kind: "enter-building"; buildingId: number }
@@ -158,6 +159,8 @@ export function applyCommand(
   switch (cmd.kind) {
     case "move-character":
       return moveCharacter(state, actor, cmd);
+    case "steer-character":
+      return steerCharacter(state, actor, cmd);
     case "enter-building":
       return enterBuilding(state, actor, cmd.buildingId);
     case "leave-building":

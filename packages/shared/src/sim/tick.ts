@@ -27,7 +27,9 @@ import {
 import { releaseTask } from "./commands";
 import { checkEntered, updateInRoom } from "./interiors";
 import { collectFetched } from "./inventory";
-import { faceTowards, stepAlong, tileOf } from "./walk";
+import { stopSteering } from "./characters";
+import { moveSolid } from "./collision";
+import { faceTowards, setFacing, stepAlong, tileOf } from "./walk";
 import { greatWorkStages } from "./greatwork";
 import { assignBuilders, pickJob, rebalance, takeJob } from "./jobs";
 import { collectWreck, updateThreats } from "./pirates";
@@ -39,6 +41,7 @@ import {
   addEntity,
   addGoods,
   islandAt,
+  isPathTile,
   lookAround,
   markDirty,
   newShip,
@@ -229,6 +232,29 @@ export function completeBuilding(state: GameState, b: BuildingEntity): void {
 // Characters
 
 /** A player's character only walks where its player sent it. */
+/** One tick of free movement: go where steered, sliding along whatever is in the way. */
+function steerStep(state: GameState, c: CharacterEntity, dt: number): void {
+  const dir = c.steer!;
+  if (state.time > c.steerUntil) {
+    stopSteering(state, c);
+    return;
+  }
+  const here = tileOf(c);
+  const step =
+    CHARACTER.speed * dt * (isPathTile(state, here.x, here.y) ? VILLAGER.pathSpeedBonus : 1);
+  const from = { x: c.x, y: c.y };
+  const to = moveSolid(state, c.x, c.y, dir.x * step, dir.y * step);
+  c.x = to.x;
+  c.y = to.y;
+  setFacing(c, dir.x, dir.y);
+  const moved = Math.hypot(c.x - from.x, c.y - from.y) > step * 0.15;
+  const action = moved ? "walk" : "idle";
+  if (c.action !== action) c.action = action;
+  lookAround(state, c.x, c.y, CHARACTER.reveal);
+  markDirty(state, c.id);
+  collectFetched(state, c);
+}
+
 function updateCharacter(state: GameState, c: CharacterEntity, dt: number): void {
   if (c.inside !== null) {
     updateInRoom(state, c, dt);
@@ -236,6 +262,10 @@ function updateCharacter(state: GameState, c: CharacterEntity, dt: number): void
   }
   collectFetched(state, c);
   checkEntered(state, c);
+  if (c.steer) {
+    steerStep(state, c, dt);
+    return;
+  }
   if (c.action !== "walk") {
     if (c.dest) {
       c.dest = null;

@@ -31,7 +31,7 @@ import {
 export type WireEntity =
   | Exclude<Entity, VillagerEntity | CharacterEntity | ShipEntity | PirateEntity>
   | Omit<VillagerEntity, "path" | "retryAt">
-  | Omit<CharacterEntity, "path" | "rpath">
+  | Omit<CharacterEntity, "path" | "rpath" | "steer" | "steerUntil">
   | Omit<ShipEntity, "path">
   | Omit<PirateEntity, "path">;
 
@@ -93,7 +93,7 @@ export function toWire(e: Entity): WireEntity {
     return clone(rest);
   }
   if (e.type === "character") {
-    const { path: _path, rpath: _rpath, ...rest } = e;
+    const { path: _path, rpath: _rpath, steer: _steer, steerUntil: _until, ...rest } = e;
     return clone(rest);
   }
   if (e.type === "ship" || e.type === "pirate") {
@@ -119,6 +119,8 @@ export function fromWire(w: WireEntity): Entity {
     e.room ??= { x: 0, y: 0 };
     e.rpath = [];
     e.enter ??= null;
+    e.steer = null;
+    e.steerUntil = 0;
   } else if (e.type === "ship") {
     e.path = [];
     e.passengers ??= [];

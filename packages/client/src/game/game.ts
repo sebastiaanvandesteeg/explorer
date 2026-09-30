@@ -75,7 +75,7 @@ interface Drag {
 
 const PAN_SPEED = 700;
 /** How quickly the camera catches up with your character (higher is snappier). */
-const FOLLOW_RATE = 7;
+const FOLLOW_RATE = 10;
 
 export class Game {
   private readonly world = new Container();
@@ -480,8 +480,8 @@ export class Game {
   }
 
   /**
-   * Walk with the keys: while a direction is held, keep sending your character a few tiles that
-   * way (W is up the screen, which is -x -y on the map). Letting go stops it where it stands.
+   * Walk with the keys: while a direction is held, steer your character that way (W is up the
+   * screen, which is -x -y on the map). The command is renewed while held; letting go stops it.
    */
   private walkWithKeys(now: number): void {
     const me = this.myCharacter();
@@ -492,34 +492,20 @@ export class Game {
     const down =
       (k.has("s") || k.has("arrowdown") ? 1 : 0) - (k.has("w") || k.has("arrowup") ? 1 : 0);
     // Screen right is (+1, -1) on the map and screen down is (+1, +1).
-    const step = { x: Math.sign(right + down), y: Math.sign(-right + down) };
-    const dir = step.x === 0 && step.y === 0 ? "" : `${step.x},${step.y}`;
+    const x = right + down;
+    const y = -right + down;
+    const len = Math.hypot(x, y);
+    const dir = len === 0 ? "" : `${(x / len).toFixed(3)},${(y / len).toFixed(3)}`;
     const quiet = (cmd: Command) => void this.session.command(cmd);
-    const here = { x: Math.floor(me.x), y: Math.floor(me.y) };
     if (dir === "") {
-      if (this.walkDir !== "") quiet({ kind: "move-character", x: here.x, y: here.y });
+      if (this.walkDir !== "") quiet({ kind: "steer-character", x: 0, y: 0 });
       this.walkDir = "";
       return;
     }
-    if (dir === this.walkDir && now - this.walkSentAt < 350) return;
+    if (dir === this.walkDir && now - this.walkSentAt < 500) return;
     this.walkDir = dir;
     this.walkSentAt = now;
-    // As far as six tiles along the direction, stopping at the first thing in the way. Against a
-    // wall, slide along it: try each half of the direction on its own.
-    const state = this.session.state;
-    const reach = (dx: number, dy: number) => {
-      let target: { x: number; y: number } | null = null;
-      for (let i = 1; i <= 6; i++) {
-        const x = here.x + dx * i;
-        const y = here.y + dy * i;
-        if (!walkable(state, x, y)) break;
-        target = { x, y };
-      }
-      return target;
-    };
-    const target =
-      reach(step.x, step.y) ?? (step.x && step.y ? (reach(step.x, 0) ?? reach(0, step.y)) : null);
-    if (target) quiet({ kind: "move-character", ...target });
+    quiet({ kind: "steer-character", x: x / len, y: y / len });
   }
 
   private followCharacter(dt: number): void {
@@ -1304,10 +1290,6 @@ export class Game {
         this.camera,
       );
       alive.add(e.id);
-      if (you && e.dest) {
-        const z = visibleHeight(state, e.dest.x, e.dest.y) ?? 0;
-        o.destination({ x: e.dest.x, y: e.dest.y, w: 1, h: 1, z });
-      }
     }
     o.pruneCharacters(alive);
   }

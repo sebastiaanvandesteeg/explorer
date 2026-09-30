@@ -121,6 +121,9 @@ export interface CharacterEntity extends Walker {
   rpath: { x: number; y: number }[];
   /** A building this character is walking over to go into. */
   enter: number | null;
+  /** The direction being steered (a unit vector on the map) and until when; not sent over the wire. */
+  steer: { x: number; y: number } | null;
+  steerUntil: number;
 }
 
 /** Something lying on the ground, on land, for anyone to pick up. */

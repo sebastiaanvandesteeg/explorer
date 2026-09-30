@@ -42,6 +42,33 @@ export const NOTE_LABELS: Record<NoteKind, string> = {
 
 export const RELEASES: Release[] = [
   {
+    slug: "free-roaming",
+    version: "0.15",
+    title: "Free Roaming",
+    date: "2026-09-30",
+    theme: "jungle",
+    summary:
+      "Walking is faster and smoother: move freely with WASD, and slip past trees and rocks that now block only where they really stand.",
+    sections: [
+      {
+        kind: "improved",
+        items: [
+          "WASD and the arrow keys now move your character continuously instead of hopping from tile to tile, and letting go stops you on the spot.",
+          "Your character is much faster: 5.5 tiles a second, up from 3.",
+          "Trees block only at their trunk, boulders, ore and crystals at their base. Squeeze between two trees and brush past them, and walk straight through bushes, flowers, mushrooms and pumpkins.",
+          "The camera follows a little more tightly.",
+        ],
+      },
+      {
+        kind: "fixed",
+        items: [
+          "The flag that marked where you were walking is gone.",
+          "A tree no longer fills its whole tile when you walk by.",
+        ],
+      },
+    ],
+  },
+  {
     slug: "come-in",
     version: "0.14",
     title: "Come In",

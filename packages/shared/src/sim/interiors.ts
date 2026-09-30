@@ -403,6 +403,8 @@ function goIn(state: GameState, c: CharacterEntity, b: BuildingEntity): void {
   const def = ROOMS[b.kind]!;
   c.inside = b.id;
   c.enter = null;
+  c.steer = null;
+  c.steerUntil = 0;
   c.fetch = null;
   c.path = [];
   c.dest = null;

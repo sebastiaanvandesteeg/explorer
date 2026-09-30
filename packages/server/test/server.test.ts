@@ -330,6 +330,20 @@ describe("characters", () => {
     expect(await anna.next((m) => m.t === "error")).toMatchObject({ code: "bad-request" });
   });
 
+  it("steer a character freely and refuse malformed steering", async () => {
+    const { id } = await createWorld("adv-steer");
+    const anna = new Player();
+    await anna.join(id, "Anna", token(1));
+    anna.send({ t: "cmd", seq: 1, cmd: { kind: "steer-character", x: 0.7, y: -0.7 } });
+    expect(await anna.next((m) => m.t === "result" && m.seq === 1)).toMatchObject({ ok: true });
+    anna.send({ t: "cmd", seq: 2, cmd: { kind: "steer-character", x: 0, y: 0 } });
+    expect(await anna.next((m) => m.t === "result" && m.seq === 2)).toMatchObject({ ok: true });
+    anna.send({ t: "cmd", seq: 3, cmd: { kind: "steer-character", x: 1e9, y: 0 } });
+    expect(await anna.next((m) => m.t === "error")).toMatchObject({ code: "bad-request" });
+    anna.send({ t: "cmd", seq: 4, cmd: { kind: "steer-character", x: "1", y: 0 } });
+    expect(await anna.next((m) => m.t === "error")).toMatchObject({ code: "bad-request" });
+  });
+
   it("let a player drop an item for another to pick up, and refuse bad requests", async () => {
     const { id } = await createWorld("adv-items");
     const anna = new Player();

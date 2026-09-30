@@ -347,9 +347,9 @@ export const VILLAGER = {
   reveal: 5,
 };
 
-/** A player's own character: a little quicker on its feet than a villager, and sees a little further. */
+/** A player's own character: much quicker on its feet than a villager, and sees a little further. */
 export const CHARACTER = {
-  speed: 3,
+  speed: 5.5,
   reveal: 6,
 };
 

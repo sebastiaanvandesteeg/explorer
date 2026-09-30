@@ -59,6 +59,8 @@ export function ensureCharacter(state: GameState, playerId: string): CharacterEn
     room: { x: 0, y: 0 },
     rpath: [],
     enter: null,
+    steer: null,
+    steerUntil: 0,
   } satisfies CharacterEntity);
   lookAround(state, c.x, c.y, CHARACTER.reveal);
   return c;
@@ -83,6 +85,47 @@ export function moveCharacter(
   return walkCharacter(state, c, target);
 }
 
+/** How long one steering command keeps a character going, in seconds (clients renew it). */
+export const STEER_HOLD = 1.2;
+
+/** Stop a character that is being steered where it stands. */
+export function stopSteering(state: GameState, c: CharacterEntity): void {
+  if (!c.steer) return;
+  c.steer = null;
+  c.steerUntil = 0;
+  if (c.path.length === 0) c.action = "idle";
+  markDirty(state, c.id);
+}
+
+/**
+ * Steer a character in a direction on the map (free movement, like holding the arrow keys), or
+ * stop it with a zero direction. It keeps going until stopped or until the command lapses.
+ */
+export function steerCharacter(
+  state: GameState,
+  playerId: string | null,
+  dir: { x: number; y: number },
+): MoveResult {
+  const c = playerId === null ? undefined : characterOf(state, playerId);
+  if (!c) return { ok: false, reason: "You have no character here" };
+  if (c.inside !== null) return { ok: false, reason: "Leave the building first" };
+  if (c.aboard !== null) return { ok: false, reason: "You are at sea" };
+  const len = Math.hypot(dir.x, dir.y);
+  if (!(len > 1e-6)) {
+    stopSteering(state, c);
+    return { ok: true };
+  }
+  c.steer = { x: dir.x / len, y: dir.y / len };
+  c.steerUntil = state.time + STEER_HOLD;
+  // Steering replaces any walk, errand or pick-up in progress.
+  c.path = [];
+  c.dest = null;
+  c.fetch = null;
+  c.enter = null;
+  markDirty(state, c.id);
+  return { ok: true };
+}
+
 /** Walk a character to a tile, or to the ground beside it if it is solid. */
 export function walkCharacter(
   state: GameState,
@@ -90,6 +133,7 @@ export function walkCharacter(
   target: { x: number; y: number },
 ): MoveResult {
   if (c.aboard !== null) return { ok: false, reason: "You are at sea" };
+  c.steer = null;
   const tx = Math.floor(target.x);
   const ty = Math.floor(target.y);
   if (!inBounds(state.world, tx, ty)) return { ok: false, reason: "Outside the map" };
