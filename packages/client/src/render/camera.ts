@@ -1,12 +1,12 @@
 import { HALF_H, HALF_W } from "@explorer/shared";
 import { Rectangle, type Container } from "pixi.js";
 
-export const MIN_ZOOM = 1;
-export const MAX_ZOOM = 5;
+export const MIN_ZOOM = 3.5;
+export const MAX_ZOOM = 3.5;
 
 /** Integer zoom and whole-pixel positions keep the pixel art crisp. */
 export class Camera {
-  zoom = 2;
+  zoom = 3.5;
   /** World pixel at the centre of the screen. */
   x = 0;
   y = 0;
