@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { isGamePath, movedPath, worldIdFromPath, worldPath } from "../src/routes";
+import {
+  isGamePath,
+  movedPath,
+  newsPath,
+  newsSlugFromPath,
+  sitePagePath,
+  worldIdFromPath,
+  worldPath,
+} from "../src/routes";
 
 describe("routes", () => {
   it("puts worlds under /play and reads their id back", () => {
@@ -30,5 +38,41 @@ describe("routes", () => {
     expect(movedPath("/", "?offlinex=1")).toBeNull();
     expect(movedPath("/play/w/abcd1234", "")).toBeNull();
     expect(movedPath("/w/../x", "")).toBeNull();
+  });
+});
+
+describe("site pages", () => {
+  it("serves the landing page at /home, and each page at its pretty URL", () => {
+    expect(sitePagePath("/home")).toBe("/index.html");
+    expect(sitePagePath("/home/")).toBe("/index.html");
+    expect(sitePagePath("/news")).toBe("/news/index.html");
+    expect(sitePagePath("/news/")).toBe("/news/index.html");
+    expect(sitePagePath("/about")).toBe("/about/index.html");
+    expect(sitePagePath("/the-lore")).toBe("/the-lore/index.html");
+  });
+
+  it("serves a release's notes from the news page", () => {
+    expect(sitePagePath("/news/black-sails")).toBe("/news/index.html");
+    expect(sitePagePath("/news/black-sails/")).toBe("/news/index.html");
+    expect(newsSlugFromPath("/news/black-sails/")).toBe("black-sails");
+    expect(newsSlugFromPath("/news")).toBeNull();
+    expect(newsPath()).toBe("/news");
+    expect(newsPath("black-sails")).toBe("/news/black-sails");
+  });
+
+  it("leaves files, the game and everything else alone", () => {
+    for (const p of [
+      "/",
+      "/play",
+      "/news/index.html",
+      "/news/a/b",
+      "/news/-x",
+      "/assets/atlas.json",
+      "/newsletter",
+      "/about/x",
+      "/the-lore/x",
+    ])
+      expect(sitePagePath(p)).toBeNull();
+    expect(newsSlugFromPath("/news/a/b")).toBeNull();
   });
 });

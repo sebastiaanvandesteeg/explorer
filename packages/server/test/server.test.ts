@@ -153,6 +153,10 @@ describe("serving the built client", () => {
     await mkdir(join(clientDir, "play"), { recursive: true });
     await writeFile(join(clientDir, "index.html"), "landing");
     await writeFile(join(clientDir, "play", "index.html"), "game");
+    for (const dir of ["news", "about", "the-lore"]) {
+      await mkdir(join(clientDir, dir), { recursive: true });
+      await writeFile(join(clientDir, dir, "index.html"), dir);
+    }
     await app.close();
     app = await startApp({ port: 0, host: "127.0.0.1", dataDir, clientDir });
     const page = async (path: string) => {
@@ -162,6 +166,12 @@ describe("serving the built client", () => {
     expect(await page("/")).toMatchObject({ status: 200, body: "landing" });
     for (const path of ["/play", "/play/", "/play/w/abcd1234"])
       expect(await page(path)).toMatchObject({ status: 200, body: "game" });
+    // The site's own pages, and a release's notes at their own address.
+    expect(await page("/home")).toMatchObject({ status: 200, body: "landing" });
+    for (const path of ["/news", "/news/", "/news/black-sails"])
+      expect(await page(path)).toMatchObject({ status: 200, body: "news" });
+    expect(await page("/about")).toMatchObject({ status: 200, body: "about" });
+    expect(await page("/the-lore")).toMatchObject({ status: 200, body: "the-lore" });
     expect((await page("/nowhere")).status).toBe(404);
     expect((await page("/play/missing.js")).status).toBe(404);
     // Invite links and offline games from before the game moved to /play still work.

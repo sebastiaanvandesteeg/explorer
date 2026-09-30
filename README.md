@@ -231,6 +231,14 @@ A storm front forms out at sea, some way from your settlements or ships, every f
   - Docks build **cargo ships** as well as scouts (4 at most). Select a cargo ship and right-click a dock on another island to set its route: it waits for goods, loads up to 40, sails to the nearest home dock, unloads and returns, on repeat. Steering it by hand cancels the route.
   - Farms, forges and churches on other islands produce into that island's pile too. Select a dock or storehouse to see what is waiting.
 
+## The website
+
+The landing site lives in `packages/client` next to the game: `/home` (or `/`), `/news`, `/the-lore` and `/about`. All of them share `src/site/shell.ts` (animated sea, weather, top bar) and a theme engine (`src/site/theme.ts`) that turns a biome into colours, weather and a skyline of that biome's plants and rocks.
+
+- **Release notes** live in `src/site/content/releases.ts`. To add one, put a new object at the top of `RELEASES`: `slug`, `version`, `title`, `date`, `summary` and `sections` of `new` / `improved` / `fixed` / `changed` notes. Its **`theme`** is any biome (`"tundra"` for a December release, say): opening `/news/<slug>` dresses the whole page in that biome, and pointing at its card on `/news` previews it. `themeOverrides` tweaks single colours (`{ "--t-accent": "#ff8844" }`).
+- **The Lore** (`content/lore.ts`): one chapter per biome or tribe; scrolling turns the page into the chapter's biome.
+- **About** (`content/about.ts`): the development story and timeline.
+
 ## Architecture
 
 ```

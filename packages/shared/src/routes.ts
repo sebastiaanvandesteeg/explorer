@@ -1,5 +1,6 @@
-// Site layout: the landing page is at the root and the game, a single-page app, lives under /play.
-// The server, the Vite dev server and the client all route with these.
+// Site layout: the landing page is at the root (and at /home), the news, about and lore pages sit
+// beside it, and the game, a single-page app, lives under /play. The server, the Vite dev server
+// and the client all route with these.
 
 export const PLAY_PATH = "/play";
 
@@ -19,6 +20,31 @@ export function worldIdFromPath(pathname: string): string | null {
 /** Whether a page belongs to the game (any extensionless path under /play) rather than the site. */
 export function isGamePath(pathname: string): boolean {
   return /^\/play(\/[^.]*)?$/.test(pathname);
+}
+
+const NEWS_ARTICLE = /^\/news\/([a-z0-9][a-z0-9-]{0,63})$/;
+
+/** The path of the news page, or of one release's notes. */
+export function newsPath(slug?: string): string {
+  return slug ? `/news/${slug}` : "/news";
+}
+
+/** The release slug in a news article's path (see newsPath), or null for the news list. */
+export function newsSlugFromPath(pathname: string): string | null {
+  return pathname.replace(/\/+$/, "").match(NEWS_ARTICLE)?.[1] ?? null;
+}
+
+/**
+ * Which HTML file of the site a pretty URL is served from, or null when it is not one of the
+ * site's pages. /news/<release> is the news page again: it shows that release's notes.
+ */
+export function sitePagePath(pathname: string): string | null {
+  const p = pathname.replace(/\/+$/, "");
+  if (p === "/home") return "/index.html";
+  if (p === "/news" || NEWS_ARTICLE.test(p)) return "/news/index.html";
+  if (p === "/about") return "/about/index.html";
+  if (p === "/the-lore") return "/the-lore/index.html";
+  return null;
 }
 
 /**

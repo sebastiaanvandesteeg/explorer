@@ -7,6 +7,7 @@ import {
   isGamePath,
   isTribe,
   movedPath,
+  sitePagePath,
   type Difficulty,
   type GameMode,
   type TribeId,
@@ -117,6 +118,8 @@ export async function startApp(opts: AppOptions): Promise<App> {
         return res.end();
       }
       if (statics) {
+        const page = sitePagePath(url.pathname);
+        if (page) req.url = page + url.search;
         const serve = isGamePath(url.pathname) ? statics.game : statics.site;
         return serve(req, res, () => json(res, 404, { error: "Not found" }));
       }
