@@ -297,6 +297,32 @@ describe("adventure worlds", () => {
     expect(await anna.next((m) => m.t === "error")).toMatchObject({ code: "bad-request" });
   });
 
+  it("let a player drop an item for another to pick up, and refuse bad requests", async () => {
+    const { id } = await createWorld("adv-items", undefined, undefined, "adventure");
+    const anna = new Player();
+    await anna.join(id, "Anna", token(1));
+    const ben = new Player();
+    await ben.join(id, "Ben", token(2));
+    const result = async (p: Player, seq: number, cmd: Record<string, unknown>) => {
+      p.send({ t: "cmd", seq, cmd } as never);
+      return p.next((m) => m.t === "result" && m.seq === seq);
+    };
+    expect(await result(anna, 1, { kind: "drop-item", slot: 0, amount: 2 })).toMatchObject({
+      ok: true,
+    });
+    const room = (await app.rooms.get(id))!;
+    const anna1 = characterOf(room.state, "p1")!;
+    const dropped = [...room.state.entities.values()].find(
+      (e) => e.type === "item" && Math.hypot(e.x - anna1.x, e.y - anna1.y) < 4,
+    );
+    expect(dropped).toMatchObject({ amount: 2 });
+    expect(await result(ben, 2, { kind: "pickup-item", itemId: 999999 })).toMatchObject({
+      ok: false,
+    });
+    anna.send({ t: "cmd", seq: 3, cmd: { kind: "drop-item", slot: "0" } } as never);
+    expect(await anna.next((m) => m.t === "error")).toMatchObject({ code: "bad-request" });
+  });
+
   it("have no characters in a colony world, and refuse to move one", async () => {
     const { id } = await createWorld("adv-colony");
     const anna = new Player();

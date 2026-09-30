@@ -50,6 +50,7 @@ The site root is the landing page; the game itself lives at **/play** (http://lo
 | Map    | `M` opens the chart of the archipelago (or use the Map button by the minimap). `M` or `Esc` closes it                                                                                           |
 | Sound  | `N` mutes or unmutes (or the Sound button in the expedition panel). Your choice is remembered                                                                                                   |
 | Home   | `C` centres on the town hall (in an adventure world it brings the camera back to your character)                                                                                                |
+| Pack   | Adventure worlds only: `I` opens your pack, `E` picks up what lies within reach, right-click an item to walk over and take it                                                                   |
 | Walk   | Adventure worlds only: right-click the ground with nothing selected (see below)                                                                                                                 |
 
 ### Adventure mode (early preview)
@@ -68,6 +69,9 @@ What works so far:
   - A new job is whichever kind the settlement has the fewest workers on, against target shares: 30% wood, 25% food, 15% stone, 15% ore, 10% tools and 5% faith, with a nudge towards whatever the treasury is short of. They staff a free workplace (lumber camp, farm, quarry, mine, blacksmith, church) if there is one, and otherwise gather trees, berries, rocks and ore by hand.
   - Every few seconds one hand-gatherer from the most over-staffed kind of job moves to a free workplace of a kind that is short of workers, so a newly built farm or mine gets its worker even when everyone is busy.
   - Colony worlds are unchanged: there villagers only work what you mark or assign.
+
+- **A pack of your own.** Each character carries up to 12 stacks of items (bread to start with), kept apart from the settlement's goods and saved with the world. Press `I` (or the Pack button) to open it, select a stack, and drop one or all of it on the ground where you stand. Anyone can pick an item up: press `E` next to it, or right-click it and your character walks over and takes it. Items lie on land only, never in the sea (dropping into the water is refused, and drops never slide onto water or a pier), and a full pack leaves the item where it is.
+- **Things to find.** Every island but your home one has a few items lying about, always one treasure its biome is known for (amber in the dunes and Amberwood, pearls in the jungle and the glowing caverns, crystal shards on the crystal isles, relic shards on the infernal ones, and so on). `scatterLoot` places them deterministically from the world seed; `grantItem` puts loot straight into a character's pack (overflow falls on the ground), so chests, wrecks and sunken sites can hand out items the same way later.
 
 What is planned, in order: acting with your own hands (gather, build and carry goods to the stockpile), boarding and steering a ship as its captain with the rest of the crew at stations, ports run by NPCs with shops and quests, and retuning pirates, storms and costs for a crew of people rather than a fleet of villagers.
 

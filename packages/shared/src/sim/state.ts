@@ -3,6 +3,8 @@ import { inBounds, isLandTerrain, tileIndex } from "../world/grid";
 import { hash2d } from "../rng";
 import { DIFFICULTY_DEFS, type Difficulty } from "./difficulty";
 import type { GameMode } from "./mode";
+import { scatterLoot } from "./inventory";
+import type { ItemKind, ItemStack } from "./items";
 import { sightFactor } from "./light";
 import type { BiomeId } from "../world/biomes";
 import { Terrain, type Dir, type NodeKind, type SiteKind, type WorldMap } from "../world/types";
@@ -106,8 +108,23 @@ export interface CharacterEntity extends Walker {
   type: "character";
   /** The player slot that controls this character (see `PlayerInfo.id`). */
   playerId: string;
+  /** What this player carries: their own, never shared with the team's stock. */
+  pack: ItemStack[];
+  /** An item on the ground this character is walking over to pick up. */
+  fetch: number | null;
   /** Where the current walk ends, or null when standing still. */
   dest: { x: number; y: number } | null;
+}
+
+/** Something lying on the ground, on land, for anyone to pick up. */
+export interface ItemEntity {
+  id: number;
+  type: "item";
+  kind: ItemKind;
+  amount: number;
+  /** The tile it lies on. */
+  x: number;
+  y: number;
 }
 
 export interface ShipEntity {
@@ -234,6 +251,7 @@ export type Entity =
   | NodeEntity
   | VillagerEntity
   | CharacterEntity
+  | ItemEntity
   | ShipEntity
   | PirateEntity
   | WreckEntity
@@ -260,6 +278,13 @@ export type GameEvent =
   | { type: "storm"; x: number; y: number }
   | { type: "wonder"; stage: number; final: boolean }
   | { type: "found"; site: SiteKind; x: number; y: number }
+  | {
+      type: "item";
+      playerId: string;
+      what: "picked" | "dropped" | "full";
+      kind: ItemKind;
+      amount: number;
+    }
   | { type: "salvaged"; what: string; goods: Partial<Stock>; x: number; y: number };
 
 export interface GameState {
@@ -578,6 +603,7 @@ export function createInitialState(
     addEntity(state, newVillager(state, t.x, t.y));
   }
   addSites(state);
+  if (state.mode === "adventure") scatterLoot(state);
   // The home island and the water around it start explored.
   for (let k = 0; k < state.explored.length; k++) {
     if (world.island[k] === s.islandId && world.shore[k]! <= 4) state.explored[k] = 1;

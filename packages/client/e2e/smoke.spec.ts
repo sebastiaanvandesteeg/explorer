@@ -246,3 +246,32 @@ test("adventure offline: right-click walks your character, and colony worlds hav
   expect(await charactersIn(page)).toHaveLength(0);
   expect(errors).toEqual([]);
 });
+
+test("adventure offline: drop an item from the pack and pick it up again", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  await page.goto("/play?offline&mode=adventure&seed=e2e");
+  await expect(page.locator("#app > canvas")).toBeVisible();
+  const onGround = () =>
+    page.evaluate(
+      () =>
+        [
+          ...(window as unknown as { __game: GameHandle }).__game.session.state.entities.values(),
+        ].filter((e) => e.type === "item" && e.kind === "bread").length,
+    );
+  const before = await onGround();
+  await page.keyboard.press("i");
+  const slot = page.locator(".pack button.slot");
+  await expect(slot).toHaveCount(1);
+  await slot.click();
+  await page.getByRole("button", { name: "Drop one" }).click();
+  await expect(page.locator(".toast").last()).toContainText("Dropped Bread");
+  await expect.poll(onGround).toBe(before + 1);
+  await expect(page.locator(".pack .slot .count")).toHaveText("2");
+  // Standing next to it, E takes it back.
+  await page.keyboard.press("e");
+  await expect(page.locator(".toast").last()).toContainText("Picked up Bread");
+  await expect.poll(onGround).toBe(before);
+  await expect(page.locator(".pack .slot .count")).toHaveText("3");
+  expect(errors).toEqual([]);
+});

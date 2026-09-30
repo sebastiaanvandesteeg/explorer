@@ -1,6 +1,7 @@
 // Player characters (adventure worlds): one per player slot, moved only by their own player.
 import { inBounds } from "../world/grid";
 import { CHARACTER } from "./catalogue";
+import { STARTER_PACK } from "./items";
 import { landPath } from "./navigation";
 import { tilesAround } from "./rules";
 import {
@@ -52,6 +53,8 @@ export function ensureCharacter(state: GameState, playerId: string): CharacterEn
     tool: null,
     aboard: null,
     dest: null,
+    pack: STARTER_PACK.map((i) => ({ ...i })),
+    fetch: null,
   } satisfies CharacterEntity);
   lookAround(state, c.x, c.y, CHARACTER.reveal);
   return c;
@@ -71,6 +74,16 @@ export function moveCharacter(
   if (state.mode !== "adventure") return { ok: false, reason: "This world has no characters" };
   const c = playerId === null ? undefined : characterOf(state, playerId);
   if (!c) return { ok: false, reason: "You have no character here" };
+  c.fetch = null;
+  return walkCharacter(state, c, target);
+}
+
+/** Walk a character to a tile, or to the ground beside it if it is solid. */
+export function walkCharacter(
+  state: GameState,
+  c: CharacterEntity,
+  target: { x: number; y: number },
+): MoveResult {
   if (c.aboard !== null) return { ok: false, reason: "You are at sea" };
   const tx = Math.floor(target.x);
   const ty = Math.floor(target.y);

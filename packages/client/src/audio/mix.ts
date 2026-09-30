@@ -85,6 +85,7 @@ export function soundsFor(ev: GameEvent): Cue[] {
     case "wonder":
       return [{ sound: ev.final ? "fanfare" : "upgrade", gain: ev.final ? 1 : 0.8 }];
     case "pirates":
+    case "item":
       return [];
   }
 }

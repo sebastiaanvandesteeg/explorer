@@ -22,7 +22,8 @@ import {
   type UpgradeId,
   UPGRADES,
 } from "./catalogue";
-import { moveCharacter } from "./characters";
+import { moveCharacter, walkCharacter } from "./characters";
+import { dropFromPack, pickUp } from "./inventory";
 import { disembark, hasRoom, landingBlock, shipMoving, shoreBeside } from "./ferry";
 import { seaPath, sailable } from "./navigation";
 import { greatWorkStages } from "./greatwork";
@@ -65,7 +66,9 @@ export type Command =
   | { kind: "buy-upgrade"; upgrade: UpgradeId }
   | { kind: "fund-great-work"; buildingId: number }
   | { kind: "trade"; resource: Resource; action: "sell" | "buy" }
-  | { kind: "move-character"; x: number; y: number };
+  | { kind: "move-character"; x: number; y: number }
+  | { kind: "drop-item"; slot: number; amount?: number; x?: number; y?: number }
+  | { kind: "pickup-item"; itemId: number };
 
 export type CommandResult = { ok: true } | { ok: false; reason: string };
 
@@ -120,6 +123,14 @@ export function applyCommand(
   switch (cmd.kind) {
     case "move-character":
       return moveCharacter(state, actor, cmd);
+    case "drop-item":
+      return state.mode === "adventure"
+        ? dropFromPack(state, actor, cmd)
+        : fail("This world has no characters");
+    case "pickup-item":
+      return state.mode === "adventure"
+        ? pickUp(state, actor, cmd, (c, x, y) => walkCharacter(state, c, { x, y }))
+        : fail("This world has no characters");
     case "place-building": {
       if (!(cmd.building in BUILDINGS)) return fail("Unknown building");
       const check = canPlaceBuilding(state, cmd.building, cmd.x, cmd.y);

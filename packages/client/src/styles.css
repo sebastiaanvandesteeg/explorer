@@ -1019,3 +1019,108 @@ input.field:focus {
 .chronicle-rows strong {
   color: var(--parchment);
 }
+
+/* ------------------------------------------------------------------ pack (adventure worlds) */
+.pack-wrap {
+  position: absolute;
+  right: 12px;
+  bottom: 64px;
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+  pointer-events: none;
+}
+.pack-wrap > * {
+  pointer-events: auto;
+}
+.pack-btn .badge {
+  margin-left: 4px;
+  opacity: 0.7;
+  font-size: 0.85em;
+}
+.pack {
+  width: 264px;
+  padding: 10px 12px 12px;
+}
+.pack h3 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: normal;
+}
+.pack-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.pack .slot {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 2px solid var(--wood-dark);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.35);
+  color: inherit;
+  font: inherit;
+}
+.pack button.slot {
+  cursor: pointer;
+}
+.pack button.slot:hover,
+.pack .slot.selected {
+  border-color: var(--parchment);
+  background: rgba(255, 255, 255, 0.1);
+}
+.pack .slot .count {
+  position: absolute;
+  right: 4px;
+  bottom: 1px;
+  font-size: 13px;
+  text-shadow: 1px 1px 0 var(--ink);
+}
+.item-icon {
+  width: 22px;
+  height: 22px;
+  background: linear-gradient(135deg, var(--item-light) 0 35%, var(--item-body) 35% 100%);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  filter: drop-shadow(0 1px 0 var(--ink));
+}
+.item-icon[data-rarity="rare"] {
+  filter: drop-shadow(0 0 4px var(--item-light));
+}
+.pack-detail {
+  min-height: 74px;
+  margin-top: 10px;
+  font-size: 14px;
+}
+.pack-detail p {
+  margin: 0 0 4px;
+}
+.pack-detail .name {
+  font-size: 16px;
+}
+.pack-detail .name small {
+  opacity: 0.65;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.pack-detail .name[data-rarity="uncommon"] {
+  color: #8fd3a4;
+}
+.pack-detail .name[data-rarity="rare"] {
+  color: #b9a8ff;
+}
+.pack-detail .blurb,
+.pack-detail .hint {
+  opacity: 0.8;
+}
+.pack-detail .actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}

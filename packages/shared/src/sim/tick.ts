@@ -25,6 +25,7 @@ import {
   type WorkerJob,
 } from "./catalogue";
 import { releaseTask } from "./commands";
+import { collectFetched } from "./inventory";
 import { faceTowards, stepAlong, tileOf } from "./walk";
 import { greatWorkStages } from "./greatwork";
 import { assignBuilders, pickJob, rebalance, takeJob } from "./jobs";
@@ -230,6 +231,7 @@ export function completeBuilding(state: GameState, b: BuildingEntity): void {
 
 /** A player's character only walks where its player sent it. */
 function updateCharacter(state: GameState, c: CharacterEntity, dt: number): void {
+  collectFetched(state, c);
   if (c.action !== "walk") {
     if (c.dest) {
       c.dest = null;
@@ -237,9 +239,13 @@ function updateCharacter(state: GameState, c: CharacterEntity, dt: number): void
     }
     return;
   }
-  if (!stepAlong(state, c, dt, CHARACTER.speed, CHARACTER.reveal)) return;
+  if (!stepAlong(state, c, dt, CHARACTER.speed, CHARACTER.reveal)) {
+    collectFetched(state, c);
+    return;
+  }
   c.action = "idle";
   c.dest = null;
+  collectFetched(state, c);
 }
 
 // ---------------------------------------------------------------------------------------------

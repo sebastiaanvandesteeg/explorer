@@ -23,6 +23,8 @@ import {
   type StormEntity,
   type WreckEntity,
   type CharacterEntity,
+  type ItemEntity,
+  ITEMS,
   type Walker,
   type WorldMap,
 } from "@explorer/shared";
@@ -787,6 +789,50 @@ class SiteView extends View {
   }
 }
 
+/** Something lying on the ground: a small gem-like token in the item's colours, bobbing gently. */
+class ItemView extends View {
+  readonly root = new Container();
+  private readonly shadow = new Graphics();
+  private readonly gem = new Graphics();
+  private kind: string | null = null;
+  private rare = false;
+
+  constructor(private readonly layer: EntityLayer) {
+    super();
+    this.root.addChild(this.shadow, this.gem);
+    this.gem.scale.set(0.8);
+    this.shadow.ellipse(0, 0, 6, 3).fill({ color: 0x000000, alpha: 0.3 });
+  }
+
+  update(e: Entity): void {
+    const it = e as ItemEntity;
+    const state = this.layer.state;
+    if (this.kind !== it.kind) {
+      this.kind = it.kind;
+      const def = ITEMS[it.kind];
+      const [body, light] = def.colour;
+      this.rare = def.rarity !== "common";
+      const g = this.gem.clear();
+      // A faceted diamond with a pale top-left facet.
+      g.poly([0, -12, 6, -6, 0, 0, -6, -6]).fill(body).stroke({ color: 0x1b1a1f, width: 1 });
+      g.poly([0, -12, -6, -6, 0, -6]).fill(light);
+      if (def.rarity === "rare") g.circle(0, -6, 9).stroke({ color: light, width: 1, alpha: 0.5 });
+    }
+    const x = it.x + 0.5;
+    const y = it.y + 0.5;
+    const h = tileHeight(state, it.x, it.y);
+    this.root.position.set(Math.round(screenX(x, y)), Math.round(screenY(x, y) - h));
+    this.root.zIndex = it.x + it.y + 0.6;
+    this.root.alpha = coverAlpha(coverAt(state.world, x, y, h));
+    this.root.visible = state.explored[tileIndex(state.world, it.x, it.y)] === 1;
+  }
+
+  override frame(now: number): void {
+    const bob = Math.sin(now / 500 + this.root.x * 0.13) * (this.rare ? 1.6 : 1);
+    this.gem.y = Math.round(bob) - 2;
+  }
+}
+
 class ShipView extends MovingView {
   readonly root = new Container();
   private sprite: Sprite;
@@ -944,6 +990,8 @@ export class EntityLayer {
         return new SiteView(this);
       case "storm":
         return new StormView(this);
+      case "item":
+        return new ItemView(this);
     }
   }
 

@@ -112,6 +112,8 @@ export function fromWire(w: WireEntity): Entity {
     e.path = [];
     e.dest ??= null;
     e.aboard ??= null;
+    e.pack ??= [];
+    e.fetch ??= null;
   } else if (e.type === "ship") {
     e.path = [];
     e.passengers ??= [];

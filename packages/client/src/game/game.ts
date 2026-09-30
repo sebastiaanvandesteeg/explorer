@@ -22,6 +22,9 @@ import {
   type BiomeId,
   type BuildingKind,
   type CharacterEntity,
+  type ItemEntity,
+  ITEMS,
+  PICKUP_REACH,
   type Command,
   type Entity,
   type GameEvent,
@@ -32,6 +35,7 @@ import {
   type StormEntity,
   type VillagerEntity,
 } from "@explorer/shared";
+import { PackPanel } from "../ui/inventory";
 import { Application, Container, Rectangle } from "pixi.js";
 import type { Atlas } from "../assets";
 import type { Session, SessionStatus } from "../net/session";
@@ -86,6 +90,7 @@ export class Game {
   private biomeCandidate: { biome: BiomeId | null; since: number } = { biome: null, since: 0 };
   private lastWorldPos = { x: 0, y: 0 };
   private readonly hud: Hud;
+  private readonly pack: PackPanel;
   private tool: Tool = { kind: "select" };
   private selected: number | null = null;
   private hoverTile: { x: number; y: number } | null = null;
@@ -172,6 +177,16 @@ export class Game {
       state.world.tribe,
     );
 
+    this.pack = new PackPanel({
+      drop: (slot, amount) =>
+        void this.send(
+          amount === undefined ? { kind: "drop-item", slot } : { kind: "drop-item", slot, amount },
+        ),
+    });
+    this.pack.setAvailable(state.mode === "adventure");
+    this.hud.root.append(this.pack.root);
+    this.syncPack();
+
     this.sound = new SoundSystem((x, y) => this.heard(x, y));
     this.hud.setSound(this.sound.isMuted);
     this.disposers.push(() => this.sound.dispose());
@@ -252,6 +267,11 @@ export class Game {
 
   // ------------------------------------------------------------------------- session
 
+  /** Show your character's pack in the pack panel. */
+  private syncPack(): void {
+    this.pack.set(this.myCharacter()?.pack ?? []);
+  }
+
   private onPatch(p: Patch): void {
     const now = performance.now();
     const state = this.session.state;
@@ -279,6 +299,7 @@ export class Game {
     )
       this.selectionDirty = true;
     for (const ev of p.events ?? []) this.onEvent(ev);
+    this.syncPack();
   }
 
   private onEvent(ev: GameEvent): void {
@@ -287,6 +308,17 @@ export class Game {
       case "built":
         this.hud.toast(`${BUILDINGS[ev.kind].name} built`);
         break;
+      case "item": {
+        if (ev.playerId !== this.session.you) break;
+        this.sound.ui(ev.what === "full" ? "error" : "click");
+        const name = ITEMS[ev.kind].name;
+        if (ev.what === "picked")
+          this.hud.toast(`Picked up ${ev.amount > 1 ? `${ev.amount} ` : ""}${name}`);
+        else if (ev.what === "dropped")
+          this.hud.toast(`Dropped ${ev.amount > 1 ? `${ev.amount} ` : ""}${name}`);
+        else this.hud.toast("Your pack is full", "error");
+        break;
+      }
       case "villager":
         this.hud.toast("A new villager joined the settlement");
         break;
@@ -569,7 +601,7 @@ export class Game {
     let best: { e: Entity; z: number } | null = null;
     for (const e of state.entities.values()) {
       // Weather is not something to click on, and neither are people's characters.
-      if (e.type === "storm" || e.type === "character") continue;
+      if (e.type === "storm" || e.type === "character" || e.type === "item") continue;
       if (
         tile &&
         e.type !== "ship" &&
@@ -587,6 +619,45 @@ export class Game {
       if (!best || z > best.z) best = { e, z };
     }
     return best?.e ?? null;
+  }
+
+  /** The item lying on the ground under a screen point, if any. */
+  private itemAt(sx: number, sy: number): ItemEntity | null {
+    let best: { e: ItemEntity; z: number } | null = null;
+    for (const e of this.session.state.entities.values()) {
+      if (e.type !== "item") continue;
+      const view = this.entities.view(e.id);
+      if (!view || !view.root.visible) continue;
+      // Generous: items are small, and a click near one should find it.
+      const b = view.root.getBounds();
+      if (
+        !b.containsPoint(sx, sy) &&
+        Math.hypot(b.x + b.width / 2 - sx, b.y + b.height / 2 - sy) > 14
+      )
+        continue;
+      if (!best || view.root.zIndex > best.z) best = { e, z: view.root.zIndex };
+    }
+    return best?.e ?? null;
+  }
+
+  /** Pick up the item under the cursor, or else the nearest one lying within reach of you. */
+  private pickUp(sx?: number, sy?: number): void {
+    const hit = sx === undefined || sy === undefined ? null : this.itemAt(sx, sy);
+    const me = this.myCharacter();
+    let target: ItemEntity | null = hit;
+    if (!target && me) {
+      let d = PICKUP_REACH + 0.5;
+      for (const e of this.session.state.entities.values()) {
+        if (e.type !== "item") continue;
+        const dist = Math.hypot(e.x + 0.5 - me.x, e.y + 0.5 - me.y);
+        if (dist < d) {
+          d = dist;
+          target = e;
+        }
+      }
+    }
+    if (target) void this.send({ kind: "pickup-item", itemId: target.id });
+    else this.hud.toast("Nothing here to pick up");
   }
 
   /** Harvestable nodes whose base lies inside a screen-aligned rectangle (world pixels). */
@@ -714,6 +785,8 @@ export class Game {
       }
       this.keys.add(k);
       if (k === "m") this.hud.map.open();
+      else if (k === "i" && this.session.state.mode === "adventure") this.pack.toggle();
+      else if (k === "e" && this.session.state.mode === "adventure") this.pickUp();
       else if (k === "n") this.hud.setSound(this.sound.toggle());
       else if (k === "escape") {
         if (this.tool.kind !== "select") this.setTool({ kind: "select" });
@@ -790,6 +863,10 @@ export class Game {
     const state = this.session.state;
     const sel = this.selected !== null ? state.entities.get(this.selected) : undefined;
     const tile = this.tileAt(sx, sy);
+    if (state.mode === "adventure" && this.itemAt(sx, sy)) {
+      this.pickUp(sx, sy);
+      return;
+    }
     if (sel?.type === "villager") {
       const target = this.entityAt(sx, sy);
       if (target?.type === "wreck")

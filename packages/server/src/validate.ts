@@ -3,6 +3,7 @@ import {
   BUILDINGS,
   MAX_CHAT_LENGTH,
   MAX_NAME_LENGTH,
+  PACK_SLOTS,
   RESOURCES,
   UPGRADES,
   type BuildingKind,
@@ -68,6 +69,23 @@ export function parseCommand(v: unknown): Command | null {
     case "move-character":
       if (!isInt(v.x) || !isInt(v.y)) return null;
       return { kind: "move-character", x: v.x, y: v.y };
+    case "drop-item": {
+      if (!isInt(v.slot) || v.slot < 0 || v.slot >= PACK_SLOTS) return null;
+      const out: Command = { kind: "drop-item", slot: v.slot };
+      if (v.amount !== undefined) {
+        if (!isInt(v.amount) || v.amount < 1) return null;
+        out.amount = v.amount;
+      }
+      if (v.x !== undefined || v.y !== undefined) {
+        if (!isInt(v.x) || !isInt(v.y)) return null;
+        out.x = v.x;
+        out.y = v.y;
+      }
+      return out;
+    }
+    case "pickup-item":
+      if (!isInt(v.itemId)) return null;
+      return { kind: "pickup-item", itemId: v.itemId };
     case "call-aboard":
     case "unload":
       if (!isInt(v.shipId)) return null;

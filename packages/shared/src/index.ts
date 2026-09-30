@@ -19,6 +19,8 @@ export * from "./sim/rules";
 export * from "./sim/navigation";
 export * from "./sim/commands";
 export * from "./sim/characters";
+export * from "./sim/items";
+export * from "./sim/inventory";
 export * from "./sim/jobs";
 export * from "./sim/ferry";
 export * from "./sim/daylight";
