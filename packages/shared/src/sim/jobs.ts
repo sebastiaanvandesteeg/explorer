@@ -168,8 +168,8 @@ export function pickJob(state: GameState, v: VillagerEntity): JobOffer | null {
 /** Put a villager on a job, claiming the workplace or the plant for them. */
 export function takeJob(state: GameState, v: VillagerEntity, offer: JobOffer): void {
   if (offer.node) {
+    // Claimed, not marked: marks are the player's colony tool, and show as badges on the plant.
     offer.node.claimedBy = v.id;
-    offer.node.marked = true;
     markDirty(state, offer.node.id);
   }
   if (offer.workplace) {

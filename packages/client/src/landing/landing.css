@@ -148,7 +148,7 @@ img {
   background:
     radial-gradient(ellipse 50% 40% at 50% 48%, rgba(12, 32, 38, 0.5), transparent),
     linear-gradient(rgba(12, 32, 38, 0.5), rgba(12, 32, 38, 0.72)),
-    url(/concept-art.webp) center / cover no-repeat;
+    url(/hero.webp) center / cover no-repeat;
   mask-image: linear-gradient(black 75%, transparent);
 }
 .hero-inner {

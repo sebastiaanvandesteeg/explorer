@@ -253,7 +253,7 @@ function taskValid(state: GameState, v: VillagerEntity, t: Task): boolean {
         n?.type === "node" &&
         n.stage === "grown" &&
         n.amount > 0 &&
-        (n.marked || t.auto !== undefined)
+        (n.marked || t.auto !== undefined || (state.mode === "adventure" && n.claimedBy === v.id))
       );
     }
     case "build": {
