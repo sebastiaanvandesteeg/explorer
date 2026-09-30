@@ -22,6 +22,7 @@ import {
   populationCap,
   RESOURCES,
   SHIP,
+  scoutCapacity,
   sellPrice,
   shipCost,
   SMITH,
@@ -92,6 +93,8 @@ export class Hud {
   private talk: Talk | null = null;
   private selectionRefs: {
     status?: HTMLElement;
+    /** A ship's crew: the captain and the passengers. */
+    crew?: HTMLElement;
     /** Extra live lines: an island's stockpile, a cargo ship's route. */
     extra?: HTMLElement;
     /** Magic house: one row per upgrade, restyled when it is learned. */
@@ -458,7 +461,63 @@ export class Hud {
     this.clockEl.replaceChildren(h(`span.orb${night ? ".moon" : ""}`), text);
   }
 
+  private you = "";
+  private playerNames = new Map<string, string>();
+
+  /** The crew of a ship, for its panel and the buttons to climb aboard or step off. */
+  private crewParts(
+    ship: ShipEntity,
+    refs: { crew?: HTMLElement },
+    button: (
+      label: string | Node,
+      onclick: () => void,
+      enabled: () => boolean,
+      title?: string,
+    ) => HTMLButtonElement,
+    cmd: (c: Command) => () => void,
+    state: GameState,
+  ): HTMLElement[] {
+    refs.crew = h("div.desc");
+    const mine = (): boolean => {
+      const me = [...state.entities.values()].find(
+        (e) => e.type === "character" && e.playerId === this.you,
+      );
+      return me?.type === "character" && me.aboard === ship.id;
+    };
+    return [
+      refs.crew,
+      h(
+        "div.actions",
+        {},
+        button(
+          "Board ship (F)",
+          cmd({ kind: "board-ship", shipId: ship.id }),
+          () => !mine(),
+          "Walk to the ship and climb aboard. The first aboard is the captain and steers with WASD",
+        ),
+        button(
+          "Leave ship (F)",
+          cmd({ kind: "leave-ship" }),
+          mine,
+          "Step off onto the shore or a pier",
+        ),
+      ),
+    ];
+  }
+
+  private crewText(ship: ShipEntity, state: GameState): string {
+    if (ship.riders.length === 0) return "No captain: board to take the helm";
+    const name = (id: number): string => {
+      const c = state.entities.get(id);
+      return c?.type === "character" ? (this.playerNames.get(c.playerId) ?? "?") : "?";
+    };
+    const passengers = ship.riders.slice(1).map(name);
+    return `Captain ${name(ship.riders[0]!)}${passengers.length ? ` · Passengers: ${passengers.join(", ")}` : ""}`;
+  }
+
   setPlayers(players: PlayerInfo[], you: string, status: SessionStatus): void {
+    this.you = you;
+    this.playerNames = new Map(players.map((p) => [p.id, p.name]));
     this.playersEl.replaceChildren(
       ...players.map((p) =>
         h(
@@ -683,7 +742,8 @@ export class Hud {
           ),
         );
       }
-      if (e.kind === "dock" && e.complete) {
+      const harbourLike = e.kind === "harbour" || (e.kind === "dock" && e.harbour === undefined);
+      if (harbourLike && e.complete) {
         const cost = shipCost(state.world.tribe);
         const cargo = cargoCost(state.world.tribe);
         actions.append(
@@ -707,7 +767,7 @@ export class Hud {
           ),
         );
       }
-      if (e.complete && (e.kind === "dock" || BUILDINGS[e.kind].dropOff)) {
+      if (e.complete && (harbourLike || BUILDINGS[e.kind].dropOff)) {
         refs.extra = h("div.desc");
         parts.push(refs.extra);
       }
@@ -717,12 +777,12 @@ export class Hud {
         refs.great = h("div.great");
         parts.push(refs.great);
       }
-      if ((e.kind === "magic_house" || e.kind === "dock") && e.complete) {
+      if ((e.kind === "magic_house" || harbourLike) && e.complete) {
         refs.upgrades = [];
         const list = h("div.upgrades", {});
         for (const id of UPGRADE_IDS) {
           const up = UPGRADES[id];
-          if (up.at !== e.kind) continue;
+          if (up.at !== (harbourLike ? "harbour" : e.kind)) continue;
           const cost = h("span.cost");
           for (const [res, n] of Object.entries(up.cost))
             cost.append(small(res as Resource, n ?? 0));
@@ -849,8 +909,9 @@ export class Hud {
           h(
             "div.desc",
             {},
-            `An armed ship. It hunts pirates within ${PATROL.engage} tiles by itself; right-click the sea to send it elsewhere, or a shipwreck to salvage it. It mends at a dock.`,
+            `An armed ship. It hunts pirates within ${PATROL.engage} tiles by itself; right-click the sea to send it elsewhere, or a shipwreck to salvage it. It mends at a harbour. Board it to sail it yourself.`,
           ),
+          ...this.crewParts(ship, refs, button, cmd, state),
         );
         this.selectionRefs = refs;
         this.selectionEl.replaceChildren(...parts.filter((p): p is HTMLElement => !!p));
@@ -866,8 +927,9 @@ export class Hud {
           h(
             "div.desc",
             {},
-            "Right-click a dock on another island to set a trade route: the ship collects that island's stockpile and sails it home. Right-click the sea to steer by hand.",
+            "Right-click a harbour on another island to set a trade route: the ship collects that island's stockpile and sails it home. Right-click the sea to send it somewhere, or board it and sail it yourself.",
           ),
+          ...this.crewParts(ship, refs, button, cmd, state),
           h(
             "div.actions",
             {},
@@ -889,8 +951,9 @@ export class Hud {
         h(
           "div.desc",
           {},
-          "Right-click the sea to sail, or an island to sail there and put your passengers ashore. Right-click a sunken site to send them diving, or a shipwreck to salvage it.",
+          "Right-click the sea to sail, or an island to sail there and put your passengers ashore. Right-click a sunken site to send them diving, or a shipwreck to salvage it. Board it (F) to sail it yourself with WASD.",
         ),
+        ...this.crewParts(ship, refs, button, cmd, state),
         h(
           "div.actions",
           {},
@@ -911,7 +974,7 @@ export class Hud {
             cmd({ kind: "call-aboard", shipId: ship.id }),
             () =>
               (state.entities.get(ship.id) as ShipEntity | undefined)?.passengers.length !==
-              SHIP.capacity,
+              scoutCapacity(state),
             "The nearest villager on this shore walks over and climbs aboard",
           ),
           button(
@@ -1057,6 +1120,7 @@ export class Hud {
         .filter((part): part is string => part !== null)
         .join(" · ");
       if (refs.extra && report.route) refs.extra.textContent = report.route;
+      if (refs.crew) refs.crew.textContent = this.crewText(e as ShipEntity, state);
     }
     this.refreshSelectionButtons();
   }

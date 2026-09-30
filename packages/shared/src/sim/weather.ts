@@ -3,7 +3,7 @@
 import { hash2d } from "../rng";
 import { DIFFICULTY_DEFS } from "./difficulty";
 import { WEATHER } from "./catalogue";
-import { dockSpawn } from "./ferry";
+import { berthOf, berths } from "./harbour";
 import { damageShip } from "./pirates";
 import {
   addEntity,
@@ -60,10 +60,7 @@ export function stormOnRoute(
 
 /** Is a ship tied up at a finished dock, out of the weather? */
 export function inHarbour(state: GameState, ship: { x: number; y: number }): boolean {
-  for (const e of state.entities.values()) {
-    if (e.type !== "building" || e.kind !== "dock" || !e.complete) continue;
-    if (dist(ship, dockSpawn(e)) <= WEATHER.harbour) return true;
-  }
+  for (const e of berths(state)) if (dist(ship, berthOf(state, e)) <= WEATHER.harbour) return true;
   return false;
 }
 

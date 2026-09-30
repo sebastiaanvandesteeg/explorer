@@ -34,3 +34,6 @@ export * from "./sim/snapshot";
 export * from "./protocol";
 export * from "./routes";
 export * from "./sim/looks";
+export * from "./sim/harbour";
+export * from "./sim/sailing";
+export * from "./sim/sailing";

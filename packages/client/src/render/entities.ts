@@ -1,4 +1,5 @@
 import {
+  hash2d,
   PATROL,
   CARGO,
   pirateMaxHp,
@@ -44,6 +45,8 @@ import {
 const INTERP_MS = TICK_SECONDS * 1000;
 /** Pier decks sit a few pixels above the water. */
 const DECK_PX = 5;
+/** How high above the water a ship's deck is, for the people standing on it. */
+const DECK_HEIGHT = 11;
 
 function tileHeight(state: GameState, x: number, y: number): number {
   const w = state.world;
@@ -142,6 +145,8 @@ class BuildingView extends View {
   private beamAt: { x: number; y: number } | null = null;
   private smokeTimer = 0;
   private sparkleTimer = 0;
+  /** Things standing on a pier: they sort with people and ships, so they live in the main layer. */
+  private props: Sprite[] = [];
 
   constructor(
     private readonly layer: EntityLayer,
@@ -158,13 +163,22 @@ class BuildingView extends View {
     this.rect = { x: b.x, y: b.y, w: b.w, h: b.h };
     this.kind = b.kind;
     const tribe = state.world.tribe;
-    const key = `${buildingSprite(b, tribe)}|${b.complete}|${b.dir ?? ""}`;
+    const up = state.upgrades;
+    const pierLook =
+      b.kind === "dock" && b.harbour !== undefined
+        ? `|${b.w}x${b.h}|${up.has("quay") ? 1 : 0}${up.has("grand_pier") ? 1 : 0}${up.has("cannons") ? 1 : 0}${up.has("iron_hulls") ? 1 : 0}`
+        : "";
+    const key = `${buildingSprite(b, tribe)}|${b.complete}|${b.dir ?? ""}${pierLook}`;
     if (key !== this.key) {
       this.key = key;
       for (const c of [...this.root.children]) if (c !== this.bar) c.destroy();
+      for (const p of this.props) p.destroy();
+      this.props = [];
       this.main = null;
       this.scaffold = null;
-      if (b.kind === "dock") {
+      if (b.kind === "dock" && b.harbour !== undefined) {
+        this.buildPier(b);
+      } else if (b.kind === "dock") {
         this.buildDock(b);
       } else if (b.kind === "path") {
         // A finished path is painted into the ground by the terrain; only the plan is a sprite.
@@ -254,6 +268,7 @@ class BuildingView extends View {
   }
 
   override destroy(): void {
+    for (const p of this.props) p.destroy();
     for (const l of this.lights) l.destroy();
     this.beam?.destroy({ children: true });
     super.destroy();
@@ -278,6 +293,57 @@ class BuildingView extends View {
       const gain = this.kind === "lighthouse" ? 0.4 : 1;
       s.alpha = night * gain * (0.62 + 0.14 * Math.sin(now / 230 + i * 2.1 + this.root.x));
     });
+  }
+
+  /**
+   * A harbour's pier: plank tiles with rails along the outer edges, and, along the edges only (so
+   * the middle stays clear to walk on), what the harbour upgrades bring: crates and barrels with
+   * the Stone Quay, warehouse stacks with the Grand Pier, cannons, ingots and lamps.
+   */
+  private buildPier(b: BuildingEntity): void {
+    const state = this.layer.state;
+    const up = state.upgrades;
+    const dir = b.dir ?? "+x";
+    const axisX = dir === "+x" || dir === "-x";
+    const length = axisX ? b.w : b.h;
+    const width = axisX ? b.h : b.w;
+    const tier = up.has("grand_pier") ? 2 : up.has("quay") ? 1 : 0;
+    const side = (across: number): "+x" | "-x" | "+y" | "-y" => {
+      // The edge with the lower across index looks towards -across.
+      const low = across === 0;
+      return axisX ? (low ? "-y" : "+y") : low ? "-x" : "+x";
+    };
+    for (let ty = 0; ty < b.h; ty++) {
+      for (let tx = 0; tx < b.w; tx++) {
+        const along =
+          dir === "+x" ? tx : dir === "-x" ? b.w - 1 - tx : dir === "+y" ? ty : b.h - 1 - ty;
+        const across = axisX ? ty : tx;
+        const edge = across === 0 || across === width - 1;
+        const end = along === length - 1;
+        const name = `pier_${axisX ? "x" : "y"}${end ? "_end" : ""}${across === 0 ? "_a" : ""}${across === width - 1 ? "_b" : ""}`;
+        const tile = this.layer.atlas.sprite(name);
+        tile.position.set(screenX(tx, ty), screenY(tx, ty));
+        this.root.addChildAt(tile, 0);
+        if (!edge || along === 0) continue;
+        const r = hash2d(b.x + tx, b.y + ty, 71);
+        let prop: string | null = null;
+        if (up.has("cannons") && along % 2 === 0 && !end) prop = `pier_p_cannon_${side(across)}`;
+        else if (end && across === 0 && tier > 0) prop = "pier_p_lamp";
+        else if (tier === 2 && r < 0.45) prop = "pier_p_stack";
+        else if (tier >= 1 && r < 0.3) prop = r < 0.15 ? "pier_p_crates" : "pier_p_barrels";
+        else if (tier >= 1 && r < 0.45)
+          prop = up.has("iron_hulls") ? "pier_p_ingots" : "pier_p_crate";
+        else if (r > 0.92) prop = "pier_p_coil";
+        if (!prop) continue;
+        const sprite = this.layer.atlas.sprite(prop);
+        const wx = b.x + tx;
+        const wy = b.y + ty;
+        sprite.position.set(screenX(wx, wy), screenY(wx, wy) - DECK_PX + 5);
+        sprite.zIndex = wx + wy + 0.6;
+        this.layer.container.addChild(sprite);
+        this.props.push(sprite);
+      }
+    }
   }
 
   private buildDock(b: BuildingEntity): void {
@@ -494,7 +560,7 @@ class HeroView extends MovingView {
 
   update(e: Entity, now: number): void {
     const c = e as CharacterEntity;
-    this.root.visible = c.aboard === null && c.inside === null;
+    this.root.visible = c.inside === null;
     this.track(c.x, c.y, now, this.c === null);
     if (this.c === null) this.height = tileHeight(this.layer.state, c.x, c.y);
     this.c = c;
@@ -504,7 +570,10 @@ class HeroView extends MovingView {
     const c = this.c;
     if (!c) return;
     this.interpolate(now);
-    const targetH = tileHeight(this.layer.state, this.x, this.y);
+    // On a ship a character stands on the deck, a little above the water.
+    const ship = c.aboard !== null ? this.layer.state.entities.get(c.aboard) : undefined;
+    const targetH =
+      ship?.type === "ship" ? DECK_HEIGHT : tileHeight(this.layer.state, this.x, this.y);
     this.height +=
       Math.sign(targetH - this.height) * Math.min(Math.abs(targetH - this.height), dt * 48);
     const phase = Math.floor(now / 160 + c.id) % 2;
@@ -514,8 +583,11 @@ class HeroView extends MovingView {
       Math.round(screenX(this.x, this.y)),
       Math.round(screenY(this.x, this.y) - this.height),
     );
-    // A hair in front of any villager on the same tile.
-    this.root.zIndex = this.x + this.y + 0.02;
+    // A hair in front of any villager on the same tile; above the ship they ride on.
+    this.root.zIndex =
+      ship?.type === "ship"
+        ? ship.x + ship.y + 0.5 + ship.riders.indexOf(c.id) * 0.01
+        : this.x + this.y + 0.02;
     this.root.alpha = this.fadeBehindTerrain(this.layer.state.world, this.height, dt);
   }
 }
@@ -549,7 +621,7 @@ class PirateView extends MovingView {
     const p = e as PirateEntity;
     this.track(p.x, p.y, now, this.p === null);
     this.p = p;
-    const name = `pirate_${p.heading % 8}`;
+    const name = `pirate_${(p.heading % 8) * 2}`;
     this.layer.atlas.setFrame(this.sprite, name);
     hullBar(this.bar, p.hp, pirateMaxHp(this.layer.state));
   }
@@ -817,7 +889,13 @@ class ShipView extends MovingView {
   private sprite: Sprite;
   private s: ShipEntity | null = null;
   private wakeTimer = 0;
+  private ringTimer = 0;
   private bar = new Graphics();
+  /** The bow's direction as drawn: it eases towards the ship's own so turns look smooth. */
+  private angle = 0;
+  private speed = 0;
+  private lastX = 0;
+  private lastY = 0;
 
   constructor(private readonly layer: EntityLayer) {
     super();
@@ -827,32 +905,69 @@ class ShipView extends MovingView {
 
   update(e: Entity, now: number): void {
     const s = e as ShipEntity;
+    if (this.s === null) {
+      this.angle = s.angle;
+      this.lastX = s.x;
+      this.lastY = s.y;
+    }
     this.track(s.x, s.y, now, this.s === null);
     this.s = s;
-    const name = `${s.kind === "scout" ? "ship" : s.kind}_${s.heading % 8}`;
-    this.layer.atlas.setFrame(this.sprite, name);
     hullBar(this.bar, s.hp, shipMaxHp(this.layer.state, s.kind));
   }
 
   override frame(now: number, dt: number): void {
-    if (!this.s) return;
+    const s = this.s;
+    if (!s) return;
     this.interpolate(now);
-    const bob = Math.round(Math.sin(now / 520 + this.s.id) * 1);
+    // Swing the drawn bow round to where the ship points, the short way.
+    const diff = Math.atan2(Math.sin(s.angle - this.angle), Math.cos(s.angle - this.angle));
+    this.angle += diff * (1 - Math.exp(-dt * 9));
+    const k = ((Math.round(this.angle / (Math.PI / 8)) % 16) + 16) % 16;
+    this.layer.atlas.setFrame(this.sprite, `${s.kind === "scout" ? "ship" : s.kind}_${k}`);
+    // How fast it is going (tiles a second), smoothed.
+    const v = dt > 0 ? Math.hypot(this.x - this.lastX, this.y - this.lastY) / dt : 0;
+    this.lastX = this.x;
+    this.lastY = this.y;
+    this.speed += (v - this.speed) * (1 - Math.exp(-dt * 6));
+    const moving = this.speed > 0.3;
+    const bob = Math.round(Math.sin(now / (moving ? 330 : 520) + s.id) * (moving ? 1.6 : 1));
     this.root.position.set(
       Math.round(screenX(this.x, this.y)),
       Math.round(screenY(this.x, this.y)) + bob,
     );
     this.root.zIndex = this.x + this.y;
     this.root.alpha = this.fadeBehindTerrain(this.layer.state.world, 0, dt);
-    if (this.moving) {
+    // Waves: a bow wave and two trailing streams while under way, slow ripples when still.
+    const half = s.kind === "cargo" ? 1.45 : 1.3;
+    const ux = Math.cos(this.angle);
+    const uy = Math.sin(this.angle);
+    const at = (along: number, across: number) => ({
+      x: screenX(this.x + ux * along - uy * across, this.y + uy * along + ux * across),
+      y: screenY(this.x + ux * along - uy * across, this.y + uy * along + ux * across),
+    });
+    if (moving) {
       this.wakeTimer -= dt;
       if (this.wakeTimer <= 0) {
-        this.wakeTimer = 0.12;
-        this.layer.sparkle(
-          this.root.x + (Math.random() - 0.5) * 16,
-          this.root.y + 4 + Math.random() * 6,
-          now,
-        );
+        this.wakeTimer = 0.07;
+        const power = Math.min(1.4, this.speed / 3);
+        for (const side of [-1, 1]) {
+          const bow = at(half * 0.85, side * 0.18);
+          const out = screenX(-uy * side, ux * side);
+          const outY = screenY(-uy * side, ux * side);
+          this.layer.foam(bow.x, bow.y, 1, out * 5, outY * 5 - 1, 0.9, 0.7, 1.4 + power * 0.3);
+          const stern = at(-half * 0.8, side * 0.26);
+          this.layer.foam(stern.x, stern.y, 2, out * 3, outY * 3, 1.5, 0.6, 1.5 + power * 0.3);
+        }
+        const tip = at(half, 0);
+        this.layer.foam(tip.x, tip.y - 2, 0, 0, -6, 0.5, 0.8, 1.1);
+        const keel = at(-half * 0.5, 0);
+        this.layer.foam(keel.x, keel.y, 1, 0, 0, 1.1, 0.7, 1.3);
+      }
+    } else {
+      this.ringTimer -= dt;
+      if (this.ringTimer <= 0) {
+        this.ringTimer = 1.6;
+        this.layer.ring(this.root.x, this.root.y + 2, 2.4, s.kind === "cargo" ? 1.1 : 0.9);
       }
     }
   }
@@ -869,6 +984,18 @@ export class EntityLayer {
   /** Depth-sorted buildings, trees, villagers and ships. */
   readonly container = new Container({ sortableChildren: true });
   readonly effects = new Container();
+  /** Foam and ripples on the water: under the ships, above the sea and shore. */
+  readonly wakes = new Container();
+  private foams: {
+    sprite: Sprite;
+    age: number;
+    life: number;
+    vx: number;
+    vy: number;
+    s0: number;
+    s1: number;
+    peak: number;
+  }[] = [];
   /** Night glows: drawn by the game above the colour grade, so darkness cannot dim them. */
   readonly lights = new Container();
   /** 0 by day up to 1 at midnight. */
@@ -993,6 +1120,21 @@ export class EntityLayer {
       )
         v.frame(now, dt);
     }
+    // Foam spreads out, drifts and fades.
+    for (let i = this.foams.length - 1; i >= 0; i--) {
+      const f = this.foams[i]!;
+      f.age += dt;
+      const t = f.age / f.life;
+      if (t >= 1) {
+        f.sprite.destroy();
+        this.foams.splice(i, 1);
+        continue;
+      }
+      f.sprite.x += f.vx * dt;
+      f.sprite.y += f.vy * dt;
+      f.sprite.scale.set(f.s0 + (f.s1 - f.s0) * t);
+      f.sprite.alpha = f.peak * Math.min(1, t * 8) * (1 - t);
+    }
     // Chimney smoke rises, drifts and fades.
     for (let i = this.smoke.length - 1; i >= 0; i--) {
       const p = this.smoke[i]!;
@@ -1061,6 +1203,44 @@ export class EntityLayer {
     this.puff(fx, fy, 0);
     for (let i = 0; i < 3; i++)
       this.sparkle(tx + (Math.random() - 0.5) * 14, ty + (Math.random() - 0.5) * 8, 0);
+  }
+
+  /** A puff of foam that spreads and fades; `kind` 0 to 2 picks a small, medium or large blob. */
+  foam(
+    x: number,
+    y: number,
+    kind: 0 | 1 | 2,
+    vx: number,
+    vy: number,
+    life: number,
+    peak: number,
+    spread: number,
+  ): void {
+    if (this.foams.length > 220) return;
+    const sprite = this.atlas.sprite(`wake_foam_${kind}`);
+    sprite.position.set(x, y);
+    sprite.alpha = 0;
+    this.wakes.addChild(sprite);
+    this.foams.push({ sprite, age: 0, life, vx, vy, s0: 0.7, s1: spread, peak });
+  }
+
+  /** A slow ring spreading over still water. */
+  ring(x: number, y: number, life: number, scale: number): void {
+    if (this.foams.length > 220) return;
+    const sprite = this.atlas.sprite("wake_ring");
+    sprite.position.set(x, y);
+    sprite.alpha = 0;
+    this.wakes.addChild(sprite);
+    this.foams.push({
+      sprite,
+      age: 0,
+      life,
+      vx: 0,
+      vy: 0,
+      s0: 0.35 * scale,
+      s1: scale,
+      peak: 0.35,
+    });
   }
 
   puff(x: number, y: number, _now: number): void {

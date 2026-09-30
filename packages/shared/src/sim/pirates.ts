@@ -15,7 +15,8 @@ import {
 } from "./catalogue";
 import { nightLevel } from "./daylight";
 import { DIFFICULTY_DEFS } from "./difficulty";
-import { dockSpawn } from "./ferry";
+import { berthOf, berths } from "./harbour";
+import { dropRiders } from "./sailing";
 import { watched } from "./light";
 import { sailable, seaPath } from "./navigation";
 import { nearestWater } from "./rules";
@@ -130,6 +131,7 @@ export function damageShip(state: GameState, s: ShipEntity, dmg: number): void {
   s.hp -= dmg;
   markDirty(state, s.id);
   if (s.hp > 0) return;
+  dropRiders(state, s);
   // Everyone aboard goes down with the ship; its cargo floats free in the wreck.
   for (const id of s.passengers) removeEntity(state, id);
   const loot: Goods = { ...s.cargo };
@@ -311,7 +313,10 @@ function hunt(state: GameState, p: PirateEntity, dt: number): void {
 function pickRaidTarget(state: GameState, p: PirateEntity): number | null {
   const candidates = all<BuildingEntity>(state, "building").filter(
     (b) =>
-      b.complete && (BUILDINGS[b.kind as keyof typeof BUILDINGS]?.dropOff || b.kind === "dock"),
+      b.complete &&
+      (BUILDINGS[b.kind as keyof typeof BUILDINGS]?.dropOff ||
+        b.kind === "harbour" ||
+        (b.kind === "dock" && b.harbour === undefined)),
   );
   const near = candidates
     .map((b) => ({ b, d: dist(p, b), c: nearestWater(state, b.x, b.y, 5) }))
@@ -429,9 +434,8 @@ function fireGuns(state: GameState, s: ShipEntity): void {
 /** Ships mend slowly while moored beside a finished dock. */
 function repair(state: GameState, s: ShipEntity, dt: number): void {
   if (s.hp >= shipMaxHp(state, s.kind) || s.path.length > 0) return;
-  for (const b of all<BuildingEntity>(state, "building")) {
-    if (b.kind !== "dock" || !b.complete) continue;
-    if (dist(s, dockSpawn(b)) > 4) continue;
+  for (const b of berths(state)) {
+    if (dist(s, berthOf(state, b)) > 4) continue;
     s.hp = Math.min(shipMaxHp(state, s.kind), s.hp + 2 * dt);
     markDirty(state, s.id);
     return;
@@ -440,7 +444,7 @@ function repair(state: GameState, s: ShipEntity, dt: number): void {
 
 /** Patrol boats chase pirates within reach whenever they are not following an order. */
 function patrol(state: GameState, s: ShipEntity): void {
-  if (s.salvage || s.dive || state.time < s.waitUntil) return;
+  if (s.salvage || s.dive || s.steer || state.time < s.waitUntil) return;
   const prey = all<PirateEntity>(state, "pirate")
     .filter((p) => dist(p, s) <= PATROL.engage && watched(state, p.x, p.y))
     .sort((a, b) => dist(a, s) - dist(b, s))[0];

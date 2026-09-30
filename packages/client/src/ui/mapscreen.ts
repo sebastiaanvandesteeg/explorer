@@ -300,7 +300,12 @@ export class MapScreen {
       else if (e.kind === "lighthouse") this.diamond(p.x, p.y, 5, "#ffec9a");
       else if (e.kind === "great_work") this.star(p.x, p.y, 9, "#e8dcff");
       else
-        this.square(p.x, p.y, e.kind === "dock" ? 4 : 3, e.kind === "dock" ? "#4fc1b0" : "#a07650");
+        this.square(
+          p.x,
+          p.y,
+          e.kind === "harbour" || e.kind === "dock" ? 4 : 3,
+          e.kind === "harbour" || e.kind === "dock" ? "#4fc1b0" : "#a07650",
+        );
     }
 
     // Island names: settled places first, then the biggest, and never on top of each other.

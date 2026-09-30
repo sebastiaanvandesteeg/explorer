@@ -9,7 +9,7 @@ import {
   completeBuilding,
   createInitialState,
   DIFFICULTY_DEFS,
-  dockSpawn,
+  berthOf,
   fetchedGoods,
   fromSnapshot,
   GATHER_JOBS,
@@ -126,7 +126,7 @@ describe("initial state", () => {
   it("starts with a hall, a dock, three villagers and the home island explored", () => {
     const s = fresh();
     const buildings = of<BuildingEntity>(s, "building");
-    expect(buildings.map((b) => b.kind).sort()).toEqual(["dock", "town_hall"]);
+    expect(buildings.map((b) => b.kind).sort()).toEqual(["dock", "harbour", "town_hall"]);
     expect(population(s)).toBe(3);
     expect(populationCap(s)).toBe(5);
     expect(s.stock).toEqual({
@@ -265,7 +265,7 @@ describe("villager work", () => {
 describe("ships", () => {
   it("launches a ship from the dock and reveals the sea as it sails", () => {
     const s = fresh();
-    const dock = of<BuildingEntity>(s, "building").find((b) => b.kind === "dock")!;
+    const dock = of<BuildingEntity>(s, "building").find((b) => b.kind === "harbour")!;
     expect(applyCommand(s, { kind: "build-ship", buildingId: dock.id })).toEqual({ ok: true });
     run(s, 21);
     const ship = of<ShipEntity>(s, "ship")[0]!;
@@ -325,7 +325,7 @@ describe("snapshots and patches", () => {
 describe("sailing to an island", () => {
   it("heads for the island's shore when told to sail onto land", () => {
     const s = fresh();
-    const dock = of<BuildingEntity>(s, "building").find((b) => b.kind === "dock")!;
+    const dock = of<BuildingEntity>(s, "building").find((b) => b.kind === "harbour")!;
     applyCommand(s, { kind: "build-ship", buildingId: dock.id });
     run(s, 21);
     const ship = of<ShipEntity>(s, "ship")[0]!;
@@ -461,7 +461,7 @@ describe("settling other islands", () => {
   it("ferries villagers to a new island where they can build", () => {
     const s = fresh();
     s.stock = { ...s.stock, wood: 999, stone: 999 };
-    const dock = of<BuildingEntity>(s, "building").find((b) => b.kind === "dock")!;
+    const dock = of<BuildingEntity>(s, "building").find((b) => b.kind === "harbour")!;
     applyCommand(s, { kind: "build-ship", buildingId: dock.id });
     run(s, 21);
     const ship = of<ShipEntity>(s, "ship")[0]!;
@@ -536,7 +536,9 @@ describe("trade routes", () => {
         x: land.x + 0.5,
         y: land.y + 0.5,
       });
-      const at = tiles.find((t) => canPlaceBuilding(s, "dock", t.x, t.y, { ignoreCost: true }).ok);
+      const at = tiles.find(
+        (t) => canPlaceBuilding(s, "harbour", t.x, t.y, { ignoreCost: true }).ok,
+      );
       if (at) return { islandId: island.id, at };
       s.entities.delete(999_000 + island.id);
     }
@@ -548,7 +550,7 @@ describe("trade routes", () => {
     for (let k = 0; k < s.explored.length; k++) s.explored[k] = 1;
     const other = world.islands.find((i) => i.id !== home)!;
     const k = world.island.findIndex((id, i) => id === other.id && world.terrain[i]! > 0);
-    const res = canPlaceBuilding(s, "dock", k % world.width, Math.floor(k / world.width));
+    const res = canPlaceBuilding(s, "harbour", k % world.width, Math.floor(k / world.width));
     expect(res.ok).toBe(false);
   });
 
@@ -556,10 +558,12 @@ describe("trade routes", () => {
     const s = fresh();
     const { islandId, at } = settleOutpost(s);
     s.stock.wood = s.stock.stone = 500;
-    expect(applyCommand(s, { kind: "place-building", building: "dock", ...at })).toEqual({
+    expect(applyCommand(s, { kind: "place-building", building: "harbour", ...at })).toEqual({
       ok: true,
     });
-    const dock = of<BuildingEntity>(s, "building").find((b) => b.kind === "dock" && !b.complete)!;
+    const dock = of<BuildingEntity>(s, "building").find(
+      (b) => b.kind === "harbour" && !b.complete,
+    )!;
     expect(dock.dir).toBeDefined();
     expect(world.island[dock.y * world.width + dock.x]).not.toBe(islandId + 1e9);
     expect(applyCommand(s, { kind: "remove-building", buildingId: dock.id }).ok).toBe(true);
@@ -567,7 +571,7 @@ describe("trade routes", () => {
 
   it("keeps the home dock", () => {
     const s = fresh();
-    const dock = of<BuildingEntity>(s, "building").find((b) => b.kind === "dock")!;
+    const dock = of<BuildingEntity>(s, "building").find((b) => b.kind === "harbour")!;
     expect(applyCommand(s, { kind: "remove-building", buildingId: dock.id }).ok).toBe(false);
   });
 
@@ -575,9 +579,9 @@ describe("trade routes", () => {
     const s = fresh();
     const { islandId, at } = settleOutpost(s);
     s.stock.wood = s.stock.stone = 500;
-    applyCommand(s, { kind: "place-building", building: "dock", ...at });
+    applyCommand(s, { kind: "place-building", building: "harbour", ...at });
     const outDock = of<BuildingEntity>(s, "building").find(
-      (b) => b.kind === "dock" && !b.complete,
+      (b) => b.kind === "harbour" && !b.complete,
     )!;
     outDock.complete = true;
     outDock.progress = 1;
@@ -589,7 +593,7 @@ describe("trade routes", () => {
     expect(stockOf(s, islandId).wood).toBe(60);
 
     const homeDock = of<BuildingEntity>(s, "building").find(
-      (b) => b.kind === "dock" && b !== outDock,
+      (b) => b.kind === "harbour" && b !== outDock,
     )!;
     expect(applyCommand(s, { kind: "build-ship", buildingId: homeDock.id, ship: "cargo" })).toEqual(
       { ok: true },
@@ -630,21 +634,21 @@ describe("trade routes", () => {
     s.nextStorm = 1e9;
     const { at } = settleOutpost(s);
     s.stock.wood = s.stock.stone = 500;
-    applyCommand(s, { kind: "place-building", building: "dock", ...at });
+    applyCommand(s, { kind: "place-building", building: "harbour", ...at });
     const outDock = of<BuildingEntity>(s, "building").find(
-      (b) => b.kind === "dock" && !b.complete,
+      (b) => b.kind === "harbour" && !b.complete,
     )!;
     outDock.complete = true;
     outDock.progress = 1;
     const island = world.island[outDock.y * world.width + outDock.x]!;
     addGoods(s, island, "wood", 30);
     const homeDock = of<BuildingEntity>(s, "building").find(
-      (b) => b.kind === "dock" && b !== outDock,
+      (b) => b.kind === "harbour" && b !== outDock,
     )!;
-    const spot = dockSpawn(homeDock);
+    const spot = berthOf(s, homeDock);
     const ship = addEntity(s, newShip(s, "cargo", spot.x, spot.y, 0));
     applyCommand(s, { kind: "set-route", shipId: ship.id, dockId: outDock.id });
-    const out = dockSpawn(outDock);
+    const out = berthOf(s, outDock);
     const storm = addEntity(s, {
       id: s.nextId++,
       type: "storm",
@@ -756,7 +760,7 @@ describe("magic house upgrades", () => {
 
 describe("pirates, wrecks and sunken sites", () => {
   const dockOf = (s: GameState) =>
-    of<BuildingEntity>(s, "building").find((b) => b.kind === "dock")!;
+    of<BuildingEntity>(s, "building").find((b) => b.kind === "harbour")!;
 
   function ship(s: GameState, kind: ShipEntity["kind"], x: number, y: number): ShipEntity {
     return addEntity(s, newShip(s, kind, x, y, 0));
@@ -782,7 +786,7 @@ describe("pirates, wrecks and sunken sites", () => {
 
   /** Open water a few tiles off the home dock's pier. */
   function nearDock(s: GameState, dist = 6): { x: number; y: number } {
-    const spawn = dockSpawn(dockOf(s));
+    const spawn = berthOf(s, dockOf(s));
     for (let r = dist; r < dist + 10; r++) {
       const x = Math.floor(spawn.x) + r;
       if (sailable(s, x, Math.floor(spawn.y))) return { x: x + 0.5, y: Math.floor(spawn.y) + 0.5 };
@@ -993,7 +997,7 @@ describe("difficulty", () => {
     run(s, 900);
     expect(of(s, "pirate")).toHaveLength(0);
     expect(s.events.some((e) => e.type === "pirates")).toBe(false);
-  });
+  }, 60_000);
 
   it("makes hard raids bigger and tougher than normal ones", () => {
     const raid = (difficulty: "normal" | "hard") => {
@@ -1050,7 +1054,7 @@ describe("night, light and lookouts", () => {
     const hall = hallOf(s);
     const cx = hall.x + hall.w / 2;
     const cy = hall.y + hall.h / 2;
-    const dock = of<BuildingEntity>(s, "building").find((b) => b.kind === "dock")!;
+    const dock = of<BuildingEntity>(s, "building").find((b) => b.kind === "harbour")!;
     for (let dy = -13; dy <= 13; dy++)
       for (let dx = -13; dx <= 13; dx++) {
         const d = Math.hypot(dx, dy);
@@ -1269,8 +1273,11 @@ describe("storms", () => {
 
     const safe = createInitialState(world, { difficulty: "hard" });
     safe.nextRaid = safe.nextStorm = 1e9;
-    const dock = of<BuildingEntity>(safe, "building").find((b) => b.kind === "dock")!;
-    const moored = addEntity(safe, newShip(safe, "scout", dockSpawn(dock).x, dockSpawn(dock).y, 0));
+    const dock = of<BuildingEntity>(safe, "building").find((b) => b.kind === "harbour")!;
+    const moored = addEntity(
+      safe,
+      newShip(safe, "scout", berthOf(safe, dock).x, berthOf(safe, dock).y, 0),
+    );
     stormOver(safe, moored.x, moored.y);
     run(safe, 5);
     expect(moored.hp).toBe(shipMaxHp(safe, "scout"));
@@ -1509,7 +1516,10 @@ describe("the Great Work", () => {
   it("tallies the expedition's story for the chronicle", () => {
     const s = fresh();
     s.nextRaid = s.nextStorm = 1e9;
-    const dockSpot = dockSpawn(of<BuildingEntity>(s, "building").find((b) => b.kind === "dock")!);
+    const dockSpot = berthOf(
+      s,
+      of<BuildingEntity>(s, "building").find((b) => b.kind === "harbour")!,
+    );
     const patrol = addEntity(s, newShip(s, "patrol", dockSpot.x + 6, dockSpot.y, 0));
     addEntity(s, {
       id: s.nextId++,

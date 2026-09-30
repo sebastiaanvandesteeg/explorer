@@ -5,6 +5,7 @@
 import { inBounds, isLandTerrain, tileIndex } from "../world/grid";
 import type { NodeKind } from "../world/types";
 import { BUILDINGS, NODES } from "./catalogue";
+import { sailable } from "./navigation";
 import type { GameState } from "./state";
 
 /** A person is a circle this big (in tiles) for collisions. */
@@ -108,6 +109,62 @@ export function resolveCollisions(
     }
     if (!pushed) break;
   }
+  return { x, y };
+}
+
+/** The tile a ship cannot enter: land, buildings (piers too), sea rocks and the map's edge. */
+function shipBlocked(state: GameState, tx: number, ty: number): boolean {
+  return !sailable(state, tx, ty);
+}
+
+/** Push a round ship out of every blocked tile it overlaps. */
+export function resolveShip(
+  state: GameState,
+  x: number,
+  y: number,
+  r: number,
+): { x: number; y: number } {
+  for (let pass = 0; pass < 4; pass++) {
+    let pushed = false;
+    for (let ty = Math.floor(y - r); ty <= Math.floor(y + r); ty++)
+      for (let tx = Math.floor(x - r); tx <= Math.floor(x + r); tx++) {
+        if (!shipBlocked(state, tx, ty)) continue;
+        const cx = Math.min(Math.max(x, tx), tx + 1);
+        const cy = Math.min(Math.max(y, ty), ty + 1);
+        const dx = x - cx;
+        const dy = y - cy;
+        const d2 = dx * dx + dy * dy;
+        if (d2 >= r * r) continue;
+        pushed = true;
+        if (d2 > 1e-12) {
+          const d = Math.sqrt(d2);
+          x += (dx / d) * (r - d);
+          y += (dy / d) * (r - d);
+        } else {
+          const m = Math.min(x - tx, tx + 1 - x, y - ty, ty + 1 - y);
+          if (m === x - tx) x = tx - r;
+          else if (m === tx + 1 - x) x = tx + 1 + r;
+          else if (m === y - ty) y = ty - r;
+          else y = ty + 1 + r;
+        }
+      }
+    if (!pushed) break;
+  }
+  return { x, y };
+}
+
+/** Move a ship by (dx, dy), sliding along coasts, piers and rocks; never tunnelling through them. */
+export function moveShip(
+  state: GameState,
+  x: number,
+  y: number,
+  dx: number,
+  dy: number,
+  r: number,
+): { x: number; y: number } {
+  const steps = Math.max(1, Math.ceil(Math.hypot(dx, dy) / 0.25));
+  for (let i = 0; i < steps; i++)
+    ({ x, y } = resolveShip(state, x + dx / steps, y + dy / steps, r));
   return { x, y };
 }
 

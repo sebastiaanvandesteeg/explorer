@@ -5,13 +5,16 @@ import { DIFFICULTY_DEFS, type Difficulty } from "./difficulty";
 import { scatterLoot } from "./inventory";
 import type { ItemKind, ItemStack } from "./items";
 import type { CharacterLook } from "./looks";
+import { startHarbour } from "./harbour";
 import { sightFactor } from "./light";
 import type { BiomeId } from "../world/biomes";
 import { Terrain, type Dir, type NodeKind, type SiteKind, type WorldMap } from "../world/types";
 import {
   BUILDINGS,
   CARGO,
+  HARBOUR_BONUS,
   NODES,
+  PATROL,
   PIRATE,
   RESOURCES,
   SHIP,
@@ -39,6 +42,10 @@ export interface BuildingEntity {
   progress: number;
   complete: boolean;
   dir?: Dir;
+  /** A harbour: the id of the pier (a `dock` entity) that runs out from it into the water. */
+  pier?: number;
+  /** A harbour's pier: the id of the harbour it belongs to. */
+  harbour?: number;
   /** Production queue (town hall trains villagers, docks build ships). */
   queue: { what: "villager" | "ship" | "cargo" | "patrol"; remaining: number }[];
   /** Villager staffing a workplace (camps, quarry, mine, farm, blacksmith, church). */
@@ -124,6 +131,8 @@ export interface CharacterEntity extends Walker {
   rpath: { x: number; y: number }[];
   /** A building this character is walking over to go into. */
   enter: number | null;
+  /** A ship this character is walking over to board. */
+  board: number | null;
   /** The direction being steered (a unit vector on the map) and until when; not sent over the wire. */
   steer: { x: number; y: number } | null;
   steerUntil: number;
@@ -145,11 +154,19 @@ export interface ShipEntity {
   type: "ship";
   x: number;
   y: number;
+  /** Which of eight compass points the ship faces (kept for the older code); see `angle`. */
   heading: number;
+  /** The way the bow points, in radians from +x on the map. */
+  angle: number;
   path: { x: number; y: number }[];
   dest: { x: number; y: number } | null;
   /** Villagers on board. */
   passengers: number[];
+  /** Players on board, in the order they boarded: the first is the captain. */
+  riders: number[];
+  /** The direction the captain is steering in (a unit vector) and until when; not sent. */
+  steer: { x: number; y: number } | null;
+  steerUntil: number;
   /** Put the passengers ashore when the ship arrives. */
   unload: boolean;
   /** Scouts explore and ferry villagers; cargo ships haul goods along a trade route. */
@@ -462,8 +479,35 @@ export function sailSpeedFactor(state: GameState): number {
   return hasUpgrade(state, "swift_sails") ? 1.5 : 1;
 }
 
+/** How grand the harbours' piers are: 0 as built, 1 with the Stone Quay, 2 with the Grand Pier. */
+export function pierTier(state: GameState): 0 | 1 | 2 {
+  return hasUpgrade(state, "grand_pier") ? 2 : hasUpgrade(state, "quay") ? 1 : 0;
+}
+
 export function cargoCapacity(state: GameState): number {
-  return Math.round(CARGO.capacity * (hasUpgrade(state, "deep_holds") ? 1.5 : 1));
+  return Math.round(
+    CARGO.capacity *
+      (hasUpgrade(state, "deep_holds") ? 1.5 : 1) *
+      HARBOUR_BONUS.cargoCapacity[pierTier(state)]!,
+  );
+}
+
+/** How many ships of a kind the fleet may have. */
+export function maxShips(state: GameState, kind: ShipKind): number {
+  const tier = pierTier(state);
+  if (kind === "cargo") return CARGO.max + HARBOUR_BONUS.extraCargoShips[tier]!;
+  if (kind === "patrol") return PATROL.max;
+  return SHIP.max + HARBOUR_BONUS.extraScouts[tier]!;
+}
+
+/** How many players can ride a ship. */
+export function riderLimit(state: GameState, kind: ShipKind): number {
+  return (kind === "cargo" ? 6 : 6) + HARBOUR_BONUS.extraRiders[pierTier(state)]!;
+}
+
+/** How many people (villagers and players) fit aboard a scout. */
+export function scoutCapacity(state: GameState): number {
+  return SHIP.capacity + HARBOUR_BONUS.extraRiders[pierTier(state)]!;
 }
 
 export function emptyStock(): Stock {
@@ -531,9 +575,13 @@ export function newShip(
     x,
     y,
     heading,
+    angle: (heading * Math.PI) / 4,
     path: [],
     dest: null,
     passengers: [],
+    riders: [],
+    steer: null,
+    steerUntil: 0,
     unload: false,
     kind,
     route: null,
@@ -588,8 +636,11 @@ export function createInitialState(
   const state = emptyState(world, opts.difficulty);
   const s = world.start;
   addEntity(state, newBuilding(state, "town_hall", s.townHall.x, s.townHall.y, true));
-  addEntity(state, newBuilding(state, "dock", s.dock.x, s.dock.y, true, s.dock.dir));
+  // The home harbour: its body on the shore behind the start pier (or just the pier, if no body fits).
+  if (!startHarbour(state))
+    addEntity(state, newBuilding(state, "dock", s.dock.x, s.dock.y, true, s.dock.dir));
   for (const n of world.nodes) {
+    if (state.occupancy[tileIndex(world, n.x, n.y)] !== 0) continue;
     addEntity(state, {
       id: state.nextId++,
       type: "node",

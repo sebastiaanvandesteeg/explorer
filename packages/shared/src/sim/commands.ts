@@ -26,6 +26,8 @@ import { moveCharacter, steerCharacter, walkCharacter } from "./characters";
 import { atNpc, enterBuilding, isEnterable, leaveCommand, moveInRoom } from "./interiors";
 import { dropFromPack, pickUp } from "./inventory";
 import { disembark, hasRoom, landingBlock, shipMoving, shoreBeside } from "./ferry";
+import { berths, growPiers, isBerth, isHome, placeHarbour } from "./harbour";
+import { boardShip, leaveShip, steerShip } from "./sailing";
 import { seaPath, sailable } from "./navigation";
 import { greatWorkStages } from "./greatwork";
 import { canPlaceBuilding, nearestWater } from "./rules";
@@ -33,11 +35,13 @@ import {
   addEntity,
   islandAt,
   markDirty,
+  maxShips,
   newBuilding,
   population,
   populationCap,
   removeEntity,
   revealIslands,
+  scoutCapacity,
   walkable,
   type GameState,
   type ShipEntity,
@@ -69,6 +73,9 @@ export type Command =
   | { kind: "trade"; resource: Resource; action: "sell" | "buy" }
   | { kind: "move-character"; x: number; y: number }
   | { kind: "steer-character"; x: number; y: number }
+  | { kind: "board-ship"; shipId: number }
+  | { kind: "leave-ship" }
+  | { kind: "steer-ship"; x: number; y: number }
   | { kind: "drop-item"; slot: number; amount?: number; x?: number; y?: number }
   | { kind: "pickup-item"; itemId: number }
   | { kind: "enter-building"; buildingId: number }
@@ -121,7 +128,7 @@ function npcGate(state: GameState, actor: string, cmd: Command): CommandResult |
     case "train-villager":
       return atNpc(state, actor, ["town_hall"], cmd.buildingId);
     case "build-ship":
-      return atNpc(state, actor, ["dock"], cmd.buildingId);
+      return harbourGate(state, actor, cmd.buildingId);
     case "fund-great-work":
       return atNpc(state, actor, ["great_work"], cmd.buildingId);
     case "trade":
@@ -161,6 +168,12 @@ export function applyCommand(
       return moveCharacter(state, actor, cmd);
     case "steer-character":
       return steerCharacter(state, actor, cmd);
+    case "board-ship":
+      return boardShip(state, actor, cmd.shipId);
+    case "leave-ship":
+      return leaveShip(state, actor);
+    case "steer-ship":
+      return steerShip(state, actor, cmd);
     case "enter-building":
       return enterBuilding(state, actor, cmd.buildingId);
     case "leave-building":
@@ -178,30 +191,37 @@ export function applyCommand(
       const def = BUILDINGS[cmd.building];
       spend(state.stock, def.cost);
       state.stockDirty = true;
-      if (check.site) {
-        // A dock: the pier runs out over the water from the shore tile that was clicked.
-        const { x, y, dir } = check.site;
-        addEntity(state, newBuilding(state, "dock", x, y, false, dir));
-        return OK;
-      }
       // Stumps and saplings under the footprint are cleared.
-      for (let y = cmd.y; y < cmd.y + def.size[1]; y++)
-        for (let x = cmd.x; x < cmd.x + def.size[0]; x++) {
+      const foot = check.site
+        ? check.site.body
+        : { x: cmd.x, y: cmd.y, w: def.size[0], h: def.size[1] };
+      for (let y = foot.y; y < foot.y + foot.h; y++)
+        for (let x = foot.x; x < foot.x + foot.w; x++) {
           const id = state.occupancy[tileIndex(state.world, x, y)]!;
           if (id) removeEntity(state, id);
         }
+      if (check.site) {
+        // A harbour: its body on the shore, and a pier running out over the water.
+        placeHarbour(state, check.site, false);
+        growPiers(state);
+        return OK;
+      }
       addEntity(state, newBuilding(state, cmd.building, cmd.x, cmd.y, false));
       return OK;
     }
     case "remove-building": {
       const b = state.entities.get(cmd.buildingId);
       if (b?.type !== "building") return fail("No such building");
-      if (!BUILDINGS[b.kind].buildable) return fail("That can't be removed");
+      const strayDock = b.kind === "dock" && b.harbour === undefined;
+      if (!BUILDINGS[b.kind].buildable && !strayDock) return fail("That can't be removed");
       if (b.kind === "great_work" && (b.stage ?? 0) >= 1)
         return fail("The Great Work can't be torn down");
-      const startDock = state.world.start.dock;
-      if (b.kind === "dock" && b.x === startDock.x && b.y === startDock.y)
-        return fail("The home dock can't be removed");
+      if (
+        (b.kind === "harbour" || b.kind === "dock") &&
+        isHome(state, b) &&
+        berths(state).filter((e) => isHome(state, e)).length <= 1
+      )
+        return fail("The home harbour can't be removed");
       refund(state.stock, BUILDINGS[b.kind].cost, b.complete ? 0.5 : 1);
       state.stockDirty = true;
       for (const e of state.entities.values()) {
@@ -213,8 +233,8 @@ export function applyCommand(
             : t.kind === "harvest" && t.auto === b.id;
         if (involved) releaseTask(state, e);
       }
-      if (b.kind === "dock") {
-        // Ships that collected from this dock, or waited in its queue, lose their route.
+      if (b.kind === "dock" || b.kind === "harbour") {
+        // Ships that collected from this harbour, or waited in its queue, lose their route.
         for (const e of state.entities.values()) {
           if (e.type === "ship" && e.route === b.id) {
             e.route = null;
@@ -228,6 +248,7 @@ export function applyCommand(
           refund(state.stock, q.what === "cargo" ? cargoCost(tribe) : shipCost(tribe));
         }
       }
+      if (b.kind === "harbour" && b.pier !== undefined) removeEntity(state, b.pier);
       removeEntity(state, b.id);
       return OK;
     }
@@ -258,7 +279,8 @@ export function applyCommand(
     }
     case "build-ship": {
       const b = state.entities.get(cmd.buildingId);
-      if (b?.type !== "building" || b.kind !== "dock" || !b.complete) return fail("Needs a dock");
+      if (b?.type !== "building" || !isBerth(state, b) || b.harbour !== undefined)
+        return fail("Needs a harbour");
       const kind = cmd.ship ?? "scout";
       const queued = kind === "scout" ? "ship" : kind;
       let count = 0;
@@ -266,7 +288,7 @@ export function applyCommand(
         if (e.type === "ship" && e.kind === kind) count++;
         else if (e.type === "building") count += e.queue.filter((q) => q.what === queued).length;
       }
-      const max = kind === "cargo" ? CARGO.max : kind === "patrol" ? PATROL.max : SHIP.max;
+      const max = maxShips(state, kind);
       if (count >= max) return fail(`At most ${max} ${kind} ships`);
       const tribe = state.world.tribe;
       const cost =
@@ -339,18 +361,12 @@ export function applyCommand(
         return OK;
       }
       const dock = state.entities.get(cmd.dockId);
-      if (dock?.type !== "building" || dock.kind !== "dock" || !dock.complete)
-        return fail("Pick a finished dock");
+      if (dock?.type !== "building" || !isBerth(state, dock) || dock.harbour !== undefined)
+        return fail("Pick a finished harbour");
       if (islandAt(state, dock.x, dock.y) === state.world.start.islandId)
-        return fail("Pick a dock on another island: cargo is carried home");
-      const home = [...state.entities.values()].some(
-        (e) =>
-          e.type === "building" &&
-          e.kind === "dock" &&
-          e.complete &&
-          islandAt(state, e.x, e.y) === state.world.start.islandId,
-      );
-      if (!home) return fail("You need a dock at home to unload at");
+        return fail("Pick a harbour on another island: cargo is carried home");
+      if (!berths(state).some((e) => isHome(state, e)))
+        return fail("You need a harbour at home to unload at");
       ship.route = dock.id;
       ship.leg = ship.leg ?? null;
       ship.path = [];
@@ -426,17 +442,20 @@ export function applyCommand(
       const def = UPGRADES[cmd.upgrade];
       if (!def) return fail("Unknown upgrade");
       if (
-        ![...state.entities.values()].some(
-          (e) => e.type === "building" && e.kind === def.at && e.complete,
-        )
+        def.at === "harbour"
+          ? berths(state).length === 0
+          : ![...state.entities.values()].some(
+              (e) => e.type === "building" && e.kind === def.at && e.complete,
+            )
       )
-        return fail(def.at === "dock" ? "Needs a dock" : "Build a magic house first");
+        return fail(def.at === "harbour" ? "Needs a harbour" : "Build a magic house first");
       if (state.upgrades.has(def.id)) return fail("Already learned");
       if (!canAfford(state.stock, def.cost)) return fail("Not enough resources");
       spend(state.stock, def.cost);
       state.stockDirty = true;
       state.upgrades.add(def.id);
       state.upgradesDirty = true;
+      if (def.id === "quay" || def.id === "grand_pier") growPiers(state);
       if (def.id === "seers_chart") revealIslands(state);
       state.events.push({ type: "upgrade", upgrade: def.id });
       return OK;
@@ -546,7 +565,7 @@ function callAboard(state: GameState, ship: ShipEntity): CommandResult {
     if (e.type === "villager" && e.task?.kind === "board" && e.task.shipId === ship.id)
       boarding.add(e.id);
   }
-  if (ship.passengers.length + boarding.size >= SHIP.capacity)
+  if (ship.passengers.length + boarding.size >= scoutCapacity(state))
     return fail("Enough villagers are on their way");
   let best: { v: VillagerEntity; score: number } | null = null;
   for (const e of state.entities.values()) {
@@ -561,4 +580,11 @@ function callAboard(state: GameState, ship: ShipEntity): CommandResult {
   releaseTask(state, best.v);
   best.v.task = { kind: "board", shipId: ship.id };
   return OK;
+}
+
+/** The harbourmaster gate for ordering ships: stand at the NPC (an old save's bare dock has none). */
+function harbourGate(state: GameState, actor: string, buildingId: number): CommandResult | null {
+  const b = state.entities.get(buildingId);
+  if (b?.type === "building" && b.kind === "dock") return null;
+  return atNpc(state, actor, ["harbour"], buildingId);
 }

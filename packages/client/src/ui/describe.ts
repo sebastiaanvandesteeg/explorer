@@ -7,7 +7,7 @@ import {
   islandName,
   pirateMaxHp,
   RESOURCES,
-  SHIP,
+  scoutCapacity,
   shipMaxHp,
   type GameState,
   type PirateEntity,
@@ -80,7 +80,12 @@ export function describeShip(state: GameState, ship: ShipEntity): ShipReport {
       : ship.dest
         ? "Sailing…"
         : "Anchored";
-  return { doing, extra: `${ship.passengers.length}/${SHIP.capacity} aboard`, hull, route: null };
+  return {
+    doing,
+    extra: `${ship.passengers.length}/${scoutCapacity(state)} villagers aboard`,
+    hull,
+    route: null,
+  };
 }
 
 /** The closest uncleared sunken site within reach of a ship. */

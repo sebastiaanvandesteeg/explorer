@@ -76,6 +76,7 @@ export function ensureCharacter(
     room: { x: 0, y: 0 },
     rpath: [],
     enter: null,
+    board: null,
     steer: null,
     steerUntil: 0,
   } satisfies CharacterEntity);
@@ -99,6 +100,7 @@ export function moveCharacter(
   if (c.inside !== null) return { ok: false, reason: "Leave the building first" };
   c.fetch = null;
   c.enter = null;
+  c.board = null;
   return walkCharacter(state, c, target);
 }
 
@@ -139,6 +141,7 @@ export function steerCharacter(
   c.dest = null;
   c.fetch = null;
   c.enter = null;
+  c.board = null;
   markDirty(state, c.id);
   return { ok: true };
 }

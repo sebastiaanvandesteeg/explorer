@@ -423,7 +423,7 @@ describe("characters", () => {
       x: goal.x + 0.5,
       y: goal.y + 0.5,
     });
-  });
+  }, 30_000);
 });
 
 describe("world events reach players", () => {

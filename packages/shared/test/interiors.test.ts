@@ -57,7 +57,7 @@ function built(s: GameState, kind: BuildingKind): BuildingEntity {
       for (let dx = -r; dx <= r; dx++) {
         const x = th.x + dx;
         const y = th.y + dy;
-        if (kind === "dock") continue;
+        if (kind === "harbour") continue;
         const b = newBuilding(s, kind, x, y, true);
         try {
           if (applyCommand(s, { kind: "place-building", building: kind, x, y }).ok) {
@@ -86,7 +86,7 @@ describe("the rooms", () => {
       [
         "blacksmith",
         "church",
-        "dock",
+        "harbour",
         "great_work",
         "house",
         "magic_house",

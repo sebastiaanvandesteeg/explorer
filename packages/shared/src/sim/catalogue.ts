@@ -24,6 +24,7 @@ export type Stock = Record<Resource, number>;
 export type BuildingKind =
   | "town_hall"
   | "dock"
+  | "harbour"
   | "house"
   | "storehouse"
   | "farm"
@@ -84,14 +85,23 @@ export const BUILDINGS: Record<BuildingKind, BuildingDef> = {
   },
   dock: {
     kind: "dock",
-    name: "Dock",
-    description:
-      "Builds scout and cargo ships. Villagers can walk out on the pier to board. Docks on other islands are where cargo ships collect goods.",
+    name: "Pier",
+    description: "The pier of a harbour: walk out on it to board ships.",
     size: [2, 3],
     cost: { wood: 60, stone: 20 },
     work: 16,
-    buildable: true,
+    buildable: false,
     walkable: true,
+  },
+  harbour: {
+    kind: "harbour",
+    name: "Harbour",
+    description:
+      "Built on the coast. Its harbourmaster builds scout, cargo and patrol ships and sells ship and pier upgrades; its pier runs out over the water and grows with them. Ships need a harbour on their island, and cargo ships collect goods from the harbours of other islands.",
+    size: [3, 2],
+    cost: { wood: 60, stone: 20 },
+    work: 16,
+    buildable: true,
     hotkey: "b",
   },
   house: {
@@ -380,6 +390,24 @@ export type ShipKind = "scout" | "cargo" | "patrol";
 /** Hit points of a ship, before Iron Hulls. */
 export const SHIP_HP: Record<ShipKind, number> = { scout: 30, cargo: 45, patrol: 70 };
 
+/**
+ * A harbour's pier: how far out it runs and how wide it is, before upgrades and after the Stone
+ * Quay and the Grand Pier. Ships launch from just past its end.
+ */
+export const PIER_TIERS = [
+  { length: 3, width: 2 },
+  { length: 5, width: 3 },
+  { length: 8, width: 4 },
+] as const;
+
+/** Extra room the harbour's upgrades give ships, by pier tier (0 = none, 1 = quay, 2 = grand). */
+export const HARBOUR_BONUS = {
+  cargoCapacity: [1, 1.5, 2],
+  extraCargoShips: [0, 2, 2],
+  extraScouts: [0, 0, 1],
+  extraRiders: [0, 0, 2],
+};
+
 /** Warships: they hunt pirates on their own whenever they are not sailing somewhere. */
 export const PATROL = {
   cost: { wood: 80, tools: 10 } as Partial<Stock>,
@@ -472,7 +500,9 @@ export type UpgradeId =
   | "storm_bolt"
   | "calm_waters"
   | "cannons"
-  | "iron_hulls";
+  | "iron_hulls"
+  | "quay"
+  | "grand_pier";
 
 export interface UpgradeDef {
   id: UpgradeId;
@@ -480,7 +510,7 @@ export interface UpgradeDef {
   description: string;
   cost: Partial<Stock>;
   /** Where it is sold: the magic house for spells, the dock for ship fittings. */
-  at: "magic_house" | "dock";
+  at: "magic_house" | "harbour";
 }
 
 /** Upgrades are learned once, for the whole team. */
@@ -547,14 +577,30 @@ export const UPGRADES: Record<UpgradeId, UpgradeDef> = {
     name: "Cannons",
     description: "Every ship gets guns and fires on pirates in range",
     cost: { wood: 60, tools: 10 },
-    at: "dock",
+    at: "harbour",
   },
   iron_hulls: {
     id: "iron_hulls",
     name: "Iron Hulls",
     description: "Ships take 50% more damage before they sink",
     cost: { wood: 40, stone: 30, tools: 15 },
-    at: "dock",
+    at: "harbour",
+  },
+  quay: {
+    id: "quay",
+    name: "Stone Quay",
+    description:
+      "A longer, wider pier with crates and barrels: cargo ships carry 50% more and two more can be built",
+    cost: { wood: 60, stone: 50 },
+    at: "harbour",
+  },
+  grand_pier: {
+    id: "grand_pier",
+    name: "Grand Pier",
+    description:
+      "A great pier with warehouse stacks: cargo ships carry twice as much, ships take more people aboard and one more scout can be built",
+    cost: { wood: 100, stone: 90, tools: 15 },
+    at: "harbour",
   },
 };
 export const UPGRADE_IDS = Object.keys(UPGRADES) as UpgradeId[];

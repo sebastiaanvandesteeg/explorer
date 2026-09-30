@@ -94,7 +94,7 @@ describe("routes and the fleet", () => {
     expect(lines[0]).toMatchObject({ shipId: ship.id });
     const home = [...s.entities.values()].find(
       (e): e is BuildingEntity =>
-        e.type === "building" && e.kind === "dock" && e.id !== building.id,
+        e.type === "building" && e.kind === "harbour" && e.id !== building.id,
     )!;
     expect(lines[0]!.to).toEqual({ x: home.x + home.w / 2, y: home.y + home.h / 2 });
   });

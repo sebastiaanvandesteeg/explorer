@@ -37,18 +37,18 @@ The site root is the landing page; the game itself lives at **/play** (http://lo
 
 ### Controls
 
-| Action | How                                                                                                                                                                                             |
-| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Walk   | WASD / arrow keys (free movement), or right-click the ground with nothing selected. The camera is bound to your character at a fixed zoom                                                       |
-| Build  | `1`–`9`, `0`, `B` (dock), `L` (lighthouse), `P` (path) or the build menu, then click. Shift-click keeps placing. Paths can be dragged                                                           |
-| Select | Click a villager, ship, building or resource                                                                                                                                                    |
-| Order  | With a villager selected, right-click a resource, building, ship, bones or the ground. With a ship selected, right-click the sea, an island, a dock (cargo ships), a shipwreck or a sunken site |
-| Cancel | `Esc` or right-click                                                                                                                                                                            |
-| Chat   | `Enter`                                                                                                                                                                                         |
-| Map    | `M` opens the chart of the archipelago (or use the Map button by the minimap). `M` or `Esc` closes it                                                                                           |
-| Sound  | `N` mutes or unmutes (or the Sound button in the expedition panel). Your choice is remembered                                                                                                   |
-| Home   | `C` centres on the town hall (it brings the camera back to your character)                                                                                                                      |
-| Pack   | `I` opens your pack, `E` picks up what lies within reach, right-click an item to walk over and take it                                                                                          |
+| Action | How                                                                                                                                                                                                                                                                                                        |
+| ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Walk   | WASD / arrow keys (free movement), or right-click the ground with nothing selected. The camera is bound to your character at a fixed zoom                                                                                                                                                                  |
+| Build  | `1`–`9`, `0`, `B` (harbour), `L` (lighthouse), `P` (path) or the build menu, then click. Shift-click keeps placing. Paths can be dragged                                                                                                                                                                   |
+| Select | Click a villager, ship, building or resource                                                                                                                                                                                                                                                               |
+| Order  | With a villager selected, right-click a resource, building, ship, bones or the ground. With a ship selected, right-click the sea, an island, a harbour (cargo ships), a shipwreck or a sunken site. With nothing selected, right-click a ship (or press `F` near one) to climb aboard; `F` again steps off |
+| Cancel | `Esc` or right-click                                                                                                                                                                                                                                                                                       |
+| Chat   | `Enter`                                                                                                                                                                                                                                                                                                    |
+| Map    | `M` opens the chart of the archipelago (or use the Map button by the minimap). `M` or `Esc` closes it                                                                                                                                                                                                      |
+| Sound  | `N` mutes or unmutes (or the Sound button in the expedition panel). Your choice is remembered                                                                                                                                                                                                              |
+| Home   | `C` centres on the town hall (it brings the camera back to your character)                                                                                                                                                                                                                                 |
+| Pack   | `I` opens your pack, `E` picks up what lies within reach, right-click an item to walk over and take it                                                                                                                                                                                                     |
 
 ### Inside buildings
 
@@ -78,7 +78,7 @@ What works so far:
 - **A pack of your own.** Each character carries up to 12 stacks of items (bread to start with), kept apart from the settlement's goods and saved with the world. Press `I` (or the Pack button) to open it, select a stack, and drop one or all of it on the ground where you stand. Anyone can pick an item up: press `E` next to it, or right-click it and your character walks over and takes it. Items lie on land only, never in the sea (dropping into the water is refused, and drops never slide onto water or a pier), and a full pack leaves the item where it is.
 - **Things to find.** Every island but your home one has a few items lying about, always one treasure its biome is known for (amber in the dunes and Amberwood, pearls in the jungle and the glowing caverns, crystal shards on the crystal isles, relic shards on the infernal ones, and so on). `scatterLoot` places them deterministically from the world seed; `grantItem` puts loot straight into a character's pack (overflow falls on the ground), so chests, wrecks and sunken sites can hand out items the same way later.
 
-What is planned, in order: acting with your own hands (gather, build and carry goods to the stockpile), boarding and steering a ship as its captain with the rest of the crew at stations, ports run by NPCs with shops and quests, and retuning pirates, storms and costs for a crew of people rather than a fleet of villagers.
+What is planned, in order: acting with your own hands (gather, build and carry goods to the stockpile), crew stations and jobs aboard ship, ports run by NPCs with shops and quests, and retuning pirates, storms and costs for a crew of people rather than a fleet of villagers.
 
 ### Tribes
 
@@ -175,11 +175,13 @@ Each is learned once, for the whole team, and paid from the shared treasury with
 
 A raiding ship sails in from over the horizon of your settlements and ships (see The world). It hunts the nearest ship of yours, or beaches beside a storehouse, camp or dock and robs a share of that island's stockpile for eight seconds before sailing off with the loot (more raiders arrive as the days pass). A red alert appears at the top of the screen for as long as raiders are in sight (see night, below), with the direction they are in and a **Look** button that takes the camera to them.
 
-- **Ships have hull points** (scout 30, cargo 45, patrol boat 70) and mend slowly beside a dock. A ship that sinks takes its passengers with it and leaves a wreck.
+- **Ships have hull points** (scout 30, cargo 45, patrol boat 70) and mend slowly beside a harbour's pier. A ship that sinks takes its passengers with it and leaves a wreck.
 - **Defences**, from cheap to grand:
-  - **Patrol boat** (80 wood, 10 tools at a dock): armed, and hunts any pirate within 18 tiles on its own until you give it an order.
-  - **Cannons** (dock fitting, 60 wood, 10 tools): every ship gets guns.
-  - **Iron Hulls** (dock fitting, 40 wood, 30 stone, 15 tools): 50% more hull points.
+  - **Patrol boat** (80 wood, 10 tools at a harbour): armed, and hunts any pirate within 18 tiles on its own until you give it an order.
+  - **Cannons** (harbour fitting, 60 wood, 10 tools): every ship gets guns, and cannons stand on the pier.
+  - **Iron Hulls** (harbour fitting, 40 wood, 30 stone, 15 tools): 50% more hull points, and stacks of ingots on the pier.
+  - **Stone Quay** (harbour fitting, 60 wood, 50 stone): a longer, wider pier with crates and barrels; cargo ships carry 50% more and two more can be built.
+  - **Grand Pier** (harbour fitting, 100 wood, 90 stone, 15 tools): a great pier with warehouse stacks; cargo ships carry twice as much, ships take two more players aboard and one more scout can be built.
   - **Stormcaller** (magic house): lightning strikes pirates near your ships and buildings.
 - **Wrecks:** a pirate that goes down at sea leaves a **shipwreck**, and one that was raiding leaves **bones** on the beach, both holding whatever it stole plus a bounty of gold, tools and sometimes a **relic**. Right-click a shipwreck with a scout or patrol boat selected, or the bones with a villager, to loot them.
 
@@ -233,11 +235,13 @@ A storm front forms out at sea, some way from your settlements or ships, every f
   - Lumber camps fell trees, quarries break rocks, and mines dig ore, gold and crystal, all within a radius.
   - Farms grow food. The blacksmith forges 2 ore into 1 set of tools. The church gathers faith.
 - **Advanced buildings** need tools: the market (sell lots of 10 goods for gold, or buy basics), the church, the lighthouse and the magic house. The magic house sells upgrades (see below).
-- **Exploring:** the dock builds scout ships. Sailing clears the fog for everyone, and each newly found island is announced.
+- **Harbours:** ships need a **harbour**: a building on the coast (click a shore tile; wood 60, stone 20) with a harbourmaster you talk to inside, and a **pier** running out over the water that you can walk on but not interact with. The home island starts with one; every other island needs its own before ships can use it. Harbour upgrades make the pier longer and wider and stock it with crates, barrels, stacks, ingots and cannons.
+- **Sailing:** ships are big, medieval vessels (a caravel, a cog, a carrack) that leave foam wakes. Walk up to a ship at the pier or on the shore and right-click it (or press `F`, or use the ship panel's **Board ship**) to climb aboard. The **first aboard is the captain** and steers with WASD (the ship turns and slides along coasts); everyone after is a **passenger** who rides on deck. If the captain steps off (`F`), the next rider becomes captain. A sunk ship puts its riders back ashore beside the town hall.
+- **Exploring:** the harbour builds scout ships. Sailing clears the fog for everyone, and each newly found island is announced.
 - **Settling:** select a ship next to the shore (or at the pier) and press **Take a villager aboard**, or right-click the ship with a villager selected. Then right-click another island to sail there and put everyone ashore. Once your villagers stand on an island you can build there. Put up a storehouse first, so they have somewhere to drop off goods.
 - **Trade routes:** each island keeps its own stockpile. Goods gathered at home go into the shared treasury that pays for everything; goods gathered on another island wait in a pile on that island until a cargo ship brings them home.
-  - Build a **dock** on the shore of a settled island (click the shore tile; the pier runs out over open water). The home dock cannot be demolished.
-  - Docks build **cargo ships** as well as scouts (4 at most). Select a cargo ship and right-click a dock on another island to set its route: it waits for goods, loads up to 40, sails to the nearest home dock, unloads and returns, on repeat. Steering it by hand cancels the route.
+  - Build a **harbour** on the shore of a settled island (click the shore tile; the pier runs out over open water). The home harbour cannot be demolished.
+  - Harbours build **cargo ships** as well as scouts (4 at most). Select a cargo ship and right-click a harbour on another island to set its route: it waits for goods, loads up to 40, sails to the nearest home harbour, unloads and returns, on repeat. Steering it by hand cancels the route.
   - Farms, forges and churches on other islands produce into that island's pile too. Select a dock or storehouse to see what is waiting.
 
 ## The website

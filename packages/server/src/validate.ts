@@ -71,6 +71,16 @@ export function parseCommand(v: unknown): Command | null {
     case "move-character":
       if (!isInt(v.x) || !isInt(v.y)) return null;
       return { kind: "move-character", x: v.x, y: v.y };
+    case "board-ship":
+      if (!isInt(v.shipId)) return null;
+      return { kind: "board-ship", shipId: v.shipId };
+    case "leave-ship":
+      return { kind: "leave-ship" };
+    case "steer-ship":
+      if (typeof v.x !== "number" || typeof v.y !== "number") return null;
+      if (!Number.isFinite(v.x) || !Number.isFinite(v.y)) return null;
+      if (Math.abs(v.x) > 10 || Math.abs(v.y) > 10) return null;
+      return { kind: "steer-ship", x: v.x, y: v.y };
     case "steer-character":
       if (typeof v.x !== "number" || typeof v.y !== "number") return null;
       if (!Number.isFinite(v.x) || !Number.isFinite(v.y)) return null;

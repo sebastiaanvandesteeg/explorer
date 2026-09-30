@@ -42,6 +42,36 @@ export const NOTE_LABELS: Record<NoteKind, string> = {
 
 export const RELEASES: Release[] = [
   {
+    slug: "all-hands-on-deck",
+    version: "0.17",
+    title: "All Hands on Deck",
+    date: "2026-10-01",
+    theme: "temperate",
+    summary:
+      "Build a harbour on the coast, grow its pier with upgrades, and sail big medieval ships yourself: climb aboard, take the wheel and ride the waves with your crew.",
+    intro: [
+      "Ships are no longer little dots that obey orders. They are real vessels with a crew, and you can be on them.",
+    ],
+    sections: [
+      {
+        kind: "new",
+        items: [
+          "The Harbour replaces the Dock: a building on the coast with the harbourmaster inside, and a pier running out over the water that you can walk on. Every island needs its own harbour before ships can use it; the home island starts with one.",
+          "Harbour upgrades grow the pier: the Stone Quay and the Grand Pier make it longer and wider and stock it with crates, barrels and warehouse stacks, and cargo ships carry more. Cannons and Iron Hulls put cannons and ingots on the pier.",
+          "Climb aboard any ship (right-click it, press F, or use its panel). The first aboard is the captain and steers with WASD; everyone else is a passenger on deck. If the captain steps off, the next rider takes the wheel.",
+        ],
+      },
+      {
+        kind: "improved",
+        items: [
+          "Ships are much bigger and look medieval: a caravel, a cog with castles, a carrack with gun ports, and black-sailed pirate galleons, in 16 headings so turns look smooth.",
+          "Ships now make waves: a bow wave and foam wakes when under way, and slow ripples when at rest.",
+          "Old saves keep working: each old dock gets a harbour on the shore behind it.",
+        ],
+      },
+    ],
+  },
+  {
     slug: "make-your-mark",
     version: "0.16",
     title: "Make Your Mark",

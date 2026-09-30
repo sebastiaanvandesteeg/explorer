@@ -94,10 +94,12 @@ export function islandRows(state: GameState): IslandRow[] {
       const row = rows.get(islandAt(state, Math.floor(e.x), Math.floor(e.y)));
       if (row) row.villagers++;
     } else if (e.type === "building" && e.kind !== "path") {
+      // A harbour's pier is part of the harbour, not a building of its own.
+      if (e.kind === "dock" && e.harbour !== undefined) continue;
       const row = rows.get(islandAt(state, e.x, e.y));
       if (!row) continue;
       row.buildings++;
-      if (e.kind === "dock" && e.complete) row.docks++;
+      if ((e.kind === "harbour" || e.kind === "dock") && e.complete) row.docks++;
     } else if (e.type === "ship" && e.kind === "cargo" && e.route !== null) {
       const pickup = state.entities.get(e.route);
       if (pickup?.type === "building") {
@@ -247,7 +249,7 @@ export function currentThreat(state: GameState): Threat | null {
     } else if (
       e.type === "building" &&
       e.complete &&
-      (e.kind === "dock" || BUILDINGS[e.kind].dropOff)
+      (e.kind === "harbour" || e.kind === "dock" || BUILDINGS[e.kind].dropOff)
     )
       buildings.push(e);
   }

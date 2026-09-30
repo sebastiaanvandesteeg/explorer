@@ -1043,6 +1043,223 @@ function greatWork(st: Style, stage: 1 | 2 | 3): Sprite {
 }
 
 // ---------------------------------------------------------------------------------------------
+// Harbours
+
+/**
+ * A harbour's body on the shore: a long warehouse and harbourmaster's office with a loading crane
+ * over the water side. `axis` is the side the shore runs along: "y" is 3 tiles along x (water on
+ * the +y side), "x" is 3 tiles along y (water on the +x side). Drawn once in (u along the shore,
+ * v towards the water) and mapped onto either.
+ */
+function harbour(st: Style, axis: "x" | "y"): Sprite {
+  const s = new Scene();
+  const long = 3;
+  const deep = 2;
+  const W = axis === "y" ? long : deep;
+  const D = axis === "y" ? deep : long;
+  s.groundShadow = { x0: -0.2, y0: -0.2, x1: W + 0.3, y1: D + 0.3 };
+  const P = (u: number, v: number): [number, number] => (axis === "y" ? [u, v] : [v, u]);
+  const box = (
+    u0: number,
+    v0: number,
+    z0: number,
+    u1: number,
+    v1: number,
+    z1: number,
+    mat: Material,
+  ) => {
+    const [x0, y0] = P(Math.min(u0, u1), Math.min(v0, v1));
+    const [x1, y1] = P(Math.max(u0, u1), Math.max(v0, v1));
+    s.box([Math.min(x0, x1), Math.min(y0, y1), z0], [Math.max(x0, x1), Math.max(y0, y1), z1], mat);
+  };
+  const post = (u: number, v: number, z: number, r: number, h: number, mat: Material) => {
+    const [x, y] = P(u, v);
+    s.prism("z", [x, y, z + h / 2], r, h / 2, mat, 8);
+  };
+  const front = axis === "y" ? "+y" : "+x";
+  const top = 19;
+  const openings: Opening[] = [
+    { face: front, u0: 0.4, u1: 0.78, z0: 3, z1: 15, kind: "door" },
+    { face: front, u0: 1.25, u1: 1.43, z0: 8, z1: 13, kind: "lit-window" },
+    { face: front, u0: 1.75, u1: 1.93, z0: 8, z1: 13, kind: "window" },
+  ];
+  // A low stone footing, the walls, and a roof whose ridge runs along the shore.
+  box(0.2, 0.25, 0, 2.05, 1.45, 3, st.base);
+  box(0.25, 0.3, 3, 2.0, 1.4, top, st.wall(top, openings, []));
+  const [rx0, ry0] = P(0.25, 0.3);
+  const [rx1, ry1] = P(2.0, 1.4);
+  const peak = roof(
+    s,
+    st,
+    Math.min(rx0, rx1),
+    Math.min(ry0, ry1),
+    Math.max(rx0, rx1),
+    Math.max(ry0, ry1),
+    top,
+    15,
+    axis === "y" ? "x" : "y",
+  );
+  // A lean-to for the harbourmaster's office at the far end.
+  box(2.0, 0.45, 0, 2.65, 1.3, 11, st.base);
+  box(2.03, 0.48, 3, 2.62, 1.27, 11, planks(st.wood, "z", 0.08));
+  box(1.98, 0.42, 11, 2.68, 1.33, 12.5, st.trim);
+  // Loading crane at the water's edge: mast, jib and a crate on a hook.
+  const cu = 2.45;
+  const cv = 1.7;
+  post(cu, cv, 0, 0.07, 30, planks(st.wood, "z", 0.06));
+  post(cu, cv, 0, 0.11, 3, st.base);
+  const [jx0, jy0] = P(cu, cv);
+  const [jx1, jy1] = P(cu, cv + 0.25);
+  strand(s, [jx0, jy0, 29], [jx1, jy1, 26], 0.035, 1.2, st.trim, 5);
+  const [hx, hy] = P(cu, cv + 0.25);
+  strand(s, [hx, hy, 26], [hx, hy, 18], 0.012, 1.4, flat("thatch"), 4);
+  box(cu - 0.1, cv + 0.15, 12, cu + 0.1, cv + 0.35, 18, planks(st.wood, "y", 0.07));
+  // Crates, barrels and a coil of rope on the quay in front.
+  const crateMat = planks(st.wood, "x", 0.07);
+  box(0.25, 1.55, 0, 0.6, 1.9, 6, crateMat);
+  box(0.3, 1.6, 6, 0.55, 1.85, 10, planks(st.wood, "y", 0.07));
+  box(0.65, 1.6, 0, 0.92, 1.9, 5, crateMat);
+  for (const [u, v] of [
+    [1.25, 1.75],
+    [1.5, 1.8],
+    [1.38, 1.62],
+  ] as const)
+    post(u, v, 0, 0.11, 6, planks(st.wood, "z", 0.05));
+  // A lamp post and a flag on the stern of the roof.
+  post(0.12, 1.92, 0, 0.03, 14, st.trim);
+  const [lx, ly] = P(0.12, 1.85);
+  lantern(s, lx, ly, 11);
+  const [bx, by] = P(0.3, 0.85);
+  s.prism("z", [bx, by, peak + 4], 0.02, 6, st.trim, 5);
+  s.box([bx - 0.02, by, peak + 6], [bx + 0.02, by + 0.26, peak + 11], stripes(st.accent));
+  return renderSprite(`b_harbour_${axis}_${st.tribe}`, s, W, D, 70, 12);
+}
+
+/** One plank tile of a harbour pier. `railA`/`railB` put a low rail on the low or high side. */
+export function pierTile(axis: "x" | "y", end: boolean, railA: boolean, railB: boolean): Sprite {
+  const s = new Scene();
+  const deck = 5;
+  // Planks run along the pier; two stringers carry them.
+  s.box([0, 0, deck - 1.8], [1, 1, deck], planks("plank", axis === "x" ? "x" : "y", 0.11));
+  const along = (t: number, across: number): [number, number] =>
+    axis === "x" ? [t, across] : [across, t];
+  for (const across of [0.12, 0.88]) {
+    const [x, y] = along(0.5, across);
+    s.box(
+      axis === "x" ? [0, y - 0.04, deck - 2.4] : [x - 0.04, 0, deck - 2.4],
+      axis === "x" ? [1, y + 0.04, deck - 1.4] : [x + 0.04, 1, deck - 1.4],
+      flat("darkwood", 0.05),
+    );
+  }
+  const rail = (across: number) => {
+    for (const t of [0.12, 0.88]) {
+      const [x, y] = along(t, across);
+      s.prism("z", [x, y, deck + 2], 0.045, 2.6, flat("timber"), 8);
+    }
+    const [x0, y0] = along(0, across);
+    const [x1, y1] = along(1, across);
+    const c = (across: number) => Math.min(across, 1);
+    void c;
+    s.box(
+      axis === "x" ? [0, y0 - 0.025, deck + 3.4] : [x0 - 0.025, 0, deck + 3.4],
+      axis === "x" ? [1, y1 + 0.025, deck + 4.4] : [x1 + 0.025, 1, deck + 4.4],
+      flat("timber", 0.05),
+    );
+  };
+  if (railA) rail(0.05);
+  if (railB) rail(0.95);
+  if (end) {
+    // Bollards on the last tile, where ships tie up.
+    for (const across of [0.2, 0.8]) {
+      const [x, y] = along(0.88, across);
+      s.prism("z", [x, y, deck + 1.6], 0.09, 1.6, flat("basalt", 0.1), 8);
+      s.ellipsoid([x, y, deck + 3.4], [0.11, 0.11, 0.8], flat("basalt", 0.2));
+    }
+  }
+  const name = `pier_${axis}${end ? "_end" : ""}${railA ? "_a" : ""}${railB ? "_b" : ""}`;
+  return renderSprite(name, s, 1, 1, 18, 6, undefined, { depthEdges: false });
+}
+
+/** Things that stand on a pier: drawn on one tile, placed by the game according to the upgrades. */
+export function pierProps(): Sprite[] {
+  const out: Sprite[] = [];
+  const deck = 5;
+  const prop = (name: string, draw: (s: Scene) => void, height = 30): void => {
+    const s = new Scene();
+    draw(s);
+    out.push(renderSprite(`pier_p_${name}`, s, 1, 1, height, 8, undefined, { depthEdges: false }));
+  };
+  const crate = (s: Scene, x: number, y: number, z: number, size: number, axis: "x" | "y") =>
+    s.box(
+      [x - size, y - size, z],
+      [x + size, y + size, z + size * 2 * 8],
+      planks("plank", axis, 0.09),
+    );
+  prop("crate", (s) => crate(s, 0.5, 0.5, deck, 0.2, "x"));
+  prop("crates", (s) => {
+    crate(s, 0.35, 0.4, deck, 0.2, "x");
+    crate(s, 0.68, 0.62, deck, 0.2, "y");
+    crate(s, 0.4, 0.42, deck + 6.4, 0.16, "y");
+  });
+  prop("barrel", (s) => {
+    s.prism("z", [0.5, 0.5, deck + 3.4], 0.2, 3.4, planks("plank", "z", 0.06), 12);
+    s.box([0.3, 0.3, deck + 2], [0.7, 0.7, deck + 2.6], flat("basalt", 0.1));
+  });
+  prop("barrels", (s) => {
+    for (const [x, y] of [
+      [0.32, 0.36],
+      [0.68, 0.4],
+      [0.5, 0.7],
+    ] as const)
+      s.prism("z", [x, y, deck + 3.2], 0.17, 3.2, planks("plank", "z", 0.06), 12);
+  });
+  prop(
+    "stack",
+    (s) => {
+      // A warehouse pile: crates three high with a sack on top.
+      crate(s, 0.3, 0.3, deck, 0.22, "x");
+      crate(s, 0.72, 0.3, deck, 0.22, "y");
+      crate(s, 0.3, 0.72, deck, 0.22, "y");
+      crate(s, 0.72, 0.72, deck, 0.22, "x");
+      crate(s, 0.5, 0.5, deck + 7, 0.22, "x");
+      s.ellipsoid([0.5, 0.5, deck + 16], [0.2, 0.18, 2.4], flat("sail", 0.05));
+    },
+    40,
+  );
+  prop("ingots", (s) => {
+    for (let i = 0; i < 3; i++)
+      for (let j = 0; j < 3 - i; j++)
+        s.box(
+          [0.2 + i * 0.12 + j * 0.24, 0.3, deck + i * 2.2],
+          [0.4 + i * 0.12 + j * 0.24, 0.7, deck + i * 2.2 + 2],
+          flat("silver", 0.12),
+        );
+  });
+  prop("coil", (s) => {
+    s.ellipsoid([0.5, 0.5, deck + 1.2], [0.22, 0.22, 1.3], flat("thatch", 0.05));
+    s.ellipsoid([0.5, 0.5, deck + 2.2], [0.14, 0.14, 0.8], flat("thatch", 0.12));
+  });
+  prop(
+    "lamp",
+    (s) => {
+      s.prism("z", [0.5, 0.5, deck + 7], 0.04, 7, flat("darkwood"), 8);
+      lantern(s, 0.5, 0.5, deck + 12);
+    },
+    34,
+  );
+  // Cannons on carriages, one for each way the muzzle can point.
+  ["+y", "+x", "-y", "-x"].forEach((dir, i) =>
+    prop(`cannon_${dir}`, (s) => {
+      s.withYaw((i * Math.PI) / 2, [0.5, 0.5], () => {
+        s.box([0.4, 0.36, deck], [0.6, 0.6, deck + 2.6], planks("plank", "y", 0.06));
+        s.prism("y", [0.5, 0.56, deck + 4.2], 0.08, 0.26, flat("hull", 0.15), 8);
+      });
+    }),
+  );
+  return out;
+}
+
+// ---------------------------------------------------------------------------------------------
 // Shared pieces
 
 /** Pier tile; planks run along `dir`. */
@@ -1164,9 +1381,16 @@ export function buildingSprites(): Sprite[] {
       greatWork(st, 1),
       greatWork(st, 2),
       greatWork(st, 3),
+      harbour(st, "x"),
+      harbour(st, "y"),
     );
   }
   out.push(dockTile("x", false), dockTile("x", true), dockTile("y", false), dockTile("y", true));
+  for (const axis of ["x", "y"] as const)
+    for (const end of [false, true])
+      for (const a of [false, true])
+        for (const b of [false, true]) out.push(pierTile(axis, end, a, b));
+  out.push(...pierProps());
   for (const [w, h] of [
     [1, 1],
     [2, 2],

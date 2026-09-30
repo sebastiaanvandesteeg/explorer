@@ -1,11 +1,12 @@
 {
  "pages": [
   "atlas-0.json",
-  "atlas-1.json"
+  "atlas-1.json",
+  "atlas-2.json"
  ],
  "sprites": {
   "b_blacksmith_amberwrights": {
-   "page": 0,
+   "page": 1,
    "anchorX": 48,
    "anchorY": 77,
    "smoke": [
@@ -29,7 +30,7 @@
    ]
   },
   "b_blacksmith_cinderborn": {
-   "page": 0,
+   "page": 1,
    "anchorX": 48,
    "anchorY": 77,
    "smoke": [
@@ -53,7 +54,7 @@
    ]
   },
   "b_blacksmith_freebooters": {
-   "page": 0,
+   "page": 1,
    "anchorX": 48,
    "anchorY": 77,
    "smoke": [
@@ -77,7 +78,7 @@
    ]
   },
   "b_blacksmith_glowkin": {
-   "page": 0,
+   "page": 1,
    "anchorX": 48,
    "anchorY": 77,
    "smoke": [
@@ -101,7 +102,7 @@
    ]
   },
   "b_blacksmith_islanders": {
-   "page": 0,
+   "page": 1,
    "anchorX": 48,
    "anchorY": 77,
    "smoke": [
@@ -125,7 +126,7 @@
    ]
   },
   "b_blacksmith_mirefolk": {
-   "page": 0,
+   "page": 1,
    "anchorX": 48,
    "anchorY": 77,
    "smoke": [
@@ -149,7 +150,7 @@
    ]
   },
   "b_blacksmith_northfolk": {
-   "page": 0,
+   "page": 1,
    "anchorX": 48,
    "anchorY": 77,
    "smoke": [
@@ -173,7 +174,7 @@
    ]
   },
   "b_blacksmith_sunfolk": {
-   "page": 0,
+   "page": 1,
    "anchorX": 48,
    "anchorY": 77,
    "smoke": [
@@ -202,7 +203,7 @@
    ]
   },
   "b_blacksmith_sylvan": {
-   "page": 0,
+   "page": 1,
    "anchorX": 48,
    "anchorY": 77,
    "smoke": [
@@ -340,7 +341,7 @@
    ]
   },
   "b_church_glowkin": {
-   "page": 0,
+   "page": 1,
    "anchorX": 80,
    "anchorY": 79,
    "res": 2,
@@ -492,7 +493,7 @@
    ]
   },
   "b_church_sunfolk": {
-   "page": 0,
+   "page": 1,
    "anchorX": 80,
    "anchorY": 72,
    "res": 2,
@@ -568,19 +569,19 @@
    ]
   },
   "b_farm_0_amberwrights": {
-   "page": 0,
+   "page": 1,
    "anchorX": 90,
    "anchorY": 36,
    "res": 2
   },
   "b_farm_0_cinderborn": {
-   "page": 0,
+   "page": 1,
    "anchorX": 90,
    "anchorY": 44,
    "res": 2
   },
   "b_farm_0_freebooters": {
-   "page": 0,
+   "page": 1,
    "anchorX": 90,
    "anchorY": 36,
    "res": 2
@@ -592,7 +593,7 @@
    "res": 2
   },
   "b_farm_0_islanders": {
-   "page": 0,
+   "page": 1,
    "anchorX": 90,
    "anchorY": 36,
    "res": 2
@@ -604,37 +605,37 @@
    "res": 2
   },
   "b_farm_0_northfolk": {
-   "page": 0,
+   "page": 1,
    "anchorX": 90,
    "anchorY": 59,
    "res": 2
   },
   "b_farm_0_sunfolk": {
-   "page": 0,
+   "page": 1,
    "anchorX": 90,
    "anchorY": 34,
    "res": 2
   },
   "b_farm_0_sylvan": {
-   "page": 0,
+   "page": 1,
    "anchorX": 90,
    "anchorY": 32,
    "res": 2
   },
   "b_farm_1_amberwrights": {
-   "page": 0,
+   "page": 1,
    "anchorX": 90,
    "anchorY": 36,
    "res": 2
   },
   "b_farm_1_cinderborn": {
-   "page": 0,
+   "page": 1,
    "anchorX": 90,
    "anchorY": 44,
    "res": 2
   },
   "b_farm_1_freebooters": {
-   "page": 0,
+   "page": 1,
    "anchorX": 90,
    "anchorY": 36,
    "res": 2
@@ -646,7 +647,7 @@
    "res": 2
   },
   "b_farm_1_islanders": {
-   "page": 0,
+   "page": 1,
    "anchorX": 90,
    "anchorY": 36,
    "res": 2
@@ -658,13 +659,13 @@
    "res": 2
   },
   "b_farm_1_northfolk": {
-   "page": 0,
+   "page": 1,
    "anchorX": 90,
    "anchorY": 59,
    "res": 2
   },
   "b_farm_1_sunfolk": {
-   "page": 0,
+   "page": 1,
    "anchorX": 90,
    "anchorY": 34,
    "res": 2
@@ -676,19 +677,19 @@
    "res": 2
   },
   "b_farm_2_amberwrights": {
-   "page": 0,
+   "page": 1,
    "anchorX": 90,
    "anchorY": 36,
    "res": 2
   },
   "b_farm_2_cinderborn": {
-   "page": 0,
+   "page": 1,
    "anchorX": 90,
    "anchorY": 44,
    "res": 2
   },
   "b_farm_2_freebooters": {
-   "page": 0,
+   "page": 1,
    "anchorX": 90,
    "anchorY": 36,
    "res": 2
@@ -700,7 +701,7 @@
    "res": 2
   },
   "b_farm_2_islanders": {
-   "page": 0,
+   "page": 1,
    "anchorX": 90,
    "anchorY": 36,
    "res": 2
@@ -712,13 +713,13 @@
    "res": 2
   },
   "b_farm_2_northfolk": {
-   "page": 0,
+   "page": 1,
    "anchorX": 90,
    "anchorY": 59,
    "res": 2
   },
   "b_farm_2_sunfolk": {
-   "page": 0,
+   "page": 1,
    "anchorX": 90,
    "anchorY": 34,
    "res": 2
@@ -766,19 +767,19 @@
    "res": 2
   },
   "b_great_work_1_northfolk": {
-   "page": 0,
+   "page": 1,
    "anchorX": 122,
    "anchorY": 29,
    "res": 2
   },
   "b_great_work_1_sunfolk": {
-   "page": 0,
+   "page": 1,
    "anchorX": 122,
    "anchorY": 29,
    "res": 2
   },
   "b_great_work_1_sylvan": {
-   "page": 0,
+   "page": 1,
    "anchorX": 122,
    "anchorY": 29,
    "res": 2
@@ -1287,8 +1288,422 @@
     }
    ]
   },
-  "b_house_amberwrights": {
+  "b_harbour_x_amberwrights": {
+   "page": 1,
+   "anchorX": 72,
+   "anchorY": 72,
+   "res": 2,
+   "lights": [
+    {
+     "x": 1,
+     "y": 11,
+     "r": 13
+    },
+    {
+     "x": 27,
+     "y": 5,
+     "r": 12
+    },
+    {
+     "x": 0,
+     "y": 12,
+     "r": 11
+    }
+   ]
+  },
+  "b_harbour_x_cinderborn": {
    "page": 0,
+   "anchorX": 72,
+   "anchorY": 99,
+   "res": 2,
+   "lights": [
+    {
+     "x": 1,
+     "y": 11,
+     "r": 13
+    },
+    {
+     "x": 27,
+     "y": 5,
+     "r": 12
+    },
+    {
+     "x": 27,
+     "y": 4,
+     "r": 11
+    },
+    {
+     "x": 2,
+     "y": 10,
+     "r": 10
+    }
+   ]
+  },
+  "b_harbour_x_freebooters": {
+   "page": 1,
+   "anchorX": 72,
+   "anchorY": 72,
+   "res": 2,
+   "lights": [
+    {
+     "x": 1,
+     "y": 11,
+     "r": 13
+    },
+    {
+     "x": 27,
+     "y": 5,
+     "r": 12
+    },
+    {
+     "x": 0,
+     "y": 12,
+     "r": 11
+    }
+   ]
+  },
+  "b_harbour_x_glowkin": {
+   "page": 1,
+   "anchorX": 72,
+   "anchorY": 63,
+   "res": 2,
+   "lights": [
+    {
+     "x": 1,
+     "y": 11,
+     "r": 13
+    },
+    {
+     "x": 27,
+     "y": 5,
+     "r": 12
+    },
+    {
+     "x": 27,
+     "y": 4,
+     "r": 11
+    },
+    {
+     "x": 2,
+     "y": 10,
+     "r": 10
+    }
+   ]
+  },
+  "b_harbour_x_islanders": {
+   "page": 1,
+   "anchorX": 72,
+   "anchorY": 72,
+   "res": 2,
+   "lights": [
+    {
+     "x": 1,
+     "y": 11,
+     "r": 13
+    },
+    {
+     "x": 27,
+     "y": 5,
+     "r": 12
+    },
+    {
+     "x": 0,
+     "y": 12,
+     "r": 11
+    }
+   ]
+  },
+  "b_harbour_x_mirefolk": {
+   "page": 1,
+   "anchorX": 72,
+   "anchorY": 76,
+   "res": 2,
+   "lights": [
+    {
+     "x": 1,
+     "y": 11,
+     "r": 13
+    },
+    {
+     "x": 27,
+     "y": 5,
+     "r": 12
+    },
+    {
+     "x": 27,
+     "y": 4,
+     "r": 11
+    }
+   ]
+  },
+  "b_harbour_x_northfolk": {
+   "page": 1,
+   "anchorX": 72,
+   "anchorY": 82,
+   "res": 2,
+   "lights": [
+    {
+     "x": 1,
+     "y": 11,
+     "r": 13
+    },
+    {
+     "x": 27,
+     "y": 5,
+     "r": 12
+    }
+   ]
+  },
+  "b_harbour_x_sunfolk": {
+   "page": 1,
+   "anchorX": 72,
+   "anchorY": 54,
+   "res": 2,
+   "lights": [
+    {
+     "x": 1,
+     "y": 11,
+     "r": 13
+    },
+    {
+     "x": 27,
+     "y": 5,
+     "r": 12
+    }
+   ]
+  },
+  "b_harbour_x_sylvan": {
+   "page": 1,
+   "anchorX": 72,
+   "anchorY": 72,
+   "res": 2,
+   "lights": [
+    {
+     "x": 1,
+     "y": 11,
+     "r": 13
+    },
+    {
+     "x": 27,
+     "y": 5,
+     "r": 12
+    },
+    {
+     "x": 0,
+     "y": 12,
+     "r": 11
+    }
+   ]
+  },
+  "b_harbour_y_amberwrights": {
+   "page": 1,
+   "anchorX": 59,
+   "anchorY": 72,
+   "res": 2,
+   "lights": [
+    {
+     "x": -1,
+     "y": 11,
+     "r": 13
+    },
+    {
+     "x": -28,
+     "y": 5,
+     "r": 12
+    },
+    {
+     "x": -1,
+     "y": 12,
+     "r": 11
+    }
+   ]
+  },
+  "b_harbour_y_cinderborn": {
+   "page": 0,
+   "anchorX": 59,
+   "anchorY": 99,
+   "res": 2,
+   "lights": [
+    {
+     "x": -1,
+     "y": 11,
+     "r": 13
+    },
+    {
+     "x": -28,
+     "y": 5,
+     "r": 12
+    },
+    {
+     "x": -28,
+     "y": 4,
+     "r": 11
+    },
+    {
+     "x": -2,
+     "y": 10,
+     "r": 10
+    }
+   ]
+  },
+  "b_harbour_y_freebooters": {
+   "page": 1,
+   "anchorX": 59,
+   "anchorY": 72,
+   "res": 2,
+   "lights": [
+    {
+     "x": -1,
+     "y": 11,
+     "r": 13
+    },
+    {
+     "x": -28,
+     "y": 5,
+     "r": 12
+    },
+    {
+     "x": -1,
+     "y": 12,
+     "r": 11
+    }
+   ]
+  },
+  "b_harbour_y_glowkin": {
+   "page": 1,
+   "anchorX": 59,
+   "anchorY": 63,
+   "res": 2,
+   "lights": [
+    {
+     "x": -1,
+     "y": 11,
+     "r": 13
+    },
+    {
+     "x": -28,
+     "y": 5,
+     "r": 12
+    },
+    {
+     "x": -28,
+     "y": 4,
+     "r": 11
+    },
+    {
+     "x": -2,
+     "y": 10,
+     "r": 10
+    }
+   ]
+  },
+  "b_harbour_y_islanders": {
+   "page": 1,
+   "anchorX": 59,
+   "anchorY": 72,
+   "res": 2,
+   "lights": [
+    {
+     "x": -1,
+     "y": 11,
+     "r": 13
+    },
+    {
+     "x": -28,
+     "y": 5,
+     "r": 12
+    },
+    {
+     "x": -1,
+     "y": 12,
+     "r": 11
+    }
+   ]
+  },
+  "b_harbour_y_mirefolk": {
+   "page": 1,
+   "anchorX": 59,
+   "anchorY": 76,
+   "res": 2,
+   "lights": [
+    {
+     "x": -1,
+     "y": 11,
+     "r": 13
+    },
+    {
+     "x": -28,
+     "y": 5,
+     "r": 12
+    },
+    {
+     "x": -28,
+     "y": 4,
+     "r": 11
+    }
+   ]
+  },
+  "b_harbour_y_northfolk": {
+   "page": 1,
+   "anchorX": 59,
+   "anchorY": 82,
+   "res": 2,
+   "lights": [
+    {
+     "x": -1,
+     "y": 11,
+     "r": 13
+    },
+    {
+     "x": -28,
+     "y": 5,
+     "r": 12
+    }
+   ]
+  },
+  "b_harbour_y_sunfolk": {
+   "page": 1,
+   "anchorX": 59,
+   "anchorY": 54,
+   "res": 2,
+   "lights": [
+    {
+     "x": -1,
+     "y": 11,
+     "r": 13
+    },
+    {
+     "x": -28,
+     "y": 5,
+     "r": 12
+    }
+   ]
+  },
+  "b_harbour_y_sylvan": {
+   "page": 1,
+   "anchorX": 59,
+   "anchorY": 72,
+   "res": 2,
+   "lights": [
+    {
+     "x": -1,
+     "y": 11,
+     "r": 13
+    },
+    {
+     "x": -28,
+     "y": 5,
+     "r": 12
+    },
+    {
+     "x": -1,
+     "y": 12,
+     "r": 11
+    }
+   ]
+  },
+  "b_house_amberwrights": {
+   "page": 1,
    "anchorX": 52,
    "anchorY": 75,
    "smoke": [
@@ -1312,7 +1727,7 @@
    ]
   },
   "b_house_cinderborn": {
-   "page": 0,
+   "page": 1,
    "anchorX": 52,
    "anchorY": 86,
    "smoke": [
@@ -1377,7 +1792,7 @@
    ]
   },
   "b_house_islanders": {
-   "page": 0,
+   "page": 1,
    "anchorX": 52,
    "anchorY": 75,
    "smoke": [
@@ -1429,7 +1844,7 @@
    ]
   },
   "b_house_northfolk": {
-   "page": 0,
+   "page": 1,
    "anchorX": 52,
    "anchorY": 82,
    "smoke": [
@@ -2586,55 +3001,55 @@
    ]
   },
   "b_quarry_amberwrights": {
-   "page": 0,
+   "page": 1,
    "anchorX": 54,
    "anchorY": 71,
    "res": 2
   },
   "b_quarry_cinderborn": {
-   "page": 0,
+   "page": 1,
    "anchorX": 54,
    "anchorY": 71,
    "res": 2
   },
   "b_quarry_freebooters": {
-   "page": 0,
+   "page": 1,
    "anchorX": 54,
    "anchorY": 71,
    "res": 2
   },
   "b_quarry_glowkin": {
-   "page": 0,
+   "page": 1,
    "anchorX": 54,
    "anchorY": 71,
    "res": 2
   },
   "b_quarry_islanders": {
-   "page": 0,
+   "page": 1,
    "anchorX": 54,
    "anchorY": 71,
    "res": 2
   },
   "b_quarry_mirefolk": {
-   "page": 0,
+   "page": 1,
    "anchorX": 54,
    "anchorY": 71,
    "res": 2
   },
   "b_quarry_northfolk": {
-   "page": 0,
+   "page": 1,
    "anchorX": 54,
    "anchorY": 71,
    "res": 2
   },
   "b_quarry_sunfolk": {
-   "page": 0,
+   "page": 1,
    "anchorX": 54,
    "anchorY": 71,
    "res": 2
   },
   "b_quarry_sylvan": {
-   "page": 0,
+   "page": 1,
    "anchorX": 54,
    "anchorY": 71,
    "res": 2
@@ -2676,7 +3091,7 @@
    "res": 2
   },
   "b_storehouse_northfolk": {
-   "page": 0,
+   "page": 1,
    "anchorX": 53,
    "anchorY": 74,
    "res": 2
@@ -3060,261 +3475,309 @@
    ]
   },
   "boat_x": {
-   "page": 1,
+   "page": 2,
    "anchorX": 12,
    "anchorY": -2,
    "res": 2
   },
   "boat_y": {
-   "page": 1,
+   "page": 2,
    "anchorX": 12,
    "anchorY": -2,
    "res": 2
   },
   "cargo_0": {
    "page": 0,
-   "anchorX": 40,
-   "anchorY": 113,
+   "anchorX": 68,
+   "anchorY": 163,
    "res": 2
   },
   "cargo_1": {
-   "page": 1,
-   "anchorX": 18,
-   "anchorY": 104,
+   "page": 0,
+   "anchorX": 54,
+   "anchorY": 165,
+   "res": 2
+  },
+  "cargo_10": {
+   "page": 0,
+   "anchorX": 32,
+   "anchorY": 159,
+   "res": 2
+  },
+  "cargo_11": {
+   "page": 0,
+   "anchorX": 54,
+   "anchorY": 158,
+   "res": 2
+  },
+  "cargo_12": {
+   "page": 0,
+   "anchorX": 68,
+   "anchorY": 158,
+   "res": 2
+  },
+  "cargo_13": {
+   "page": 0,
+   "anchorX": 72,
+   "anchorY": 158,
+   "res": 2
+  },
+  "cargo_14": {
+   "page": 0,
+   "anchorX": 66,
+   "anchorY": 159,
+   "res": 2
+  },
+  "cargo_15": {
+   "page": 0,
+   "anchorX": 72,
+   "anchorY": 160,
    "res": 2
   },
   "cargo_2": {
    "page": 0,
-   "anchorX": 30,
-   "anchorY": 113,
+   "anchorX": 32,
+   "anchorY": 165,
    "res": 2
   },
   "cargo_3": {
-   "page": 1,
-   "anchorX": 43,
-   "anchorY": 110,
+   "page": 0,
+   "anchorX": 38,
+   "anchorY": 165,
    "res": 2
   },
   "cargo_4": {
    "page": 0,
-   "anchorX": 30,
-   "anchorY": 111,
+   "anchorX": 57,
+   "anchorY": 163,
    "res": 2
   },
   "cargo_5": {
-   "page": 1,
-   "anchorX": 18,
-   "anchorY": 106,
+   "page": 0,
+   "anchorX": 73,
+   "anchorY": 160,
    "res": 2
   },
   "cargo_6": {
    "page": 0,
-   "anchorX": 40,
-   "anchorY": 111,
+   "anchorX": 79,
+   "anchorY": 159,
    "res": 2
   },
   "cargo_7": {
-   "page": 1,
-   "anchorX": 40,
-   "anchorY": 110,
+   "page": 0,
+   "anchorX": 73,
+   "anchorY": 158,
+   "res": 2
+  },
+  "cargo_8": {
+   "page": 0,
+   "anchorX": 57,
+   "anchorY": 158,
+   "res": 2
+  },
+  "cargo_9": {
+   "page": 0,
+   "anchorX": 38,
+   "anchorY": 158,
    "res": 2
   },
   "carry_crystal": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": 15,
    "res": 2
   },
   "carry_food": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 16,
    "res": 2
   },
   "carry_glowcap": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": 13,
    "res": 2
   },
   "carry_gold": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": 11,
    "res": 2
   },
   "carry_hellstone": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": 11,
    "res": 2
   },
   "carry_mirepearl": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": 11,
    "res": 2
   },
   "carry_ore": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": 11,
    "res": 2
   },
   "carry_rimeglass": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": 11,
    "res": 2
   },
   "carry_stone": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": 11,
    "res": 2
   },
   "carry_sunstone": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": 11,
    "res": 2
   },
   "carry_wood": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 12,
    "res": 2
   },
   "deco_autumn_small_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": -5
   },
   "deco_autumn_small_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": -5
   },
   "deco_autumn_tall": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 7
   },
   "deco_blossom_small_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": -5
   },
   "deco_blossom_small_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": -6
   },
   "deco_blossom_tall": {
-   "page": 1,
+   "page": 2,
    "anchorX": 3,
    "anchorY": 3
   },
   "deco_crystal_small_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": -5
   },
   "deco_crystal_small_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": -5
   },
   "deco_crystal_tall": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 12,
    "res": 2
   },
   "deco_desert_small_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": -7
   },
   "deco_desert_small_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": -6
   },
   "deco_desert_tall": {
-   "page": 1,
+   "page": 2,
    "anchorX": 4,
    "anchorY": -1
   },
   "deco_fungal_small_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": -6
   },
   "deco_fungal_small_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": -6
   },
   "deco_fungal_tall": {
-   "page": 1,
+   "page": 2,
    "anchorX": 16,
    "anchorY": 10,
    "res": 2
   },
   "deco_infernal_small_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": -7
   },
   "deco_infernal_small_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": -8
   },
   "deco_infernal_tall": {
-   "page": 1,
+   "page": 2,
    "anchorX": 16,
    "anchorY": 7,
    "res": 2
   },
   "deco_jungle_small_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 2,
    "anchorY": -4
   },
   "deco_jungle_small_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": -5
   },
   "deco_jungle_tall": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": 1
   },
   "deco_swamp_small_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": -1
   },
   "deco_swamp_small_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": -6
   },
   "deco_swamp_tall": {
-   "page": 1,
+   "page": 2,
    "anchorX": 1,
    "anchorY": 7
   },
   "deco_temperate_small_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": -5
   },
   "deco_temperate_small_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": -4
   },
@@ -3325,22 +3788,22 @@
    "res": 2
   },
   "deco_tundra_small_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 11,
    "anchorY": -3
   },
   "deco_tundra_small_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 2,
    "anchorY": -4
   },
   "deco_tundra_tall": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": -1
   },
   "dock_x": {
-   "page": 1,
+   "page": 2,
    "anchorX": 32,
    "anchorY": 10,
    "res": 2
@@ -3352,7 +3815,7 @@
    "res": 2
   },
   "dock_y": {
-   "page": 1,
+   "page": 2,
    "anchorX": 32,
    "anchorY": 10,
    "res": 2
@@ -3364,1201 +3827,1201 @@
    "res": 2
   },
   "hero_face_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 2,
    "anchorY": 30,
    "res": 2
   },
   "hero_gear_archer_0_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 3,
    "anchorY": 20,
    "res": 2
   },
   "hero_gear_archer_0_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 3,
    "anchorY": 20,
    "res": 2
   },
   "hero_gear_archer_1_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 20,
    "res": 2
   },
   "hero_gear_archer_1_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 20,
    "res": 2
   },
   "hero_gear_archer_2_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": 20,
    "res": 2
   },
   "hero_gear_archer_2_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": 20,
    "res": 2
   },
   "hero_gear_barbarian_0_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 15,
    "res": 2
   },
   "hero_gear_barbarian_0_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 15,
    "res": 2
   },
   "hero_gear_barbarian_1_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 15,
    "res": 2
   },
   "hero_gear_barbarian_1_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 15,
    "res": 2
   },
   "hero_gear_barbarian_2_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 15,
    "res": 2
   },
   "hero_gear_barbarian_2_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 15,
    "res": 2
   },
   "hero_gear_bard_0_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 12,
    "anchorY": 30,
    "res": 2
   },
   "hero_gear_bard_0_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 12,
    "anchorY": 30,
    "res": 2
   },
   "hero_gear_bard_1_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 12,
    "anchorY": 30,
    "res": 2
   },
   "hero_gear_bard_1_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 12,
    "anchorY": 30,
    "res": 2
   },
   "hero_gear_bard_2_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 12,
    "anchorY": 30,
    "res": 2
   },
   "hero_gear_bard_2_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 12,
    "anchorY": 30,
    "res": 2
   },
   "hero_gear_cleric_0_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 3,
    "anchorY": 19,
    "res": 2
   },
   "hero_gear_cleric_0_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 3,
    "anchorY": 19,
    "res": 2
   },
   "hero_gear_cleric_1_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 3,
    "anchorY": 19,
    "res": 2
   },
   "hero_gear_cleric_1_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 3,
    "anchorY": 19,
    "res": 2
   },
   "hero_gear_cleric_2_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 3,
    "anchorY": 19,
    "res": 2
   },
   "hero_gear_cleric_2_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 3,
    "anchorY": 19,
    "res": 2
   },
   "hero_gear_knight_0_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 12,
    "anchorY": 20,
    "res": 2
   },
   "hero_gear_knight_0_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 12,
    "anchorY": 20,
    "res": 2
   },
   "hero_gear_knight_1_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 15,
    "anchorY": 20,
    "res": 2
   },
   "hero_gear_knight_1_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 15,
    "anchorY": 20,
    "res": 2
   },
   "hero_gear_knight_2_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 17,
    "anchorY": 20,
    "res": 2
   },
   "hero_gear_knight_2_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 17,
    "anchorY": 20,
    "res": 2
   },
   "hero_hair_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_hair_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_hat_archer_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 47,
    "res": 2
   },
   "hero_hat_archer_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 47,
    "res": 2
   },
   "hero_hat_barbarian_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 13,
    "anchorY": 48,
    "res": 2
   },
   "hero_hat_barbarian_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 13,
    "anchorY": 48,
    "res": 2
   },
   "hero_hat_bard_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 46,
    "res": 2
   },
   "hero_hat_bard_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 46,
    "res": 2
   },
   "hero_hat_cleric_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": 48,
    "res": 2
   },
   "hero_hat_cleric_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": 48,
    "res": 2
   },
   "hero_hat_druid_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 49,
    "res": 2
   },
   "hero_hat_druid_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 49,
    "res": 2
   },
   "hero_hat_knight_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 42,
    "res": 2
   },
   "hero_hat_knight_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 42,
    "res": 2
   },
   "hero_hat_mage_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 12,
    "anchorY": 54,
    "res": 2
   },
   "hero_hat_mage_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 12,
    "anchorY": 54,
    "res": 2
   },
   "hero_hat_thief_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 41,
    "res": 2
   },
   "hero_hat_thief_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 41,
    "res": 2
   },
   "hero_iris_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 1,
    "anchorY": 29,
    "res": 2
   },
   "hero_outfit_archer_0_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_archer_0_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_archer_0_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_archer_0_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_archer_0_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_archer_0_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_archer_1_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_archer_1_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_archer_1_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_archer_1_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_archer_1_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_archer_1_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_archer_2_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_archer_2_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_archer_2_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_archer_2_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_archer_2_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_archer_2_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_barbarian_0_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_barbarian_0_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_barbarian_0_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_barbarian_0_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_barbarian_0_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_barbarian_0_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_barbarian_1_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_barbarian_1_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_barbarian_1_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_barbarian_1_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_barbarian_1_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_barbarian_1_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_barbarian_2_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_barbarian_2_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_barbarian_2_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_barbarian_2_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_barbarian_2_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_barbarian_2_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_bard_0_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_bard_0_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_bard_0_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_bard_0_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_bard_0_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_bard_0_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_bard_1_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_bard_1_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_bard_1_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_bard_1_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_bard_1_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_bard_1_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_bard_2_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_bard_2_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_bard_2_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_bard_2_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_bard_2_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_bard_2_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_cleric_0_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_cleric_0_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_cleric_0_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_cleric_0_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_cleric_0_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_cleric_0_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_cleric_1_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_cleric_1_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_cleric_1_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_cleric_1_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_cleric_1_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_cleric_1_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_cleric_2_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 11,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_cleric_2_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 11,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_cleric_2_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 11,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_cleric_2_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 11,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_cleric_2_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 11,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_cleric_2_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 11,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_druid_0_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_druid_0_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_druid_0_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_druid_0_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_druid_0_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_druid_0_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_druid_1_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_druid_1_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_druid_1_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_druid_1_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_druid_1_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_druid_1_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_druid_2_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 11,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_druid_2_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 11,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_druid_2_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 11,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_druid_2_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 11,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_druid_2_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 11,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_druid_2_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 11,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_knight_0_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 22,
    "res": 2
   },
   "hero_outfit_knight_0_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 22,
    "res": 2
   },
   "hero_outfit_knight_0_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 22,
    "res": 2
   },
   "hero_outfit_knight_0_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 22,
    "res": 2
   },
   "hero_outfit_knight_0_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 22,
    "res": 2
   },
   "hero_outfit_knight_0_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 22,
    "res": 2
   },
   "hero_outfit_knight_1_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 22,
    "res": 2
   },
   "hero_outfit_knight_1_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 22,
    "res": 2
   },
   "hero_outfit_knight_1_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 22,
    "res": 2
   },
   "hero_outfit_knight_1_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 22,
    "res": 2
   },
   "hero_outfit_knight_1_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 22,
    "res": 2
   },
   "hero_outfit_knight_1_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 22,
    "res": 2
   },
   "hero_outfit_knight_2_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 12,
    "anchorY": 22,
    "res": 2
   },
   "hero_outfit_knight_2_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 12,
    "anchorY": 22,
    "res": 2
   },
   "hero_outfit_knight_2_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 12,
    "anchorY": 22,
    "res": 2
   },
   "hero_outfit_knight_2_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 12,
    "anchorY": 22,
    "res": 2
   },
   "hero_outfit_knight_2_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 12,
    "anchorY": 22,
    "res": 2
   },
   "hero_outfit_knight_2_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 12,
    "anchorY": 22,
    "res": 2
   },
   "hero_outfit_mage_0_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_mage_0_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_mage_0_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_mage_0_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_mage_0_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_mage_0_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_mage_1_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_mage_1_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_mage_1_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_mage_1_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_mage_1_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_mage_1_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_mage_2_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 11,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_mage_2_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 11,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_mage_2_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 11,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_mage_2_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 11,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_mage_2_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 11,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_mage_2_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 11,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_thief_0_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_thief_0_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_thief_0_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_thief_0_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_thief_0_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_thief_0_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_thief_1_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_thief_1_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_thief_1_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_thief_1_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_thief_1_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_thief_1_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_thief_2_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_thief_2_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_thief_2_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_thief_2_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_thief_2_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 21,
    "res": 2
   },
   "hero_outfit_thief_2_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 21,
    "res": 2
   },
   "hero_prop_archer_0_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": 35,
    "res": 2
   },
   "hero_prop_archer_0_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": 35,
    "res": 2
   },
   "hero_prop_archer_1_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 35,
    "res": 2
   },
   "hero_prop_archer_1_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 35,
    "res": 2
   },
   "hero_prop_archer_2_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 12,
    "anchorY": 35,
    "res": 2
   },
   "hero_prop_archer_2_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 12,
    "anchorY": 35,
    "res": 2
@@ -4600,37 +5063,37 @@
    "res": 2
   },
   "hero_prop_cleric_0_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 34,
    "res": 2
   },
   "hero_prop_cleric_0_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 34,
    "res": 2
   },
   "hero_prop_cleric_1_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": -3,
    "anchorY": 34,
    "res": 2
   },
   "hero_prop_cleric_1_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": -3,
    "anchorY": 34,
    "res": 2
   },
   "hero_prop_cleric_2_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": -5,
    "anchorY": 34,
    "res": 2
   },
   "hero_prop_cleric_2_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": -5,
    "anchorY": 34,
    "res": 2
@@ -4672,37 +5135,37 @@
    "res": 2
   },
   "hero_prop_knight_0_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": -1,
    "anchorY": 40,
    "res": 2
   },
   "hero_prop_knight_0_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": -1,
    "anchorY": 40,
    "res": 2
   },
   "hero_prop_knight_1_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": -4,
    "anchorY": 40,
    "res": 2
   },
   "hero_prop_knight_1_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": -4,
    "anchorY": 40,
    "res": 2
   },
   "hero_prop_knight_2_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": -6,
    "anchorY": 40,
    "res": 2
   },
   "hero_prop_knight_2_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": -6,
    "anchorY": 40,
    "res": 2
@@ -4744,37 +5207,37 @@
    "res": 2
   },
   "hero_prop_thief_0_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": -3,
    "anchorY": 13,
    "res": 2
   },
   "hero_prop_thief_0_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": -3,
    "anchorY": 13,
    "res": 2
   },
   "hero_prop_thief_1_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": -6,
    "anchorY": 13,
    "res": 2
   },
   "hero_prop_thief_1_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": -6,
    "anchorY": 13,
    "res": 2
   },
   "hero_prop_thief_2_back": {
-   "page": 1,
+   "page": 2,
    "anchorX": -8,
    "anchorY": 13,
    "res": 2
   },
   "hero_prop_thief_2_front": {
-   "page": 1,
+   "page": 2,
    "anchorX": -8,
    "anchorY": 13,
    "res": 2
@@ -5644,1079 +6107,1079 @@
    "res": 2
   },
   "hero_scarf_0_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 3,
    "anchorY": 22,
    "res": 2
   },
   "hero_scarf_0_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 3,
    "anchorY": 22,
    "res": 2
   },
   "hero_scarf_0_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 3,
    "anchorY": 22,
    "res": 2
   },
   "hero_scarf_0_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": 22,
    "res": 2
   },
   "hero_scarf_0_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 22,
    "res": 2
   },
   "hero_scarf_0_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 22,
    "res": 2
   },
   "hero_scarf_1_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 22,
    "res": 2
   },
   "hero_scarf_1_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 22,
    "res": 2
   },
   "hero_scarf_1_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 22,
    "res": 2
   },
   "hero_scarf_1_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 22,
    "res": 2
   },
   "hero_scarf_1_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 11,
    "anchorY": 22,
    "res": 2
   },
   "hero_scarf_1_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": 22,
    "res": 2
   },
   "hero_scarf_2_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": 22,
    "res": 2
   },
   "hero_scarf_2_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": 22,
    "res": 2
   },
   "hero_scarf_2_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 7,
    "anchorY": 22,
    "res": 2
   },
   "hero_scarf_2_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 11,
    "anchorY": 22,
    "res": 2
   },
   "hero_scarf_2_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 13,
    "anchorY": 22,
    "res": 2
   },
   "hero_scarf_2_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 22,
    "res": 2
   },
   "hero_skin_archer_0_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_archer_0_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_archer_0_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_archer_0_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_archer_0_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_archer_0_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_archer_1_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_archer_1_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_archer_1_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_archer_1_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_archer_1_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_archer_1_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_archer_2_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_archer_2_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_archer_2_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_archer_2_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_archer_2_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_archer_2_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_barbarian_0_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_barbarian_0_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_barbarian_0_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_barbarian_0_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_barbarian_0_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_barbarian_0_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_barbarian_1_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_barbarian_1_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_barbarian_1_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_barbarian_1_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_barbarian_1_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_barbarian_1_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_barbarian_2_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_barbarian_2_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_barbarian_2_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_barbarian_2_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_barbarian_2_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_barbarian_2_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_bard_0_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_bard_0_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_bard_0_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_bard_0_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_bard_0_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_bard_0_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_bard_1_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_bard_1_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_bard_1_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_bard_1_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_bard_1_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_bard_1_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_bard_2_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_bard_2_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_bard_2_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_bard_2_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_bard_2_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_bard_2_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_cleric_0_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_cleric_0_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_cleric_0_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_cleric_0_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_cleric_0_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_cleric_0_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_cleric_1_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_cleric_1_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_cleric_1_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_cleric_1_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_cleric_1_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_cleric_1_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_cleric_2_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_cleric_2_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_cleric_2_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_cleric_2_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_cleric_2_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_cleric_2_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_druid_0_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_druid_0_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_druid_0_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_druid_0_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_druid_0_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_druid_0_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_druid_1_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_druid_1_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_druid_1_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_druid_1_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_druid_1_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_druid_1_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_druid_2_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_druid_2_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_druid_2_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_druid_2_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_druid_2_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_druid_2_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_knight_0_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_knight_0_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_knight_0_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_knight_0_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_knight_0_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_knight_0_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_knight_1_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_knight_1_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_knight_1_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_knight_1_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_knight_1_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_knight_1_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_knight_2_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_knight_2_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_knight_2_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_knight_2_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_knight_2_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_knight_2_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_mage_0_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_mage_0_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_mage_0_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_mage_0_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_mage_0_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_mage_0_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_mage_1_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_mage_1_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_mage_1_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_mage_1_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_mage_1_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_mage_1_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_mage_2_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_mage_2_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_mage_2_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_mage_2_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_mage_2_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_mage_2_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_thief_0_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_thief_0_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_thief_0_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_thief_0_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_thief_0_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_thief_0_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_thief_1_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_thief_1_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_thief_1_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_thief_1_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_thief_1_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_thief_1_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_thief_2_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_thief_2_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_thief_2_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_thief_2_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_thief_2_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "hero_skin_thief_2_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 36,
    "res": 2
   },
   "icon_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 4,
    "anchorY": 6
   },
   "icon_basket": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 5
   },
   "icon_crystal": {
-   "page": 1,
+   "page": 2,
    "anchorX": 4,
    "anchorY": 6
   },
   "icon_faith": {
-   "page": 1,
+   "page": 2,
    "anchorX": 4,
    "anchorY": 7
   },
   "icon_flag": {
-   "page": 1,
+   "page": 2,
    "anchorX": 4,
    "anchorY": 6
   },
   "icon_food": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 5
   },
   "icon_glowcap": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 6
   },
   "icon_gold": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 4
   },
   "icon_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 4,
    "anchorY": 6
   },
   "icon_hellstone": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 5
   },
   "icon_mirepearl": {
-   "page": 1,
+   "page": 2,
    "anchorX": 4,
    "anchorY": 5
   },
   "icon_ore": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 3
   },
   "icon_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 4,
    "anchorY": 7
   },
   "icon_relic": {
-   "page": 1,
+   "page": 2,
    "anchorX": 4,
    "anchorY": 6
   },
   "icon_rimeglass": {
-   "page": 1,
+   "page": 2,
    "anchorX": 2,
    "anchorY": 6
   },
   "icon_ship": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 6
   },
   "icon_stone": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 6
   },
   "icon_sunstone": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 6
   },
   "icon_tools": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 6
   },
   "icon_villager": {
-   "page": 1,
+   "page": 2,
    "anchorX": 4,
    "anchorY": 6
   },
   "icon_wood": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 4
   },
@@ -6883,799 +7346,799 @@
    ]
   },
   "in_floor_arcane_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_arcane_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_arcane_2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_arcane_3": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_arcane_s0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_arcane_s1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_arcane_s2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_amberwrights_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_amberwrights_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_amberwrights_2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_amberwrights_3": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_amberwrights_s0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_amberwrights_s1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_amberwrights_s2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_cinderborn_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_cinderborn_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_cinderborn_2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_cinderborn_3": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_cinderborn_s0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_cinderborn_s1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_cinderborn_s2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_freebooters_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_freebooters_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_freebooters_2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_freebooters_3": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_freebooters_s0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_freebooters_s1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_freebooters_s2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_glowkin_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_glowkin_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_glowkin_2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_glowkin_3": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_glowkin_s0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_glowkin_s1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_glowkin_s2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_islanders_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_islanders_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_islanders_2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_islanders_3": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_islanders_s0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_islanders_s1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_islanders_s2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_mirefolk_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_mirefolk_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_mirefolk_2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_mirefolk_3": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_mirefolk_s0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_mirefolk_s1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_mirefolk_s2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_northfolk_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_northfolk_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_northfolk_2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_northfolk_3": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_northfolk_s0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_northfolk_s1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_northfolk_s2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_sunfolk_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_sunfolk_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_sunfolk_2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_sunfolk_3": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_sunfolk_s0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_sunfolk_s1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_sunfolk_s2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_sylvan_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_sylvan_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_sylvan_2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_sylvan_3": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_sylvan_s0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_sylvan_s1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_boards_sylvan_s2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_amberwrights_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_amberwrights_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_amberwrights_2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_amberwrights_3": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_amberwrights_s0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_amberwrights_s1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_amberwrights_s2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_cinderborn_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_cinderborn_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_cinderborn_2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_cinderborn_3": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_cinderborn_s0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_cinderborn_s1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_cinderborn_s2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_freebooters_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_freebooters_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_freebooters_2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_freebooters_3": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_freebooters_s0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_freebooters_s1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_freebooters_s2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_glowkin_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_glowkin_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_glowkin_2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_glowkin_3": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_glowkin_s0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_glowkin_s1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_glowkin_s2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_islanders_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_islanders_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_islanders_2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_islanders_3": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_islanders_s0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_islanders_s1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_islanders_s2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_mirefolk_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_mirefolk_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_mirefolk_2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_mirefolk_3": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_mirefolk_s0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_mirefolk_s1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_mirefolk_s2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_northfolk_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_northfolk_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_northfolk_2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_northfolk_3": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_northfolk_s0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_northfolk_s1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_northfolk_s2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_sunfolk_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_sunfolk_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_sunfolk_2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_sunfolk_3": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_sunfolk_s0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_sunfolk_s1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_sunfolk_s2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_sylvan_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_sylvan_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_sylvan_2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_sylvan_3": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_sylvan_s0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_sylvan_s1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
   },
   "in_floor_flags_sylvan_s2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 31,
    "anchorY": 0,
    "res": 2
@@ -7765,7 +8228,7 @@
    "res": 2
   },
   "in_fur_blacksmith_forge_3x1": {
-   "page": 0,
+   "page": 1,
    "anchorX": 31,
    "anchorY": 82,
    "res": 2,
@@ -7866,36 +8329,6 @@
    "anchorY": 0,
    "res": 2
   },
-  "in_fur_dock_barrel_1x1": {
-   "page": 1,
-   "anchorX": 18,
-   "anchorY": 29,
-   "res": 2
-  },
-  "in_fur_dock_chart_3x1": {
-   "page": 1,
-   "anchorX": 31,
-   "anchorY": 24,
-   "res": 2
-  },
-  "in_fur_dock_crate_1x1": {
-   "page": 1,
-   "anchorX": 31,
-   "anchorY": 28,
-   "res": 2
-  },
-  "in_fur_dock_plinth_1x1": {
-   "page": 1,
-   "anchorX": 15,
-   "anchorY": 48,
-   "res": 2
-  },
-  "in_fur_dock_rug_3x1": {
-   "page": 1,
-   "anchorX": 29,
-   "anchorY": 0,
-   "res": 2
-  },
   "in_fur_great_work_desk_2x1": {
    "page": 1,
    "anchorX": 33,
@@ -7921,6 +8354,36 @@
    "anchorY": 0,
    "res": 2
   },
+  "in_fur_harbour_barrel_1x1": {
+   "page": 1,
+   "anchorX": 18,
+   "anchorY": 29,
+   "res": 2
+  },
+  "in_fur_harbour_chart_3x1": {
+   "page": 1,
+   "anchorX": 31,
+   "anchorY": 24,
+   "res": 2
+  },
+  "in_fur_harbour_crate_1x1": {
+   "page": 1,
+   "anchorX": 31,
+   "anchorY": 28,
+   "res": 2
+  },
+  "in_fur_harbour_plinth_1x1": {
+   "page": 1,
+   "anchorX": 15,
+   "anchorY": 48,
+   "res": 2
+  },
+  "in_fur_harbour_rug_3x1": {
+   "page": 1,
+   "anchorX": 29,
+   "anchorY": 0,
+   "res": 2
+  },
   "in_fur_house_bed_2x2": {
    "page": 1,
    "anchorX": 61,
@@ -7934,7 +8397,7 @@
    "res": 2
   },
   "in_fur_house_hearth_2x1": {
-   "page": 0,
+   "page": 1,
    "anchorX": 33,
    "anchorY": 86,
    "res": 2,
@@ -8021,13 +8484,13 @@
    "res": 2
   },
   "in_fur_magic_house_rug_4x4": {
-   "page": 0,
+   "page": 1,
    "anchorX": 125,
    "anchorY": 0,
    "res": 2
   },
   "in_fur_magic_house_shelf_3x1": {
-   "page": 0,
+   "page": 1,
    "anchorX": 30,
    "anchorY": 83,
    "res": 2
@@ -8094,223 +8557,223 @@
    "res": 2
   },
   "in_mat": {
-   "page": 1,
+   "page": 2,
    "anchorX": 25,
    "anchorY": -2,
    "res": 2
   },
   "in_slab_x_amberwrights_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_x_amberwrights_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_x_cinderborn_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_x_cinderborn_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_x_freebooters_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_x_freebooters_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_x_glowkin_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_x_glowkin_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_x_islanders_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_x_islanders_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_x_mirefolk_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_x_mirefolk_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_x_northfolk_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_x_northfolk_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_x_sunfolk_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_x_sunfolk_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_x_sylvan_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_x_sylvan_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_y_amberwrights_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 32,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_y_amberwrights_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 32,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_y_cinderborn_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 32,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_y_cinderborn_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 32,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_y_freebooters_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 32,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_y_freebooters_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 32,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_y_glowkin_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 32,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_y_glowkin_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 32,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_y_islanders_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 32,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_y_islanders_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 32,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_y_mirefolk_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 32,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_y_mirefolk_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 32,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_y_northfolk_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 32,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_y_northfolk_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 32,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_y_sunfolk_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 32,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_y_sunfolk_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 32,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_y_sylvan_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 32,
    "anchorY": 1,
    "res": 2
   },
   "in_slab_y_sylvan_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 32,
    "anchorY": 1,
    "res": 2
@@ -9072,17 +9535,17 @@
    "res": 2
   },
   "mark_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 18
   },
   "mark_basket": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 18
   },
   "mark_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 18
   },
@@ -9117,13 +9580,13 @@
    "res": 2
   },
   "n_berry_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 16,
    "anchorY": 8,
    "res": 2
   },
   "n_berry_bare": {
-   "page": 1,
+   "page": 2,
    "anchorX": 16,
    "anchorY": 8,
    "res": 2
@@ -9147,13 +9610,13 @@
    "res": 2
   },
   "n_boulder_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 15,
    "anchorY": 8,
    "res": 2
   },
   "n_boulder_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 13,
    "anchorY": 7,
    "res": 2
@@ -9165,13 +9628,13 @@
    "res": 2
   },
   "n_cactus_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 19,
    "res": 2
   },
   "n_cactus_bare": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 17,
    "res": 2
@@ -9201,37 +9664,37 @@
    "res": 2
   },
   "n_ember_fruit_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 12,
    "anchorY": 17,
    "res": 2
   },
   "n_ember_fruit_bare": {
-   "page": 1,
+   "page": 2,
    "anchorX": 10,
    "anchorY": 10,
    "res": 2
   },
   "n_flower_bush_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 15,
    "anchorY": 10,
    "res": 2
   },
   "n_flower_bush_bare": {
-   "page": 1,
+   "page": 2,
    "anchorX": 15,
    "anchorY": 10,
    "res": 2
   },
   "n_frost_berry_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 15,
    "anchorY": 10,
    "res": 2
   },
   "n_frost_berry_bare": {
-   "page": 1,
+   "page": 2,
    "anchorX": 15,
    "anchorY": 10,
    "res": 2
@@ -9267,13 +9730,13 @@
    "res": 2
   },
   "n_glowshroom_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 2,
    "anchorY": 10,
    "res": 2
   },
   "n_glowshroom_bare": {
-   "page": 1,
+   "page": 2,
    "anchorX": 2,
    "anchorY": 3,
    "res": 2
@@ -9291,13 +9754,13 @@
    "res": 2
   },
   "n_ice_rock_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 21,
    "anchorY": 9,
    "res": 2
   },
   "n_ice_rock_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 14,
    "anchorY": 8,
    "res": 2
@@ -9315,7 +9778,7 @@
    "res": 2
   },
   "n_mirepearl_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 17,
    "anchorY": 4,
    "res": 2
@@ -9339,13 +9802,13 @@
    "res": 2
   },
   "n_obsidian_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 16,
    "anchorY": 13,
    "res": 2
   },
   "n_obsidian_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 19,
    "anchorY": 9,
    "res": 2
@@ -9387,13 +9850,13 @@
    "res": 2
   },
   "n_pumpkin_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 20,
    "anchorY": 0,
    "res": 2
   },
   "n_pumpkin_bare": {
-   "page": 1,
+   "page": 2,
    "anchorX": 17,
    "anchorY": -5,
    "res": 2
@@ -9405,37 +9868,37 @@
    "res": 2
   },
   "n_sandstone_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 21,
    "anchorY": 13,
    "res": 2
   },
   "n_sandstone_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 22,
    "anchorY": 9,
    "res": 2
   },
   "n_sapling_charred": {
-   "page": 1,
+   "page": 2,
    "anchorX": 1,
    "anchorY": 4,
    "res": 2
   },
   "n_sapling_silver": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 10,
    "res": 2
   },
   "n_sapling_stalk": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": -1,
    "res": 2
   },
   "n_sapling_wood": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 10,
    "res": 2
@@ -9465,25 +9928,25 @@
    "res": 2
   },
   "n_stump_charred": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": -6,
    "res": 2
   },
   "n_stump_silver": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": -6,
    "res": 2
   },
   "n_stump_stalk": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": -6,
    "res": 2
   },
   "n_stump_wood": {
-   "page": 1,
+   "page": 2,
    "anchorX": 11,
    "anchorY": -6,
    "res": 2
@@ -9495,13 +9958,13 @@
    "res": 2
   },
   "n_swamp_shroom_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 13,
    "anchorY": 9,
    "res": 2
   },
   "n_swamp_shroom_bare": {
-   "page": 1,
+   "page": 2,
    "anchorX": 5,
    "anchorY": 5,
    "res": 2
@@ -9519,189 +9982,460 @@
    "res": 2
   },
   "p_ash_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 0
   },
   "p_ash_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 0
   },
   "p_dust_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 0
   },
   "p_dust_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 0
   },
   "p_ember_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 0
   },
   "p_ember_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 1,
    "anchorY": 0
   },
   "p_firefly_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 1,
    "anchorY": 1
   },
   "p_firefly_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 0
   },
   "p_leaf_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 0
   },
   "p_leaf_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 0
   },
   "p_mote_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 1,
    "anchorY": 1
   },
   "p_mote_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 0
   },
   "p_petal_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 0
   },
   "p_petal_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 0
   },
   "p_snow_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 0
   },
   "p_snow_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 1,
    "anchorY": 1
   },
   "p_spore_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 1,
    "anchorY": 1
   },
   "p_spore_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 0
   },
   "patrol_0": {
    "page": 0,
-   "anchorX": 40,
-   "anchorY": 113,
+   "anchorX": 66,
+   "anchorY": 165,
    "res": 2
   },
   "patrol_1": {
-   "page": 1,
-   "anchorX": 20,
-   "anchorY": 104,
+   "page": 0,
+   "anchorX": 51,
+   "anchorY": 167,
+   "res": 2
+  },
+  "patrol_10": {
+   "page": 0,
+   "anchorX": 29,
+   "anchorY": 165,
+   "res": 2
+  },
+  "patrol_11": {
+   "page": 0,
+   "anchorX": 51,
+   "anchorY": 165,
+   "res": 2
+  },
+  "patrol_12": {
+   "page": 0,
+   "anchorX": 66,
+   "anchorY": 164,
+   "res": 2
+  },
+  "patrol_13": {
+   "page": 0,
+   "anchorX": 72,
+   "anchorY": 163,
+   "res": 2
+  },
+  "patrol_14": {
+   "page": 0,
+   "anchorX": 70,
+   "anchorY": 161,
+   "res": 2
+  },
+  "patrol_15": {
+   "page": 0,
+   "anchorX": 72,
+   "anchorY": 163,
    "res": 2
   },
   "patrol_2": {
    "page": 0,
-   "anchorX": 30,
-   "anchorY": 113,
+   "anchorX": 29,
+   "anchorY": 167,
    "res": 2
   },
   "patrol_3": {
-   "page": 1,
-   "anchorX": 43,
-   "anchorY": 110,
+   "page": 0,
+   "anchorX": 40,
+   "anchorY": 167,
    "res": 2
   },
   "patrol_4": {
    "page": 0,
-   "anchorX": 30,
-   "anchorY": 111,
+   "anchorX": 58,
+   "anchorY": 165,
    "res": 2
   },
   "patrol_5": {
-   "page": 1,
-   "anchorX": 20,
-   "anchorY": 106,
+   "page": 0,
+   "anchorX": 75,
+   "anchorY": 163,
    "res": 2
   },
   "patrol_6": {
    "page": 0,
-   "anchorX": 40,
-   "anchorY": 111,
+   "anchorX": 81,
+   "anchorY": 161,
    "res": 2
   },
   "patrol_7": {
-   "page": 1,
+   "page": 0,
+   "anchorX": 75,
+   "anchorY": 163,
+   "res": 2
+  },
+  "patrol_8": {
+   "page": 0,
+   "anchorX": 58,
+   "anchorY": 164,
+   "res": 2
+  },
+  "patrol_9": {
+   "page": 0,
    "anchorX": 40,
-   "anchorY": 110,
+   "anchorY": 165,
+   "res": 2
+  },
+  "pier_p_barrel": {
+   "page": 2,
+   "anchorX": 13,
+   "anchorY": 12,
+   "res": 2
+  },
+  "pier_p_barrels": {
+   "page": 2,
+   "anchorX": 14,
+   "anchorY": 16,
+   "res": 2
+  },
+  "pier_p_cannon_-x": {
+   "page": 2,
+   "anchorX": 9,
+   "anchorY": 9,
+   "res": 2
+  },
+  "pier_p_cannon_-y": {
+   "page": 2,
+   "anchorX": 9,
+   "anchorY": 11,
+   "res": 2
+  },
+  "pier_p_cannon_+x": {
+   "page": 2,
+   "anchorX": 13,
+   "anchorY": 11,
+   "res": 2
+  },
+  "pier_p_cannon_+y": {
+   "page": 2,
+   "anchorX": 13,
+   "anchorY": 9,
+   "res": 2
+  },
+  "pier_p_coil": {
+   "page": 2,
+   "anchorX": 10,
+   "anchorY": 2,
+   "res": 2
+  },
+  "pier_p_crate": {
+   "page": 2,
+   "anchorX": 13,
+   "anchorY": 7,
+   "res": 2
+  },
+  "pier_p_crates": {
+   "page": 2,
+   "anchorX": 14,
+   "anchorY": 20,
+   "res": 2
+  },
+  "pier_p_ingots": {
+   "page": 2,
+   "anchorX": 16,
+   "anchorY": 11,
+   "res": 2
+  },
+  "pier_p_lamp": {
+   "page": 2,
+   "anchorX": 2,
+   "anchorY": 23,
+   "res": 2,
+   "lights": [
+    {
+     "x": 0,
+     "y": -9,
+     "r": 12
+    }
+   ]
+  },
+  "pier_p_stack": {
+   "page": 1,
+   "anchorX": 28,
+   "anchorY": 32,
+   "res": 2
+  },
+  "pier_x": {
+   "page": 2,
+   "anchorX": 32,
+   "anchorY": 10,
+   "res": 2
+  },
+  "pier_x_a": {
+   "page": 1,
+   "anchorX": 32,
+   "anchorY": 18,
+   "res": 2
+  },
+  "pier_x_a_b": {
+   "page": 1,
+   "anchorX": 32,
+   "anchorY": 18,
+   "res": 2
+  },
+  "pier_x_b": {
+   "page": 2,
+   "anchorX": 32,
+   "anchorY": 10,
+   "res": 2
+  },
+  "pier_x_end": {
+   "page": 2,
+   "anchorX": 32,
+   "anchorY": 10,
+   "res": 2
+  },
+  "pier_x_end_a": {
+   "page": 1,
+   "anchorX": 32,
+   "anchorY": 18,
+   "res": 2
+  },
+  "pier_x_end_a_b": {
+   "page": 1,
+   "anchorX": 32,
+   "anchorY": 18,
+   "res": 2
+  },
+  "pier_x_end_b": {
+   "page": 2,
+   "anchorX": 32,
+   "anchorY": 10,
+   "res": 2
+  },
+  "pier_y": {
+   "page": 2,
+   "anchorX": 32,
+   "anchorY": 10,
+   "res": 2
+  },
+  "pier_y_a": {
+   "page": 1,
+   "anchorX": 32,
+   "anchorY": 18,
+   "res": 2
+  },
+  "pier_y_a_b": {
+   "page": 1,
+   "anchorX": 32,
+   "anchorY": 18,
+   "res": 2
+  },
+  "pier_y_b": {
+   "page": 2,
+   "anchorX": 32,
+   "anchorY": 10,
+   "res": 2
+  },
+  "pier_y_end": {
+   "page": 2,
+   "anchorX": 32,
+   "anchorY": 10,
+   "res": 2
+  },
+  "pier_y_end_a": {
+   "page": 1,
+   "anchorX": 32,
+   "anchorY": 18,
+   "res": 2
+  },
+  "pier_y_end_a_b": {
+   "page": 1,
+   "anchorX": 32,
+   "anchorY": 18,
+   "res": 2
+  },
+  "pier_y_end_b": {
+   "page": 2,
+   "anchorX": 32,
+   "anchorY": 10,
    "res": 2
   },
   "pirate_0": {
    "page": 0,
-   "anchorX": 40,
-   "anchorY": 113,
+   "anchorX": 66,
+   "anchorY": 165,
    "res": 2
   },
   "pirate_1": {
-   "page": 1,
-   "anchorX": 20,
-   "anchorY": 104,
+   "page": 0,
+   "anchorX": 51,
+   "anchorY": 167,
+   "res": 2
+  },
+  "pirate_10": {
+   "page": 0,
+   "anchorX": 29,
+   "anchorY": 165,
+   "res": 2
+  },
+  "pirate_11": {
+   "page": 0,
+   "anchorX": 51,
+   "anchorY": 165,
+   "res": 2
+  },
+  "pirate_12": {
+   "page": 0,
+   "anchorX": 66,
+   "anchorY": 164,
+   "res": 2
+  },
+  "pirate_13": {
+   "page": 0,
+   "anchorX": 72,
+   "anchorY": 163,
+   "res": 2
+  },
+  "pirate_14": {
+   "page": 0,
+   "anchorX": 70,
+   "anchorY": 161,
+   "res": 2
+  },
+  "pirate_15": {
+   "page": 0,
+   "anchorX": 72,
+   "anchorY": 163,
    "res": 2
   },
   "pirate_2": {
    "page": 0,
-   "anchorX": 30,
-   "anchorY": 113,
+   "anchorX": 29,
+   "anchorY": 167,
    "res": 2
   },
   "pirate_3": {
-   "page": 1,
-   "anchorX": 43,
-   "anchorY": 110,
+   "page": 0,
+   "anchorX": 40,
+   "anchorY": 167,
    "res": 2
   },
   "pirate_4": {
    "page": 0,
-   "anchorX": 30,
-   "anchorY": 111,
+   "anchorX": 58,
+   "anchorY": 165,
    "res": 2
   },
   "pirate_5": {
-   "page": 1,
-   "anchorX": 20,
-   "anchorY": 106,
+   "page": 0,
+   "anchorX": 75,
+   "anchorY": 163,
    "res": 2
   },
   "pirate_6": {
    "page": 0,
-   "anchorX": 40,
-   "anchorY": 111,
+   "anchorX": 81,
+   "anchorY": 161,
    "res": 2
   },
   "pirate_7": {
-   "page": 1,
+   "page": 0,
+   "anchorX": 75,
+   "anchorY": 163,
+   "res": 2
+  },
+  "pirate_8": {
+   "page": 0,
+   "anchorX": 58,
+   "anchorY": 164,
+   "res": 2
+  },
+  "pirate_9": {
+   "page": 0,
    "anchorX": 40,
-   "anchorY": 110,
+   "anchorY": 165,
    "res": 2
   },
   "scaffold_1x1": {
@@ -9729,7 +10463,7 @@
    "res": 2
   },
   "scaffold_3x3": {
-   "page": 0,
+   "page": 1,
    "anchorX": 85,
    "anchorY": 48,
    "res": 2
@@ -9751,71 +10485,119 @@
    "anchorY": 30
   },
   "sea_rock_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 22,
    "anchorY": 3
   },
   "sea_rock_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 21,
    "anchorY": 2.8999999999999986
   },
   "sea_rock_2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 25,
    "anchorY": 7.099999999999994
   },
   "sea_rock_3": {
-   "page": 1,
+   "page": 2,
    "anchorX": 17,
    "anchorY": 1.7999999999999972
   },
   "ship_0": {
    "page": 0,
-   "anchorX": 40,
-   "anchorY": 113,
+   "anchorX": 59,
+   "anchorY": 151,
    "res": 2
   },
   "ship_1": {
-   "page": 1,
-   "anchorX": 18,
-   "anchorY": 104,
+   "page": 0,
+   "anchorX": 44,
+   "anchorY": 152,
+   "res": 2
+  },
+  "ship_10": {
+   "page": 0,
+   "anchorX": 26,
+   "anchorY": 152,
+   "res": 2
+  },
+  "ship_11": {
+   "page": 0,
+   "anchorX": 45,
+   "anchorY": 152,
+   "res": 2
+  },
+  "ship_12": {
+   "page": 0,
+   "anchorX": 59,
+   "anchorY": 151,
+   "res": 2
+  },
+  "ship_13": {
+   "page": 0,
+   "anchorX": 65,
+   "anchorY": 149,
+   "res": 2
+  },
+  "ship_14": {
+   "page": 0,
+   "anchorX": 68,
+   "anchorY": 147,
+   "res": 2
+  },
+  "ship_15": {
+   "page": 0,
+   "anchorX": 65,
+   "anchorY": 149,
    "res": 2
   },
   "ship_2": {
    "page": 0,
-   "anchorX": 30,
-   "anchorY": 113,
+   "anchorX": 26,
+   "anchorY": 152,
    "res": 2
   },
   "ship_3": {
-   "page": 1,
-   "anchorX": 43,
-   "anchorY": 110,
+   "page": 0,
+   "anchorX": 38,
+   "anchorY": 152,
    "res": 2
   },
   "ship_4": {
    "page": 0,
-   "anchorX": 30,
-   "anchorY": 111,
+   "anchorX": 54,
+   "anchorY": 151,
    "res": 2
   },
   "ship_5": {
-   "page": 1,
-   "anchorX": 18,
-   "anchorY": 106,
+   "page": 0,
+   "anchorX": 70,
+   "anchorY": 149,
    "res": 2
   },
   "ship_6": {
    "page": 0,
-   "anchorX": 40,
-   "anchorY": 111,
+   "anchorX": 75,
+   "anchorY": 147,
    "res": 2
   },
   "ship_7": {
-   "page": 1,
-   "anchorX": 40,
-   "anchorY": 110,
+   "page": 0,
+   "anchorX": 70,
+   "anchorY": 149,
+   "res": 2
+  },
+  "ship_8": {
+   "page": 0,
+   "anchorX": 54,
+   "anchorY": 151,
+   "res": 2
+  },
+  "ship_9": {
+   "page": 0,
+   "anchorX": 38,
+   "anchorY": 152,
    "res": 2
   },
   "shore_rock_0": {
@@ -9837,7 +10619,7 @@
    "res": 2
   },
   "shore_rock_3": {
-   "page": 1,
+   "page": 2,
    "anchorX": 11,
    "anchorY": -2,
    "res": 2
@@ -9855,59 +10637,59 @@
    "res": 2
   },
   "smoke_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 2,
    "anchorY": 2
   },
   "smoke_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 3,
    "anchorY": 2
   },
   "smoke_2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 4,
    "anchorY": 4
   },
   "smoke_3": {
-   "page": 1,
+   "page": 2,
    "anchorX": 6,
    "anchorY": 5
   },
   "sparkle_0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 0,
    "anchorY": 0
   },
   "sparkle_1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 1,
    "anchorY": 0
   },
   "sparkle_2": {
-   "page": 1,
+   "page": 2,
    "anchorX": 2,
    "anchorY": 1
   },
   "t_path": {
-   "page": 1,
+   "page": 2,
    "anchorX": 16,
    "anchorY": 0
   },
   "villager_amberwrights_0_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_0_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_0_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
@@ -9925,55 +10707,55 @@
    "res": 2
   },
   "villager_amberwrights_0_back_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 38,
    "res": 2
   },
   "villager_amberwrights_0_back_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_0_back_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_0_back_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_0_back_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_0_back_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_0_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_0_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_0_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
@@ -9991,55 +10773,55 @@
    "res": 2
   },
   "villager_amberwrights_0_front_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 38,
    "res": 2
   },
   "villager_amberwrights_0_front_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_0_front_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_0_front_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_0_front_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_0_front_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_1_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_1_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_1_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
@@ -10057,55 +10839,55 @@
    "res": 2
   },
   "villager_amberwrights_1_back_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 38,
    "res": 2
   },
   "villager_amberwrights_1_back_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_1_back_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_1_back_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_1_back_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_1_back_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_1_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_1_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_1_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
@@ -10123,55 +10905,55 @@
    "res": 2
   },
   "villager_amberwrights_1_front_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 38,
    "res": 2
   },
   "villager_amberwrights_1_front_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_1_front_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_1_front_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_1_front_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_1_front_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_2_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_2_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_2_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
@@ -10189,55 +10971,55 @@
    "res": 2
   },
   "villager_amberwrights_2_back_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 38,
    "res": 2
   },
   "villager_amberwrights_2_back_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_2_back_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_2_back_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_2_back_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_2_back_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_2_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_2_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_2_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
@@ -10255,37 +11037,37 @@
    "res": 2
   },
   "villager_amberwrights_2_front_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 38,
    "res": 2
   },
   "villager_amberwrights_2_front_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_2_front_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_2_front_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_2_front_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_amberwrights_2_front_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
@@ -10381,61 +11163,61 @@
    "res": 2
   },
   "villager_cinderborn_0_front_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_0_front_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_0_front_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_0_front_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_0_front_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_0_front_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_0_front_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_1_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_1_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_1_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
@@ -10447,61 +11229,61 @@
    "res": 2
   },
   "villager_cinderborn_1_back_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_1_back_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_1_back_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_1_back_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_1_back_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_1_back_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_1_back_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_1_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_1_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_1_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
@@ -10513,61 +11295,61 @@
    "res": 2
   },
   "villager_cinderborn_1_front_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_1_front_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_1_front_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_1_front_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_1_front_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_1_front_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_1_front_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_2_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_2_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_2_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
@@ -10579,61 +11361,61 @@
    "res": 2
   },
   "villager_cinderborn_2_back_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_2_back_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_2_back_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_2_back_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_2_back_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_2_back_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_2_back_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_2_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_2_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_2_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
@@ -10645,61 +11427,61 @@
    "res": 2
   },
   "villager_cinderborn_2_front_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_2_front_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_2_front_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_2_front_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_2_front_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_2_front_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_cinderborn_2_front_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_freebooters_0_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_0_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_0_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
@@ -10711,61 +11493,61 @@
    "res": 2
   },
   "villager_freebooters_0_back_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_freebooters_0_back_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 38,
    "res": 2
   },
   "villager_freebooters_0_back_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_freebooters_0_back_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_0_back_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_0_back_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_0_back_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_0_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_0_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_0_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
@@ -10777,61 +11559,61 @@
    "res": 2
   },
   "villager_freebooters_0_front_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_freebooters_0_front_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 38,
    "res": 2
   },
   "villager_freebooters_0_front_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_freebooters_0_front_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_0_front_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_0_front_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_0_front_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_1_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_1_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_1_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
@@ -10843,61 +11625,61 @@
    "res": 2
   },
   "villager_freebooters_1_back_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_freebooters_1_back_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 38,
    "res": 2
   },
   "villager_freebooters_1_back_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_freebooters_1_back_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_1_back_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_1_back_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_1_back_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_1_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_1_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_1_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
@@ -10909,61 +11691,61 @@
    "res": 2
   },
   "villager_freebooters_1_front_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_freebooters_1_front_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 38,
    "res": 2
   },
   "villager_freebooters_1_front_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_freebooters_1_front_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_1_front_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_1_front_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_1_front_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_2_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_2_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_2_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
@@ -10975,61 +11757,61 @@
    "res": 2
   },
   "villager_freebooters_2_back_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_freebooters_2_back_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 38,
    "res": 2
   },
   "villager_freebooters_2_back_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_freebooters_2_back_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_2_back_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_2_back_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_2_back_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_2_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_2_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_2_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
@@ -11041,43 +11823,43 @@
    "res": 2
   },
   "villager_freebooters_2_front_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_freebooters_2_front_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 38,
    "res": 2
   },
   "villager_freebooters_2_front_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_freebooters_2_front_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_2_front_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_2_front_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
   },
   "villager_freebooters_2_front_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 35,
    "res": 2
@@ -11479,19 +12261,19 @@
    "res": 2
   },
   "villager_islanders_0_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_0_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_0_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
@@ -11503,61 +12285,61 @@
    "res": 2
   },
   "villager_islanders_0_back_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_islanders_0_back_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 38,
    "res": 2
   },
   "villager_islanders_0_back_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_islanders_0_back_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_0_back_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_0_back_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_0_back_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_0_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_0_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_0_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
@@ -11569,61 +12351,61 @@
    "res": 2
   },
   "villager_islanders_0_front_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_islanders_0_front_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 38,
    "res": 2
   },
   "villager_islanders_0_front_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_islanders_0_front_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_0_front_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_0_front_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_0_front_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_1_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_1_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_1_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
@@ -11635,61 +12417,61 @@
    "res": 2
   },
   "villager_islanders_1_back_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_islanders_1_back_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 38,
    "res": 2
   },
   "villager_islanders_1_back_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_islanders_1_back_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_1_back_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_1_back_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_1_back_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_1_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_1_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_1_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
@@ -11701,61 +12483,61 @@
    "res": 2
   },
   "villager_islanders_1_front_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_islanders_1_front_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 38,
    "res": 2
   },
   "villager_islanders_1_front_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_islanders_1_front_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_1_front_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_1_front_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_1_front_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_2_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_2_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_2_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
@@ -11767,61 +12549,61 @@
    "res": 2
   },
   "villager_islanders_2_back_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_islanders_2_back_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 38,
    "res": 2
   },
   "villager_islanders_2_back_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_islanders_2_back_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_2_back_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_2_back_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_2_back_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_2_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_2_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_2_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
@@ -11833,43 +12615,43 @@
    "res": 2
   },
   "villager_islanders_2_front_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_islanders_2_front_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 38,
    "res": 2
   },
   "villager_islanders_2_front_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_islanders_2_front_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_2_front_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_2_front_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
   },
   "villager_islanders_2_front_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 34,
    "res": 2
@@ -12271,19 +13053,19 @@
    "res": 2
   },
   "villager_northfolk_0_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_0_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_0_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
@@ -12295,61 +13077,61 @@
    "res": 2
   },
   "villager_northfolk_0_back_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_0_back_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_0_back_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_0_back_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_0_back_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_0_back_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_0_back_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_0_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_0_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_0_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
@@ -12361,61 +13143,61 @@
    "res": 2
   },
   "villager_northfolk_0_front_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_0_front_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_0_front_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_0_front_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_0_front_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_0_front_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_0_front_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_1_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_1_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_1_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
@@ -12427,61 +13209,61 @@
    "res": 2
   },
   "villager_northfolk_1_back_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_1_back_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_1_back_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_1_back_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_1_back_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_1_back_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_1_back_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_1_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_1_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_1_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
@@ -12493,61 +13275,61 @@
    "res": 2
   },
   "villager_northfolk_1_front_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_1_front_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_1_front_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_1_front_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_1_front_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_1_front_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_1_front_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_2_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_2_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_2_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
@@ -12559,61 +13341,61 @@
    "res": 2
   },
   "villager_northfolk_2_back_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_2_back_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_2_back_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_2_back_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_2_back_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_2_back_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_2_back_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_2_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_2_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_2_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
@@ -12625,61 +13407,61 @@
    "res": 2
   },
   "villager_northfolk_2_front_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_2_front_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_2_front_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_2_front_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_2_front_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_2_front_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_northfolk_2_front_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sunfolk_0_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_0_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_0_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
@@ -12691,61 +13473,61 @@
    "res": 2
   },
   "villager_sunfolk_0_back_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sunfolk_0_back_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 38,
    "res": 2
   },
   "villager_sunfolk_0_back_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_0_back_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_0_back_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_0_back_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_0_back_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_0_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_0_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_0_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
@@ -12757,61 +13539,61 @@
    "res": 2
   },
   "villager_sunfolk_0_front_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sunfolk_0_front_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 38,
    "res": 2
   },
   "villager_sunfolk_0_front_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_0_front_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_0_front_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_0_front_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_0_front_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_1_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_1_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_1_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
@@ -12823,61 +13605,61 @@
    "res": 2
   },
   "villager_sunfolk_1_back_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sunfolk_1_back_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 38,
    "res": 2
   },
   "villager_sunfolk_1_back_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_1_back_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_1_back_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_1_back_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_1_back_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_1_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_1_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_1_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
@@ -12889,61 +13671,61 @@
    "res": 2
   },
   "villager_sunfolk_1_front_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sunfolk_1_front_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 38,
    "res": 2
   },
   "villager_sunfolk_1_front_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_1_front_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_1_front_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_1_front_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_1_front_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_2_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_2_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_2_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
@@ -12955,61 +13737,61 @@
    "res": 2
   },
   "villager_sunfolk_2_back_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sunfolk_2_back_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 38,
    "res": 2
   },
   "villager_sunfolk_2_back_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_2_back_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_2_back_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_2_back_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_2_back_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_2_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_2_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_2_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
@@ -13021,61 +13803,61 @@
    "res": 2
   },
   "villager_sunfolk_2_front_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sunfolk_2_front_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 38,
    "res": 2
   },
   "villager_sunfolk_2_front_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_2_front_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_2_front_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_2_front_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sunfolk_2_front_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 37,
    "res": 2
   },
   "villager_sylvan_0_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_0_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_0_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
@@ -13087,61 +13869,61 @@
    "res": 2
   },
   "villager_sylvan_0_back_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_0_back_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_0_back_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_0_back_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_0_back_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_0_back_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_0_back_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_0_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_0_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_0_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
@@ -13153,61 +13935,61 @@
    "res": 2
   },
   "villager_sylvan_0_front_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_0_front_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_0_front_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_0_front_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_0_front_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_0_front_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_0_front_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_1_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_1_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_1_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
@@ -13219,61 +14001,61 @@
    "res": 2
   },
   "villager_sylvan_1_back_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_1_back_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_1_back_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_1_back_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_1_back_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_1_back_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_1_back_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_1_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_1_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_1_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
@@ -13285,61 +14067,61 @@
    "res": 2
   },
   "villager_sylvan_1_front_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_1_front_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_1_front_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_1_front_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_1_front_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_1_front_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_1_front_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_2_back_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_2_back_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_2_back_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
@@ -13351,61 +14133,61 @@
    "res": 2
   },
   "villager_sylvan_2_back_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_2_back_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_2_back_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_2_back_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_2_back_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_2_back_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_2_back_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_2_front_stand": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_2_front_walk0": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_2_front_walk1": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
@@ -13417,49 +14199,74 @@
    "res": 2
   },
   "villager_sylvan_2_front_work0_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_2_front_work0_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_2_front_work0_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_2_front_work1_axe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_2_front_work1_hammer": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_2_front_work1_hoe": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
   "villager_sylvan_2_front_work1_pick": {
-   "page": 1,
+   "page": 2,
    "anchorX": 8,
    "anchorY": 39,
    "res": 2
   },
+  "wake_foam_0": {
+   "page": 2,
+   "anchorX": 7,
+   "anchorY": 5
+  },
+  "wake_foam_1": {
+   "page": 2,
+   "anchorX": 10,
+   "anchorY": 6
+  },
+  "wake_foam_2": {
+   "page": 2,
+   "anchorX": 14,
+   "anchorY": 8
+  },
+  "wake_ring": {
+   "page": 2,
+   "anchorX": 28,
+   "anchorY": 15
+  },
+  "wake_spray": {
+   "page": 2,
+   "anchorX": 6,
+   "anchorY": 5
+  },
   "wreck_bones": {
-   "page": 1,
+   "page": 2,
    "anchorX": 9,
    "anchorY": -2
   },

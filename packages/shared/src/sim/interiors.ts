@@ -240,7 +240,7 @@ export const ROOMS: Partial<Record<BuildingKind, RoomDef>> = {
     ],
     npc: { x: 7, y: 2, role: "architect", title: "Architect" },
   },
-  dock: {
+  harbour: {
     w: 9,
     h: 6,
     door: { x: 4, y: 5 },

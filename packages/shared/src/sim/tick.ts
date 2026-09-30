@@ -35,6 +35,8 @@ import { assignBuilders, pickJob, rebalance, takeJob } from "./jobs";
 import { collectWreck, updateThreats } from "./pirates";
 import { stormOnRoute, updateWeather } from "./weather";
 import { disembark, dockSpawn, embark, hasRoom, shipMoving, shoreBeside } from "./ferry";
+import { berthOf, growPiers, isBerth } from "./harbour";
+import { checkBoarded, steerStep as steerShipStep, syncRiders } from "./sailing";
 import { landPath, sailable, seaPath } from "./navigation";
 import { buildingAround, isAdjacentTo, tilesAround } from "./rules";
 import {
@@ -46,6 +48,7 @@ import {
   markDirty,
   newShip,
   newVillager,
+  pierTier,
   population,
   populationCap,
   removeEntity,
@@ -86,6 +89,8 @@ export function tick(state: GameState, dt = TICK_SECONDS): void {
   }
   updateThreats(state, dt);
   updateWeather(state, dt);
+  // A pier that could not grow (a rock in the way) tries again now and then.
+  if (state.tick % 100 === 0 && pierTier(state) > 0) growPiers(state);
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -107,7 +112,7 @@ function updateBuilding(state: GameState, b: BuildingEntity, dt: number): void {
           b.queue.shift();
         }
       } else if (job.what !== "villager") {
-        const at = shipSpawn(b);
+        const at = berthOf(state, b);
         if (sailable(state, Math.floor(at.x), Math.floor(at.y))) {
           const ship = newShip(
             state,
@@ -256,12 +261,15 @@ function steerStep(state: GameState, c: CharacterEntity, dt: number): void {
 }
 
 function updateCharacter(state: GameState, c: CharacterEntity, dt: number): void {
+  // On a ship, a character stands where the ship puts them.
+  if (c.aboard !== null) return;
   if (c.inside !== null) {
     updateInRoom(state, c, dt);
     return;
   }
   collectFetched(state, c);
   checkEntered(state, c);
+  checkBoarded(state, c);
   if (c.steer) {
     steerStep(state, c, dt);
     return;
@@ -658,6 +666,12 @@ function wander(state: GameState, v: VillagerEntity): void {
 // Ships
 
 function updateShip(state: GameState, s: ShipEntity, dt: number): void {
+  moveShipAlong(state, s, dt);
+  if (s.riders.length > 0 && state.entities.has(s.id)) syncRiders(state, s);
+}
+
+function moveShipAlong(state: GameState, s: ShipEntity, dt: number): void {
+  if (steerShipStep(state, s, dt)) return;
   if (s.path.length === 0) {
     if (s.kind === "cargo" && s.route !== null) runRoute(state, s);
     return;
@@ -698,7 +712,7 @@ function updateShip(state: GameState, s: ShipEntity, dt: number): void {
 
 const dockAt = (state: GameState, id: number | null): BuildingEntity | null => {
   const b = id === null ? undefined : state.entities.get(id);
-  return b?.type === "building" && b.kind === "dock" && b.complete ? b : null;
+  return b?.type === "building" && b.harbour === undefined && isBerth(state, b) ? b : null;
 };
 
 /** The completed dock on the home island nearest to another dock: where cargo goes ashore. */
@@ -707,7 +721,7 @@ export function homeDockFor(state: GameState, from: BuildingEntity): BuildingEnt
   let best: BuildingEntity | null = null;
   let bestD = Infinity;
   for (const e of state.entities.values()) {
-    if (e.type !== "building" || e.kind !== "dock" || !e.complete) continue;
+    if (e.type !== "building" || e.harbour !== undefined || !isBerth(state, e)) continue;
     if (islandAt(state, e.x, e.y) !== home) continue;
     const d = Math.hypot(e.x - from.x, e.y - from.y);
     if (d < bestD) {
@@ -745,7 +759,7 @@ function runRoute(state: GameState, s: ShipEntity): void {
   if (!home) return rest(5);
   if (s.leg === null) s.leg = cargoLoad(s) > 0 ? "drop" : "pickup";
   const dock = s.leg === "pickup" ? pickup : home;
-  const spot = dockSpawn(dock);
+  const spot = berthOf(state, dock);
   const tile = { x: Math.floor(spot.x), y: Math.floor(spot.y) };
   if (Math.hypot(s.x - spot.x, s.y - spot.y) > 1.5) {
     // Wait in port while a storm sits on the way.

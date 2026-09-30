@@ -65,6 +65,7 @@ export function buildingSprite(b: BuildingEntity, tribe: TribeId): string {
     const stage = b.stage ?? 0;
     return `b_great_work_${Math.min(3, Math.max(1, b.complete ? stage : stage + 1))}_${tribe}`;
   }
+  if (b.kind === "harbour") return `b_harbour_${b.w >= 3 ? "y" : "x"}_${tribe}`;
   return buildingThumb(b.kind, tribe);
 }
 
@@ -72,6 +73,7 @@ export function buildingSprite(b: BuildingEntity, tribe: TribeId): string {
 export function buildingThumb(kind: BuildingKind, tribe: TribeId): string {
   if (kind === "path") return "t_path";
   if (kind === "dock") return "dock_x_end";
+  if (kind === "harbour") return `b_harbour_y_${tribe}`;
   if (kind === "farm") return `b_farm_2_${tribe}`;
   if (kind === "great_work") return `b_great_work_3_${tribe}`;
   return `b_${kind}_${tribe}`;

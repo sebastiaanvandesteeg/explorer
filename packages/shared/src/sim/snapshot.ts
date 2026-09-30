@@ -2,6 +2,7 @@
 import type { TribeId } from "../tribes";
 import type { WorldMap } from "../world/types";
 import { isDifficulty, type Difficulty } from "./difficulty";
+import { migrateDocks } from "./harbour";
 import { defaultLookFor, sanitizeLook } from "./looks";
 import { SIGNATURE_NODES } from "../world/biomes";
 import { NODES, SHIP_HP, type Stock, type UpgradeId } from "./catalogue";
@@ -33,7 +34,7 @@ export type WireEntity =
   | Exclude<Entity, VillagerEntity | CharacterEntity | ShipEntity | PirateEntity>
   | Omit<VillagerEntity, "path" | "retryAt">
   | Omit<CharacterEntity, "path" | "rpath" | "steer" | "steerUntil">
-  | Omit<ShipEntity, "path">
+  | Omit<ShipEntity, "path" | "steer" | "steerUntil">
   | Omit<PirateEntity, "path">;
 
 export interface Patch {
@@ -97,7 +98,11 @@ export function toWire(e: Entity): WireEntity {
     const { path: _path, rpath: _rpath, steer: _steer, steerUntil: _until, ...rest } = e;
     return clone(rest);
   }
-  if (e.type === "ship" || e.type === "pirate") {
+  if (e.type === "ship") {
+    const { path: _path, steer: _steer, steerUntil: _until, ...rest } = e;
+    return clone(rest);
+  }
+  if (e.type === "pirate") {
     const { path: _path, ...rest } = e;
     return clone(rest);
   }
@@ -121,10 +126,15 @@ export function fromWire(w: WireEntity): Entity {
     e.room ??= { x: 0, y: 0 };
     e.rpath = [];
     e.enter ??= null;
+    e.board ??= null;
     e.steer = null;
     e.steerUntil = 0;
   } else if (e.type === "ship") {
     e.path = [];
+    e.angle ??= ((e.heading ?? 0) * Math.PI) / 4;
+    e.riders ??= [];
+    e.steer = null;
+    e.steerUntil = 0;
     e.passengers ??= [];
     e.unload ??= false;
     e.kind ??= "scout";
@@ -226,6 +236,8 @@ export function fromSnapshot(world: WorldMap, snap: Snapshot, resume = false): G
     state.entities.set(e.id, e);
   }
   rebuildOccupancy(state);
+  // Saves from before harbours have stand-alone docks: give them a harbour (the server does this once).
+  if (resume) migrateDocks(state);
   // Saves from before sunken sites existed get them now.
   if (![...state.entities.values()].some((e) => e.type === "site")) addSites(state);
   if (!snap.depositsSeeded) seedSignatureDeposits(state);

@@ -3,7 +3,7 @@ import {
   BUILDINGS,
   canPlaceBuilding,
   characterOf,
-  dockSite,
+  harbourSite,
   dayNumber,
   dayPhase,
   UPGRADES,
@@ -35,6 +35,7 @@ import {
   type GameState,
   type Patch,
   type PlayerInfo,
+  type ShipEntity,
   type Resource,
   type StormEntity,
   type VillagerEntity,
@@ -153,6 +154,7 @@ export class Game {
       this.terrain.ocean,
       this.terrain.waves,
       this.terrain.container,
+      this.entities.wakes,
       this.entities.ground,
       this.overlay.under,
       this.entities.container,
@@ -458,6 +460,39 @@ export class Game {
   }
 
   /** Your own character (every world has one). */
+  /** Whether a character aboard a ship is its captain (the first rider); null if not aboard. */
+  private captainOf(me: CharacterEntity): boolean | null {
+    if (me.aboard === null) return null;
+    const ship = this.session.state.entities.get(me.aboard);
+    return ship?.type === "ship" ? ship.riders[0] === me.id : false;
+  }
+
+  /** The ship nearest your character within reach to climb aboard, if any. */
+  private shipNearMe(): ShipEntity | null {
+    const me = this.myCharacter();
+    if (!me) return null;
+    let best: ShipEntity | null = null;
+    for (const e of this.session.state.entities.values()) {
+      if (e.type !== "ship") continue;
+      const d = Math.hypot(e.x - me.x, e.y - me.y);
+      if (d <= 7 && (!best || d < Math.hypot(best.x - me.x, best.y - me.y))) best = e;
+    }
+    return best;
+  }
+
+  /** `F`: climb aboard the nearest ship, or step off the one you are on. */
+  private boardOrLeave(): void {
+    const me = this.myCharacter();
+    if (!me || me.inside !== null) return;
+    if (me.aboard !== null) {
+      void this.send({ kind: "leave-ship" });
+      return;
+    }
+    const ship = this.shipNearMe();
+    if (ship) void this.send({ kind: "board-ship", shipId: ship.id });
+    else this.hud.toast("No ship nearby to board", "error");
+  }
+
   private myCharacter(): CharacterEntity | undefined {
     const state = this.session.state;
     const cached = this.myCharacterId !== null ? state.entities.get(this.myCharacterId) : undefined;
@@ -495,15 +530,23 @@ export class Game {
     const len = Math.hypot(x, y);
     const dir = len === 0 ? "" : `${(x / len).toFixed(3)},${(y / len).toFixed(3)}`;
     const quiet = (cmd: Command) => void this.session.command(cmd);
+    // Aboard a ship the keys are the wheel (for the captain), not your legs.
+    const aboard = me.aboard !== null;
+    const kind = aboard ? "steer-ship" : "steer-character";
     if (dir === "") {
-      if (this.walkDir !== "") quiet({ kind: "steer-character", x: 0, y: 0 });
+      if (this.walkDir !== "") quiet({ kind, x: 0, y: 0 });
       this.walkDir = "";
+      return;
+    }
+    if (aboard && this.captainOf(me) === false) {
+      if (this.walkDir === "") this.hud.toast("Only the captain steers the ship");
+      this.walkDir = dir;
       return;
     }
     if (dir === this.walkDir && now - this.walkSentAt < 500) return;
     this.walkDir = dir;
     this.walkSentAt = now;
-    quiet({ kind: "steer-character", x: x / len, y: y / len });
+    quiet({ kind, x: x / len, y: y / len });
   }
 
   private followCharacter(dt: number): void {
@@ -519,11 +562,11 @@ export class Game {
   }
 
   private footprintFor(kind: BuildingKind, tile: { x: number; y: number }): Footprint {
-    if (kind === "dock") {
-      // A dock is placed by its shore tile; the pier is whatever fits out over the water.
-      const site = dockSite(this.session.state, tile.x, tile.y);
+    if (kind === "harbour") {
+      // A harbour is placed by its shore tile; the body and the pier are worked out around it.
+      const site = harbourSite(this.session.state, tile.x, tile.y, { ignoreCost: true });
       const z = visibleHeight(this.session.state, tile.x, tile.y) ?? 0;
-      return site ? { ...site, z } : { x: tile.x, y: tile.y, w: 1, h: 1, z };
+      return site ? { ...site.body, z } : { x: tile.x, y: tile.y, w: 1, h: 1, z };
     }
     const [w, h] = BUILDINGS[kind].size;
     const x = tile.x - Math.floor((w - 1) / 2);
@@ -638,6 +681,8 @@ export class Game {
     for (const e of state.entities.values()) {
       // Weather is not something to click on, and neither are people's characters.
       if (e.type === "storm" || e.type === "character" || e.type === "item") continue;
+      // A harbour's pier is only something to walk on; the harbour itself is what you use.
+      if (e.type === "building" && e.kind === "dock" && e.harbour !== undefined) continue;
       if (
         tile &&
         e.type !== "ship" &&
@@ -780,6 +825,7 @@ export class Game {
       if (k === "m") this.hud.map.open();
       else if (k === "i") this.pack.toggle();
       else if (k === "e") this.pickUp();
+      else if (k === "f") this.boardOrLeave();
       else if (k === "n") this.hud.setSound(this.sound.toggle());
       else if (k === "escape") {
         if (this.tool.kind !== "select") this.setTool({ kind: "select" });
@@ -826,7 +872,7 @@ export class Game {
     if (tool.kind === "build") {
       if (tool.building === "path" || !this.hoverTile) return;
       const f = this.footprintFor(tool.building, this.hoverTile);
-      const at = tool.building === "dock" ? this.hoverTile : f;
+      const at = tool.building === "harbour" ? this.hoverTile : f;
       void this.send({ kind: "place-building", building: tool.building, x: at.x, y: at.y }).then(
         (ok) => {
           if (ok && !shift) this.setTool({ kind: "select" });
@@ -879,7 +925,7 @@ export class Game {
     } else if (sel?.type === "ship" && sel.kind === "cargo") {
       // A dock on another island becomes the ship's trade route; anywhere else steers it by hand.
       const target = this.entityAt(sx, sy);
-      if (target?.type === "building" && target.kind === "dock")
+      if (target?.type === "building" && target.kind === "harbour")
         void this.send({ kind: "set-route", shipId: sel.id, dockId: target.id });
       else if (tile) void this.send({ kind: "move-ship", shipId: sel.id, x: tile.x, y: tile.y });
     } else if (sel?.type === "ship" && sel.kind !== "cargo" && this.shipTarget(sel.id, sx, sy)) {
@@ -888,6 +934,11 @@ export class Game {
       // Right-clicking land with passengers aboard means "take them there".
       const unload = isLand(state.world, tile.x, tile.y) && sel.passengers.length > 0;
       void this.send({ kind: "move-ship", shipId: sel.id, x: tile.x, y: tile.y, unload });
+    } else if (this.entityAt(sx, sy)?.type === "ship") {
+      // Nothing selected: right-clicking a ship means climbing aboard.
+      const ship = this.entityAt(sx, sy)!;
+      this.select(null);
+      void this.send({ kind: "board-ship", shipId: ship.id });
     } else if (this.enterableAt(sx, sy)) {
       const b = this.enterableAt(sx, sy)!;
       this.select(null);
@@ -1214,10 +1265,12 @@ export class Game {
     let ghost: { name: string; f: Footprint; ok: boolean } | null = null;
     if (hover && tool.kind === "build") {
       const f = this.footprintFor(tool.building, hover);
-      const at = tool.building === "dock" ? hover : f;
-      const ok = canPlaceBuilding(state, tool.building, at.x, at.y).ok;
+      const at = tool.building === "harbour" ? hover : f;
+      const check = canPlaceBuilding(state, tool.building, at.x, at.y);
+      const ok = check.ok;
       o.footprint(f, ok);
-      if (tool.building !== "path" && tool.building !== "dock")
+      if (check.ok && check.site) o.footprint({ ...check.site.pier, z: f.z }, ok);
+      if (tool.building !== "path")
         ghost = { name: buildingThumb(tool.building, state.world.tribe), f, ok };
     } else if (hover && this.pointer) {
       this.drawBackdrop(o, state);
@@ -1259,7 +1312,7 @@ export class Game {
   private drawCharacters(o: Overlay, state: GameState): void {
     const alive = new Set<number>();
     for (const e of state.entities.values()) {
-      if (e.type !== "character" || e.aboard !== null || e.inside !== null) continue;
+      if (e.type !== "character" || e.inside !== null) continue;
       const pos = this.entities.position(e.id);
       if (!pos) continue;
       const info = this.session.players.find((p) => p.id === e.playerId);
