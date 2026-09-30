@@ -39,7 +39,7 @@ The site root is the landing page; the game itself lives at **/play** (http://lo
 
 | Action | How                                                                                                                                                                                             |
 | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Pan    | Drag the ground, right/middle-drag, or WASD / arrow keys                                                                                                                                        |
+| Pan    | Drag the ground, right/middle-drag, or WASD / arrow keys (colony worlds: in an adventure world they walk your character)                                                                        |
 | Zoom   | Mouse wheel, `+` / `-`                                                                                                                                                                          |
 | Gather | `H`, then click or drag a box across trees, rocks and bushes (Shift to unmark)                                                                                                                  |
 | Build  | `1`–`9`, `0`, `B` (dock), `L` (lighthouse), `P` (path) or the build menu, then click. Shift-click keeps placing. Paths can be dragged                                                           |
@@ -59,10 +59,15 @@ When you create a world you choose **how you play**. **Colony** is the game as d
 What works so far:
 
 - **One character per player.** It appears on the shore beside the town hall the first time you join (each of the 8 players gets a spot of their own), and is where you left it when you come back, even after a server restart. Everyone sees everyone's character, drawn with a ring in the player's colour and their name above it, and as a dot in the player's colour on the minimap.
-- **Right-click to walk.** With nothing selected, right-click the ground and your character walks there by the shortest way (faster on paths). Right-click a tree, rock or building and you walk to the ground beside it. Only you can move your character. Selecting a villager or ship first keeps the colony controls: right-click orders that instead.
-- **The camera follows you.** Dragging the ground or pressing WASD lets go of it so you can look around; `C` or a new right-click brings it back.
+- **Walk with WASD or the arrow keys** (W is up the screen), or right-click the ground with nothing selected and your character walks there by the shortest way (faster on paths). Right-click a tree, rock or building and you walk to the ground beside it. Keys slide you along walls. Only you can move your character. Selecting a villager or ship first keeps the colony controls: right-click orders that instead.
+- **The camera is bound to your character.** It stays on you wherever you go; dragging the ground does not move it (the wheel still zooms).
+- **You stand out.** Your character is drawn a quarter larger than a villager, in your tribe's dress, with a cape and sash in your player colour. The cape is a separate greyscale layer that the game tints, which is where character customization will plug in later.
 - **Your character counts as a foothold** on the island it stands on, sees a little further than a villager (6 tiles, and it uncovers the map as it goes), and keeps buildings from going up on top of it.
-- **Villagers still run the settlement** (they gather marked resources, raise buildings and staff workplaces by themselves) and the colony commands work as before. Nothing else about the economy changes yet.
+- **Villagers run the settlement by themselves.** Nobody orders them about:
+  - When a building needs raising, the nearest villager on its island drops whatever they are doing (a house wants one builder, the Great Work three) and builds it. When it is done they look for a new job.
+  - A new job is whichever kind the settlement has the fewest workers on, against target shares: 30% wood, 25% food, 15% stone, 15% ore, 10% tools and 5% faith, with a nudge towards whatever the treasury is short of. They staff a free workplace (lumber camp, farm, quarry, mine, blacksmith, church) if there is one, and otherwise gather trees, berries, rocks and ore by hand.
+  - Every few seconds one hand-gatherer from the most over-staffed kind of job moves to a free workplace of a kind that is short of workers, so a newly built farm or mine gets its worker even when everyone is busy.
+  - Colony worlds are unchanged: there villagers only work what you mark or assign.
 
 What is planned, in order: acting with your own hands (gather, build and carry goods to the stockpile), boarding and steering a ship as its captain with the rest of the crew at stations, ports run by NPCs with shops and quests, and retuning pirates, storms and costs for a crew of people rather than a fleet of villagers.
 

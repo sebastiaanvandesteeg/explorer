@@ -147,7 +147,7 @@ export class Overlay {
   ): void {
     const hex = Number.parseInt(color.slice(1), 16);
     this.g
-      .ellipse(x, y, 8, 4)
+      .ellipse(x, y, 10, 5)
       .fill({ color: hex, alpha: you ? 0.35 : 0.2 })
       .stroke({ width: you ? 2 : 1, color: hex, alpha: 1, pixelLine: !you });
     let tag = this.nameTags.get(id);
@@ -166,7 +166,7 @@ export class Overlay {
       this.nameTags.set(id, tag);
     }
     if (tag.text !== name) tag.text = name;
-    const p = camera.worldToScreen(x, y - 26);
+    const p = camera.worldToScreen(x, y - 34);
     tag.position.set(Math.round(p.x), Math.round(p.y));
   }
 

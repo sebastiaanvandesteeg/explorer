@@ -1106,8 +1106,8 @@
   },
   "boat_x": {
    "frame": {
-    "x": 669,
-    "y": 890,
+    "x": 526,
+    "y": 986,
     "w": 24,
     "h": 20
    },
@@ -1130,8 +1130,8 @@
   },
   "boat_y": {
    "frame": {
-    "x": 695,
-    "y": 890,
+    "x": 552,
+    "y": 986,
     "w": 24,
     "h": 20
    },
@@ -1202,8 +1202,8 @@
   },
   "carry_crystal": {
    "frame": {
-    "x": 1060,
-    "y": 890,
+    "x": 917,
+    "y": 986,
     "w": 14,
     "h": 14
    },
@@ -1226,8 +1226,8 @@
   },
   "carry_food": {
    "frame": {
-    "x": 1026,
-    "y": 890,
+    "x": 883,
+    "y": 986,
     "w": 18,
     "h": 15
    },
@@ -1250,8 +1250,8 @@
   },
   "carry_glowcap": {
    "frame": {
-    "x": 1115,
-    "y": 890,
+    "x": 972,
+    "y": 986,
     "w": 14,
     "h": 12
    },
@@ -1274,8 +1274,8 @@
   },
   "carry_gold": {
    "frame": {
-    "x": 1376,
-    "y": 890,
+    "x": 1233,
+    "y": 986,
     "w": 14,
     "h": 10
    },
@@ -1298,8 +1298,8 @@
   },
   "carry_hellstone": {
    "frame": {
-    "x": 1392,
-    "y": 890,
+    "x": 1249,
+    "y": 986,
     "w": 14,
     "h": 10
    },
@@ -1322,8 +1322,8 @@
   },
   "carry_mirepearl": {
    "frame": {
-    "x": 1408,
-    "y": 890,
+    "x": 1265,
+    "y": 986,
     "w": 14,
     "h": 10
    },
@@ -1346,8 +1346,8 @@
   },
   "carry_ore": {
    "frame": {
-    "x": 1424,
-    "y": 890,
+    "x": 1281,
+    "y": 986,
     "w": 14,
     "h": 10
    },
@@ -1370,8 +1370,8 @@
   },
   "carry_rimeglass": {
    "frame": {
-    "x": 1440,
-    "y": 890,
+    "x": 1297,
+    "y": 986,
     "w": 14,
     "h": 10
    },
@@ -1394,8 +1394,8 @@
   },
   "carry_stone": {
    "frame": {
-    "x": 1456,
-    "y": 890,
+    "x": 1313,
+    "y": 986,
     "w": 14,
     "h": 10
    },
@@ -1418,8 +1418,8 @@
   },
   "carry_sunstone": {
    "frame": {
-    "x": 1472,
-    "y": 890,
+    "x": 1329,
+    "y": 986,
     "w": 14,
     "h": 10
    },
@@ -1442,8 +1442,8 @@
   },
   "carry_wood": {
    "frame": {
-    "x": 1283,
-    "y": 890,
+    "x": 1140,
+    "y": 986,
     "w": 22,
     "h": 11
    },
@@ -1466,8 +1466,8 @@
   },
   "deco_autumn_small_0": {
    "frame": {
-    "x": 1561,
-    "y": 890,
+    "x": 1418,
+    "y": 986,
     "w": 11,
     "h": 9
    },
@@ -1490,8 +1490,8 @@
   },
   "deco_autumn_small_1": {
    "frame": {
-    "x": 1634,
-    "y": 890,
+    "x": 1491,
+    "y": 986,
     "w": 10,
     "h": 8
    },
@@ -1514,8 +1514,8 @@
   },
   "deco_autumn_tall": {
    "frame": {
-    "x": 650,
-    "y": 890,
+    "x": 507,
+    "y": 986,
     "w": 17,
     "h": 21
    },
@@ -1538,8 +1538,8 @@
   },
   "deco_blossom_small_0": {
    "frame": {
-    "x": 1841,
-    "y": 890,
+    "x": 1698,
+    "y": 986,
     "w": 17,
     "h": 6
    },
@@ -1562,8 +1562,8 @@
   },
   "deco_blossom_small_1": {
    "frame": {
-    "x": 1732,
-    "y": 890,
+    "x": 1589,
+    "y": 986,
     "w": 15,
     "h": 7
    },
@@ -1586,8 +1586,8 @@
   },
   "deco_blossom_tall": {
    "frame": {
-    "x": 1046,
-    "y": 890,
+    "x": 903,
+    "y": 986,
     "w": 12,
     "h": 15
    },
@@ -1610,8 +1610,8 @@
   },
   "deco_crystal_small_0": {
    "frame": {
-    "x": 1860,
-    "y": 890,
+    "x": 1717,
+    "y": 986,
     "w": 13,
     "h": 6
    },
@@ -1634,8 +1634,8 @@
   },
   "deco_crystal_small_1": {
    "frame": {
-    "x": 1646,
-    "y": 890,
+    "x": 1503,
+    "y": 986,
     "w": 19,
     "h": 8
    },
@@ -1658,8 +1658,8 @@
   },
   "deco_crystal_tall": {
    "frame": {
-    "x": 1953,
-    "y": 853,
+    "x": 1601,
+    "y": 949,
     "w": 20,
     "h": 31
    },
@@ -1682,8 +1682,8 @@
   },
   "deco_desert_small_0": {
    "frame": {
-    "x": 1889,
-    "y": 890,
+    "x": 1746,
+    "y": 986,
     "w": 18,
     "h": 5
    },
@@ -1706,8 +1706,8 @@
   },
   "deco_desert_small_1": {
    "frame": {
-    "x": 1875,
-    "y": 890,
+    "x": 1732,
+    "y": 986,
     "w": 12,
     "h": 6
    },
@@ -1730,8 +1730,8 @@
   },
   "deco_desert_tall": {
    "frame": {
-    "x": 1574,
-    "y": 890,
+    "x": 1431,
+    "y": 986,
     "w": 9,
     "h": 9
    },
@@ -1754,8 +1754,8 @@
   },
   "deco_fungal_small_0": {
    "frame": {
-    "x": 1909,
-    "y": 890,
+    "x": 1766,
+    "y": 986,
     "w": 14,
     "h": 5
    },
@@ -1778,8 +1778,8 @@
   },
   "deco_fungal_small_1": {
    "frame": {
-    "x": 1749,
-    "y": 890,
+    "x": 1606,
+    "y": 986,
     "w": 13,
     "h": 7
    },
@@ -1802,8 +1802,8 @@
   },
   "deco_fungal_tall": {
    "frame": {
-    "x": 380,
-    "y": 890,
+    "x": 2,
+    "y": 986,
     "w": 31,
     "h": 27
    },
@@ -1826,8 +1826,8 @@
   },
   "deco_infernal_small_0": {
    "frame": {
-    "x": 1764,
-    "y": 890,
+    "x": 1621,
+    "y": 986,
     "w": 12,
     "h": 7
    },
@@ -1850,8 +1850,8 @@
   },
   "deco_infernal_small_1": {
    "frame": {
-    "x": 1934,
-    "y": 890,
+    "x": 1791,
+    "y": 986,
     "w": 18,
     "h": 4
    },
@@ -1874,8 +1874,8 @@
   },
   "deco_infernal_tall": {
    "frame": {
-    "x": 181,
-    "y": 890,
+    "x": 1849,
+    "y": 949,
     "w": 30,
     "h": 30
    },
@@ -1898,8 +1898,8 @@
   },
   "deco_jungle_small_0": {
    "frame": {
-    "x": 1778,
-    "y": 890,
+    "x": 1635,
+    "y": 986,
     "w": 9,
     "h": 7
    },
@@ -1922,8 +1922,8 @@
   },
   "deco_jungle_small_1": {
    "frame": {
-    "x": 1789,
-    "y": 890,
+    "x": 1646,
+    "y": 986,
     "w": 15,
     "h": 7
    },
@@ -1946,8 +1946,8 @@
   },
   "deco_jungle_tall": {
    "frame": {
-    "x": 1076,
-    "y": 890,
+    "x": 933,
+    "y": 986,
     "w": 16,
     "h": 13
    },
@@ -1970,8 +1970,8 @@
   },
   "deco_swamp_small_0": {
    "frame": {
-    "x": 1667,
-    "y": 890,
+    "x": 1524,
+    "y": 986,
     "w": 15,
     "h": 8
    },
@@ -1994,8 +1994,8 @@
   },
   "deco_swamp_small_1": {
    "frame": {
-    "x": 1684,
-    "y": 890,
+    "x": 1541,
+    "y": 986,
     "w": 12,
     "h": 8
    },
@@ -2018,8 +2018,8 @@
   },
   "deco_swamp_tall": {
    "frame": {
-    "x": 875,
-    "y": 890,
+    "x": 732,
+    "y": 986,
     "w": 10,
     "h": 17
    },
@@ -2042,8 +2042,8 @@
   },
   "deco_temperate_small_0": {
    "frame": {
-    "x": 1806,
-    "y": 890,
+    "x": 1663,
+    "y": 986,
     "w": 13,
     "h": 7
    },
@@ -2066,8 +2066,8 @@
   },
   "deco_temperate_small_1": {
    "frame": {
-    "x": 1585,
-    "y": 890,
+    "x": 1442,
+    "y": 986,
     "w": 12,
     "h": 9
    },
@@ -2114,8 +2114,8 @@
   },
   "deco_tundra_small_0": {
    "frame": {
-    "x": 1821,
-    "y": 890,
+    "x": 1678,
+    "y": 986,
     "w": 18,
     "h": 7
    },
@@ -2138,8 +2138,8 @@
   },
   "deco_tundra_small_1": {
    "frame": {
-    "x": 1698,
-    "y": 890,
+    "x": 1555,
+    "y": 986,
     "w": 8,
     "h": 8
    },
@@ -2162,8 +2162,8 @@
   },
   "deco_tundra_tall": {
    "frame": {
-    "x": 1599,
-    "y": 890,
+    "x": 1456,
+    "y": 986,
     "w": 8,
     "h": 9
    },
@@ -2186,8 +2186,8 @@
   },
   "dock_x": {
    "frame": {
-    "x": 1684,
-    "y": 814,
+    "x": 1318,
+    "y": 910,
     "w": 64,
     "h": 35
    },
@@ -2234,8 +2234,8 @@
   },
   "dock_y": {
    "frame": {
-    "x": 1750,
-    "y": 814,
+    "x": 1384,
+    "y": 910,
     "w": 64,
     "h": 35
    },
@@ -2280,10 +2280,4114 @@
     "y": 0.34
    }
   },
+  "hero_amberwrights_0_back_stand": {
+   "frame": {
+    "x": 1163,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_amberwrights_0_back_walk0": {
+   "frame": {
+    "x": 1185,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_amberwrights_0_back_walk1": {
+   "frame": {
+    "x": 1207,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_amberwrights_0_front_stand": {
+   "frame": {
+    "x": 1229,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_amberwrights_0_front_walk0": {
+   "frame": {
+    "x": 1251,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_amberwrights_0_front_walk1": {
+   "frame": {
+    "x": 1273,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_amberwrights_1_back_stand": {
+   "frame": {
+    "x": 1295,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_amberwrights_1_back_walk0": {
+   "frame": {
+    "x": 1317,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_amberwrights_1_back_walk1": {
+   "frame": {
+    "x": 1339,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_amberwrights_1_front_stand": {
+   "frame": {
+    "x": 1361,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_amberwrights_1_front_walk0": {
+   "frame": {
+    "x": 1383,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_amberwrights_1_front_walk1": {
+   "frame": {
+    "x": 1405,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_amberwrights_2_back_stand": {
+   "frame": {
+    "x": 1427,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_amberwrights_2_back_walk0": {
+   "frame": {
+    "x": 1449,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_amberwrights_2_back_walk1": {
+   "frame": {
+    "x": 1471,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_amberwrights_2_front_stand": {
+   "frame": {
+    "x": 1493,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_amberwrights_2_front_walk0": {
+   "frame": {
+    "x": 1515,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_amberwrights_2_front_walk1": {
+   "frame": {
+    "x": 1537,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_cinderborn_0_back_stand": {
+   "frame": {
+    "x": 1923,
+    "y": 538,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_cinderborn_0_back_walk0": {
+   "frame": {
+    "x": 1945,
+    "y": 538,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_cinderborn_0_back_walk1": {
+   "frame": {
+    "x": 1967,
+    "y": 538,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_cinderborn_0_front_stand": {
+   "frame": {
+    "x": 1989,
+    "y": 538,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_cinderborn_0_front_walk0": {
+   "frame": {
+    "x": 2011,
+    "y": 538,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_cinderborn_0_front_walk1": {
+   "frame": {
+    "x": 2,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_cinderborn_1_back_stand": {
+   "frame": {
+    "x": 24,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_cinderborn_1_back_walk0": {
+   "frame": {
+    "x": 46,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_cinderborn_1_back_walk1": {
+   "frame": {
+    "x": 68,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_cinderborn_1_front_stand": {
+   "frame": {
+    "x": 90,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_cinderborn_1_front_walk0": {
+   "frame": {
+    "x": 112,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_cinderborn_1_front_walk1": {
+   "frame": {
+    "x": 134,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_cinderborn_2_back_stand": {
+   "frame": {
+    "x": 156,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_cinderborn_2_back_walk0": {
+   "frame": {
+    "x": 178,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_cinderborn_2_back_walk1": {
+   "frame": {
+    "x": 200,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_cinderborn_2_front_stand": {
+   "frame": {
+    "x": 222,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_cinderborn_2_front_walk0": {
+   "frame": {
+    "x": 244,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_cinderborn_2_front_walk1": {
+   "frame": {
+    "x": 266,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_freebooters_0_back_stand": {
+   "frame": {
+    "x": 2017,
+    "y": 607,
+    "w": 20,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 44
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_freebooters_0_back_walk0": {
+   "frame": {
+    "x": 2,
+    "y": 658,
+    "w": 20,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 44
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_freebooters_0_back_walk1": {
+   "frame": {
+    "x": 24,
+    "y": 658,
+    "w": 20,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 44
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_freebooters_0_front_stand": {
+   "frame": {
+    "x": 46,
+    "y": 658,
+    "w": 20,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 44
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_freebooters_0_front_walk0": {
+   "frame": {
+    "x": 68,
+    "y": 658,
+    "w": 20,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 44
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_freebooters_0_front_walk1": {
+   "frame": {
+    "x": 90,
+    "y": 658,
+    "w": 20,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 44
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_freebooters_1_back_stand": {
+   "frame": {
+    "x": 112,
+    "y": 658,
+    "w": 20,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 44
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_freebooters_1_back_walk0": {
+   "frame": {
+    "x": 134,
+    "y": 658,
+    "w": 20,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 44
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_freebooters_1_back_walk1": {
+   "frame": {
+    "x": 156,
+    "y": 658,
+    "w": 20,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 44
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_freebooters_1_front_stand": {
+   "frame": {
+    "x": 178,
+    "y": 658,
+    "w": 20,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 44
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_freebooters_1_front_walk0": {
+   "frame": {
+    "x": 200,
+    "y": 658,
+    "w": 20,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 44
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_freebooters_1_front_walk1": {
+   "frame": {
+    "x": 222,
+    "y": 658,
+    "w": 20,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 44
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_freebooters_2_back_stand": {
+   "frame": {
+    "x": 244,
+    "y": 658,
+    "w": 20,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 44
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_freebooters_2_back_walk0": {
+   "frame": {
+    "x": 266,
+    "y": 658,
+    "w": 20,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 44
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_freebooters_2_back_walk1": {
+   "frame": {
+    "x": 288,
+    "y": 658,
+    "w": 20,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 44
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_freebooters_2_front_stand": {
+   "frame": {
+    "x": 310,
+    "y": 658,
+    "w": 20,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 44
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_freebooters_2_front_walk0": {
+   "frame": {
+    "x": 332,
+    "y": 658,
+    "w": 20,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 44
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_freebooters_2_front_walk1": {
+   "frame": {
+    "x": 354,
+    "y": 658,
+    "w": 20,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 44
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_glowkin_0_back_stand": {
+   "frame": {
+    "x": 992,
+    "y": 538,
+    "w": 20,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_glowkin_0_back_walk0": {
+   "frame": {
+    "x": 1014,
+    "y": 538,
+    "w": 20,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_glowkin_0_back_walk1": {
+   "frame": {
+    "x": 1036,
+    "y": 538,
+    "w": 20,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_glowkin_0_front_stand": {
+   "frame": {
+    "x": 1058,
+    "y": 538,
+    "w": 20,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_glowkin_0_front_walk0": {
+   "frame": {
+    "x": 1080,
+    "y": 538,
+    "w": 20,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_glowkin_0_front_walk1": {
+   "frame": {
+    "x": 1102,
+    "y": 538,
+    "w": 20,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_glowkin_1_back_stand": {
+   "frame": {
+    "x": 1124,
+    "y": 538,
+    "w": 20,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_glowkin_1_back_walk0": {
+   "frame": {
+    "x": 1146,
+    "y": 538,
+    "w": 20,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_glowkin_1_back_walk1": {
+   "frame": {
+    "x": 1168,
+    "y": 538,
+    "w": 20,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_glowkin_1_front_stand": {
+   "frame": {
+    "x": 1190,
+    "y": 538,
+    "w": 20,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_glowkin_1_front_walk0": {
+   "frame": {
+    "x": 1212,
+    "y": 538,
+    "w": 20,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_glowkin_1_front_walk1": {
+   "frame": {
+    "x": 1234,
+    "y": 538,
+    "w": 20,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_glowkin_2_back_stand": {
+   "frame": {
+    "x": 1256,
+    "y": 538,
+    "w": 20,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_glowkin_2_back_walk0": {
+   "frame": {
+    "x": 1278,
+    "y": 538,
+    "w": 20,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_glowkin_2_back_walk1": {
+   "frame": {
+    "x": 1300,
+    "y": 538,
+    "w": 20,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_glowkin_2_front_stand": {
+   "frame": {
+    "x": 1322,
+    "y": 538,
+    "w": 20,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_glowkin_2_front_walk0": {
+   "frame": {
+    "x": 1344,
+    "y": 538,
+    "w": 20,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_glowkin_2_front_walk1": {
+   "frame": {
+    "x": 1366,
+    "y": 538,
+    "w": 20,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_islanders_0_back_stand": {
+   "frame": {
+    "x": 434,
+    "y": 658,
+    "w": 20,
+    "h": 43
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 43
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 43
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_islanders_0_back_walk0": {
+   "frame": {
+    "x": 456,
+    "y": 658,
+    "w": 20,
+    "h": 43
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 43
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 43
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_islanders_0_back_walk1": {
+   "frame": {
+    "x": 478,
+    "y": 658,
+    "w": 20,
+    "h": 43
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 43
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 43
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_islanders_0_front_stand": {
+   "frame": {
+    "x": 500,
+    "y": 658,
+    "w": 20,
+    "h": 43
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 43
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 43
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_islanders_0_front_walk0": {
+   "frame": {
+    "x": 522,
+    "y": 658,
+    "w": 20,
+    "h": 43
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 43
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 43
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_islanders_0_front_walk1": {
+   "frame": {
+    "x": 544,
+    "y": 658,
+    "w": 20,
+    "h": 43
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 43
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 43
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_islanders_1_back_stand": {
+   "frame": {
+    "x": 566,
+    "y": 658,
+    "w": 20,
+    "h": 43
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 43
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 43
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_islanders_1_back_walk0": {
+   "frame": {
+    "x": 588,
+    "y": 658,
+    "w": 20,
+    "h": 43
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 43
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 43
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_islanders_1_back_walk1": {
+   "frame": {
+    "x": 610,
+    "y": 658,
+    "w": 20,
+    "h": 43
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 43
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 43
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_islanders_1_front_stand": {
+   "frame": {
+    "x": 632,
+    "y": 658,
+    "w": 20,
+    "h": 43
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 43
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 43
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_islanders_1_front_walk0": {
+   "frame": {
+    "x": 654,
+    "y": 658,
+    "w": 20,
+    "h": 43
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 43
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 43
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_islanders_1_front_walk1": {
+   "frame": {
+    "x": 676,
+    "y": 658,
+    "w": 20,
+    "h": 43
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 43
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 43
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_islanders_2_back_stand": {
+   "frame": {
+    "x": 698,
+    "y": 658,
+    "w": 20,
+    "h": 43
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 43
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 43
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_islanders_2_back_walk0": {
+   "frame": {
+    "x": 720,
+    "y": 658,
+    "w": 20,
+    "h": 43
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 43
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 43
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_islanders_2_back_walk1": {
+   "frame": {
+    "x": 742,
+    "y": 658,
+    "w": 20,
+    "h": 43
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 43
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 43
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_islanders_2_front_stand": {
+   "frame": {
+    "x": 764,
+    "y": 658,
+    "w": 20,
+    "h": 43
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 43
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 43
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_islanders_2_front_walk0": {
+   "frame": {
+    "x": 786,
+    "y": 658,
+    "w": 20,
+    "h": 43
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 43
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 43
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_islanders_2_front_walk1": {
+   "frame": {
+    "x": 808,
+    "y": 658,
+    "w": 20,
+    "h": 43
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 43
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 43
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_mirefolk_0_back_stand": {
+   "frame": {
+    "x": 1388,
+    "y": 538,
+    "w": 25,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.52,
+    "y": 1
+   }
+  },
+  "hero_mirefolk_0_back_walk0": {
+   "frame": {
+    "x": 1415,
+    "y": 538,
+    "w": 25,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.52,
+    "y": 1
+   }
+  },
+  "hero_mirefolk_0_back_walk1": {
+   "frame": {
+    "x": 1442,
+    "y": 538,
+    "w": 25,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.52,
+    "y": 1
+   }
+  },
+  "hero_mirefolk_0_front_stand": {
+   "frame": {
+    "x": 1469,
+    "y": 538,
+    "w": 25,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.52,
+    "y": 1
+   }
+  },
+  "hero_mirefolk_0_front_walk0": {
+   "frame": {
+    "x": 1496,
+    "y": 538,
+    "w": 25,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.52,
+    "y": 1
+   }
+  },
+  "hero_mirefolk_0_front_walk1": {
+   "frame": {
+    "x": 1523,
+    "y": 538,
+    "w": 25,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.52,
+    "y": 1
+   }
+  },
+  "hero_mirefolk_1_back_stand": {
+   "frame": {
+    "x": 1550,
+    "y": 538,
+    "w": 25,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.52,
+    "y": 1
+   }
+  },
+  "hero_mirefolk_1_back_walk0": {
+   "frame": {
+    "x": 1577,
+    "y": 538,
+    "w": 25,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.52,
+    "y": 1
+   }
+  },
+  "hero_mirefolk_1_back_walk1": {
+   "frame": {
+    "x": 1604,
+    "y": 538,
+    "w": 25,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.52,
+    "y": 1
+   }
+  },
+  "hero_mirefolk_1_front_stand": {
+   "frame": {
+    "x": 1631,
+    "y": 538,
+    "w": 25,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.52,
+    "y": 1
+   }
+  },
+  "hero_mirefolk_1_front_walk0": {
+   "frame": {
+    "x": 1658,
+    "y": 538,
+    "w": 25,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.52,
+    "y": 1
+   }
+  },
+  "hero_mirefolk_1_front_walk1": {
+   "frame": {
+    "x": 1685,
+    "y": 538,
+    "w": 25,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.52,
+    "y": 1
+   }
+  },
+  "hero_mirefolk_2_back_stand": {
+   "frame": {
+    "x": 1712,
+    "y": 538,
+    "w": 25,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.52,
+    "y": 1
+   }
+  },
+  "hero_mirefolk_2_back_walk0": {
+   "frame": {
+    "x": 1739,
+    "y": 538,
+    "w": 25,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.52,
+    "y": 1
+   }
+  },
+  "hero_mirefolk_2_back_walk1": {
+   "frame": {
+    "x": 1766,
+    "y": 538,
+    "w": 25,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.52,
+    "y": 1
+   }
+  },
+  "hero_mirefolk_2_front_stand": {
+   "frame": {
+    "x": 1793,
+    "y": 538,
+    "w": 25,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.52,
+    "y": 1
+   }
+  },
+  "hero_mirefolk_2_front_walk0": {
+   "frame": {
+    "x": 1820,
+    "y": 538,
+    "w": 25,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.52,
+    "y": 1
+   }
+  },
+  "hero_mirefolk_2_front_walk1": {
+   "frame": {
+    "x": 1847,
+    "y": 538,
+    "w": 25,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 25,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 25,
+    "h": 50
+   },
+   "anchor": {
+    "x": 0.52,
+    "y": 1
+   }
+  },
+  "hero_northfolk_0_back_stand": {
+   "frame": {
+    "x": 288,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_northfolk_0_back_walk0": {
+   "frame": {
+    "x": 310,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_northfolk_0_back_walk1": {
+   "frame": {
+    "x": 332,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_northfolk_0_front_stand": {
+   "frame": {
+    "x": 354,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_northfolk_0_front_walk0": {
+   "frame": {
+    "x": 376,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_northfolk_0_front_walk1": {
+   "frame": {
+    "x": 398,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_northfolk_1_back_stand": {
+   "frame": {
+    "x": 420,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_northfolk_1_back_walk0": {
+   "frame": {
+    "x": 442,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_northfolk_1_back_walk1": {
+   "frame": {
+    "x": 464,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_northfolk_1_front_stand": {
+   "frame": {
+    "x": 486,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_northfolk_1_front_walk0": {
+   "frame": {
+    "x": 508,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_northfolk_1_front_walk1": {
+   "frame": {
+    "x": 530,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_northfolk_2_back_stand": {
+   "frame": {
+    "x": 552,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_northfolk_2_back_walk0": {
+   "frame": {
+    "x": 574,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_northfolk_2_back_walk1": {
+   "frame": {
+    "x": 596,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_northfolk_2_front_stand": {
+   "frame": {
+    "x": 618,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_northfolk_2_front_walk0": {
+   "frame": {
+    "x": 640,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_northfolk_2_front_walk1": {
+   "frame": {
+    "x": 662,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sunfolk_0_back_stand": {
+   "frame": {
+    "x": 1559,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sunfolk_0_back_walk0": {
+   "frame": {
+    "x": 1581,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sunfolk_0_back_walk1": {
+   "frame": {
+    "x": 1603,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sunfolk_0_front_stand": {
+   "frame": {
+    "x": 1625,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sunfolk_0_front_walk0": {
+   "frame": {
+    "x": 1647,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sunfolk_0_front_walk1": {
+   "frame": {
+    "x": 1669,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sunfolk_1_back_stand": {
+   "frame": {
+    "x": 1691,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sunfolk_1_back_walk0": {
+   "frame": {
+    "x": 1713,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sunfolk_1_back_walk1": {
+   "frame": {
+    "x": 1735,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sunfolk_1_front_stand": {
+   "frame": {
+    "x": 1757,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sunfolk_1_front_walk0": {
+   "frame": {
+    "x": 1779,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sunfolk_1_front_walk1": {
+   "frame": {
+    "x": 1801,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sunfolk_2_back_stand": {
+   "frame": {
+    "x": 1823,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sunfolk_2_back_walk0": {
+   "frame": {
+    "x": 1845,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sunfolk_2_back_walk1": {
+   "frame": {
+    "x": 1867,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sunfolk_2_front_stand": {
+   "frame": {
+    "x": 1889,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sunfolk_2_front_walk0": {
+   "frame": {
+    "x": 1911,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sunfolk_2_front_walk1": {
+   "frame": {
+    "x": 1933,
+    "y": 607,
+    "w": 20,
+    "h": 47
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 47
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 47
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sylvan_0_back_stand": {
+   "frame": {
+    "x": 684,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sylvan_0_back_walk0": {
+   "frame": {
+    "x": 706,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sylvan_0_back_walk1": {
+   "frame": {
+    "x": 728,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sylvan_0_front_stand": {
+   "frame": {
+    "x": 750,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sylvan_0_front_walk0": {
+   "frame": {
+    "x": 772,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sylvan_0_front_walk1": {
+   "frame": {
+    "x": 794,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sylvan_1_back_stand": {
+   "frame": {
+    "x": 816,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sylvan_1_back_walk0": {
+   "frame": {
+    "x": 838,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sylvan_1_back_walk1": {
+   "frame": {
+    "x": 860,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sylvan_1_front_stand": {
+   "frame": {
+    "x": 882,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sylvan_1_front_walk0": {
+   "frame": {
+    "x": 904,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sylvan_1_front_walk1": {
+   "frame": {
+    "x": 926,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sylvan_2_back_stand": {
+   "frame": {
+    "x": 948,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sylvan_2_back_walk0": {
+   "frame": {
+    "x": 970,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sylvan_2_back_walk1": {
+   "frame": {
+    "x": 992,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sylvan_2_front_stand": {
+   "frame": {
+    "x": 1014,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sylvan_2_front_walk0": {
+   "frame": {
+    "x": 1036,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "hero_sylvan_2_front_walk1": {
+   "frame": {
+    "x": 1058,
+    "y": 607,
+    "w": 20,
+    "h": 49
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 49
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 49
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1
+   }
+  },
+  "herocape_back_over_stand": {
+   "frame": {
+    "x": 108,
+    "y": 986,
+    "w": 20,
+    "h": 25
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 20,
+    "h": 25
+   },
+   "sourceSize": {
+    "w": 20,
+    "h": 25
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1.16
+   }
+  },
+  "herocape_back_over_walk0": {
+   "frame": {
+    "x": 130,
+    "y": 986,
+    "w": 21,
+    "h": 25
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 21,
+    "h": 25
+   },
+   "sourceSize": {
+    "w": 21,
+    "h": 25
+   },
+   "anchor": {
+    "x": 0.47619,
+    "y": 1.16
+   }
+  },
+  "herocape_back_over_walk1": {
+   "frame": {
+    "x": 153,
+    "y": 986,
+    "w": 22,
+    "h": 25
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 22,
+    "h": 25
+   },
+   "sourceSize": {
+    "w": 22,
+    "h": 25
+   },
+   "anchor": {
+    "x": 0.545455,
+    "y": 1.16
+   }
+  },
+  "herocape_front_over_stand": {
+   "frame": {
+    "x": 333,
+    "y": 986,
+    "w": 24,
+    "h": 22
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 22
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 22
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1.318182
+   }
+  },
+  "herocape_front_over_walk0": {
+   "frame": {
+    "x": 359,
+    "y": 986,
+    "w": 24,
+    "h": 22
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 22
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 22
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1.318182
+   }
+  },
+  "herocape_front_over_walk1": {
+   "frame": {
+    "x": 385,
+    "y": 986,
+    "w": 24,
+    "h": 22
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 22
+   },
+   "sourceSize": {
+    "w": 24,
+    "h": 22
+   },
+   "anchor": {
+    "x": 0.5,
+    "y": 1.318182
+   }
+  },
+  "herocape_front_under_stand": {
+   "frame": {
+    "x": 411,
+    "y": 986,
+    "w": 27,
+    "h": 22
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 27,
+    "h": 22
+   },
+   "sourceSize": {
+    "w": 27,
+    "h": 22
+   },
+   "anchor": {
+    "x": 0.518519,
+    "y": 1.227273
+   }
+  },
+  "herocape_front_under_walk0": {
+   "frame": {
+    "x": 440,
+    "y": 986,
+    "w": 28,
+    "h": 22
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 28,
+    "h": 22
+   },
+   "sourceSize": {
+    "w": 28,
+    "h": 22
+   },
+   "anchor": {
+    "x": 0.464286,
+    "y": 1.227273
+   }
+  },
+  "herocape_front_under_walk1": {
+   "frame": {
+    "x": 470,
+    "y": 986,
+    "w": 27,
+    "h": 22
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 27,
+    "h": 22
+   },
+   "sourceSize": {
+    "w": 27,
+    "h": 22
+   },
+   "anchor": {
+    "x": 0.555556,
+    "y": 1.227273
+   }
+  },
   "icon_axe": {
    "frame": {
-    "x": 1131,
-    "y": 890,
+    "x": 988,
+    "y": 986,
     "w": 9,
     "h": 12
    },
@@ -2306,8 +6410,8 @@
   },
   "icon_basket": {
    "frame": {
-    "x": 1488,
-    "y": 890,
+    "x": 1345,
+    "y": 986,
     "w": 10,
     "h": 10
    },
@@ -2330,8 +6434,8 @@
   },
   "icon_crystal": {
    "frame": {
-    "x": 1142,
-    "y": 890,
+    "x": 999,
+    "y": 986,
     "w": 8,
     "h": 12
    },
@@ -2354,8 +6458,8 @@
   },
   "icon_faith": {
    "frame": {
-    "x": 1094,
-    "y": 890,
+    "x": 951,
+    "y": 986,
     "w": 8,
     "h": 13
    },
@@ -2378,8 +6482,8 @@
   },
   "icon_flag": {
    "frame": {
-    "x": 1152,
-    "y": 890,
+    "x": 1009,
+    "y": 986,
     "w": 8,
     "h": 12
    },
@@ -2402,8 +6506,8 @@
   },
   "icon_food": {
    "frame": {
-    "x": 1500,
-    "y": 890,
+    "x": 1357,
+    "y": 986,
     "w": 10,
     "h": 10
    },
@@ -2426,8 +6530,8 @@
   },
   "icon_glowcap": {
    "frame": {
-    "x": 1307,
-    "y": 890,
+    "x": 1164,
+    "y": 986,
     "w": 10,
     "h": 11
    },
@@ -2450,8 +6554,8 @@
   },
   "icon_gold": {
    "frame": {
-    "x": 1708,
-    "y": 890,
+    "x": 1565,
+    "y": 986,
     "w": 10,
     "h": 8
    },
@@ -2474,8 +6578,8 @@
   },
   "icon_hammer": {
    "frame": {
-    "x": 1162,
-    "y": 890,
+    "x": 1019,
+    "y": 986,
     "w": 10,
     "h": 12
    },
@@ -2498,8 +6602,8 @@
   },
   "icon_hellstone": {
    "frame": {
-    "x": 1512,
-    "y": 890,
+    "x": 1369,
+    "y": 986,
     "w": 10,
     "h": 10
    },
@@ -2522,8 +6626,8 @@
   },
   "icon_mirepearl": {
    "frame": {
-    "x": 1524,
-    "y": 890,
+    "x": 1381,
+    "y": 986,
     "w": 8,
     "h": 10
    },
@@ -2546,8 +6650,8 @@
   },
   "icon_ore": {
    "frame": {
-    "x": 1720,
-    "y": 890,
+    "x": 1577,
+    "y": 986,
     "w": 10,
     "h": 8
    },
@@ -2570,8 +6674,8 @@
   },
   "icon_pick": {
    "frame": {
-    "x": 1104,
-    "y": 890,
+    "x": 961,
+    "y": 986,
     "w": 9,
     "h": 13
    },
@@ -2594,8 +6698,8 @@
   },
   "icon_relic": {
    "frame": {
-    "x": 1319,
-    "y": 890,
+    "x": 1176,
+    "y": 986,
     "w": 8,
     "h": 11
    },
@@ -2618,8 +6722,8 @@
   },
   "icon_rimeglass": {
    "frame": {
-    "x": 1174,
-    "y": 890,
+    "x": 1031,
+    "y": 986,
     "w": 6,
     "h": 12
    },
@@ -2642,8 +6746,8 @@
   },
   "icon_ship": {
    "frame": {
-    "x": 1329,
-    "y": 890,
+    "x": 1186,
+    "y": 986,
     "w": 12,
     "h": 11
    },
@@ -2666,8 +6770,8 @@
   },
   "icon_stone": {
    "frame": {
-    "x": 1534,
-    "y": 890,
+    "x": 1391,
+    "y": 986,
     "w": 11,
     "h": 10
    },
@@ -2690,8 +6794,8 @@
   },
   "icon_sunstone": {
    "frame": {
-    "x": 1343,
-    "y": 890,
+    "x": 1200,
+    "y": 986,
     "w": 10,
     "h": 11
    },
@@ -2714,8 +6818,8 @@
   },
   "icon_tools": {
    "frame": {
-    "x": 1182,
-    "y": 890,
+    "x": 1039,
+    "y": 986,
     "w": 11,
     "h": 12
    },
@@ -2738,8 +6842,8 @@
   },
   "icon_villager": {
    "frame": {
-    "x": 1195,
-    "y": 890,
+    "x": 1052,
+    "y": 986,
     "w": 8,
     "h": 12
    },
@@ -2762,8 +6866,8 @@
   },
   "icon_wood": {
    "frame": {
-    "x": 1609,
-    "y": 890,
+    "x": 1466,
+    "y": 986,
     "w": 12,
     "h": 9
    },
@@ -2786,8 +6890,8 @@
   },
   "mark_axe": {
    "frame": {
-    "x": 887,
-    "y": 890,
+    "x": 744,
+    "y": 986,
     "w": 16,
     "h": 17
    },
@@ -2810,8 +6914,8 @@
   },
   "mark_basket": {
    "frame": {
-    "x": 905,
-    "y": 890,
+    "x": 762,
+    "y": 986,
     "w": 16,
     "h": 17
    },
@@ -2834,8 +6938,8 @@
   },
   "mark_pick": {
    "frame": {
-    "x": 923,
-    "y": 890,
+    "x": 780,
+    "y": 986,
     "w": 16,
     "h": 17
    },
@@ -2930,8 +7034,8 @@
   },
   "n_banana_0": {
    "frame": {
-    "x": 1596,
-    "y": 649,
+    "x": 1191,
+    "y": 746,
     "w": 58,
     "h": 39
    },
@@ -2954,8 +7058,8 @@
   },
   "n_banana_bare": {
    "frame": {
-    "x": 1656,
-    "y": 649,
+    "x": 1251,
+    "y": 746,
     "w": 58,
     "h": 39
    },
@@ -2978,8 +7082,8 @@
   },
   "n_berry_0": {
    "frame": {
-    "x": 1975,
-    "y": 853,
+    "x": 1623,
+    "y": 949,
     "w": 45,
     "h": 31
    },
@@ -3002,8 +7106,8 @@
   },
   "n_berry_bare": {
    "frame": {
-    "x": 2,
-    "y": 890,
+    "x": 1670,
+    "y": 949,
     "w": 45,
     "h": 31
    },
@@ -3074,8 +7178,8 @@
   },
   "n_bog_ore_0": {
    "frame": {
-    "x": 1124,
-    "y": 538,
+    "x": 1955,
+    "y": 607,
     "w": 60,
     "h": 45
    },
@@ -3098,8 +7202,8 @@
   },
   "n_boulder_0": {
    "frame": {
-    "x": 1816,
-    "y": 814,
+    "x": 1450,
+    "y": 910,
     "w": 43,
     "h": 35
    },
@@ -3122,8 +7226,8 @@
   },
   "n_boulder_1": {
    "frame": {
-    "x": 213,
-    "y": 890,
+    "x": 1881,
+    "y": 949,
     "w": 38,
     "h": 30
    },
@@ -3146,7 +7250,7 @@
   },
   "n_cactus_0": {
    "frame": {
-    "x": 992,
+    "x": 1874,
     "y": 538,
     "w": 47,
     "h": 50
@@ -3170,8 +7274,8 @@
   },
   "n_cactus_1": {
    "frame": {
-    "x": 390,
-    "y": 773,
+    "x": 2,
+    "y": 870,
     "w": 37,
     "h": 38
    },
@@ -3194,8 +7298,8 @@
   },
   "n_cactus_bare": {
    "frame": {
-    "x": 1602,
-    "y": 814,
+    "x": 1236,
+    "y": 910,
     "w": 35,
     "h": 36
    },
@@ -3314,8 +7418,8 @@
   },
   "n_ember_fruit_0": {
    "frame": {
-    "x": 1639,
-    "y": 814,
+    "x": 1273,
+    "y": 910,
     "w": 43,
     "h": 36
    },
@@ -3338,8 +7442,8 @@
   },
   "n_ember_fruit_bare": {
    "frame": {
-    "x": 49,
-    "y": 890,
+    "x": 1717,
+    "y": 949,
     "w": 43,
     "h": 31
    },
@@ -3362,8 +7466,8 @@
   },
   "n_flower_bush_0": {
    "frame": {
-    "x": 1771,
-    "y": 853,
+    "x": 1419,
+    "y": 949,
     "w": 41,
     "h": 32
    },
@@ -3386,8 +7490,8 @@
   },
   "n_flower_bush_bare": {
    "frame": {
-    "x": 1814,
-    "y": 853,
+    "x": 1462,
+    "y": 949,
     "w": 41,
     "h": 32
    },
@@ -3410,8 +7514,8 @@
   },
   "n_frost_berry_0": {
    "frame": {
-    "x": 253,
-    "y": 890,
+    "x": 1921,
+    "y": 949,
     "w": 43,
     "h": 30
    },
@@ -3434,8 +7538,8 @@
   },
   "n_frost_berry_bare": {
    "frame": {
-    "x": 298,
-    "y": 890,
+    "x": 1966,
+    "y": 949,
     "w": 43,
     "h": 30
    },
@@ -3578,8 +7682,8 @@
   },
   "n_glowshroom_0": {
    "frame": {
-    "x": 343,
-    "y": 890,
+    "x": 2011,
+    "y": 949,
     "w": 35,
     "h": 30
    },
@@ -3602,8 +7706,8 @@
   },
   "n_glowshroom_bare": {
    "frame": {
-    "x": 525,
-    "y": 890,
+    "x": 216,
+    "y": 986,
     "w": 23,
     "h": 24
    },
@@ -3626,8 +7730,8 @@
   },
   "n_gold_vein_0": {
    "frame": {
-    "x": 1244,
-    "y": 538,
+    "x": 830,
+    "y": 658,
     "w": 57,
     "h": 43
    },
@@ -3650,8 +7754,8 @@
   },
   "n_hellstone_0": {
    "frame": {
-    "x": 1303,
-    "y": 538,
+    "x": 889,
+    "y": 658,
     "w": 54,
     "h": 43
    },
@@ -3674,8 +7778,8 @@
   },
   "n_ice_rock_0": {
    "frame": {
-    "x": 1722,
-    "y": 853,
+    "x": 1370,
+    "y": 949,
     "w": 47,
     "h": 33
    },
@@ -3698,8 +7802,8 @@
   },
   "n_ice_rock_1": {
    "frame": {
-    "x": 94,
-    "y": 890,
+    "x": 1762,
+    "y": 949,
     "w": 37,
     "h": 31
    },
@@ -3770,8 +7874,8 @@
   },
   "n_mirepearl_0": {
    "frame": {
-    "x": 413,
-    "y": 890,
+    "x": 35,
+    "y": 986,
     "w": 37,
     "h": 27
    },
@@ -3866,8 +7970,8 @@
   },
   "n_obsidian_0": {
    "frame": {
-    "x": 1029,
-    "y": 773,
+    "x": 641,
+    "y": 870,
     "w": 44,
     "h": 37
    },
@@ -3890,8 +7994,8 @@
   },
   "n_obsidian_1": {
    "frame": {
-    "x": 1857,
-    "y": 853,
+    "x": 1505,
+    "y": 949,
     "w": 44,
     "h": 32
    },
@@ -3914,8 +8018,8 @@
   },
   "n_ore_0": {
    "frame": {
-    "x": 1186,
-    "y": 538,
+    "x": 376,
+    "y": 658,
     "w": 56,
     "h": 44
    },
@@ -4058,8 +8162,8 @@
   },
   "n_pumpkin_0": {
    "frame": {
-    "x": 486,
-    "y": 890,
+    "x": 177,
+    "y": 986,
     "w": 37,
     "h": 25
    },
@@ -4082,8 +8186,8 @@
   },
   "n_pumpkin_bare": {
    "frame": {
-    "x": 721,
-    "y": 890,
+    "x": 578,
+    "y": 986,
     "w": 34,
     "h": 20
    },
@@ -4130,8 +8234,8 @@
   },
   "n_sandstone_0": {
    "frame": {
-    "x": 1075,
-    "y": 773,
+    "x": 687,
+    "y": 870,
     "w": 49,
     "h": 37
    },
@@ -4154,8 +8258,8 @@
   },
   "n_sandstone_1": {
    "frame": {
-    "x": 133,
-    "y": 890,
+    "x": 1801,
+    "y": 949,
     "w": 46,
     "h": 31
    },
@@ -4178,8 +8282,8 @@
   },
   "n_sapling_charred": {
    "frame": {
-    "x": 642,
-    "y": 890,
+    "x": 499,
+    "y": 986,
     "w": 6,
     "h": 22
    },
@@ -4202,8 +8306,8 @@
   },
   "n_sapling_silver": {
    "frame": {
-    "x": 452,
-    "y": 890,
+    "x": 74,
+    "y": 986,
     "w": 15,
     "h": 27
    },
@@ -4226,8 +8330,8 @@
   },
   "n_sapling_stalk": {
    "frame": {
-    "x": 941,
-    "y": 890,
+    "x": 798,
+    "y": 986,
     "w": 10,
     "h": 16
    },
@@ -4250,8 +8354,8 @@
   },
   "n_sapling_wood": {
    "frame": {
-    "x": 469,
-    "y": 890,
+    "x": 91,
+    "y": 986,
     "w": 15,
     "h": 27
    },
@@ -4370,8 +8474,8 @@
   },
   "n_stump_charred": {
    "frame": {
-    "x": 1205,
-    "y": 890,
+    "x": 1062,
+    "y": 986,
     "w": 16,
     "h": 12
    },
@@ -4394,8 +8498,8 @@
   },
   "n_stump_silver": {
    "frame": {
-    "x": 1223,
-    "y": 890,
+    "x": 1080,
+    "y": 986,
     "w": 16,
     "h": 12
    },
@@ -4418,8 +8522,8 @@
   },
   "n_stump_stalk": {
    "frame": {
-    "x": 1241,
-    "y": 890,
+    "x": 1098,
+    "y": 986,
     "w": 16,
     "h": 12
    },
@@ -4442,8 +8546,8 @@
   },
   "n_stump_wood": {
    "frame": {
-    "x": 1259,
-    "y": 890,
+    "x": 1116,
+    "y": 986,
     "w": 22,
     "h": 12
    },
@@ -4490,8 +8594,8 @@
   },
   "n_swamp_shroom_0": {
    "frame": {
-    "x": 1903,
-    "y": 853,
+    "x": 1551,
+    "y": 949,
     "w": 48,
     "h": 32
    },
@@ -4514,8 +8618,8 @@
   },
   "n_swamp_shroom_bare": {
    "frame": {
-    "x": 550,
-    "y": 890,
+    "x": 241,
+    "y": 986,
     "w": 37,
     "h": 24
    },
@@ -4586,8 +8690,8 @@
   },
   "p_ash_0": {
    "frame": {
-    "x": 2000,
-    "y": 890,
+    "x": 1857,
+    "y": 986,
     "w": 1,
     "h": 1
    },
@@ -4610,8 +8714,8 @@
   },
   "p_ash_1": {
    "frame": {
-    "x": 1980,
-    "y": 890,
+    "x": 1837,
+    "y": 986,
     "w": 2,
     "h": 2
    },
@@ -4634,8 +8738,8 @@
   },
   "p_dust_0": {
    "frame": {
-    "x": 2003,
-    "y": 890,
+    "x": 1860,
+    "y": 986,
     "w": 1,
     "h": 1
    },
@@ -4658,8 +8762,8 @@
   },
   "p_dust_1": {
    "frame": {
-    "x": 2006,
-    "y": 890,
+    "x": 1863,
+    "y": 986,
     "w": 2,
     "h": 1
    },
@@ -4682,8 +8786,8 @@
   },
   "p_ember_0": {
    "frame": {
-    "x": 1984,
-    "y": 890,
+    "x": 1841,
+    "y": 986,
     "w": 1,
     "h": 2
    },
@@ -4706,8 +8810,8 @@
   },
   "p_ember_1": {
    "frame": {
-    "x": 2010,
-    "y": 890,
+    "x": 1867,
+    "y": 986,
     "w": 2,
     "h": 1
    },
@@ -4730,8 +8834,8 @@
   },
   "p_firefly_0": {
    "frame": {
-    "x": 1960,
-    "y": 890,
+    "x": 1817,
+    "y": 986,
     "w": 3,
     "h": 3
    },
@@ -4754,8 +8858,8 @@
   },
   "p_firefly_1": {
    "frame": {
-    "x": 2014,
-    "y": 890,
+    "x": 1871,
+    "y": 986,
     "w": 1,
     "h": 1
    },
@@ -4778,8 +8882,8 @@
   },
   "p_leaf_0": {
    "frame": {
-    "x": 2017,
-    "y": 890,
+    "x": 1874,
+    "y": 986,
     "w": 2,
     "h": 1
    },
@@ -4802,8 +8906,8 @@
   },
   "p_leaf_1": {
    "frame": {
-    "x": 1987,
-    "y": 890,
+    "x": 1844,
+    "y": 986,
     "w": 1,
     "h": 2
    },
@@ -4826,8 +8930,8 @@
   },
   "p_mote_0": {
    "frame": {
-    "x": 1965,
-    "y": 890,
+    "x": 1822,
+    "y": 986,
     "w": 3,
     "h": 3
    },
@@ -4850,8 +8954,8 @@
   },
   "p_mote_1": {
    "frame": {
-    "x": 2021,
-    "y": 890,
+    "x": 1878,
+    "y": 986,
     "w": 1,
     "h": 1
    },
@@ -4874,8 +8978,8 @@
   },
   "p_petal_0": {
    "frame": {
-    "x": 2024,
-    "y": 890,
+    "x": 1881,
+    "y": 986,
     "w": 2,
     "h": 1
    },
@@ -4898,8 +9002,8 @@
   },
   "p_petal_1": {
    "frame": {
-    "x": 1990,
-    "y": 890,
+    "x": 1847,
+    "y": 986,
     "w": 1,
     "h": 2
    },
@@ -4922,8 +9026,8 @@
   },
   "p_snow_0": {
    "frame": {
-    "x": 2028,
-    "y": 890,
+    "x": 1885,
+    "y": 986,
     "w": 1,
     "h": 1
    },
@@ -4946,8 +9050,8 @@
   },
   "p_snow_1": {
    "frame": {
-    "x": 1970,
-    "y": 890,
+    "x": 1827,
+    "y": 986,
     "w": 3,
     "h": 3
    },
@@ -4970,8 +9074,8 @@
   },
   "p_spore_0": {
    "frame": {
-    "x": 1975,
-    "y": 890,
+    "x": 1832,
+    "y": 986,
     "w": 3,
     "h": 3
    },
@@ -4994,8 +9098,8 @@
   },
   "p_spore_1": {
    "frame": {
-    "x": 2031,
-    "y": 890,
+    "x": 1888,
+    "y": 986,
     "w": 1,
     "h": 1
    },
@@ -5330,8 +9434,8 @@
   },
   "sea_rock_0": {
    "frame": {
-    "x": 757,
-    "y": 890,
+    "x": 614,
+    "y": 986,
     "w": 46,
     "h": 19
    },
@@ -5354,8 +9458,8 @@
   },
   "sea_rock_1": {
    "frame": {
-    "x": 805,
-    "y": 890,
+    "x": 662,
+    "y": 986,
     "w": 41,
     "h": 19
    },
@@ -5378,8 +9482,8 @@
   },
   "sea_rock_2": {
    "frame": {
-    "x": 589,
-    "y": 890,
+    "x": 280,
+    "y": 986,
     "w": 51,
     "h": 24
    },
@@ -5402,8 +9506,8 @@
   },
   "sea_rock_3": {
    "frame": {
-    "x": 953,
-    "y": 890,
+    "x": 810,
+    "y": 986,
     "w": 37,
     "h": 16
    },
@@ -5546,8 +9650,8 @@
   },
   "shore_rock_1": {
    "frame": {
-    "x": 1041,
-    "y": 538,
+    "x": 1080,
+    "y": 607,
     "w": 81,
     "h": 48
    },
@@ -5594,8 +9698,8 @@
   },
   "shore_rock_3": {
    "frame": {
-    "x": 848,
-    "y": 890,
+    "x": 705,
+    "y": 986,
     "w": 25,
     "h": 18
    },
@@ -5666,8 +9770,8 @@
   },
   "smoke_0": {
    "frame": {
-    "x": 1954,
-    "y": 890,
+    "x": 1811,
+    "y": 986,
     "w": 4,
     "h": 4
    },
@@ -5690,8 +9794,8 @@
   },
   "smoke_1": {
    "frame": {
-    "x": 1925,
-    "y": 890,
+    "x": 1782,
+    "y": 986,
     "w": 7,
     "h": 5
    },
@@ -5714,8 +9818,8 @@
   },
   "smoke_2": {
    "frame": {
-    "x": 1623,
-    "y": 890,
+    "x": 1480,
+    "y": 986,
     "w": 9,
     "h": 9
    },
@@ -5738,8 +9842,8 @@
   },
   "smoke_3": {
    "frame": {
-    "x": 1547,
-    "y": 890,
+    "x": 1404,
+    "y": 986,
     "w": 12,
     "h": 10
    },
@@ -5762,8 +9866,8 @@
   },
   "sparkle_0": {
    "frame": {
-    "x": 2034,
-    "y": 890,
+    "x": 1891,
+    "y": 986,
     "w": 1,
     "h": 1
    },
@@ -5786,8 +9890,8 @@
   },
   "sparkle_1": {
    "frame": {
-    "x": 2037,
-    "y": 890,
+    "x": 1894,
+    "y": 986,
     "w": 3,
     "h": 1
    },
@@ -5810,8 +9914,8 @@
   },
   "sparkle_2": {
    "frame": {
-    "x": 1993,
-    "y": 890,
+    "x": 1850,
+    "y": 986,
     "w": 5,
     "h": 2
    },
@@ -5834,8 +9938,8 @@
   },
   "t_path": {
    "frame": {
-    "x": 992,
-    "y": 890,
+    "x": 849,
+    "y": 986,
     "w": 32,
     "h": 16
    },
@@ -5858,8 +9962,8 @@
   },
   "villager_amberwrights_0_back_stand": {
    "frame": {
-    "x": 1126,
-    "y": 773,
+    "x": 738,
+    "y": 870,
     "w": 16,
     "h": 37
    },
@@ -5882,8 +9986,8 @@
   },
   "villager_amberwrights_0_back_walk0": {
    "frame": {
-    "x": 1144,
-    "y": 773,
+    "x": 756,
+    "y": 870,
     "w": 16,
     "h": 37
    },
@@ -5906,8 +10010,8 @@
   },
   "villager_amberwrights_0_back_walk1": {
    "frame": {
-    "x": 1162,
-    "y": 773,
+    "x": 774,
+    "y": 870,
     "w": 16,
     "h": 37
    },
@@ -5930,8 +10034,8 @@
   },
   "villager_amberwrights_0_back_work0_axe": {
    "frame": {
-    "x": 1359,
-    "y": 538,
+    "x": 945,
+    "y": 658,
     "w": 23,
     "h": 40
    },
@@ -5954,8 +10058,8 @@
   },
   "villager_amberwrights_0_back_work0_hammer": {
    "frame": {
-    "x": 1716,
-    "y": 649,
+    "x": 1311,
+    "y": 746,
     "w": 22,
     "h": 39
    },
@@ -5978,8 +10082,8 @@
   },
   "villager_amberwrights_0_back_work0_hoe": {
    "frame": {
-    "x": 429,
-    "y": 773,
+    "x": 41,
+    "y": 870,
     "w": 23,
     "h": 38
    },
@@ -6002,8 +10106,8 @@
   },
   "villager_amberwrights_0_back_work0_pick": {
    "frame": {
-    "x": 1180,
-    "y": 773,
+    "x": 792,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -6026,8 +10130,8 @@
   },
   "villager_amberwrights_0_back_work1_axe": {
    "frame": {
-    "x": 1206,
-    "y": 773,
+    "x": 818,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -6050,8 +10154,8 @@
   },
   "villager_amberwrights_0_back_work1_hammer": {
    "frame": {
-    "x": 1232,
-    "y": 773,
+    "x": 844,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -6074,8 +10178,8 @@
   },
   "villager_amberwrights_0_back_work1_hoe": {
    "frame": {
-    "x": 1258,
-    "y": 773,
+    "x": 870,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -6098,8 +10202,8 @@
   },
   "villager_amberwrights_0_back_work1_pick": {
    "frame": {
-    "x": 1284,
-    "y": 773,
+    "x": 896,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -6122,8 +10226,8 @@
   },
   "villager_amberwrights_0_front_stand": {
    "frame": {
-    "x": 1310,
-    "y": 773,
+    "x": 922,
+    "y": 870,
     "w": 16,
     "h": 37
    },
@@ -6146,8 +10250,8 @@
   },
   "villager_amberwrights_0_front_walk0": {
    "frame": {
-    "x": 1328,
-    "y": 773,
+    "x": 940,
+    "y": 870,
     "w": 16,
     "h": 37
    },
@@ -6170,8 +10274,8 @@
   },
   "villager_amberwrights_0_front_walk1": {
    "frame": {
-    "x": 1346,
-    "y": 773,
+    "x": 958,
+    "y": 870,
     "w": 16,
     "h": 37
    },
@@ -6194,8 +10298,8 @@
   },
   "villager_amberwrights_0_front_work0_axe": {
    "frame": {
-    "x": 1384,
-    "y": 538,
+    "x": 970,
+    "y": 658,
     "w": 23,
     "h": 40
    },
@@ -6218,8 +10322,8 @@
   },
   "villager_amberwrights_0_front_work0_hammer": {
    "frame": {
-    "x": 1740,
-    "y": 649,
+    "x": 1335,
+    "y": 746,
     "w": 22,
     "h": 39
    },
@@ -6242,8 +10346,8 @@
   },
   "villager_amberwrights_0_front_work0_hoe": {
    "frame": {
-    "x": 454,
-    "y": 773,
+    "x": 66,
+    "y": 870,
     "w": 23,
     "h": 38
    },
@@ -6266,8 +10370,8 @@
   },
   "villager_amberwrights_0_front_work0_pick": {
    "frame": {
-    "x": 1364,
-    "y": 773,
+    "x": 976,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -6290,8 +10394,8 @@
   },
   "villager_amberwrights_0_front_work1_axe": {
    "frame": {
-    "x": 1390,
-    "y": 773,
+    "x": 1002,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -6314,8 +10418,8 @@
   },
   "villager_amberwrights_0_front_work1_hammer": {
    "frame": {
-    "x": 1416,
-    "y": 773,
+    "x": 1028,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -6338,8 +10442,8 @@
   },
   "villager_amberwrights_0_front_work1_hoe": {
    "frame": {
-    "x": 1442,
-    "y": 773,
+    "x": 1054,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -6362,8 +10466,8 @@
   },
   "villager_amberwrights_0_front_work1_pick": {
    "frame": {
-    "x": 1468,
-    "y": 773,
+    "x": 1080,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -6386,8 +10490,8 @@
   },
   "villager_amberwrights_1_back_stand": {
    "frame": {
-    "x": 1494,
-    "y": 773,
+    "x": 1106,
+    "y": 870,
     "w": 16,
     "h": 37
    },
@@ -6410,8 +10514,8 @@
   },
   "villager_amberwrights_1_back_walk0": {
    "frame": {
-    "x": 1512,
-    "y": 773,
+    "x": 1124,
+    "y": 870,
     "w": 16,
     "h": 37
    },
@@ -6434,8 +10538,8 @@
   },
   "villager_amberwrights_1_back_walk1": {
    "frame": {
-    "x": 1530,
-    "y": 773,
+    "x": 1142,
+    "y": 870,
     "w": 16,
     "h": 37
    },
@@ -6458,8 +10562,8 @@
   },
   "villager_amberwrights_1_back_work0_axe": {
    "frame": {
-    "x": 1409,
-    "y": 538,
+    "x": 995,
+    "y": 658,
     "w": 23,
     "h": 40
    },
@@ -6482,8 +10586,8 @@
   },
   "villager_amberwrights_1_back_work0_hammer": {
    "frame": {
-    "x": 1764,
-    "y": 649,
+    "x": 1359,
+    "y": 746,
     "w": 22,
     "h": 39
    },
@@ -6506,8 +10610,8 @@
   },
   "villager_amberwrights_1_back_work0_hoe": {
    "frame": {
-    "x": 479,
-    "y": 773,
+    "x": 91,
+    "y": 870,
     "w": 23,
     "h": 38
    },
@@ -6530,8 +10634,8 @@
   },
   "villager_amberwrights_1_back_work0_pick": {
    "frame": {
-    "x": 1548,
-    "y": 773,
+    "x": 1160,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -6554,8 +10658,8 @@
   },
   "villager_amberwrights_1_back_work1_axe": {
    "frame": {
-    "x": 1574,
-    "y": 773,
+    "x": 1186,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -6578,8 +10682,8 @@
   },
   "villager_amberwrights_1_back_work1_hammer": {
    "frame": {
-    "x": 1600,
-    "y": 773,
+    "x": 1212,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -6602,8 +10706,8 @@
   },
   "villager_amberwrights_1_back_work1_hoe": {
    "frame": {
-    "x": 1626,
-    "y": 773,
+    "x": 1238,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -6626,8 +10730,8 @@
   },
   "villager_amberwrights_1_back_work1_pick": {
    "frame": {
-    "x": 1652,
-    "y": 773,
+    "x": 1264,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -6650,8 +10754,8 @@
   },
   "villager_amberwrights_1_front_stand": {
    "frame": {
-    "x": 1678,
-    "y": 773,
+    "x": 1290,
+    "y": 870,
     "w": 16,
     "h": 37
    },
@@ -6674,8 +10778,8 @@
   },
   "villager_amberwrights_1_front_walk0": {
    "frame": {
-    "x": 1696,
-    "y": 773,
+    "x": 1308,
+    "y": 870,
     "w": 16,
     "h": 37
    },
@@ -6698,8 +10802,8 @@
   },
   "villager_amberwrights_1_front_walk1": {
    "frame": {
-    "x": 1714,
-    "y": 773,
+    "x": 1326,
+    "y": 870,
     "w": 16,
     "h": 37
    },
@@ -6722,8 +10826,8 @@
   },
   "villager_amberwrights_1_front_work0_axe": {
    "frame": {
-    "x": 1434,
-    "y": 538,
+    "x": 1020,
+    "y": 658,
     "w": 23,
     "h": 40
    },
@@ -6746,8 +10850,8 @@
   },
   "villager_amberwrights_1_front_work0_hammer": {
    "frame": {
-    "x": 1788,
-    "y": 649,
+    "x": 1383,
+    "y": 746,
     "w": 22,
     "h": 39
    },
@@ -6770,8 +10874,8 @@
   },
   "villager_amberwrights_1_front_work0_hoe": {
    "frame": {
-    "x": 504,
-    "y": 773,
+    "x": 116,
+    "y": 870,
     "w": 23,
     "h": 38
    },
@@ -6794,8 +10898,8 @@
   },
   "villager_amberwrights_1_front_work0_pick": {
    "frame": {
-    "x": 1732,
-    "y": 773,
+    "x": 1344,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -6818,8 +10922,8 @@
   },
   "villager_amberwrights_1_front_work1_axe": {
    "frame": {
-    "x": 1758,
-    "y": 773,
+    "x": 1370,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -6842,8 +10946,8 @@
   },
   "villager_amberwrights_1_front_work1_hammer": {
    "frame": {
-    "x": 1784,
-    "y": 773,
+    "x": 1396,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -6866,8 +10970,8 @@
   },
   "villager_amberwrights_1_front_work1_hoe": {
    "frame": {
-    "x": 1810,
-    "y": 773,
+    "x": 1422,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -6890,8 +10994,8 @@
   },
   "villager_amberwrights_1_front_work1_pick": {
    "frame": {
-    "x": 1836,
-    "y": 773,
+    "x": 1448,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -6914,8 +11018,8 @@
   },
   "villager_amberwrights_2_back_stand": {
    "frame": {
-    "x": 1862,
-    "y": 773,
+    "x": 1474,
+    "y": 870,
     "w": 16,
     "h": 37
    },
@@ -6938,8 +11042,8 @@
   },
   "villager_amberwrights_2_back_walk0": {
    "frame": {
-    "x": 1880,
-    "y": 773,
+    "x": 1492,
+    "y": 870,
     "w": 16,
     "h": 37
    },
@@ -6962,8 +11066,8 @@
   },
   "villager_amberwrights_2_back_walk1": {
    "frame": {
-    "x": 1898,
-    "y": 773,
+    "x": 1510,
+    "y": 870,
     "w": 16,
     "h": 37
    },
@@ -6986,8 +11090,8 @@
   },
   "villager_amberwrights_2_back_work0_axe": {
    "frame": {
-    "x": 1459,
-    "y": 538,
+    "x": 1045,
+    "y": 658,
     "w": 23,
     "h": 40
    },
@@ -7010,8 +11114,8 @@
   },
   "villager_amberwrights_2_back_work0_hammer": {
    "frame": {
-    "x": 1812,
-    "y": 649,
+    "x": 1407,
+    "y": 746,
     "w": 22,
     "h": 39
    },
@@ -7034,8 +11138,8 @@
   },
   "villager_amberwrights_2_back_work0_hoe": {
    "frame": {
-    "x": 529,
-    "y": 773,
+    "x": 141,
+    "y": 870,
     "w": 23,
     "h": 38
    },
@@ -7058,8 +11162,8 @@
   },
   "villager_amberwrights_2_back_work0_pick": {
    "frame": {
-    "x": 1916,
-    "y": 773,
+    "x": 1528,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -7082,8 +11186,8 @@
   },
   "villager_amberwrights_2_back_work1_axe": {
    "frame": {
-    "x": 1942,
-    "y": 773,
+    "x": 1554,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -7106,8 +11210,8 @@
   },
   "villager_amberwrights_2_back_work1_hammer": {
    "frame": {
-    "x": 1968,
-    "y": 773,
+    "x": 1580,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -7130,8 +11234,8 @@
   },
   "villager_amberwrights_2_back_work1_hoe": {
    "frame": {
-    "x": 1994,
-    "y": 773,
+    "x": 1606,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -7154,8 +11258,8 @@
   },
   "villager_amberwrights_2_back_work1_pick": {
    "frame": {
-    "x": 2020,
-    "y": 773,
+    "x": 1632,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -7178,8 +11282,8 @@
   },
   "villager_amberwrights_2_front_stand": {
    "frame": {
-    "x": 2,
-    "y": 814,
+    "x": 1658,
+    "y": 870,
     "w": 16,
     "h": 37
    },
@@ -7202,8 +11306,8 @@
   },
   "villager_amberwrights_2_front_walk0": {
    "frame": {
-    "x": 20,
-    "y": 814,
+    "x": 1676,
+    "y": 870,
     "w": 16,
     "h": 37
    },
@@ -7226,8 +11330,8 @@
   },
   "villager_amberwrights_2_front_walk1": {
    "frame": {
-    "x": 38,
-    "y": 814,
+    "x": 1694,
+    "y": 870,
     "w": 16,
     "h": 37
    },
@@ -7250,8 +11354,8 @@
   },
   "villager_amberwrights_2_front_work0_axe": {
    "frame": {
-    "x": 1484,
-    "y": 538,
+    "x": 1070,
+    "y": 658,
     "w": 23,
     "h": 40
    },
@@ -7274,8 +11378,8 @@
   },
   "villager_amberwrights_2_front_work0_hammer": {
    "frame": {
-    "x": 1836,
-    "y": 649,
+    "x": 1431,
+    "y": 746,
     "w": 22,
     "h": 39
    },
@@ -7298,8 +11402,8 @@
   },
   "villager_amberwrights_2_front_work0_hoe": {
    "frame": {
-    "x": 554,
-    "y": 773,
+    "x": 166,
+    "y": 870,
     "w": 23,
     "h": 38
    },
@@ -7322,8 +11426,8 @@
   },
   "villager_amberwrights_2_front_work0_pick": {
    "frame": {
-    "x": 56,
-    "y": 814,
+    "x": 1712,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -7346,8 +11450,8 @@
   },
   "villager_amberwrights_2_front_work1_axe": {
    "frame": {
-    "x": 82,
-    "y": 814,
+    "x": 1738,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -7370,8 +11474,8 @@
   },
   "villager_amberwrights_2_front_work1_hammer": {
    "frame": {
-    "x": 108,
-    "y": 814,
+    "x": 1764,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -7394,8 +11498,8 @@
   },
   "villager_amberwrights_2_front_work1_hoe": {
    "frame": {
-    "x": 134,
-    "y": 814,
+    "x": 1790,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -7418,8 +11522,8 @@
   },
   "villager_amberwrights_2_front_work1_pick": {
    "frame": {
-    "x": 160,
-    "y": 814,
+    "x": 1816,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -7442,8 +11546,8 @@
   },
   "villager_cinderborn_0_back_stand": {
    "frame": {
-    "x": 1860,
-    "y": 649,
+    "x": 1455,
+    "y": 746,
     "w": 16,
     "h": 39
    },
@@ -7466,8 +11570,8 @@
   },
   "villager_cinderborn_0_back_walk0": {
    "frame": {
-    "x": 1878,
-    "y": 649,
+    "x": 1473,
+    "y": 746,
     "w": 16,
     "h": 39
    },
@@ -7490,8 +11594,8 @@
   },
   "villager_cinderborn_0_back_walk1": {
    "frame": {
-    "x": 1896,
-    "y": 649,
+    "x": 1491,
+    "y": 746,
     "w": 16,
     "h": 39
    },
@@ -7514,8 +11618,8 @@
   },
   "villager_cinderborn_0_back_work0_axe": {
    "frame": {
-    "x": 1509,
-    "y": 538,
+    "x": 1095,
+    "y": 658,
     "w": 23,
     "h": 40
    },
@@ -7538,8 +11642,8 @@
   },
   "villager_cinderborn_0_back_work0_hammer": {
    "frame": {
-    "x": 1914,
-    "y": 649,
+    "x": 1509,
+    "y": 746,
     "w": 22,
     "h": 39
    },
@@ -7562,8 +11666,8 @@
   },
   "villager_cinderborn_0_back_work0_hoe": {
    "frame": {
-    "x": 1938,
-    "y": 649,
+    "x": 1533,
+    "y": 746,
     "w": 23,
     "h": 39
    },
@@ -7586,8 +11690,8 @@
   },
   "villager_cinderborn_0_back_work0_pick": {
    "frame": {
-    "x": 1963,
-    "y": 649,
+    "x": 1558,
+    "y": 746,
     "w": 24,
     "h": 39
    },
@@ -7610,8 +11714,8 @@
   },
   "villager_cinderborn_0_back_work1_axe": {
    "frame": {
-    "x": 1989,
-    "y": 649,
+    "x": 1584,
+    "y": 746,
     "w": 24,
     "h": 39
    },
@@ -7634,8 +11738,8 @@
   },
   "villager_cinderborn_0_back_work1_hammer": {
    "frame": {
-    "x": 2015,
-    "y": 649,
+    "x": 1610,
+    "y": 746,
     "w": 24,
     "h": 39
    },
@@ -7658,8 +11762,8 @@
   },
   "villager_cinderborn_0_back_work1_hoe": {
    "frame": {
-    "x": 2,
-    "y": 691,
+    "x": 1636,
+    "y": 746,
     "w": 24,
     "h": 39
    },
@@ -7682,8 +11786,8 @@
   },
   "villager_cinderborn_0_back_work1_pick": {
    "frame": {
-    "x": 28,
-    "y": 691,
+    "x": 1662,
+    "y": 746,
     "w": 24,
     "h": 39
    },
@@ -7706,8 +11810,8 @@
   },
   "villager_cinderborn_0_front_stand": {
    "frame": {
-    "x": 54,
-    "y": 691,
+    "x": 1688,
+    "y": 746,
     "w": 16,
     "h": 39
    },
@@ -7730,8 +11834,8 @@
   },
   "villager_cinderborn_0_front_walk0": {
    "frame": {
-    "x": 72,
-    "y": 691,
+    "x": 1706,
+    "y": 746,
     "w": 16,
     "h": 39
    },
@@ -7754,8 +11858,8 @@
   },
   "villager_cinderborn_0_front_walk1": {
    "frame": {
-    "x": 90,
-    "y": 691,
+    "x": 1724,
+    "y": 746,
     "w": 16,
     "h": 39
    },
@@ -7778,8 +11882,8 @@
   },
   "villager_cinderborn_0_front_work0_axe": {
    "frame": {
-    "x": 1534,
-    "y": 538,
+    "x": 1120,
+    "y": 658,
     "w": 23,
     "h": 40
    },
@@ -7802,8 +11906,8 @@
   },
   "villager_cinderborn_0_front_work0_hammer": {
    "frame": {
-    "x": 108,
-    "y": 691,
+    "x": 1742,
+    "y": 746,
     "w": 22,
     "h": 39
    },
@@ -7826,8 +11930,8 @@
   },
   "villager_cinderborn_0_front_work0_hoe": {
    "frame": {
-    "x": 132,
-    "y": 691,
+    "x": 1766,
+    "y": 746,
     "w": 23,
     "h": 39
    },
@@ -7850,8 +11954,8 @@
   },
   "villager_cinderborn_0_front_work0_pick": {
    "frame": {
-    "x": 157,
-    "y": 691,
+    "x": 1791,
+    "y": 746,
     "w": 24,
     "h": 39
    },
@@ -7874,8 +11978,8 @@
   },
   "villager_cinderborn_0_front_work1_axe": {
    "frame": {
-    "x": 183,
-    "y": 691,
+    "x": 1817,
+    "y": 746,
     "w": 24,
     "h": 39
    },
@@ -7898,8 +12002,8 @@
   },
   "villager_cinderborn_0_front_work1_hammer": {
    "frame": {
-    "x": 209,
-    "y": 691,
+    "x": 1843,
+    "y": 746,
     "w": 24,
     "h": 39
    },
@@ -7922,8 +12026,8 @@
   },
   "villager_cinderborn_0_front_work1_hoe": {
    "frame": {
-    "x": 235,
-    "y": 691,
+    "x": 1869,
+    "y": 746,
     "w": 24,
     "h": 39
    },
@@ -7946,8 +12050,8 @@
   },
   "villager_cinderborn_0_front_work1_pick": {
    "frame": {
-    "x": 261,
-    "y": 691,
+    "x": 1895,
+    "y": 746,
     "w": 24,
     "h": 39
    },
@@ -7970,8 +12074,8 @@
   },
   "villager_cinderborn_1_back_stand": {
    "frame": {
-    "x": 287,
-    "y": 691,
+    "x": 1921,
+    "y": 746,
     "w": 16,
     "h": 39
    },
@@ -7994,8 +12098,8 @@
   },
   "villager_cinderborn_1_back_walk0": {
    "frame": {
-    "x": 305,
-    "y": 691,
+    "x": 1939,
+    "y": 746,
     "w": 16,
     "h": 39
    },
@@ -8018,8 +12122,8 @@
   },
   "villager_cinderborn_1_back_walk1": {
    "frame": {
-    "x": 323,
-    "y": 691,
+    "x": 1957,
+    "y": 746,
     "w": 16,
     "h": 39
    },
@@ -8042,8 +12146,8 @@
   },
   "villager_cinderborn_1_back_work0_axe": {
    "frame": {
-    "x": 1559,
-    "y": 538,
+    "x": 1145,
+    "y": 658,
     "w": 23,
     "h": 40
    },
@@ -8066,8 +12170,8 @@
   },
   "villager_cinderborn_1_back_work0_hammer": {
    "frame": {
-    "x": 341,
-    "y": 691,
+    "x": 1975,
+    "y": 746,
     "w": 22,
     "h": 39
    },
@@ -8090,8 +12194,8 @@
   },
   "villager_cinderborn_1_back_work0_hoe": {
    "frame": {
-    "x": 365,
-    "y": 691,
+    "x": 1999,
+    "y": 746,
     "w": 23,
     "h": 39
    },
@@ -8114,8 +12218,8 @@
   },
   "villager_cinderborn_1_back_work0_pick": {
    "frame": {
-    "x": 390,
-    "y": 691,
+    "x": 2,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -8138,8 +12242,8 @@
   },
   "villager_cinderborn_1_back_work1_axe": {
    "frame": {
-    "x": 416,
-    "y": 691,
+    "x": 28,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -8162,8 +12266,8 @@
   },
   "villager_cinderborn_1_back_work1_hammer": {
    "frame": {
-    "x": 442,
-    "y": 691,
+    "x": 54,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -8186,8 +12290,8 @@
   },
   "villager_cinderborn_1_back_work1_hoe": {
    "frame": {
-    "x": 468,
-    "y": 691,
+    "x": 80,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -8210,8 +12314,8 @@
   },
   "villager_cinderborn_1_back_work1_pick": {
    "frame": {
-    "x": 494,
-    "y": 691,
+    "x": 106,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -8234,8 +12338,8 @@
   },
   "villager_cinderborn_1_front_stand": {
    "frame": {
-    "x": 520,
-    "y": 691,
+    "x": 132,
+    "y": 788,
     "w": 16,
     "h": 39
    },
@@ -8258,8 +12362,8 @@
   },
   "villager_cinderborn_1_front_walk0": {
    "frame": {
-    "x": 538,
-    "y": 691,
+    "x": 150,
+    "y": 788,
     "w": 16,
     "h": 39
    },
@@ -8282,8 +12386,8 @@
   },
   "villager_cinderborn_1_front_walk1": {
    "frame": {
-    "x": 556,
-    "y": 691,
+    "x": 168,
+    "y": 788,
     "w": 16,
     "h": 39
    },
@@ -8306,8 +12410,8 @@
   },
   "villager_cinderborn_1_front_work0_axe": {
    "frame": {
-    "x": 1584,
-    "y": 538,
+    "x": 1170,
+    "y": 658,
     "w": 23,
     "h": 40
    },
@@ -8330,8 +12434,8 @@
   },
   "villager_cinderborn_1_front_work0_hammer": {
    "frame": {
-    "x": 574,
-    "y": 691,
+    "x": 186,
+    "y": 788,
     "w": 22,
     "h": 39
    },
@@ -8354,8 +12458,8 @@
   },
   "villager_cinderborn_1_front_work0_hoe": {
    "frame": {
-    "x": 598,
-    "y": 691,
+    "x": 210,
+    "y": 788,
     "w": 23,
     "h": 39
    },
@@ -8378,8 +12482,8 @@
   },
   "villager_cinderborn_1_front_work0_pick": {
    "frame": {
-    "x": 623,
-    "y": 691,
+    "x": 235,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -8402,8 +12506,8 @@
   },
   "villager_cinderborn_1_front_work1_axe": {
    "frame": {
-    "x": 649,
-    "y": 691,
+    "x": 261,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -8426,8 +12530,8 @@
   },
   "villager_cinderborn_1_front_work1_hammer": {
    "frame": {
-    "x": 675,
-    "y": 691,
+    "x": 287,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -8450,8 +12554,8 @@
   },
   "villager_cinderborn_1_front_work1_hoe": {
    "frame": {
-    "x": 701,
-    "y": 691,
+    "x": 313,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -8474,8 +12578,8 @@
   },
   "villager_cinderborn_1_front_work1_pick": {
    "frame": {
-    "x": 727,
-    "y": 691,
+    "x": 339,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -8498,8 +12602,8 @@
   },
   "villager_cinderborn_2_back_stand": {
    "frame": {
-    "x": 753,
-    "y": 691,
+    "x": 365,
+    "y": 788,
     "w": 16,
     "h": 39
    },
@@ -8522,8 +12626,8 @@
   },
   "villager_cinderborn_2_back_walk0": {
    "frame": {
-    "x": 771,
-    "y": 691,
+    "x": 383,
+    "y": 788,
     "w": 16,
     "h": 39
    },
@@ -8546,8 +12650,8 @@
   },
   "villager_cinderborn_2_back_walk1": {
    "frame": {
-    "x": 789,
-    "y": 691,
+    "x": 401,
+    "y": 788,
     "w": 16,
     "h": 39
    },
@@ -8570,8 +12674,8 @@
   },
   "villager_cinderborn_2_back_work0_axe": {
    "frame": {
-    "x": 1609,
-    "y": 538,
+    "x": 1195,
+    "y": 658,
     "w": 23,
     "h": 40
    },
@@ -8594,8 +12698,8 @@
   },
   "villager_cinderborn_2_back_work0_hammer": {
    "frame": {
-    "x": 807,
-    "y": 691,
+    "x": 419,
+    "y": 788,
     "w": 22,
     "h": 39
    },
@@ -8618,8 +12722,8 @@
   },
   "villager_cinderborn_2_back_work0_hoe": {
    "frame": {
-    "x": 831,
-    "y": 691,
+    "x": 443,
+    "y": 788,
     "w": 23,
     "h": 39
    },
@@ -8642,8 +12746,8 @@
   },
   "villager_cinderborn_2_back_work0_pick": {
    "frame": {
-    "x": 856,
-    "y": 691,
+    "x": 468,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -8666,8 +12770,8 @@
   },
   "villager_cinderborn_2_back_work1_axe": {
    "frame": {
-    "x": 882,
-    "y": 691,
+    "x": 494,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -8690,8 +12794,8 @@
   },
   "villager_cinderborn_2_back_work1_hammer": {
    "frame": {
-    "x": 908,
-    "y": 691,
+    "x": 520,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -8714,8 +12818,8 @@
   },
   "villager_cinderborn_2_back_work1_hoe": {
    "frame": {
-    "x": 934,
-    "y": 691,
+    "x": 546,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -8738,8 +12842,8 @@
   },
   "villager_cinderborn_2_back_work1_pick": {
    "frame": {
-    "x": 960,
-    "y": 691,
+    "x": 572,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -8762,8 +12866,8 @@
   },
   "villager_cinderborn_2_front_stand": {
    "frame": {
-    "x": 986,
-    "y": 691,
+    "x": 598,
+    "y": 788,
     "w": 16,
     "h": 39
    },
@@ -8786,8 +12890,8 @@
   },
   "villager_cinderborn_2_front_walk0": {
    "frame": {
-    "x": 1004,
-    "y": 691,
+    "x": 616,
+    "y": 788,
     "w": 16,
     "h": 39
    },
@@ -8810,8 +12914,8 @@
   },
   "villager_cinderborn_2_front_walk1": {
    "frame": {
-    "x": 1022,
-    "y": 691,
+    "x": 634,
+    "y": 788,
     "w": 16,
     "h": 39
    },
@@ -8834,8 +12938,8 @@
   },
   "villager_cinderborn_2_front_work0_axe": {
    "frame": {
-    "x": 1634,
-    "y": 538,
+    "x": 1220,
+    "y": 658,
     "w": 23,
     "h": 40
    },
@@ -8858,8 +12962,8 @@
   },
   "villager_cinderborn_2_front_work0_hammer": {
    "frame": {
-    "x": 1040,
-    "y": 691,
+    "x": 652,
+    "y": 788,
     "w": 22,
     "h": 39
    },
@@ -8882,8 +12986,8 @@
   },
   "villager_cinderborn_2_front_work0_hoe": {
    "frame": {
-    "x": 1064,
-    "y": 691,
+    "x": 676,
+    "y": 788,
     "w": 23,
     "h": 39
    },
@@ -8906,8 +13010,8 @@
   },
   "villager_cinderborn_2_front_work0_pick": {
    "frame": {
-    "x": 1089,
-    "y": 691,
+    "x": 701,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -8930,8 +13034,8 @@
   },
   "villager_cinderborn_2_front_work1_axe": {
    "frame": {
-    "x": 1115,
-    "y": 691,
+    "x": 727,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -8954,8 +13058,8 @@
   },
   "villager_cinderborn_2_front_work1_hammer": {
    "frame": {
-    "x": 1141,
-    "y": 691,
+    "x": 753,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -8978,8 +13082,8 @@
   },
   "villager_cinderborn_2_front_work1_hoe": {
    "frame": {
-    "x": 1167,
-    "y": 691,
+    "x": 779,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -9002,8 +13106,8 @@
   },
   "villager_cinderborn_2_front_work1_pick": {
    "frame": {
-    "x": 1193,
-    "y": 691,
+    "x": 805,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -9026,8 +13130,8 @@
   },
   "villager_freebooters_0_back_stand": {
    "frame": {
-    "x": 1861,
-    "y": 814,
+    "x": 1495,
+    "y": 910,
     "w": 16,
     "h": 35
    },
@@ -9050,8 +13154,8 @@
   },
   "villager_freebooters_0_back_walk0": {
    "frame": {
-    "x": 1879,
-    "y": 814,
+    "x": 1513,
+    "y": 910,
     "w": 16,
     "h": 35
    },
@@ -9074,8 +13178,8 @@
   },
   "villager_freebooters_0_back_walk1": {
    "frame": {
-    "x": 1897,
-    "y": 814,
+    "x": 1531,
+    "y": 910,
     "w": 16,
     "h": 35
    },
@@ -9098,8 +13202,8 @@
   },
   "villager_freebooters_0_back_work0_axe": {
    "frame": {
-    "x": 1659,
-    "y": 538,
+    "x": 1245,
+    "y": 658,
     "w": 23,
     "h": 40
    },
@@ -9122,8 +13226,8 @@
   },
   "villager_freebooters_0_back_work0_hammer": {
    "frame": {
-    "x": 1219,
-    "y": 691,
+    "x": 831,
+    "y": 788,
     "w": 22,
     "h": 39
    },
@@ -9146,8 +13250,8 @@
   },
   "villager_freebooters_0_back_work0_hoe": {
    "frame": {
-    "x": 579,
-    "y": 773,
+    "x": 191,
+    "y": 870,
     "w": 23,
     "h": 38
    },
@@ -9170,8 +13274,8 @@
   },
   "villager_freebooters_0_back_work0_pick": {
    "frame": {
-    "x": 186,
-    "y": 814,
+    "x": 1842,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -9194,8 +13298,8 @@
   },
   "villager_freebooters_0_back_work1_axe": {
    "frame": {
-    "x": 1915,
-    "y": 814,
+    "x": 1549,
+    "y": 910,
     "w": 24,
     "h": 35
    },
@@ -9218,8 +13322,8 @@
   },
   "villager_freebooters_0_back_work1_hammer": {
    "frame": {
-    "x": 1941,
-    "y": 814,
+    "x": 1575,
+    "y": 910,
     "w": 24,
     "h": 35
    },
@@ -9242,8 +13346,8 @@
   },
   "villager_freebooters_0_back_work1_hoe": {
    "frame": {
-    "x": 1967,
-    "y": 814,
+    "x": 1601,
+    "y": 910,
     "w": 24,
     "h": 35
    },
@@ -9266,8 +13370,8 @@
   },
   "villager_freebooters_0_back_work1_pick": {
    "frame": {
-    "x": 1993,
-    "y": 814,
+    "x": 1627,
+    "y": 910,
     "w": 24,
     "h": 35
    },
@@ -9290,8 +13394,8 @@
   },
   "villager_freebooters_0_front_stand": {
    "frame": {
-    "x": 2019,
-    "y": 814,
+    "x": 1653,
+    "y": 910,
     "w": 16,
     "h": 35
    },
@@ -9314,8 +13418,8 @@
   },
   "villager_freebooters_0_front_walk0": {
    "frame": {
-    "x": 2,
-    "y": 853,
+    "x": 1671,
+    "y": 910,
     "w": 16,
     "h": 35
    },
@@ -9338,8 +13442,8 @@
   },
   "villager_freebooters_0_front_walk1": {
    "frame": {
-    "x": 20,
-    "y": 853,
+    "x": 1689,
+    "y": 910,
     "w": 16,
     "h": 35
    },
@@ -9362,8 +13466,8 @@
   },
   "villager_freebooters_0_front_work0_axe": {
    "frame": {
-    "x": 1684,
-    "y": 538,
+    "x": 1270,
+    "y": 658,
     "w": 23,
     "h": 40
    },
@@ -9386,8 +13490,8 @@
   },
   "villager_freebooters_0_front_work0_hammer": {
    "frame": {
-    "x": 1243,
-    "y": 691,
+    "x": 855,
+    "y": 788,
     "w": 22,
     "h": 39
    },
@@ -9410,8 +13514,8 @@
   },
   "villager_freebooters_0_front_work0_hoe": {
    "frame": {
-    "x": 604,
-    "y": 773,
+    "x": 216,
+    "y": 870,
     "w": 23,
     "h": 38
    },
@@ -9434,8 +13538,8 @@
   },
   "villager_freebooters_0_front_work0_pick": {
    "frame": {
-    "x": 212,
-    "y": 814,
+    "x": 1868,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -9458,8 +13562,8 @@
   },
   "villager_freebooters_0_front_work1_axe": {
    "frame": {
-    "x": 38,
-    "y": 853,
+    "x": 1707,
+    "y": 910,
     "w": 24,
     "h": 35
    },
@@ -9482,8 +13586,8 @@
   },
   "villager_freebooters_0_front_work1_hammer": {
    "frame": {
-    "x": 64,
-    "y": 853,
+    "x": 1733,
+    "y": 910,
     "w": 24,
     "h": 35
    },
@@ -9506,8 +13610,8 @@
   },
   "villager_freebooters_0_front_work1_hoe": {
    "frame": {
-    "x": 90,
-    "y": 853,
+    "x": 1759,
+    "y": 910,
     "w": 24,
     "h": 35
    },
@@ -9530,8 +13634,8 @@
   },
   "villager_freebooters_0_front_work1_pick": {
    "frame": {
-    "x": 116,
-    "y": 853,
+    "x": 1785,
+    "y": 910,
     "w": 24,
     "h": 35
    },
@@ -9554,8 +13658,8 @@
   },
   "villager_freebooters_1_back_stand": {
    "frame": {
-    "x": 142,
-    "y": 853,
+    "x": 1811,
+    "y": 910,
     "w": 16,
     "h": 35
    },
@@ -9578,8 +13682,8 @@
   },
   "villager_freebooters_1_back_walk0": {
    "frame": {
-    "x": 160,
-    "y": 853,
+    "x": 1829,
+    "y": 910,
     "w": 16,
     "h": 35
    },
@@ -9602,8 +13706,8 @@
   },
   "villager_freebooters_1_back_walk1": {
    "frame": {
-    "x": 178,
-    "y": 853,
+    "x": 1847,
+    "y": 910,
     "w": 16,
     "h": 35
    },
@@ -9626,8 +13730,8 @@
   },
   "villager_freebooters_1_back_work0_axe": {
    "frame": {
-    "x": 1709,
-    "y": 538,
+    "x": 1295,
+    "y": 658,
     "w": 23,
     "h": 40
    },
@@ -9650,8 +13754,8 @@
   },
   "villager_freebooters_1_back_work0_hammer": {
    "frame": {
-    "x": 1267,
-    "y": 691,
+    "x": 879,
+    "y": 788,
     "w": 22,
     "h": 39
    },
@@ -9674,8 +13778,8 @@
   },
   "villager_freebooters_1_back_work0_hoe": {
    "frame": {
-    "x": 629,
-    "y": 773,
+    "x": 241,
+    "y": 870,
     "w": 23,
     "h": 38
    },
@@ -9698,8 +13802,8 @@
   },
   "villager_freebooters_1_back_work0_pick": {
    "frame": {
-    "x": 238,
-    "y": 814,
+    "x": 1894,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -9722,8 +13826,8 @@
   },
   "villager_freebooters_1_back_work1_axe": {
    "frame": {
-    "x": 196,
-    "y": 853,
+    "x": 1865,
+    "y": 910,
     "w": 24,
     "h": 35
    },
@@ -9746,8 +13850,8 @@
   },
   "villager_freebooters_1_back_work1_hammer": {
    "frame": {
-    "x": 222,
-    "y": 853,
+    "x": 1891,
+    "y": 910,
     "w": 24,
     "h": 35
    },
@@ -9770,8 +13874,8 @@
   },
   "villager_freebooters_1_back_work1_hoe": {
    "frame": {
-    "x": 248,
-    "y": 853,
+    "x": 1917,
+    "y": 910,
     "w": 24,
     "h": 35
    },
@@ -9794,8 +13898,8 @@
   },
   "villager_freebooters_1_back_work1_pick": {
    "frame": {
-    "x": 274,
-    "y": 853,
+    "x": 1943,
+    "y": 910,
     "w": 24,
     "h": 35
    },
@@ -9818,8 +13922,8 @@
   },
   "villager_freebooters_1_front_stand": {
    "frame": {
-    "x": 300,
-    "y": 853,
+    "x": 1969,
+    "y": 910,
     "w": 16,
     "h": 35
    },
@@ -9842,8 +13946,8 @@
   },
   "villager_freebooters_1_front_walk0": {
    "frame": {
-    "x": 318,
-    "y": 853,
+    "x": 1987,
+    "y": 910,
     "w": 16,
     "h": 35
    },
@@ -9866,8 +13970,8 @@
   },
   "villager_freebooters_1_front_walk1": {
    "frame": {
-    "x": 336,
-    "y": 853,
+    "x": 2005,
+    "y": 910,
     "w": 16,
     "h": 35
    },
@@ -9890,8 +13994,8 @@
   },
   "villager_freebooters_1_front_work0_axe": {
    "frame": {
-    "x": 1734,
-    "y": 538,
+    "x": 1320,
+    "y": 658,
     "w": 23,
     "h": 40
    },
@@ -9914,8 +14018,8 @@
   },
   "villager_freebooters_1_front_work0_hammer": {
    "frame": {
-    "x": 1291,
-    "y": 691,
+    "x": 903,
+    "y": 788,
     "w": 22,
     "h": 39
    },
@@ -9938,8 +14042,8 @@
   },
   "villager_freebooters_1_front_work0_hoe": {
    "frame": {
-    "x": 654,
-    "y": 773,
+    "x": 266,
+    "y": 870,
     "w": 23,
     "h": 38
    },
@@ -9962,8 +14066,8 @@
   },
   "villager_freebooters_1_front_work0_pick": {
    "frame": {
-    "x": 264,
-    "y": 814,
+    "x": 1920,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -9986,8 +14090,8 @@
   },
   "villager_freebooters_1_front_work1_axe": {
    "frame": {
-    "x": 354,
-    "y": 853,
+    "x": 2,
+    "y": 949,
     "w": 24,
     "h": 35
    },
@@ -10010,8 +14114,8 @@
   },
   "villager_freebooters_1_front_work1_hammer": {
    "frame": {
-    "x": 380,
-    "y": 853,
+    "x": 28,
+    "y": 949,
     "w": 24,
     "h": 35
    },
@@ -10034,8 +14138,8 @@
   },
   "villager_freebooters_1_front_work1_hoe": {
    "frame": {
-    "x": 406,
-    "y": 853,
+    "x": 54,
+    "y": 949,
     "w": 24,
     "h": 35
    },
@@ -10058,8 +14162,8 @@
   },
   "villager_freebooters_1_front_work1_pick": {
    "frame": {
-    "x": 432,
-    "y": 853,
+    "x": 80,
+    "y": 949,
     "w": 24,
     "h": 35
    },
@@ -10082,8 +14186,8 @@
   },
   "villager_freebooters_2_back_stand": {
    "frame": {
-    "x": 458,
-    "y": 853,
+    "x": 106,
+    "y": 949,
     "w": 16,
     "h": 35
    },
@@ -10106,8 +14210,8 @@
   },
   "villager_freebooters_2_back_walk0": {
    "frame": {
-    "x": 476,
-    "y": 853,
+    "x": 124,
+    "y": 949,
     "w": 16,
     "h": 35
    },
@@ -10130,8 +14234,8 @@
   },
   "villager_freebooters_2_back_walk1": {
    "frame": {
-    "x": 494,
-    "y": 853,
+    "x": 142,
+    "y": 949,
     "w": 16,
     "h": 35
    },
@@ -10154,8 +14258,8 @@
   },
   "villager_freebooters_2_back_work0_axe": {
    "frame": {
-    "x": 1759,
-    "y": 538,
+    "x": 1345,
+    "y": 658,
     "w": 23,
     "h": 40
    },
@@ -10178,8 +14282,8 @@
   },
   "villager_freebooters_2_back_work0_hammer": {
    "frame": {
-    "x": 1315,
-    "y": 691,
+    "x": 927,
+    "y": 788,
     "w": 22,
     "h": 39
    },
@@ -10202,8 +14306,8 @@
   },
   "villager_freebooters_2_back_work0_hoe": {
    "frame": {
-    "x": 679,
-    "y": 773,
+    "x": 291,
+    "y": 870,
     "w": 23,
     "h": 38
    },
@@ -10226,8 +14330,8 @@
   },
   "villager_freebooters_2_back_work0_pick": {
    "frame": {
-    "x": 290,
-    "y": 814,
+    "x": 1946,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -10250,8 +14354,8 @@
   },
   "villager_freebooters_2_back_work1_axe": {
    "frame": {
-    "x": 512,
-    "y": 853,
+    "x": 160,
+    "y": 949,
     "w": 24,
     "h": 35
    },
@@ -10274,8 +14378,8 @@
   },
   "villager_freebooters_2_back_work1_hammer": {
    "frame": {
-    "x": 538,
-    "y": 853,
+    "x": 186,
+    "y": 949,
     "w": 24,
     "h": 35
    },
@@ -10298,8 +14402,8 @@
   },
   "villager_freebooters_2_back_work1_hoe": {
    "frame": {
-    "x": 564,
-    "y": 853,
+    "x": 212,
+    "y": 949,
     "w": 24,
     "h": 35
    },
@@ -10322,8 +14426,8 @@
   },
   "villager_freebooters_2_back_work1_pick": {
    "frame": {
-    "x": 590,
-    "y": 853,
+    "x": 238,
+    "y": 949,
     "w": 24,
     "h": 35
    },
@@ -10346,8 +14450,8 @@
   },
   "villager_freebooters_2_front_stand": {
    "frame": {
-    "x": 616,
-    "y": 853,
+    "x": 264,
+    "y": 949,
     "w": 16,
     "h": 35
    },
@@ -10370,8 +14474,8 @@
   },
   "villager_freebooters_2_front_walk0": {
    "frame": {
-    "x": 634,
-    "y": 853,
+    "x": 282,
+    "y": 949,
     "w": 16,
     "h": 35
    },
@@ -10394,8 +14498,8 @@
   },
   "villager_freebooters_2_front_walk1": {
    "frame": {
-    "x": 652,
-    "y": 853,
+    "x": 300,
+    "y": 949,
     "w": 16,
     "h": 35
    },
@@ -10418,8 +14522,8 @@
   },
   "villager_freebooters_2_front_work0_axe": {
    "frame": {
-    "x": 1784,
-    "y": 538,
+    "x": 1370,
+    "y": 658,
     "w": 23,
     "h": 40
    },
@@ -10442,8 +14546,8 @@
   },
   "villager_freebooters_2_front_work0_hammer": {
    "frame": {
-    "x": 1339,
-    "y": 691,
+    "x": 951,
+    "y": 788,
     "w": 22,
     "h": 39
    },
@@ -10466,8 +14570,8 @@
   },
   "villager_freebooters_2_front_work0_hoe": {
    "frame": {
-    "x": 704,
-    "y": 773,
+    "x": 316,
+    "y": 870,
     "w": 23,
     "h": 38
    },
@@ -10490,8 +14594,8 @@
   },
   "villager_freebooters_2_front_work0_pick": {
    "frame": {
-    "x": 316,
-    "y": 814,
+    "x": 1972,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -10514,8 +14618,8 @@
   },
   "villager_freebooters_2_front_work1_axe": {
    "frame": {
-    "x": 670,
-    "y": 853,
+    "x": 318,
+    "y": 949,
     "w": 24,
     "h": 35
    },
@@ -10538,8 +14642,8 @@
   },
   "villager_freebooters_2_front_work1_hammer": {
    "frame": {
-    "x": 696,
-    "y": 853,
+    "x": 344,
+    "y": 949,
     "w": 24,
     "h": 35
    },
@@ -10562,8 +14666,8 @@
   },
   "villager_freebooters_2_front_work1_hoe": {
    "frame": {
-    "x": 722,
-    "y": 853,
+    "x": 370,
+    "y": 949,
     "w": 24,
     "h": 35
    },
@@ -10586,8 +14690,8 @@
   },
   "villager_freebooters_2_front_work1_pick": {
    "frame": {
-    "x": 748,
-    "y": 853,
+    "x": 396,
+    "y": 949,
     "w": 24,
     "h": 35
    },
@@ -10610,8 +14714,8 @@
   },
   "villager_glowkin_0_back_stand": {
    "frame": {
-    "x": 1809,
-    "y": 538,
+    "x": 1395,
+    "y": 658,
     "w": 16,
     "h": 40
    },
@@ -10634,8 +14738,8 @@
   },
   "villager_glowkin_0_back_walk0": {
    "frame": {
-    "x": 1827,
-    "y": 538,
+    "x": 1413,
+    "y": 658,
     "w": 16,
     "h": 40
    },
@@ -10658,8 +14762,8 @@
   },
   "villager_glowkin_0_back_walk1": {
    "frame": {
-    "x": 1845,
-    "y": 538,
+    "x": 1431,
+    "y": 658,
     "w": 16,
     "h": 40
    },
@@ -10682,8 +14786,8 @@
   },
   "villager_glowkin_0_back_work0_axe": {
    "frame": {
-    "x": 1863,
-    "y": 538,
+    "x": 1449,
+    "y": 658,
     "w": 23,
     "h": 40
    },
@@ -10706,8 +14810,8 @@
   },
   "villager_glowkin_0_back_work0_hammer": {
    "frame": {
-    "x": 1888,
-    "y": 538,
+    "x": 1474,
+    "y": 658,
     "w": 22,
     "h": 40
    },
@@ -10730,8 +14834,8 @@
   },
   "villager_glowkin_0_back_work0_hoe": {
    "frame": {
-    "x": 1912,
-    "y": 538,
+    "x": 1498,
+    "y": 658,
     "w": 23,
     "h": 40
    },
@@ -10754,8 +14858,8 @@
   },
   "villager_glowkin_0_back_work0_pick": {
    "frame": {
-    "x": 1937,
-    "y": 538,
+    "x": 1523,
+    "y": 658,
     "w": 24,
     "h": 40
    },
@@ -10778,8 +14882,8 @@
   },
   "villager_glowkin_0_back_work1_axe": {
    "frame": {
-    "x": 1963,
-    "y": 538,
+    "x": 1549,
+    "y": 658,
     "w": 24,
     "h": 40
    },
@@ -10802,8 +14906,8 @@
   },
   "villager_glowkin_0_back_work1_hammer": {
    "frame": {
-    "x": 1989,
-    "y": 538,
+    "x": 1575,
+    "y": 658,
     "w": 24,
     "h": 40
    },
@@ -10826,8 +14930,8 @@
   },
   "villager_glowkin_0_back_work1_hoe": {
    "frame": {
-    "x": 2015,
-    "y": 538,
+    "x": 1601,
+    "y": 658,
     "w": 24,
     "h": 40
    },
@@ -10850,8 +14954,8 @@
   },
   "villager_glowkin_0_back_work1_pick": {
    "frame": {
-    "x": 2,
-    "y": 607,
+    "x": 1627,
+    "y": 658,
     "w": 24,
     "h": 40
    },
@@ -10874,8 +14978,8 @@
   },
   "villager_glowkin_0_front_stand": {
    "frame": {
-    "x": 28,
-    "y": 607,
+    "x": 1653,
+    "y": 658,
     "w": 16,
     "h": 40
    },
@@ -10898,8 +15002,8 @@
   },
   "villager_glowkin_0_front_walk0": {
    "frame": {
-    "x": 46,
-    "y": 607,
+    "x": 1671,
+    "y": 658,
     "w": 16,
     "h": 40
    },
@@ -10922,8 +15026,8 @@
   },
   "villager_glowkin_0_front_walk1": {
    "frame": {
-    "x": 64,
-    "y": 607,
+    "x": 1689,
+    "y": 658,
     "w": 16,
     "h": 40
    },
@@ -10946,8 +15050,8 @@
   },
   "villager_glowkin_0_front_work0_axe": {
    "frame": {
-    "x": 82,
-    "y": 607,
+    "x": 1707,
+    "y": 658,
     "w": 23,
     "h": 40
    },
@@ -10970,8 +15074,8 @@
   },
   "villager_glowkin_0_front_work0_hammer": {
    "frame": {
-    "x": 107,
-    "y": 607,
+    "x": 1732,
+    "y": 658,
     "w": 22,
     "h": 40
    },
@@ -10994,8 +15098,8 @@
   },
   "villager_glowkin_0_front_work0_hoe": {
    "frame": {
-    "x": 131,
-    "y": 607,
+    "x": 1756,
+    "y": 658,
     "w": 23,
     "h": 40
    },
@@ -11018,8 +15122,8 @@
   },
   "villager_glowkin_0_front_work0_pick": {
    "frame": {
-    "x": 156,
-    "y": 607,
+    "x": 1781,
+    "y": 658,
     "w": 24,
     "h": 40
    },
@@ -11042,8 +15146,8 @@
   },
   "villager_glowkin_0_front_work1_axe": {
    "frame": {
-    "x": 182,
-    "y": 607,
+    "x": 1807,
+    "y": 658,
     "w": 24,
     "h": 40
    },
@@ -11066,8 +15170,8 @@
   },
   "villager_glowkin_0_front_work1_hammer": {
    "frame": {
-    "x": 208,
-    "y": 607,
+    "x": 1833,
+    "y": 658,
     "w": 24,
     "h": 40
    },
@@ -11090,8 +15194,8 @@
   },
   "villager_glowkin_0_front_work1_hoe": {
    "frame": {
-    "x": 234,
-    "y": 607,
+    "x": 1859,
+    "y": 658,
     "w": 24,
     "h": 40
    },
@@ -11114,8 +15218,8 @@
   },
   "villager_glowkin_0_front_work1_pick": {
    "frame": {
-    "x": 260,
-    "y": 607,
+    "x": 1885,
+    "y": 658,
     "w": 24,
     "h": 40
    },
@@ -11138,8 +15242,8 @@
   },
   "villager_glowkin_1_back_stand": {
    "frame": {
-    "x": 286,
-    "y": 607,
+    "x": 1911,
+    "y": 658,
     "w": 16,
     "h": 40
    },
@@ -11162,8 +15266,8 @@
   },
   "villager_glowkin_1_back_walk0": {
    "frame": {
-    "x": 304,
-    "y": 607,
+    "x": 1929,
+    "y": 658,
     "w": 16,
     "h": 40
    },
@@ -11186,8 +15290,8 @@
   },
   "villager_glowkin_1_back_walk1": {
    "frame": {
-    "x": 322,
-    "y": 607,
+    "x": 1947,
+    "y": 658,
     "w": 16,
     "h": 40
    },
@@ -11210,8 +15314,8 @@
   },
   "villager_glowkin_1_back_work0_axe": {
    "frame": {
-    "x": 340,
-    "y": 607,
+    "x": 1965,
+    "y": 658,
     "w": 23,
     "h": 40
    },
@@ -11234,8 +15338,8 @@
   },
   "villager_glowkin_1_back_work0_hammer": {
    "frame": {
-    "x": 365,
-    "y": 607,
+    "x": 1990,
+    "y": 658,
     "w": 22,
     "h": 40
    },
@@ -11258,8 +15362,8 @@
   },
   "villager_glowkin_1_back_work0_hoe": {
    "frame": {
-    "x": 389,
-    "y": 607,
+    "x": 2014,
+    "y": 658,
     "w": 23,
     "h": 40
    },
@@ -11282,8 +15386,8 @@
   },
   "villager_glowkin_1_back_work0_pick": {
    "frame": {
-    "x": 414,
-    "y": 607,
+    "x": 2,
+    "y": 704,
     "w": 24,
     "h": 40
    },
@@ -11306,8 +15410,8 @@
   },
   "villager_glowkin_1_back_work1_axe": {
    "frame": {
-    "x": 440,
-    "y": 607,
+    "x": 28,
+    "y": 704,
     "w": 24,
     "h": 40
    },
@@ -11330,8 +15434,8 @@
   },
   "villager_glowkin_1_back_work1_hammer": {
    "frame": {
-    "x": 466,
-    "y": 607,
+    "x": 54,
+    "y": 704,
     "w": 24,
     "h": 40
    },
@@ -11354,8 +15458,8 @@
   },
   "villager_glowkin_1_back_work1_hoe": {
    "frame": {
-    "x": 492,
-    "y": 607,
+    "x": 80,
+    "y": 704,
     "w": 24,
     "h": 40
    },
@@ -11378,8 +15482,8 @@
   },
   "villager_glowkin_1_back_work1_pick": {
    "frame": {
-    "x": 518,
-    "y": 607,
+    "x": 106,
+    "y": 704,
     "w": 24,
     "h": 40
    },
@@ -11402,8 +15506,8 @@
   },
   "villager_glowkin_1_front_stand": {
    "frame": {
-    "x": 544,
-    "y": 607,
+    "x": 132,
+    "y": 704,
     "w": 16,
     "h": 40
    },
@@ -11426,8 +15530,8 @@
   },
   "villager_glowkin_1_front_walk0": {
    "frame": {
-    "x": 562,
-    "y": 607,
+    "x": 150,
+    "y": 704,
     "w": 16,
     "h": 40
    },
@@ -11450,8 +15554,8 @@
   },
   "villager_glowkin_1_front_walk1": {
    "frame": {
-    "x": 580,
-    "y": 607,
+    "x": 168,
+    "y": 704,
     "w": 16,
     "h": 40
    },
@@ -11474,8 +15578,8 @@
   },
   "villager_glowkin_1_front_work0_axe": {
    "frame": {
-    "x": 598,
-    "y": 607,
+    "x": 186,
+    "y": 704,
     "w": 23,
     "h": 40
    },
@@ -11498,8 +15602,8 @@
   },
   "villager_glowkin_1_front_work0_hammer": {
    "frame": {
-    "x": 623,
-    "y": 607,
+    "x": 211,
+    "y": 704,
     "w": 22,
     "h": 40
    },
@@ -11522,8 +15626,8 @@
   },
   "villager_glowkin_1_front_work0_hoe": {
    "frame": {
-    "x": 647,
-    "y": 607,
+    "x": 235,
+    "y": 704,
     "w": 23,
     "h": 40
    },
@@ -11546,8 +15650,8 @@
   },
   "villager_glowkin_1_front_work0_pick": {
    "frame": {
-    "x": 672,
-    "y": 607,
+    "x": 260,
+    "y": 704,
     "w": 24,
     "h": 40
    },
@@ -11570,8 +15674,8 @@
   },
   "villager_glowkin_1_front_work1_axe": {
    "frame": {
-    "x": 698,
-    "y": 607,
+    "x": 286,
+    "y": 704,
     "w": 24,
     "h": 40
    },
@@ -11594,8 +15698,8 @@
   },
   "villager_glowkin_1_front_work1_hammer": {
    "frame": {
-    "x": 724,
-    "y": 607,
+    "x": 312,
+    "y": 704,
     "w": 24,
     "h": 40
    },
@@ -11618,8 +15722,8 @@
   },
   "villager_glowkin_1_front_work1_hoe": {
    "frame": {
-    "x": 750,
-    "y": 607,
+    "x": 338,
+    "y": 704,
     "w": 24,
     "h": 40
    },
@@ -11642,8 +15746,8 @@
   },
   "villager_glowkin_1_front_work1_pick": {
    "frame": {
-    "x": 776,
-    "y": 607,
+    "x": 364,
+    "y": 704,
     "w": 24,
     "h": 40
    },
@@ -11666,8 +15770,8 @@
   },
   "villager_glowkin_2_back_stand": {
    "frame": {
-    "x": 802,
-    "y": 607,
+    "x": 390,
+    "y": 704,
     "w": 16,
     "h": 40
    },
@@ -11690,8 +15794,8 @@
   },
   "villager_glowkin_2_back_walk0": {
    "frame": {
-    "x": 820,
-    "y": 607,
+    "x": 408,
+    "y": 704,
     "w": 16,
     "h": 40
    },
@@ -11714,8 +15818,8 @@
   },
   "villager_glowkin_2_back_walk1": {
    "frame": {
-    "x": 838,
-    "y": 607,
+    "x": 426,
+    "y": 704,
     "w": 16,
     "h": 40
    },
@@ -11738,8 +15842,8 @@
   },
   "villager_glowkin_2_back_work0_axe": {
    "frame": {
-    "x": 856,
-    "y": 607,
+    "x": 444,
+    "y": 704,
     "w": 23,
     "h": 40
    },
@@ -11762,8 +15866,8 @@
   },
   "villager_glowkin_2_back_work0_hammer": {
    "frame": {
-    "x": 881,
-    "y": 607,
+    "x": 469,
+    "y": 704,
     "w": 22,
     "h": 40
    },
@@ -11786,8 +15890,8 @@
   },
   "villager_glowkin_2_back_work0_hoe": {
    "frame": {
-    "x": 905,
-    "y": 607,
+    "x": 493,
+    "y": 704,
     "w": 23,
     "h": 40
    },
@@ -11810,8 +15914,8 @@
   },
   "villager_glowkin_2_back_work0_pick": {
    "frame": {
-    "x": 930,
-    "y": 607,
+    "x": 518,
+    "y": 704,
     "w": 24,
     "h": 40
    },
@@ -11834,8 +15938,8 @@
   },
   "villager_glowkin_2_back_work1_axe": {
    "frame": {
-    "x": 956,
-    "y": 607,
+    "x": 544,
+    "y": 704,
     "w": 24,
     "h": 40
    },
@@ -11858,8 +15962,8 @@
   },
   "villager_glowkin_2_back_work1_hammer": {
    "frame": {
-    "x": 982,
-    "y": 607,
+    "x": 570,
+    "y": 704,
     "w": 24,
     "h": 40
    },
@@ -11882,8 +15986,8 @@
   },
   "villager_glowkin_2_back_work1_hoe": {
    "frame": {
-    "x": 1008,
-    "y": 607,
+    "x": 596,
+    "y": 704,
     "w": 24,
     "h": 40
    },
@@ -11906,8 +16010,8 @@
   },
   "villager_glowkin_2_back_work1_pick": {
    "frame": {
-    "x": 1034,
-    "y": 607,
+    "x": 622,
+    "y": 704,
     "w": 24,
     "h": 40
    },
@@ -11930,8 +16034,8 @@
   },
   "villager_glowkin_2_front_stand": {
    "frame": {
-    "x": 1060,
-    "y": 607,
+    "x": 648,
+    "y": 704,
     "w": 16,
     "h": 40
    },
@@ -11954,8 +16058,8 @@
   },
   "villager_glowkin_2_front_walk0": {
    "frame": {
-    "x": 1078,
-    "y": 607,
+    "x": 666,
+    "y": 704,
     "w": 16,
     "h": 40
    },
@@ -11978,8 +16082,8 @@
   },
   "villager_glowkin_2_front_walk1": {
    "frame": {
-    "x": 1096,
-    "y": 607,
+    "x": 684,
+    "y": 704,
     "w": 16,
     "h": 40
    },
@@ -12002,8 +16106,8 @@
   },
   "villager_glowkin_2_front_work0_axe": {
    "frame": {
-    "x": 1114,
-    "y": 607,
+    "x": 702,
+    "y": 704,
     "w": 23,
     "h": 40
    },
@@ -12026,8 +16130,8 @@
   },
   "villager_glowkin_2_front_work0_hammer": {
    "frame": {
-    "x": 1139,
-    "y": 607,
+    "x": 727,
+    "y": 704,
     "w": 22,
     "h": 40
    },
@@ -12050,8 +16154,8 @@
   },
   "villager_glowkin_2_front_work0_hoe": {
    "frame": {
-    "x": 1163,
-    "y": 607,
+    "x": 751,
+    "y": 704,
     "w": 23,
     "h": 40
    },
@@ -12074,8 +16178,8 @@
   },
   "villager_glowkin_2_front_work0_pick": {
    "frame": {
-    "x": 1188,
-    "y": 607,
+    "x": 776,
+    "y": 704,
     "w": 24,
     "h": 40
    },
@@ -12098,8 +16202,8 @@
   },
   "villager_glowkin_2_front_work1_axe": {
    "frame": {
-    "x": 1214,
-    "y": 607,
+    "x": 802,
+    "y": 704,
     "w": 24,
     "h": 40
    },
@@ -12122,8 +16226,8 @@
   },
   "villager_glowkin_2_front_work1_hammer": {
    "frame": {
-    "x": 1240,
-    "y": 607,
+    "x": 828,
+    "y": 704,
     "w": 24,
     "h": 40
    },
@@ -12146,8 +16250,8 @@
   },
   "villager_glowkin_2_front_work1_hoe": {
    "frame": {
-    "x": 1266,
-    "y": 607,
+    "x": 854,
+    "y": 704,
     "w": 24,
     "h": 40
    },
@@ -12170,8 +16274,8 @@
   },
   "villager_glowkin_2_front_work1_pick": {
    "frame": {
-    "x": 1292,
-    "y": 607,
+    "x": 880,
+    "y": 704,
     "w": 24,
     "h": 40
    },
@@ -12194,8 +16298,8 @@
   },
   "villager_islanders_0_back_stand": {
    "frame": {
-    "x": 774,
-    "y": 853,
+    "x": 422,
+    "y": 949,
     "w": 16,
     "h": 34
    },
@@ -12218,8 +16322,8 @@
   },
   "villager_islanders_0_back_walk0": {
    "frame": {
-    "x": 792,
-    "y": 853,
+    "x": 440,
+    "y": 949,
     "w": 16,
     "h": 34
    },
@@ -12242,8 +16346,8 @@
   },
   "villager_islanders_0_back_walk1": {
    "frame": {
-    "x": 810,
-    "y": 853,
+    "x": 458,
+    "y": 949,
     "w": 16,
     "h": 34
    },
@@ -12266,8 +16370,8 @@
   },
   "villager_islanders_0_back_work0_axe": {
    "frame": {
-    "x": 1318,
-    "y": 607,
+    "x": 906,
+    "y": 704,
     "w": 23,
     "h": 40
    },
@@ -12290,8 +16394,8 @@
   },
   "villager_islanders_0_back_work0_hammer": {
    "frame": {
-    "x": 1363,
-    "y": 691,
+    "x": 975,
+    "y": 788,
     "w": 22,
     "h": 39
    },
@@ -12314,8 +16418,8 @@
   },
   "villager_islanders_0_back_work0_hoe": {
    "frame": {
-    "x": 729,
-    "y": 773,
+    "x": 341,
+    "y": 870,
     "w": 23,
     "h": 38
    },
@@ -12338,8 +16442,8 @@
   },
   "villager_islanders_0_back_work0_pick": {
    "frame": {
-    "x": 342,
-    "y": 814,
+    "x": 1998,
+    "y": 870,
     "w": 24,
     "h": 37
    },
@@ -12362,8 +16466,8 @@
   },
   "villager_islanders_0_back_work1_axe": {
    "frame": {
-    "x": 828,
-    "y": 853,
+    "x": 476,
+    "y": 949,
     "w": 24,
     "h": 34
    },
@@ -12386,8 +16490,8 @@
   },
   "villager_islanders_0_back_work1_hammer": {
    "frame": {
-    "x": 854,
-    "y": 853,
+    "x": 502,
+    "y": 949,
     "w": 24,
     "h": 34
    },
@@ -12410,8 +16514,8 @@
   },
   "villager_islanders_0_back_work1_hoe": {
    "frame": {
-    "x": 880,
-    "y": 853,
+    "x": 528,
+    "y": 949,
     "w": 24,
     "h": 34
    },
@@ -12434,8 +16538,8 @@
   },
   "villager_islanders_0_back_work1_pick": {
    "frame": {
-    "x": 906,
-    "y": 853,
+    "x": 554,
+    "y": 949,
     "w": 24,
     "h": 34
    },
@@ -12458,8 +16562,8 @@
   },
   "villager_islanders_0_front_stand": {
    "frame": {
-    "x": 932,
-    "y": 853,
+    "x": 580,
+    "y": 949,
     "w": 16,
     "h": 34
    },
@@ -12482,8 +16586,8 @@
   },
   "villager_islanders_0_front_walk0": {
    "frame": {
-    "x": 950,
-    "y": 853,
+    "x": 598,
+    "y": 949,
     "w": 16,
     "h": 34
    },
@@ -12506,8 +16610,8 @@
   },
   "villager_islanders_0_front_walk1": {
    "frame": {
-    "x": 968,
-    "y": 853,
+    "x": 616,
+    "y": 949,
     "w": 16,
     "h": 34
    },
@@ -12530,8 +16634,8 @@
   },
   "villager_islanders_0_front_work0_axe": {
    "frame": {
-    "x": 1343,
-    "y": 607,
+    "x": 931,
+    "y": 704,
     "w": 23,
     "h": 40
    },
@@ -12554,8 +16658,8 @@
   },
   "villager_islanders_0_front_work0_hammer": {
    "frame": {
-    "x": 1387,
-    "y": 691,
+    "x": 999,
+    "y": 788,
     "w": 22,
     "h": 39
    },
@@ -12578,8 +16682,8 @@
   },
   "villager_islanders_0_front_work0_hoe": {
    "frame": {
-    "x": 754,
-    "y": 773,
+    "x": 366,
+    "y": 870,
     "w": 23,
     "h": 38
    },
@@ -12602,8 +16706,8 @@
   },
   "villager_islanders_0_front_work0_pick": {
    "frame": {
-    "x": 368,
-    "y": 814,
+    "x": 2,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -12626,8 +16730,8 @@
   },
   "villager_islanders_0_front_work1_axe": {
    "frame": {
-    "x": 986,
-    "y": 853,
+    "x": 634,
+    "y": 949,
     "w": 24,
     "h": 34
    },
@@ -12650,8 +16754,8 @@
   },
   "villager_islanders_0_front_work1_hammer": {
    "frame": {
-    "x": 1012,
-    "y": 853,
+    "x": 660,
+    "y": 949,
     "w": 24,
     "h": 34
    },
@@ -12674,8 +16778,8 @@
   },
   "villager_islanders_0_front_work1_hoe": {
    "frame": {
-    "x": 1038,
-    "y": 853,
+    "x": 686,
+    "y": 949,
     "w": 24,
     "h": 34
    },
@@ -12698,8 +16802,8 @@
   },
   "villager_islanders_0_front_work1_pick": {
    "frame": {
-    "x": 1064,
-    "y": 853,
+    "x": 712,
+    "y": 949,
     "w": 24,
     "h": 34
    },
@@ -12722,8 +16826,8 @@
   },
   "villager_islanders_1_back_stand": {
    "frame": {
-    "x": 1090,
-    "y": 853,
+    "x": 738,
+    "y": 949,
     "w": 16,
     "h": 34
    },
@@ -12746,8 +16850,8 @@
   },
   "villager_islanders_1_back_walk0": {
    "frame": {
-    "x": 1108,
-    "y": 853,
+    "x": 756,
+    "y": 949,
     "w": 16,
     "h": 34
    },
@@ -12770,8 +16874,8 @@
   },
   "villager_islanders_1_back_walk1": {
    "frame": {
-    "x": 1126,
-    "y": 853,
+    "x": 774,
+    "y": 949,
     "w": 16,
     "h": 34
    },
@@ -12794,8 +16898,8 @@
   },
   "villager_islanders_1_back_work0_axe": {
    "frame": {
-    "x": 1368,
-    "y": 607,
+    "x": 956,
+    "y": 704,
     "w": 23,
     "h": 40
    },
@@ -12818,8 +16922,8 @@
   },
   "villager_islanders_1_back_work0_hammer": {
    "frame": {
-    "x": 1411,
-    "y": 691,
+    "x": 1023,
+    "y": 788,
     "w": 22,
     "h": 39
    },
@@ -12842,8 +16946,8 @@
   },
   "villager_islanders_1_back_work0_hoe": {
    "frame": {
-    "x": 779,
-    "y": 773,
+    "x": 391,
+    "y": 870,
     "w": 23,
     "h": 38
    },
@@ -12866,8 +16970,8 @@
   },
   "villager_islanders_1_back_work0_pick": {
    "frame": {
-    "x": 394,
-    "y": 814,
+    "x": 28,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -12890,8 +16994,8 @@
   },
   "villager_islanders_1_back_work1_axe": {
    "frame": {
-    "x": 1144,
-    "y": 853,
+    "x": 792,
+    "y": 949,
     "w": 24,
     "h": 34
    },
@@ -12914,8 +17018,8 @@
   },
   "villager_islanders_1_back_work1_hammer": {
    "frame": {
-    "x": 1170,
-    "y": 853,
+    "x": 818,
+    "y": 949,
     "w": 24,
     "h": 34
    },
@@ -12938,8 +17042,8 @@
   },
   "villager_islanders_1_back_work1_hoe": {
    "frame": {
-    "x": 1196,
-    "y": 853,
+    "x": 844,
+    "y": 949,
     "w": 24,
     "h": 34
    },
@@ -12962,8 +17066,8 @@
   },
   "villager_islanders_1_back_work1_pick": {
    "frame": {
-    "x": 1222,
-    "y": 853,
+    "x": 870,
+    "y": 949,
     "w": 24,
     "h": 34
    },
@@ -12986,8 +17090,8 @@
   },
   "villager_islanders_1_front_stand": {
    "frame": {
-    "x": 1248,
-    "y": 853,
+    "x": 896,
+    "y": 949,
     "w": 16,
     "h": 34
    },
@@ -13010,8 +17114,8 @@
   },
   "villager_islanders_1_front_walk0": {
    "frame": {
-    "x": 1266,
-    "y": 853,
+    "x": 914,
+    "y": 949,
     "w": 16,
     "h": 34
    },
@@ -13034,8 +17138,8 @@
   },
   "villager_islanders_1_front_walk1": {
    "frame": {
-    "x": 1284,
-    "y": 853,
+    "x": 932,
+    "y": 949,
     "w": 16,
     "h": 34
    },
@@ -13058,8 +17162,8 @@
   },
   "villager_islanders_1_front_work0_axe": {
    "frame": {
-    "x": 1393,
-    "y": 607,
+    "x": 981,
+    "y": 704,
     "w": 23,
     "h": 40
    },
@@ -13082,8 +17186,8 @@
   },
   "villager_islanders_1_front_work0_hammer": {
    "frame": {
-    "x": 1435,
-    "y": 691,
+    "x": 1047,
+    "y": 788,
     "w": 22,
     "h": 39
    },
@@ -13106,8 +17210,8 @@
   },
   "villager_islanders_1_front_work0_hoe": {
    "frame": {
-    "x": 804,
-    "y": 773,
+    "x": 416,
+    "y": 870,
     "w": 23,
     "h": 38
    },
@@ -13130,8 +17234,8 @@
   },
   "villager_islanders_1_front_work0_pick": {
    "frame": {
-    "x": 420,
-    "y": 814,
+    "x": 54,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -13154,8 +17258,8 @@
   },
   "villager_islanders_1_front_work1_axe": {
    "frame": {
-    "x": 1302,
-    "y": 853,
+    "x": 950,
+    "y": 949,
     "w": 24,
     "h": 34
    },
@@ -13178,8 +17282,8 @@
   },
   "villager_islanders_1_front_work1_hammer": {
    "frame": {
-    "x": 1328,
-    "y": 853,
+    "x": 976,
+    "y": 949,
     "w": 24,
     "h": 34
    },
@@ -13202,8 +17306,8 @@
   },
   "villager_islanders_1_front_work1_hoe": {
    "frame": {
-    "x": 1354,
-    "y": 853,
+    "x": 1002,
+    "y": 949,
     "w": 24,
     "h": 34
    },
@@ -13226,8 +17330,8 @@
   },
   "villager_islanders_1_front_work1_pick": {
    "frame": {
-    "x": 1380,
-    "y": 853,
+    "x": 1028,
+    "y": 949,
     "w": 24,
     "h": 34
    },
@@ -13250,8 +17354,8 @@
   },
   "villager_islanders_2_back_stand": {
    "frame": {
-    "x": 1406,
-    "y": 853,
+    "x": 1054,
+    "y": 949,
     "w": 16,
     "h": 34
    },
@@ -13274,8 +17378,8 @@
   },
   "villager_islanders_2_back_walk0": {
    "frame": {
-    "x": 1424,
-    "y": 853,
+    "x": 1072,
+    "y": 949,
     "w": 16,
     "h": 34
    },
@@ -13298,8 +17402,8 @@
   },
   "villager_islanders_2_back_walk1": {
    "frame": {
-    "x": 1442,
-    "y": 853,
+    "x": 1090,
+    "y": 949,
     "w": 16,
     "h": 34
    },
@@ -13322,8 +17426,8 @@
   },
   "villager_islanders_2_back_work0_axe": {
    "frame": {
-    "x": 1418,
-    "y": 607,
+    "x": 1006,
+    "y": 704,
     "w": 23,
     "h": 40
    },
@@ -13346,8 +17450,8 @@
   },
   "villager_islanders_2_back_work0_hammer": {
    "frame": {
-    "x": 1459,
-    "y": 691,
+    "x": 1071,
+    "y": 788,
     "w": 22,
     "h": 39
    },
@@ -13370,8 +17474,8 @@
   },
   "villager_islanders_2_back_work0_hoe": {
    "frame": {
-    "x": 829,
-    "y": 773,
+    "x": 441,
+    "y": 870,
     "w": 23,
     "h": 38
    },
@@ -13394,8 +17498,8 @@
   },
   "villager_islanders_2_back_work0_pick": {
    "frame": {
-    "x": 446,
-    "y": 814,
+    "x": 80,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -13418,8 +17522,8 @@
   },
   "villager_islanders_2_back_work1_axe": {
    "frame": {
-    "x": 1460,
-    "y": 853,
+    "x": 1108,
+    "y": 949,
     "w": 24,
     "h": 34
    },
@@ -13442,8 +17546,8 @@
   },
   "villager_islanders_2_back_work1_hammer": {
    "frame": {
-    "x": 1486,
-    "y": 853,
+    "x": 1134,
+    "y": 949,
     "w": 24,
     "h": 34
    },
@@ -13466,8 +17570,8 @@
   },
   "villager_islanders_2_back_work1_hoe": {
    "frame": {
-    "x": 1512,
-    "y": 853,
+    "x": 1160,
+    "y": 949,
     "w": 24,
     "h": 34
    },
@@ -13490,8 +17594,8 @@
   },
   "villager_islanders_2_back_work1_pick": {
    "frame": {
-    "x": 1538,
-    "y": 853,
+    "x": 1186,
+    "y": 949,
     "w": 24,
     "h": 34
    },
@@ -13514,8 +17618,8 @@
   },
   "villager_islanders_2_front_stand": {
    "frame": {
-    "x": 1564,
-    "y": 853,
+    "x": 1212,
+    "y": 949,
     "w": 16,
     "h": 34
    },
@@ -13538,8 +17642,8 @@
   },
   "villager_islanders_2_front_walk0": {
    "frame": {
-    "x": 1582,
-    "y": 853,
+    "x": 1230,
+    "y": 949,
     "w": 16,
     "h": 34
    },
@@ -13562,8 +17666,8 @@
   },
   "villager_islanders_2_front_walk1": {
    "frame": {
-    "x": 1600,
-    "y": 853,
+    "x": 1248,
+    "y": 949,
     "w": 16,
     "h": 34
    },
@@ -13586,8 +17690,8 @@
   },
   "villager_islanders_2_front_work0_axe": {
    "frame": {
-    "x": 1443,
-    "y": 607,
+    "x": 1031,
+    "y": 704,
     "w": 23,
     "h": 40
    },
@@ -13610,8 +17714,8 @@
   },
   "villager_islanders_2_front_work0_hammer": {
    "frame": {
-    "x": 1483,
-    "y": 691,
+    "x": 1095,
+    "y": 788,
     "w": 22,
     "h": 39
    },
@@ -13634,8 +17738,8 @@
   },
   "villager_islanders_2_front_work0_hoe": {
    "frame": {
-    "x": 854,
-    "y": 773,
+    "x": 466,
+    "y": 870,
     "w": 23,
     "h": 38
    },
@@ -13658,8 +17762,8 @@
   },
   "villager_islanders_2_front_work0_pick": {
    "frame": {
-    "x": 472,
-    "y": 814,
+    "x": 106,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -13682,8 +17786,8 @@
   },
   "villager_islanders_2_front_work1_axe": {
    "frame": {
-    "x": 1618,
-    "y": 853,
+    "x": 1266,
+    "y": 949,
     "w": 24,
     "h": 34
    },
@@ -13706,8 +17810,8 @@
   },
   "villager_islanders_2_front_work1_hammer": {
    "frame": {
-    "x": 1644,
-    "y": 853,
+    "x": 1292,
+    "y": 949,
     "w": 24,
     "h": 34
    },
@@ -13730,8 +17834,8 @@
   },
   "villager_islanders_2_front_work1_hoe": {
    "frame": {
-    "x": 1670,
-    "y": 853,
+    "x": 1318,
+    "y": 949,
     "w": 24,
     "h": 34
    },
@@ -13754,8 +17858,8 @@
   },
   "villager_islanders_2_front_work1_pick": {
    "frame": {
-    "x": 1696,
-    "y": 853,
+    "x": 1344,
+    "y": 949,
     "w": 24,
     "h": 34
    },
@@ -13778,8 +17882,8 @@
   },
   "villager_mirefolk_0_back_stand": {
    "frame": {
-    "x": 1468,
-    "y": 607,
+    "x": 1056,
+    "y": 704,
     "w": 20,
     "h": 40
    },
@@ -13802,8 +17906,8 @@
   },
   "villager_mirefolk_0_back_walk0": {
    "frame": {
-    "x": 1490,
-    "y": 607,
+    "x": 1078,
+    "y": 704,
     "w": 20,
     "h": 40
    },
@@ -13826,8 +17930,8 @@
   },
   "villager_mirefolk_0_back_walk1": {
    "frame": {
-    "x": 1512,
-    "y": 607,
+    "x": 1100,
+    "y": 704,
     "w": 20,
     "h": 40
    },
@@ -13850,8 +17954,8 @@
   },
   "villager_mirefolk_0_back_work0_axe": {
    "frame": {
-    "x": 1534,
-    "y": 607,
+    "x": 1122,
+    "y": 704,
     "w": 25,
     "h": 40
    },
@@ -13874,8 +17978,8 @@
   },
   "villager_mirefolk_0_back_work0_hammer": {
    "frame": {
-    "x": 1561,
-    "y": 607,
+    "x": 1149,
+    "y": 704,
     "w": 24,
     "h": 40
    },
@@ -13898,8 +18002,8 @@
   },
   "villager_mirefolk_0_back_work0_hoe": {
    "frame": {
-    "x": 1587,
-    "y": 607,
+    "x": 1175,
+    "y": 704,
     "w": 25,
     "h": 40
    },
@@ -13922,8 +18026,8 @@
   },
   "villager_mirefolk_0_back_work0_pick": {
    "frame": {
-    "x": 1614,
-    "y": 607,
+    "x": 1202,
+    "y": 704,
     "w": 26,
     "h": 40
    },
@@ -13946,8 +18050,8 @@
   },
   "villager_mirefolk_0_back_work1_axe": {
    "frame": {
-    "x": 1642,
-    "y": 607,
+    "x": 1230,
+    "y": 704,
     "w": 26,
     "h": 40
    },
@@ -13970,8 +18074,8 @@
   },
   "villager_mirefolk_0_back_work1_hammer": {
    "frame": {
-    "x": 1670,
-    "y": 607,
+    "x": 1258,
+    "y": 704,
     "w": 26,
     "h": 40
    },
@@ -13994,8 +18098,8 @@
   },
   "villager_mirefolk_0_back_work1_hoe": {
    "frame": {
-    "x": 1698,
-    "y": 607,
+    "x": 1286,
+    "y": 704,
     "w": 26,
     "h": 40
    },
@@ -14018,8 +18122,8 @@
   },
   "villager_mirefolk_0_back_work1_pick": {
    "frame": {
-    "x": 1726,
-    "y": 607,
+    "x": 1314,
+    "y": 704,
     "w": 26,
     "h": 40
    },
@@ -14042,8 +18146,8 @@
   },
   "villager_mirefolk_0_front_stand": {
    "frame": {
-    "x": 1754,
-    "y": 607,
+    "x": 1342,
+    "y": 704,
     "w": 20,
     "h": 40
    },
@@ -14066,8 +18170,8 @@
   },
   "villager_mirefolk_0_front_walk0": {
    "frame": {
-    "x": 1776,
-    "y": 607,
+    "x": 1364,
+    "y": 704,
     "w": 20,
     "h": 40
    },
@@ -14090,8 +18194,8 @@
   },
   "villager_mirefolk_0_front_walk1": {
    "frame": {
-    "x": 1798,
-    "y": 607,
+    "x": 1386,
+    "y": 704,
     "w": 20,
     "h": 40
    },
@@ -14114,8 +18218,8 @@
   },
   "villager_mirefolk_0_front_work0_axe": {
    "frame": {
-    "x": 1820,
-    "y": 607,
+    "x": 1408,
+    "y": 704,
     "w": 25,
     "h": 40
    },
@@ -14138,8 +18242,8 @@
   },
   "villager_mirefolk_0_front_work0_hammer": {
    "frame": {
-    "x": 1847,
-    "y": 607,
+    "x": 1435,
+    "y": 704,
     "w": 24,
     "h": 40
    },
@@ -14162,8 +18266,8 @@
   },
   "villager_mirefolk_0_front_work0_hoe": {
    "frame": {
-    "x": 1873,
-    "y": 607,
+    "x": 1461,
+    "y": 704,
     "w": 25,
     "h": 40
    },
@@ -14186,8 +18290,8 @@
   },
   "villager_mirefolk_0_front_work0_pick": {
    "frame": {
-    "x": 1900,
-    "y": 607,
+    "x": 1488,
+    "y": 704,
     "w": 26,
     "h": 40
    },
@@ -14210,8 +18314,8 @@
   },
   "villager_mirefolk_0_front_work1_axe": {
    "frame": {
-    "x": 1928,
-    "y": 607,
+    "x": 1516,
+    "y": 704,
     "w": 26,
     "h": 40
    },
@@ -14234,8 +18338,8 @@
   },
   "villager_mirefolk_0_front_work1_hammer": {
    "frame": {
-    "x": 1956,
-    "y": 607,
+    "x": 1544,
+    "y": 704,
     "w": 26,
     "h": 40
    },
@@ -14258,8 +18362,8 @@
   },
   "villager_mirefolk_0_front_work1_hoe": {
    "frame": {
-    "x": 1984,
-    "y": 607,
+    "x": 1572,
+    "y": 704,
     "w": 26,
     "h": 40
    },
@@ -14282,8 +18386,8 @@
   },
   "villager_mirefolk_0_front_work1_pick": {
    "frame": {
-    "x": 2012,
-    "y": 607,
+    "x": 1600,
+    "y": 704,
     "w": 26,
     "h": 40
    },
@@ -14306,8 +18410,8 @@
   },
   "villager_mirefolk_1_back_stand": {
    "frame": {
-    "x": 2,
-    "y": 649,
+    "x": 1628,
+    "y": 704,
     "w": 20,
     "h": 40
    },
@@ -14330,8 +18434,8 @@
   },
   "villager_mirefolk_1_back_walk0": {
    "frame": {
-    "x": 24,
-    "y": 649,
+    "x": 1650,
+    "y": 704,
     "w": 20,
     "h": 40
    },
@@ -14354,8 +18458,8 @@
   },
   "villager_mirefolk_1_back_walk1": {
    "frame": {
-    "x": 46,
-    "y": 649,
+    "x": 1672,
+    "y": 704,
     "w": 20,
     "h": 40
    },
@@ -14378,8 +18482,8 @@
   },
   "villager_mirefolk_1_back_work0_axe": {
    "frame": {
-    "x": 68,
-    "y": 649,
+    "x": 1694,
+    "y": 704,
     "w": 25,
     "h": 40
    },
@@ -14402,8 +18506,8 @@
   },
   "villager_mirefolk_1_back_work0_hammer": {
    "frame": {
-    "x": 95,
-    "y": 649,
+    "x": 1721,
+    "y": 704,
     "w": 24,
     "h": 40
    },
@@ -14426,8 +18530,8 @@
   },
   "villager_mirefolk_1_back_work0_hoe": {
    "frame": {
-    "x": 121,
-    "y": 649,
+    "x": 1747,
+    "y": 704,
     "w": 25,
     "h": 40
    },
@@ -14450,8 +18554,8 @@
   },
   "villager_mirefolk_1_back_work0_pick": {
    "frame": {
-    "x": 148,
-    "y": 649,
+    "x": 1774,
+    "y": 704,
     "w": 26,
     "h": 40
    },
@@ -14474,8 +18578,8 @@
   },
   "villager_mirefolk_1_back_work1_axe": {
    "frame": {
-    "x": 176,
-    "y": 649,
+    "x": 1802,
+    "y": 704,
     "w": 26,
     "h": 40
    },
@@ -14498,8 +18602,8 @@
   },
   "villager_mirefolk_1_back_work1_hammer": {
    "frame": {
-    "x": 204,
-    "y": 649,
+    "x": 1830,
+    "y": 704,
     "w": 26,
     "h": 40
    },
@@ -14522,8 +18626,8 @@
   },
   "villager_mirefolk_1_back_work1_hoe": {
    "frame": {
-    "x": 232,
-    "y": 649,
+    "x": 1858,
+    "y": 704,
     "w": 26,
     "h": 40
    },
@@ -14546,8 +18650,8 @@
   },
   "villager_mirefolk_1_back_work1_pick": {
    "frame": {
-    "x": 260,
-    "y": 649,
+    "x": 1886,
+    "y": 704,
     "w": 26,
     "h": 40
    },
@@ -14570,8 +18674,8 @@
   },
   "villager_mirefolk_1_front_stand": {
    "frame": {
-    "x": 288,
-    "y": 649,
+    "x": 1914,
+    "y": 704,
     "w": 20,
     "h": 40
    },
@@ -14594,8 +18698,8 @@
   },
   "villager_mirefolk_1_front_walk0": {
    "frame": {
-    "x": 310,
-    "y": 649,
+    "x": 1936,
+    "y": 704,
     "w": 20,
     "h": 40
    },
@@ -14618,8 +18722,8 @@
   },
   "villager_mirefolk_1_front_walk1": {
    "frame": {
-    "x": 332,
-    "y": 649,
+    "x": 1958,
+    "y": 704,
     "w": 20,
     "h": 40
    },
@@ -14642,8 +18746,8 @@
   },
   "villager_mirefolk_1_front_work0_axe": {
    "frame": {
-    "x": 354,
-    "y": 649,
+    "x": 1980,
+    "y": 704,
     "w": 25,
     "h": 40
    },
@@ -14666,8 +18770,8 @@
   },
   "villager_mirefolk_1_front_work0_hammer": {
    "frame": {
-    "x": 381,
-    "y": 649,
+    "x": 2007,
+    "y": 704,
     "w": 24,
     "h": 40
    },
@@ -14690,8 +18794,8 @@
   },
   "villager_mirefolk_1_front_work0_hoe": {
    "frame": {
-    "x": 407,
-    "y": 649,
+    "x": 2,
+    "y": 746,
     "w": 25,
     "h": 40
    },
@@ -14714,8 +18818,8 @@
   },
   "villager_mirefolk_1_front_work0_pick": {
    "frame": {
-    "x": 434,
-    "y": 649,
+    "x": 29,
+    "y": 746,
     "w": 26,
     "h": 40
    },
@@ -14738,8 +18842,8 @@
   },
   "villager_mirefolk_1_front_work1_axe": {
    "frame": {
-    "x": 462,
-    "y": 649,
+    "x": 57,
+    "y": 746,
     "w": 26,
     "h": 40
    },
@@ -14762,8 +18866,8 @@
   },
   "villager_mirefolk_1_front_work1_hammer": {
    "frame": {
-    "x": 490,
-    "y": 649,
+    "x": 85,
+    "y": 746,
     "w": 26,
     "h": 40
    },
@@ -14786,8 +18890,8 @@
   },
   "villager_mirefolk_1_front_work1_hoe": {
    "frame": {
-    "x": 518,
-    "y": 649,
+    "x": 113,
+    "y": 746,
     "w": 26,
     "h": 40
    },
@@ -14810,8 +18914,8 @@
   },
   "villager_mirefolk_1_front_work1_pick": {
    "frame": {
-    "x": 546,
-    "y": 649,
+    "x": 141,
+    "y": 746,
     "w": 26,
     "h": 40
    },
@@ -14834,8 +18938,8 @@
   },
   "villager_mirefolk_2_back_stand": {
    "frame": {
-    "x": 574,
-    "y": 649,
+    "x": 169,
+    "y": 746,
     "w": 20,
     "h": 40
    },
@@ -14858,8 +18962,8 @@
   },
   "villager_mirefolk_2_back_walk0": {
    "frame": {
-    "x": 596,
-    "y": 649,
+    "x": 191,
+    "y": 746,
     "w": 20,
     "h": 40
    },
@@ -14882,8 +18986,8 @@
   },
   "villager_mirefolk_2_back_walk1": {
    "frame": {
-    "x": 618,
-    "y": 649,
+    "x": 213,
+    "y": 746,
     "w": 20,
     "h": 40
    },
@@ -14906,8 +19010,8 @@
   },
   "villager_mirefolk_2_back_work0_axe": {
    "frame": {
-    "x": 640,
-    "y": 649,
+    "x": 235,
+    "y": 746,
     "w": 25,
     "h": 40
    },
@@ -14930,8 +19034,8 @@
   },
   "villager_mirefolk_2_back_work0_hammer": {
    "frame": {
-    "x": 667,
-    "y": 649,
+    "x": 262,
+    "y": 746,
     "w": 24,
     "h": 40
    },
@@ -14954,8 +19058,8 @@
   },
   "villager_mirefolk_2_back_work0_hoe": {
    "frame": {
-    "x": 693,
-    "y": 649,
+    "x": 288,
+    "y": 746,
     "w": 25,
     "h": 40
    },
@@ -14978,8 +19082,8 @@
   },
   "villager_mirefolk_2_back_work0_pick": {
    "frame": {
-    "x": 720,
-    "y": 649,
+    "x": 315,
+    "y": 746,
     "w": 26,
     "h": 40
    },
@@ -15002,8 +19106,8 @@
   },
   "villager_mirefolk_2_back_work1_axe": {
    "frame": {
-    "x": 748,
-    "y": 649,
+    "x": 343,
+    "y": 746,
     "w": 26,
     "h": 40
    },
@@ -15026,8 +19130,8 @@
   },
   "villager_mirefolk_2_back_work1_hammer": {
    "frame": {
-    "x": 776,
-    "y": 649,
+    "x": 371,
+    "y": 746,
     "w": 26,
     "h": 40
    },
@@ -15050,8 +19154,8 @@
   },
   "villager_mirefolk_2_back_work1_hoe": {
    "frame": {
-    "x": 804,
-    "y": 649,
+    "x": 399,
+    "y": 746,
     "w": 26,
     "h": 40
    },
@@ -15074,8 +19178,8 @@
   },
   "villager_mirefolk_2_back_work1_pick": {
    "frame": {
-    "x": 832,
-    "y": 649,
+    "x": 427,
+    "y": 746,
     "w": 26,
     "h": 40
    },
@@ -15098,8 +19202,8 @@
   },
   "villager_mirefolk_2_front_stand": {
    "frame": {
-    "x": 860,
-    "y": 649,
+    "x": 455,
+    "y": 746,
     "w": 20,
     "h": 40
    },
@@ -15122,8 +19226,8 @@
   },
   "villager_mirefolk_2_front_walk0": {
    "frame": {
-    "x": 882,
-    "y": 649,
+    "x": 477,
+    "y": 746,
     "w": 20,
     "h": 40
    },
@@ -15146,8 +19250,8 @@
   },
   "villager_mirefolk_2_front_walk1": {
    "frame": {
-    "x": 904,
-    "y": 649,
+    "x": 499,
+    "y": 746,
     "w": 20,
     "h": 40
    },
@@ -15170,8 +19274,8 @@
   },
   "villager_mirefolk_2_front_work0_axe": {
    "frame": {
-    "x": 926,
-    "y": 649,
+    "x": 521,
+    "y": 746,
     "w": 25,
     "h": 40
    },
@@ -15194,8 +19298,8 @@
   },
   "villager_mirefolk_2_front_work0_hammer": {
    "frame": {
-    "x": 953,
-    "y": 649,
+    "x": 548,
+    "y": 746,
     "w": 24,
     "h": 40
    },
@@ -15218,8 +19322,8 @@
   },
   "villager_mirefolk_2_front_work0_hoe": {
    "frame": {
-    "x": 979,
-    "y": 649,
+    "x": 574,
+    "y": 746,
     "w": 25,
     "h": 40
    },
@@ -15242,8 +19346,8 @@
   },
   "villager_mirefolk_2_front_work0_pick": {
    "frame": {
-    "x": 1006,
-    "y": 649,
+    "x": 601,
+    "y": 746,
     "w": 26,
     "h": 40
    },
@@ -15266,8 +19370,8 @@
   },
   "villager_mirefolk_2_front_work1_axe": {
    "frame": {
-    "x": 1034,
-    "y": 649,
+    "x": 629,
+    "y": 746,
     "w": 26,
     "h": 40
    },
@@ -15290,8 +19394,8 @@
   },
   "villager_mirefolk_2_front_work1_hammer": {
    "frame": {
-    "x": 1062,
-    "y": 649,
+    "x": 657,
+    "y": 746,
     "w": 26,
     "h": 40
    },
@@ -15314,8 +19418,8 @@
   },
   "villager_mirefolk_2_front_work1_hoe": {
    "frame": {
-    "x": 1090,
-    "y": 649,
+    "x": 685,
+    "y": 746,
     "w": 26,
     "h": 40
    },
@@ -15338,8 +19442,8 @@
   },
   "villager_mirefolk_2_front_work1_pick": {
    "frame": {
-    "x": 1118,
-    "y": 649,
+    "x": 713,
+    "y": 746,
     "w": 26,
     "h": 40
    },
@@ -15362,8 +19466,8 @@
   },
   "villager_northfolk_0_back_stand": {
    "frame": {
-    "x": 1507,
-    "y": 691,
+    "x": 1119,
+    "y": 788,
     "w": 16,
     "h": 39
    },
@@ -15386,8 +19490,8 @@
   },
   "villager_northfolk_0_back_walk0": {
    "frame": {
-    "x": 1525,
-    "y": 691,
+    "x": 1137,
+    "y": 788,
     "w": 16,
     "h": 39
    },
@@ -15410,8 +19514,8 @@
   },
   "villager_northfolk_0_back_walk1": {
    "frame": {
-    "x": 1543,
-    "y": 691,
+    "x": 1155,
+    "y": 788,
     "w": 16,
     "h": 39
    },
@@ -15434,8 +19538,8 @@
   },
   "villager_northfolk_0_back_work0_axe": {
    "frame": {
-    "x": 1146,
-    "y": 649,
+    "x": 741,
+    "y": 746,
     "w": 23,
     "h": 40
    },
@@ -15458,8 +19562,8 @@
   },
   "villager_northfolk_0_back_work0_hammer": {
    "frame": {
-    "x": 1561,
-    "y": 691,
+    "x": 1173,
+    "y": 788,
     "w": 22,
     "h": 39
    },
@@ -15482,8 +19586,8 @@
   },
   "villager_northfolk_0_back_work0_hoe": {
    "frame": {
-    "x": 1585,
-    "y": 691,
+    "x": 1197,
+    "y": 788,
     "w": 23,
     "h": 39
    },
@@ -15506,8 +19610,8 @@
   },
   "villager_northfolk_0_back_work0_pick": {
    "frame": {
-    "x": 1610,
-    "y": 691,
+    "x": 1222,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -15530,8 +19634,8 @@
   },
   "villager_northfolk_0_back_work1_axe": {
    "frame": {
-    "x": 1636,
-    "y": 691,
+    "x": 1248,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -15554,8 +19658,8 @@
   },
   "villager_northfolk_0_back_work1_hammer": {
    "frame": {
-    "x": 1662,
-    "y": 691,
+    "x": 1274,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -15578,8 +19682,8 @@
   },
   "villager_northfolk_0_back_work1_hoe": {
    "frame": {
-    "x": 1688,
-    "y": 691,
+    "x": 1300,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -15602,8 +19706,8 @@
   },
   "villager_northfolk_0_back_work1_pick": {
    "frame": {
-    "x": 1714,
-    "y": 691,
+    "x": 1326,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -15626,8 +19730,8 @@
   },
   "villager_northfolk_0_front_stand": {
    "frame": {
-    "x": 1740,
-    "y": 691,
+    "x": 1352,
+    "y": 788,
     "w": 16,
     "h": 39
    },
@@ -15650,8 +19754,8 @@
   },
   "villager_northfolk_0_front_walk0": {
    "frame": {
-    "x": 1758,
-    "y": 691,
+    "x": 1370,
+    "y": 788,
     "w": 16,
     "h": 39
    },
@@ -15674,8 +19778,8 @@
   },
   "villager_northfolk_0_front_walk1": {
    "frame": {
-    "x": 1776,
-    "y": 691,
+    "x": 1388,
+    "y": 788,
     "w": 16,
     "h": 39
    },
@@ -15698,8 +19802,8 @@
   },
   "villager_northfolk_0_front_work0_axe": {
    "frame": {
-    "x": 1171,
-    "y": 649,
+    "x": 766,
+    "y": 746,
     "w": 23,
     "h": 40
    },
@@ -15722,8 +19826,8 @@
   },
   "villager_northfolk_0_front_work0_hammer": {
    "frame": {
-    "x": 1794,
-    "y": 691,
+    "x": 1406,
+    "y": 788,
     "w": 22,
     "h": 39
    },
@@ -15746,8 +19850,8 @@
   },
   "villager_northfolk_0_front_work0_hoe": {
    "frame": {
-    "x": 1818,
-    "y": 691,
+    "x": 1430,
+    "y": 788,
     "w": 23,
     "h": 39
    },
@@ -15770,8 +19874,8 @@
   },
   "villager_northfolk_0_front_work0_pick": {
    "frame": {
-    "x": 1843,
-    "y": 691,
+    "x": 1455,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -15794,8 +19898,8 @@
   },
   "villager_northfolk_0_front_work1_axe": {
    "frame": {
-    "x": 1869,
-    "y": 691,
+    "x": 1481,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -15818,8 +19922,8 @@
   },
   "villager_northfolk_0_front_work1_hammer": {
    "frame": {
-    "x": 1895,
-    "y": 691,
+    "x": 1507,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -15842,8 +19946,8 @@
   },
   "villager_northfolk_0_front_work1_hoe": {
    "frame": {
-    "x": 1921,
-    "y": 691,
+    "x": 1533,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -15866,8 +19970,8 @@
   },
   "villager_northfolk_0_front_work1_pick": {
    "frame": {
-    "x": 1947,
-    "y": 691,
+    "x": 1559,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -15890,8 +19994,8 @@
   },
   "villager_northfolk_1_back_stand": {
    "frame": {
-    "x": 1973,
-    "y": 691,
+    "x": 1585,
+    "y": 788,
     "w": 16,
     "h": 39
    },
@@ -15914,8 +20018,8 @@
   },
   "villager_northfolk_1_back_walk0": {
    "frame": {
-    "x": 1991,
-    "y": 691,
+    "x": 1603,
+    "y": 788,
     "w": 16,
     "h": 39
    },
@@ -15938,8 +20042,8 @@
   },
   "villager_northfolk_1_back_walk1": {
    "frame": {
-    "x": 2009,
-    "y": 691,
+    "x": 1621,
+    "y": 788,
     "w": 16,
     "h": 39
    },
@@ -15962,8 +20066,8 @@
   },
   "villager_northfolk_1_back_work0_axe": {
    "frame": {
-    "x": 1196,
-    "y": 649,
+    "x": 791,
+    "y": 746,
     "w": 23,
     "h": 40
    },
@@ -15986,8 +20090,8 @@
   },
   "villager_northfolk_1_back_work0_hammer": {
    "frame": {
-    "x": 2,
-    "y": 732,
+    "x": 1639,
+    "y": 788,
     "w": 22,
     "h": 39
    },
@@ -16010,8 +20114,8 @@
   },
   "villager_northfolk_1_back_work0_hoe": {
    "frame": {
-    "x": 26,
-    "y": 732,
+    "x": 1663,
+    "y": 788,
     "w": 23,
     "h": 39
    },
@@ -16034,8 +20138,8 @@
   },
   "villager_northfolk_1_back_work0_pick": {
    "frame": {
-    "x": 51,
-    "y": 732,
+    "x": 1688,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -16058,8 +20162,8 @@
   },
   "villager_northfolk_1_back_work1_axe": {
    "frame": {
-    "x": 77,
-    "y": 732,
+    "x": 1714,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -16082,8 +20186,8 @@
   },
   "villager_northfolk_1_back_work1_hammer": {
    "frame": {
-    "x": 103,
-    "y": 732,
+    "x": 1740,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -16106,8 +20210,8 @@
   },
   "villager_northfolk_1_back_work1_hoe": {
    "frame": {
-    "x": 129,
-    "y": 732,
+    "x": 1766,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -16130,8 +20234,8 @@
   },
   "villager_northfolk_1_back_work1_pick": {
    "frame": {
-    "x": 155,
-    "y": 732,
+    "x": 1792,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -16154,8 +20258,8 @@
   },
   "villager_northfolk_1_front_stand": {
    "frame": {
-    "x": 181,
-    "y": 732,
+    "x": 1818,
+    "y": 788,
     "w": 16,
     "h": 39
    },
@@ -16178,8 +20282,8 @@
   },
   "villager_northfolk_1_front_walk0": {
    "frame": {
-    "x": 199,
-    "y": 732,
+    "x": 1836,
+    "y": 788,
     "w": 16,
     "h": 39
    },
@@ -16202,8 +20306,8 @@
   },
   "villager_northfolk_1_front_walk1": {
    "frame": {
-    "x": 217,
-    "y": 732,
+    "x": 1854,
+    "y": 788,
     "w": 16,
     "h": 39
    },
@@ -16226,8 +20330,8 @@
   },
   "villager_northfolk_1_front_work0_axe": {
    "frame": {
-    "x": 1221,
-    "y": 649,
+    "x": 816,
+    "y": 746,
     "w": 23,
     "h": 40
    },
@@ -16250,8 +20354,8 @@
   },
   "villager_northfolk_1_front_work0_hammer": {
    "frame": {
-    "x": 235,
-    "y": 732,
+    "x": 1872,
+    "y": 788,
     "w": 22,
     "h": 39
    },
@@ -16274,8 +20378,8 @@
   },
   "villager_northfolk_1_front_work0_hoe": {
    "frame": {
-    "x": 259,
-    "y": 732,
+    "x": 1896,
+    "y": 788,
     "w": 23,
     "h": 39
    },
@@ -16298,8 +20402,8 @@
   },
   "villager_northfolk_1_front_work0_pick": {
    "frame": {
-    "x": 284,
-    "y": 732,
+    "x": 1921,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -16322,8 +20426,8 @@
   },
   "villager_northfolk_1_front_work1_axe": {
    "frame": {
-    "x": 310,
-    "y": 732,
+    "x": 1947,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -16346,8 +20450,8 @@
   },
   "villager_northfolk_1_front_work1_hammer": {
    "frame": {
-    "x": 336,
-    "y": 732,
+    "x": 1973,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -16370,8 +20474,8 @@
   },
   "villager_northfolk_1_front_work1_hoe": {
    "frame": {
-    "x": 362,
-    "y": 732,
+    "x": 1999,
+    "y": 788,
     "w": 24,
     "h": 39
    },
@@ -16394,8 +20498,8 @@
   },
   "villager_northfolk_1_front_work1_pick": {
    "frame": {
-    "x": 388,
-    "y": 732,
+    "x": 2,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -16418,8 +20522,8 @@
   },
   "villager_northfolk_2_back_stand": {
    "frame": {
-    "x": 414,
-    "y": 732,
+    "x": 28,
+    "y": 829,
     "w": 16,
     "h": 39
    },
@@ -16442,8 +20546,8 @@
   },
   "villager_northfolk_2_back_walk0": {
    "frame": {
-    "x": 432,
-    "y": 732,
+    "x": 46,
+    "y": 829,
     "w": 16,
     "h": 39
    },
@@ -16466,8 +20570,8 @@
   },
   "villager_northfolk_2_back_walk1": {
    "frame": {
-    "x": 450,
-    "y": 732,
+    "x": 64,
+    "y": 829,
     "w": 16,
     "h": 39
    },
@@ -16490,8 +20594,8 @@
   },
   "villager_northfolk_2_back_work0_axe": {
    "frame": {
-    "x": 1246,
-    "y": 649,
+    "x": 841,
+    "y": 746,
     "w": 23,
     "h": 40
    },
@@ -16514,8 +20618,8 @@
   },
   "villager_northfolk_2_back_work0_hammer": {
    "frame": {
-    "x": 468,
-    "y": 732,
+    "x": 82,
+    "y": 829,
     "w": 22,
     "h": 39
    },
@@ -16538,8 +20642,8 @@
   },
   "villager_northfolk_2_back_work0_hoe": {
    "frame": {
-    "x": 492,
-    "y": 732,
+    "x": 106,
+    "y": 829,
     "w": 23,
     "h": 39
    },
@@ -16562,8 +20666,8 @@
   },
   "villager_northfolk_2_back_work0_pick": {
    "frame": {
-    "x": 517,
-    "y": 732,
+    "x": 131,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -16586,8 +20690,8 @@
   },
   "villager_northfolk_2_back_work1_axe": {
    "frame": {
-    "x": 543,
-    "y": 732,
+    "x": 157,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -16610,8 +20714,8 @@
   },
   "villager_northfolk_2_back_work1_hammer": {
    "frame": {
-    "x": 569,
-    "y": 732,
+    "x": 183,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -16634,8 +20738,8 @@
   },
   "villager_northfolk_2_back_work1_hoe": {
    "frame": {
-    "x": 595,
-    "y": 732,
+    "x": 209,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -16658,8 +20762,8 @@
   },
   "villager_northfolk_2_back_work1_pick": {
    "frame": {
-    "x": 621,
-    "y": 732,
+    "x": 235,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -16682,8 +20786,8 @@
   },
   "villager_northfolk_2_front_stand": {
    "frame": {
-    "x": 647,
-    "y": 732,
+    "x": 261,
+    "y": 829,
     "w": 16,
     "h": 39
    },
@@ -16706,8 +20810,8 @@
   },
   "villager_northfolk_2_front_walk0": {
    "frame": {
-    "x": 665,
-    "y": 732,
+    "x": 279,
+    "y": 829,
     "w": 16,
     "h": 39
    },
@@ -16730,8 +20834,8 @@
   },
   "villager_northfolk_2_front_walk1": {
    "frame": {
-    "x": 683,
-    "y": 732,
+    "x": 297,
+    "y": 829,
     "w": 16,
     "h": 39
    },
@@ -16754,8 +20858,8 @@
   },
   "villager_northfolk_2_front_work0_axe": {
    "frame": {
-    "x": 1271,
-    "y": 649,
+    "x": 866,
+    "y": 746,
     "w": 23,
     "h": 40
    },
@@ -16778,8 +20882,8 @@
   },
   "villager_northfolk_2_front_work0_hammer": {
    "frame": {
-    "x": 701,
-    "y": 732,
+    "x": 315,
+    "y": 829,
     "w": 22,
     "h": 39
    },
@@ -16802,8 +20906,8 @@
   },
   "villager_northfolk_2_front_work0_hoe": {
    "frame": {
-    "x": 725,
-    "y": 732,
+    "x": 339,
+    "y": 829,
     "w": 23,
     "h": 39
    },
@@ -16826,8 +20930,8 @@
   },
   "villager_northfolk_2_front_work0_pick": {
    "frame": {
-    "x": 750,
-    "y": 732,
+    "x": 364,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -16850,8 +20954,8 @@
   },
   "villager_northfolk_2_front_work1_axe": {
    "frame": {
-    "x": 776,
-    "y": 732,
+    "x": 390,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -16874,8 +20978,8 @@
   },
   "villager_northfolk_2_front_work1_hammer": {
    "frame": {
-    "x": 802,
-    "y": 732,
+    "x": 416,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -16898,8 +21002,8 @@
   },
   "villager_northfolk_2_front_work1_hoe": {
    "frame": {
-    "x": 828,
-    "y": 732,
+    "x": 442,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -16922,8 +21026,8 @@
   },
   "villager_northfolk_2_front_work1_pick": {
    "frame": {
-    "x": 854,
-    "y": 732,
+    "x": 468,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -16946,8 +21050,8 @@
   },
   "villager_sunfolk_0_back_stand": {
    "frame": {
-    "x": 498,
-    "y": 814,
+    "x": 132,
+    "y": 910,
     "w": 16,
     "h": 37
    },
@@ -16970,8 +21074,8 @@
   },
   "villager_sunfolk_0_back_walk0": {
    "frame": {
-    "x": 516,
-    "y": 814,
+    "x": 150,
+    "y": 910,
     "w": 16,
     "h": 37
    },
@@ -16994,8 +21098,8 @@
   },
   "villager_sunfolk_0_back_walk1": {
    "frame": {
-    "x": 534,
-    "y": 814,
+    "x": 168,
+    "y": 910,
     "w": 16,
     "h": 37
    },
@@ -17018,8 +21122,8 @@
   },
   "villager_sunfolk_0_back_work0_axe": {
    "frame": {
-    "x": 1296,
-    "y": 649,
+    "x": 891,
+    "y": 746,
     "w": 23,
     "h": 40
    },
@@ -17042,8 +21146,8 @@
   },
   "villager_sunfolk_0_back_work0_hammer": {
    "frame": {
-    "x": 880,
-    "y": 732,
+    "x": 494,
+    "y": 829,
     "w": 22,
     "h": 39
    },
@@ -17066,8 +21170,8 @@
   },
   "villager_sunfolk_0_back_work0_hoe": {
    "frame": {
-    "x": 879,
-    "y": 773,
+    "x": 491,
+    "y": 870,
     "w": 23,
     "h": 38
    },
@@ -17090,8 +21194,8 @@
   },
   "villager_sunfolk_0_back_work0_pick": {
    "frame": {
-    "x": 552,
-    "y": 814,
+    "x": 186,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -17114,8 +21218,8 @@
   },
   "villager_sunfolk_0_back_work1_axe": {
    "frame": {
-    "x": 578,
-    "y": 814,
+    "x": 212,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -17138,8 +21242,8 @@
   },
   "villager_sunfolk_0_back_work1_hammer": {
    "frame": {
-    "x": 604,
-    "y": 814,
+    "x": 238,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -17162,8 +21266,8 @@
   },
   "villager_sunfolk_0_back_work1_hoe": {
    "frame": {
-    "x": 630,
-    "y": 814,
+    "x": 264,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -17186,8 +21290,8 @@
   },
   "villager_sunfolk_0_back_work1_pick": {
    "frame": {
-    "x": 656,
-    "y": 814,
+    "x": 290,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -17210,8 +21314,8 @@
   },
   "villager_sunfolk_0_front_stand": {
    "frame": {
-    "x": 682,
-    "y": 814,
+    "x": 316,
+    "y": 910,
     "w": 16,
     "h": 37
    },
@@ -17234,8 +21338,8 @@
   },
   "villager_sunfolk_0_front_walk0": {
    "frame": {
-    "x": 700,
-    "y": 814,
+    "x": 334,
+    "y": 910,
     "w": 16,
     "h": 37
    },
@@ -17258,8 +21362,8 @@
   },
   "villager_sunfolk_0_front_walk1": {
    "frame": {
-    "x": 718,
-    "y": 814,
+    "x": 352,
+    "y": 910,
     "w": 16,
     "h": 37
    },
@@ -17282,8 +21386,8 @@
   },
   "villager_sunfolk_0_front_work0_axe": {
    "frame": {
-    "x": 1321,
-    "y": 649,
+    "x": 916,
+    "y": 746,
     "w": 23,
     "h": 40
    },
@@ -17306,8 +21410,8 @@
   },
   "villager_sunfolk_0_front_work0_hammer": {
    "frame": {
-    "x": 904,
-    "y": 732,
+    "x": 518,
+    "y": 829,
     "w": 22,
     "h": 39
    },
@@ -17330,8 +21434,8 @@
   },
   "villager_sunfolk_0_front_work0_hoe": {
    "frame": {
-    "x": 904,
-    "y": 773,
+    "x": 516,
+    "y": 870,
     "w": 23,
     "h": 38
    },
@@ -17354,8 +21458,8 @@
   },
   "villager_sunfolk_0_front_work0_pick": {
    "frame": {
-    "x": 736,
-    "y": 814,
+    "x": 370,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -17378,8 +21482,8 @@
   },
   "villager_sunfolk_0_front_work1_axe": {
    "frame": {
-    "x": 762,
-    "y": 814,
+    "x": 396,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -17402,8 +21506,8 @@
   },
   "villager_sunfolk_0_front_work1_hammer": {
    "frame": {
-    "x": 788,
-    "y": 814,
+    "x": 422,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -17426,8 +21530,8 @@
   },
   "villager_sunfolk_0_front_work1_hoe": {
    "frame": {
-    "x": 814,
-    "y": 814,
+    "x": 448,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -17450,8 +21554,8 @@
   },
   "villager_sunfolk_0_front_work1_pick": {
    "frame": {
-    "x": 840,
-    "y": 814,
+    "x": 474,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -17474,8 +21578,8 @@
   },
   "villager_sunfolk_1_back_stand": {
    "frame": {
-    "x": 866,
-    "y": 814,
+    "x": 500,
+    "y": 910,
     "w": 16,
     "h": 37
    },
@@ -17498,8 +21602,8 @@
   },
   "villager_sunfolk_1_back_walk0": {
    "frame": {
-    "x": 884,
-    "y": 814,
+    "x": 518,
+    "y": 910,
     "w": 16,
     "h": 37
    },
@@ -17522,8 +21626,8 @@
   },
   "villager_sunfolk_1_back_walk1": {
    "frame": {
-    "x": 902,
-    "y": 814,
+    "x": 536,
+    "y": 910,
     "w": 16,
     "h": 37
    },
@@ -17546,8 +21650,8 @@
   },
   "villager_sunfolk_1_back_work0_axe": {
    "frame": {
-    "x": 1346,
-    "y": 649,
+    "x": 941,
+    "y": 746,
     "w": 23,
     "h": 40
    },
@@ -17570,8 +21674,8 @@
   },
   "villager_sunfolk_1_back_work0_hammer": {
    "frame": {
-    "x": 928,
-    "y": 732,
+    "x": 542,
+    "y": 829,
     "w": 22,
     "h": 39
    },
@@ -17594,8 +21698,8 @@
   },
   "villager_sunfolk_1_back_work0_hoe": {
    "frame": {
-    "x": 929,
-    "y": 773,
+    "x": 541,
+    "y": 870,
     "w": 23,
     "h": 38
    },
@@ -17618,8 +21722,8 @@
   },
   "villager_sunfolk_1_back_work0_pick": {
    "frame": {
-    "x": 920,
-    "y": 814,
+    "x": 554,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -17642,8 +21746,8 @@
   },
   "villager_sunfolk_1_back_work1_axe": {
    "frame": {
-    "x": 946,
-    "y": 814,
+    "x": 580,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -17666,8 +21770,8 @@
   },
   "villager_sunfolk_1_back_work1_hammer": {
    "frame": {
-    "x": 972,
-    "y": 814,
+    "x": 606,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -17690,8 +21794,8 @@
   },
   "villager_sunfolk_1_back_work1_hoe": {
    "frame": {
-    "x": 998,
-    "y": 814,
+    "x": 632,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -17714,8 +21818,8 @@
   },
   "villager_sunfolk_1_back_work1_pick": {
    "frame": {
-    "x": 1024,
-    "y": 814,
+    "x": 658,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -17738,8 +21842,8 @@
   },
   "villager_sunfolk_1_front_stand": {
    "frame": {
-    "x": 1050,
-    "y": 814,
+    "x": 684,
+    "y": 910,
     "w": 16,
     "h": 37
    },
@@ -17762,8 +21866,8 @@
   },
   "villager_sunfolk_1_front_walk0": {
    "frame": {
-    "x": 1068,
-    "y": 814,
+    "x": 702,
+    "y": 910,
     "w": 16,
     "h": 37
    },
@@ -17786,8 +21890,8 @@
   },
   "villager_sunfolk_1_front_walk1": {
    "frame": {
-    "x": 1086,
-    "y": 814,
+    "x": 720,
+    "y": 910,
     "w": 16,
     "h": 37
    },
@@ -17810,8 +21914,8 @@
   },
   "villager_sunfolk_1_front_work0_axe": {
    "frame": {
-    "x": 1371,
-    "y": 649,
+    "x": 966,
+    "y": 746,
     "w": 23,
     "h": 40
    },
@@ -17834,8 +21938,8 @@
   },
   "villager_sunfolk_1_front_work0_hammer": {
    "frame": {
-    "x": 952,
-    "y": 732,
+    "x": 566,
+    "y": 829,
     "w": 22,
     "h": 39
    },
@@ -17858,8 +21962,8 @@
   },
   "villager_sunfolk_1_front_work0_hoe": {
    "frame": {
-    "x": 954,
-    "y": 773,
+    "x": 566,
+    "y": 870,
     "w": 23,
     "h": 38
    },
@@ -17882,8 +21986,8 @@
   },
   "villager_sunfolk_1_front_work0_pick": {
    "frame": {
-    "x": 1104,
-    "y": 814,
+    "x": 738,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -17906,8 +22010,8 @@
   },
   "villager_sunfolk_1_front_work1_axe": {
    "frame": {
-    "x": 1130,
-    "y": 814,
+    "x": 764,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -17930,8 +22034,8 @@
   },
   "villager_sunfolk_1_front_work1_hammer": {
    "frame": {
-    "x": 1156,
-    "y": 814,
+    "x": 790,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -17954,8 +22058,8 @@
   },
   "villager_sunfolk_1_front_work1_hoe": {
    "frame": {
-    "x": 1182,
-    "y": 814,
+    "x": 816,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -17978,8 +22082,8 @@
   },
   "villager_sunfolk_1_front_work1_pick": {
    "frame": {
-    "x": 1208,
-    "y": 814,
+    "x": 842,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -18002,8 +22106,8 @@
   },
   "villager_sunfolk_2_back_stand": {
    "frame": {
-    "x": 1234,
-    "y": 814,
+    "x": 868,
+    "y": 910,
     "w": 16,
     "h": 37
    },
@@ -18026,8 +22130,8 @@
   },
   "villager_sunfolk_2_back_walk0": {
    "frame": {
-    "x": 1252,
-    "y": 814,
+    "x": 886,
+    "y": 910,
     "w": 16,
     "h": 37
    },
@@ -18050,8 +22154,8 @@
   },
   "villager_sunfolk_2_back_walk1": {
    "frame": {
-    "x": 1270,
-    "y": 814,
+    "x": 904,
+    "y": 910,
     "w": 16,
     "h": 37
    },
@@ -18074,8 +22178,8 @@
   },
   "villager_sunfolk_2_back_work0_axe": {
    "frame": {
-    "x": 1396,
-    "y": 649,
+    "x": 991,
+    "y": 746,
     "w": 23,
     "h": 40
    },
@@ -18098,8 +22202,8 @@
   },
   "villager_sunfolk_2_back_work0_hammer": {
    "frame": {
-    "x": 976,
-    "y": 732,
+    "x": 590,
+    "y": 829,
     "w": 22,
     "h": 39
    },
@@ -18122,8 +22226,8 @@
   },
   "villager_sunfolk_2_back_work0_hoe": {
    "frame": {
-    "x": 979,
-    "y": 773,
+    "x": 591,
+    "y": 870,
     "w": 23,
     "h": 38
    },
@@ -18146,8 +22250,8 @@
   },
   "villager_sunfolk_2_back_work0_pick": {
    "frame": {
-    "x": 1288,
-    "y": 814,
+    "x": 922,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -18170,8 +22274,8 @@
   },
   "villager_sunfolk_2_back_work1_axe": {
    "frame": {
-    "x": 1314,
-    "y": 814,
+    "x": 948,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -18194,8 +22298,8 @@
   },
   "villager_sunfolk_2_back_work1_hammer": {
    "frame": {
-    "x": 1340,
-    "y": 814,
+    "x": 974,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -18218,8 +22322,8 @@
   },
   "villager_sunfolk_2_back_work1_hoe": {
    "frame": {
-    "x": 1366,
-    "y": 814,
+    "x": 1000,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -18242,8 +22346,8 @@
   },
   "villager_sunfolk_2_back_work1_pick": {
    "frame": {
-    "x": 1392,
-    "y": 814,
+    "x": 1026,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -18266,8 +22370,8 @@
   },
   "villager_sunfolk_2_front_stand": {
    "frame": {
-    "x": 1418,
-    "y": 814,
+    "x": 1052,
+    "y": 910,
     "w": 16,
     "h": 37
    },
@@ -18290,8 +22394,8 @@
   },
   "villager_sunfolk_2_front_walk0": {
    "frame": {
-    "x": 1436,
-    "y": 814,
+    "x": 1070,
+    "y": 910,
     "w": 16,
     "h": 37
    },
@@ -18314,8 +22418,8 @@
   },
   "villager_sunfolk_2_front_walk1": {
    "frame": {
-    "x": 1454,
-    "y": 814,
+    "x": 1088,
+    "y": 910,
     "w": 16,
     "h": 37
    },
@@ -18338,8 +22442,8 @@
   },
   "villager_sunfolk_2_front_work0_axe": {
    "frame": {
-    "x": 1421,
-    "y": 649,
+    "x": 1016,
+    "y": 746,
     "w": 23,
     "h": 40
    },
@@ -18362,8 +22466,8 @@
   },
   "villager_sunfolk_2_front_work0_hammer": {
    "frame": {
-    "x": 1000,
-    "y": 732,
+    "x": 614,
+    "y": 829,
     "w": 22,
     "h": 39
    },
@@ -18386,8 +22490,8 @@
   },
   "villager_sunfolk_2_front_work0_hoe": {
    "frame": {
-    "x": 1004,
-    "y": 773,
+    "x": 616,
+    "y": 870,
     "w": 23,
     "h": 38
    },
@@ -18410,8 +22514,8 @@
   },
   "villager_sunfolk_2_front_work0_pick": {
    "frame": {
-    "x": 1472,
-    "y": 814,
+    "x": 1106,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -18434,8 +22538,8 @@
   },
   "villager_sunfolk_2_front_work1_axe": {
    "frame": {
-    "x": 1498,
-    "y": 814,
+    "x": 1132,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -18458,8 +22562,8 @@
   },
   "villager_sunfolk_2_front_work1_hammer": {
    "frame": {
-    "x": 1524,
-    "y": 814,
+    "x": 1158,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -18482,8 +22586,8 @@
   },
   "villager_sunfolk_2_front_work1_hoe": {
    "frame": {
-    "x": 1550,
-    "y": 814,
+    "x": 1184,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -18506,8 +22610,8 @@
   },
   "villager_sunfolk_2_front_work1_pick": {
    "frame": {
-    "x": 1576,
-    "y": 814,
+    "x": 1210,
+    "y": 910,
     "w": 24,
     "h": 37
    },
@@ -18530,8 +22634,8 @@
   },
   "villager_sylvan_0_back_stand": {
    "frame": {
-    "x": 1024,
-    "y": 732,
+    "x": 638,
+    "y": 829,
     "w": 16,
     "h": 39
    },
@@ -18554,8 +22658,8 @@
   },
   "villager_sylvan_0_back_walk0": {
    "frame": {
-    "x": 1042,
-    "y": 732,
+    "x": 656,
+    "y": 829,
     "w": 16,
     "h": 39
    },
@@ -18578,8 +22682,8 @@
   },
   "villager_sylvan_0_back_walk1": {
    "frame": {
-    "x": 1060,
-    "y": 732,
+    "x": 674,
+    "y": 829,
     "w": 16,
     "h": 39
    },
@@ -18602,8 +22706,8 @@
   },
   "villager_sylvan_0_back_work0_axe": {
    "frame": {
-    "x": 1446,
-    "y": 649,
+    "x": 1041,
+    "y": 746,
     "w": 23,
     "h": 40
    },
@@ -18626,8 +22730,8 @@
   },
   "villager_sylvan_0_back_work0_hammer": {
    "frame": {
-    "x": 1078,
-    "y": 732,
+    "x": 692,
+    "y": 829,
     "w": 22,
     "h": 39
    },
@@ -18650,8 +22754,8 @@
   },
   "villager_sylvan_0_back_work0_hoe": {
    "frame": {
-    "x": 1102,
-    "y": 732,
+    "x": 716,
+    "y": 829,
     "w": 23,
     "h": 39
    },
@@ -18674,8 +22778,8 @@
   },
   "villager_sylvan_0_back_work0_pick": {
    "frame": {
-    "x": 1127,
-    "y": 732,
+    "x": 741,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -18698,8 +22802,8 @@
   },
   "villager_sylvan_0_back_work1_axe": {
    "frame": {
-    "x": 1153,
-    "y": 732,
+    "x": 767,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -18722,8 +22826,8 @@
   },
   "villager_sylvan_0_back_work1_hammer": {
    "frame": {
-    "x": 1179,
-    "y": 732,
+    "x": 793,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -18746,8 +22850,8 @@
   },
   "villager_sylvan_0_back_work1_hoe": {
    "frame": {
-    "x": 1205,
-    "y": 732,
+    "x": 819,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -18770,8 +22874,8 @@
   },
   "villager_sylvan_0_back_work1_pick": {
    "frame": {
-    "x": 1231,
-    "y": 732,
+    "x": 845,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -18794,8 +22898,8 @@
   },
   "villager_sylvan_0_front_stand": {
    "frame": {
-    "x": 1257,
-    "y": 732,
+    "x": 871,
+    "y": 829,
     "w": 16,
     "h": 39
    },
@@ -18818,8 +22922,8 @@
   },
   "villager_sylvan_0_front_walk0": {
    "frame": {
-    "x": 1275,
-    "y": 732,
+    "x": 889,
+    "y": 829,
     "w": 16,
     "h": 39
    },
@@ -18842,8 +22946,8 @@
   },
   "villager_sylvan_0_front_walk1": {
    "frame": {
-    "x": 1293,
-    "y": 732,
+    "x": 907,
+    "y": 829,
     "w": 16,
     "h": 39
    },
@@ -18866,8 +22970,8 @@
   },
   "villager_sylvan_0_front_work0_axe": {
    "frame": {
-    "x": 1471,
-    "y": 649,
+    "x": 1066,
+    "y": 746,
     "w": 23,
     "h": 40
    },
@@ -18890,8 +22994,8 @@
   },
   "villager_sylvan_0_front_work0_hammer": {
    "frame": {
-    "x": 1311,
-    "y": 732,
+    "x": 925,
+    "y": 829,
     "w": 22,
     "h": 39
    },
@@ -18914,8 +23018,8 @@
   },
   "villager_sylvan_0_front_work0_hoe": {
    "frame": {
-    "x": 1335,
-    "y": 732,
+    "x": 949,
+    "y": 829,
     "w": 23,
     "h": 39
    },
@@ -18938,8 +23042,8 @@
   },
   "villager_sylvan_0_front_work0_pick": {
    "frame": {
-    "x": 1360,
-    "y": 732,
+    "x": 974,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -18962,8 +23066,8 @@
   },
   "villager_sylvan_0_front_work1_axe": {
    "frame": {
-    "x": 1386,
-    "y": 732,
+    "x": 1000,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -18986,8 +23090,8 @@
   },
   "villager_sylvan_0_front_work1_hammer": {
    "frame": {
-    "x": 1412,
-    "y": 732,
+    "x": 1026,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -19010,8 +23114,8 @@
   },
   "villager_sylvan_0_front_work1_hoe": {
    "frame": {
-    "x": 1438,
-    "y": 732,
+    "x": 1052,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -19034,8 +23138,8 @@
   },
   "villager_sylvan_0_front_work1_pick": {
    "frame": {
-    "x": 1464,
-    "y": 732,
+    "x": 1078,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -19058,8 +23162,8 @@
   },
   "villager_sylvan_1_back_stand": {
    "frame": {
-    "x": 1490,
-    "y": 732,
+    "x": 1104,
+    "y": 829,
     "w": 16,
     "h": 39
    },
@@ -19082,8 +23186,8 @@
   },
   "villager_sylvan_1_back_walk0": {
    "frame": {
-    "x": 1508,
-    "y": 732,
+    "x": 1122,
+    "y": 829,
     "w": 16,
     "h": 39
    },
@@ -19106,8 +23210,8 @@
   },
   "villager_sylvan_1_back_walk1": {
    "frame": {
-    "x": 1526,
-    "y": 732,
+    "x": 1140,
+    "y": 829,
     "w": 16,
     "h": 39
    },
@@ -19130,8 +23234,8 @@
   },
   "villager_sylvan_1_back_work0_axe": {
    "frame": {
-    "x": 1496,
-    "y": 649,
+    "x": 1091,
+    "y": 746,
     "w": 23,
     "h": 40
    },
@@ -19154,8 +23258,8 @@
   },
   "villager_sylvan_1_back_work0_hammer": {
    "frame": {
-    "x": 1544,
-    "y": 732,
+    "x": 1158,
+    "y": 829,
     "w": 22,
     "h": 39
    },
@@ -19178,8 +23282,8 @@
   },
   "villager_sylvan_1_back_work0_hoe": {
    "frame": {
-    "x": 1568,
-    "y": 732,
+    "x": 1182,
+    "y": 829,
     "w": 23,
     "h": 39
    },
@@ -19202,8 +23306,8 @@
   },
   "villager_sylvan_1_back_work0_pick": {
    "frame": {
-    "x": 1593,
-    "y": 732,
+    "x": 1207,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -19226,8 +23330,8 @@
   },
   "villager_sylvan_1_back_work1_axe": {
    "frame": {
-    "x": 1619,
-    "y": 732,
+    "x": 1233,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -19250,8 +23354,8 @@
   },
   "villager_sylvan_1_back_work1_hammer": {
    "frame": {
-    "x": 1645,
-    "y": 732,
+    "x": 1259,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -19274,8 +23378,8 @@
   },
   "villager_sylvan_1_back_work1_hoe": {
    "frame": {
-    "x": 1671,
-    "y": 732,
+    "x": 1285,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -19298,8 +23402,8 @@
   },
   "villager_sylvan_1_back_work1_pick": {
    "frame": {
-    "x": 1697,
-    "y": 732,
+    "x": 1311,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -19322,8 +23426,8 @@
   },
   "villager_sylvan_1_front_stand": {
    "frame": {
-    "x": 1723,
-    "y": 732,
+    "x": 1337,
+    "y": 829,
     "w": 16,
     "h": 39
    },
@@ -19346,8 +23450,8 @@
   },
   "villager_sylvan_1_front_walk0": {
    "frame": {
-    "x": 1741,
-    "y": 732,
+    "x": 1355,
+    "y": 829,
     "w": 16,
     "h": 39
    },
@@ -19370,8 +23474,8 @@
   },
   "villager_sylvan_1_front_walk1": {
    "frame": {
-    "x": 1759,
-    "y": 732,
+    "x": 1373,
+    "y": 829,
     "w": 16,
     "h": 39
    },
@@ -19394,8 +23498,8 @@
   },
   "villager_sylvan_1_front_work0_axe": {
    "frame": {
-    "x": 1521,
-    "y": 649,
+    "x": 1116,
+    "y": 746,
     "w": 23,
     "h": 40
    },
@@ -19418,8 +23522,8 @@
   },
   "villager_sylvan_1_front_work0_hammer": {
    "frame": {
-    "x": 1777,
-    "y": 732,
+    "x": 1391,
+    "y": 829,
     "w": 22,
     "h": 39
    },
@@ -19442,8 +23546,8 @@
   },
   "villager_sylvan_1_front_work0_hoe": {
    "frame": {
-    "x": 1801,
-    "y": 732,
+    "x": 1415,
+    "y": 829,
     "w": 23,
     "h": 39
    },
@@ -19466,8 +23570,8 @@
   },
   "villager_sylvan_1_front_work0_pick": {
    "frame": {
-    "x": 1826,
-    "y": 732,
+    "x": 1440,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -19490,8 +23594,8 @@
   },
   "villager_sylvan_1_front_work1_axe": {
    "frame": {
-    "x": 1852,
-    "y": 732,
+    "x": 1466,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -19514,8 +23618,8 @@
   },
   "villager_sylvan_1_front_work1_hammer": {
    "frame": {
-    "x": 1878,
-    "y": 732,
+    "x": 1492,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -19538,8 +23642,8 @@
   },
   "villager_sylvan_1_front_work1_hoe": {
    "frame": {
-    "x": 1904,
-    "y": 732,
+    "x": 1518,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -19562,8 +23666,8 @@
   },
   "villager_sylvan_1_front_work1_pick": {
    "frame": {
-    "x": 1930,
-    "y": 732,
+    "x": 1544,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -19586,8 +23690,8 @@
   },
   "villager_sylvan_2_back_stand": {
    "frame": {
-    "x": 1956,
-    "y": 732,
+    "x": 1570,
+    "y": 829,
     "w": 16,
     "h": 39
    },
@@ -19610,8 +23714,8 @@
   },
   "villager_sylvan_2_back_walk0": {
    "frame": {
-    "x": 1974,
-    "y": 732,
+    "x": 1588,
+    "y": 829,
     "w": 16,
     "h": 39
    },
@@ -19634,8 +23738,8 @@
   },
   "villager_sylvan_2_back_walk1": {
    "frame": {
-    "x": 1992,
-    "y": 732,
+    "x": 1606,
+    "y": 829,
     "w": 16,
     "h": 39
    },
@@ -19658,8 +23762,8 @@
   },
   "villager_sylvan_2_back_work0_axe": {
    "frame": {
-    "x": 1546,
-    "y": 649,
+    "x": 1141,
+    "y": 746,
     "w": 23,
     "h": 40
    },
@@ -19682,8 +23786,8 @@
   },
   "villager_sylvan_2_back_work0_hammer": {
    "frame": {
-    "x": 2010,
-    "y": 732,
+    "x": 1624,
+    "y": 829,
     "w": 22,
     "h": 39
    },
@@ -19706,8 +23810,8 @@
   },
   "villager_sylvan_2_back_work0_hoe": {
    "frame": {
-    "x": 2,
-    "y": 773,
+    "x": 1648,
+    "y": 829,
     "w": 23,
     "h": 39
    },
@@ -19730,8 +23834,8 @@
   },
   "villager_sylvan_2_back_work0_pick": {
    "frame": {
-    "x": 27,
-    "y": 773,
+    "x": 1673,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -19754,8 +23858,8 @@
   },
   "villager_sylvan_2_back_work1_axe": {
    "frame": {
-    "x": 53,
-    "y": 773,
+    "x": 1699,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -19778,8 +23882,8 @@
   },
   "villager_sylvan_2_back_work1_hammer": {
    "frame": {
-    "x": 79,
-    "y": 773,
+    "x": 1725,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -19802,8 +23906,8 @@
   },
   "villager_sylvan_2_back_work1_hoe": {
    "frame": {
-    "x": 105,
-    "y": 773,
+    "x": 1751,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -19826,8 +23930,8 @@
   },
   "villager_sylvan_2_back_work1_pick": {
    "frame": {
-    "x": 131,
-    "y": 773,
+    "x": 1777,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -19850,8 +23954,8 @@
   },
   "villager_sylvan_2_front_stand": {
    "frame": {
-    "x": 157,
-    "y": 773,
+    "x": 1803,
+    "y": 829,
     "w": 16,
     "h": 39
    },
@@ -19874,8 +23978,8 @@
   },
   "villager_sylvan_2_front_walk0": {
    "frame": {
-    "x": 175,
-    "y": 773,
+    "x": 1821,
+    "y": 829,
     "w": 16,
     "h": 39
    },
@@ -19898,8 +24002,8 @@
   },
   "villager_sylvan_2_front_walk1": {
    "frame": {
-    "x": 193,
-    "y": 773,
+    "x": 1839,
+    "y": 829,
     "w": 16,
     "h": 39
    },
@@ -19922,8 +24026,8 @@
   },
   "villager_sylvan_2_front_work0_axe": {
    "frame": {
-    "x": 1571,
-    "y": 649,
+    "x": 1166,
+    "y": 746,
     "w": 23,
     "h": 40
    },
@@ -19946,8 +24050,8 @@
   },
   "villager_sylvan_2_front_work0_hammer": {
    "frame": {
-    "x": 211,
-    "y": 773,
+    "x": 1857,
+    "y": 829,
     "w": 22,
     "h": 39
    },
@@ -19970,8 +24074,8 @@
   },
   "villager_sylvan_2_front_work0_hoe": {
    "frame": {
-    "x": 235,
-    "y": 773,
+    "x": 1881,
+    "y": 829,
     "w": 23,
     "h": 39
    },
@@ -19994,8 +24098,8 @@
   },
   "villager_sylvan_2_front_work0_pick": {
    "frame": {
-    "x": 260,
-    "y": 773,
+    "x": 1906,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -20018,8 +24122,8 @@
   },
   "villager_sylvan_2_front_work1_axe": {
    "frame": {
-    "x": 286,
-    "y": 773,
+    "x": 1932,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -20042,8 +24146,8 @@
   },
   "villager_sylvan_2_front_work1_hammer": {
    "frame": {
-    "x": 312,
-    "y": 773,
+    "x": 1958,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -20066,8 +24170,8 @@
   },
   "villager_sylvan_2_front_work1_hoe": {
    "frame": {
-    "x": 338,
-    "y": 773,
+    "x": 1984,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -20090,8 +24194,8 @@
   },
   "villager_sylvan_2_front_work1_pick": {
    "frame": {
-    "x": 364,
-    "y": 773,
+    "x": 2010,
+    "y": 829,
     "w": 24,
     "h": 39
    },
@@ -20114,8 +24218,8 @@
   },
   "wreck_bones": {
    "frame": {
-    "x": 1355,
-    "y": 890,
+    "x": 1212,
+    "y": 986,
     "w": 19,
     "h": 11
    },

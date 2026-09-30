@@ -22,6 +22,7 @@ import {
   type SiteEntity,
   type StormEntity,
   type WreckEntity,
+  type CharacterEntity,
   type Walker,
   type WorldMap,
 } from "@explorer/shared";
@@ -32,6 +33,8 @@ import {
   buildingSprite,
   markerSprite,
   nodeSprite,
+  heroCapeSprite,
+  heroSprite,
   scaffoldSprite,
   tileJitter,
   villagerSprite,
@@ -472,6 +475,70 @@ class VillagerView extends MovingView {
   }
 }
 
+/**
+ * A player's character: a quarter larger than the villagers so it stands out, with a cape and
+ * sash in the player's colour (the greyscale cape layers multiplied by it).
+ */
+class HeroView extends MovingView {
+  readonly root = new Container();
+  private readonly body: Sprite;
+  private readonly capeUnder: Sprite;
+  private readonly capeOver: Sprite;
+  private c: CharacterEntity | null = null;
+  private height = 0;
+
+  constructor(private readonly layer: EntityLayer) {
+    super();
+    const tribe = layer.state.world.tribe;
+    const first = heroSprite(tribe, 0, false, "stand");
+    this.capeUnder = layer.atlas.sprite(heroCapeSprite(false, "under", "stand"));
+    this.body = layer.atlas.sprite(first);
+    this.capeOver = layer.atlas.sprite(heroCapeSprite(false, "over", "stand"));
+    this.root.addChild(this.capeUnder, this.body, this.capeOver);
+  }
+
+  update(e: Entity, now: number): void {
+    const c = e as CharacterEntity;
+    this.root.visible = c.aboard === null;
+    this.track(c.x, c.y, now, this.c === null);
+    if (this.c === null) this.height = tileHeight(this.layer.state, c.x, c.y);
+    this.c = c;
+  }
+
+  override frame(now: number, dt: number): void {
+    const c = this.c;
+    if (!c) return;
+    this.interpolate(now);
+    const targetH = tileHeight(this.layer.state, this.x, this.y);
+    this.height +=
+      Math.sign(targetH - this.height) * Math.min(Math.abs(targetH - this.height), dt * 48);
+    const phase = Math.floor(now / 160 + c.id) % 2;
+    const pose = this.moving ? (phase ? "walk0" : "walk1") : "stand";
+    const back = c.facing === 2 || c.facing === 3;
+    const flip = c.facing === 1 || c.facing === 2;
+    const show = (sprite: Sprite, name: string) => {
+      this.layer.atlas.setFrame(sprite, name);
+      const k = Math.abs(sprite.scale.x);
+      sprite.scale.x = flip ? -k : k;
+    };
+    show(this.body, heroSprite(this.layer.state.world.tribe, c.tunic, back, pose));
+    // From the front the cape hangs behind the body; from the back it covers it.
+    this.capeUnder.visible = !back;
+    if (!back) show(this.capeUnder, heroCapeSprite(false, "under", pose));
+    show(this.capeOver, heroCapeSprite(back, "over", pose));
+    const tint = this.layer.playerColour(c.playerId);
+    this.capeUnder.tint = tint;
+    this.capeOver.tint = tint;
+    this.root.position.set(
+      Math.round(screenX(this.x, this.y)),
+      Math.round(screenY(this.x, this.y) - this.height),
+    );
+    // A hair in front of any villager on the same tile.
+    this.root.zIndex = this.x + this.y + 0.02;
+    this.root.alpha = this.fadeBehindTerrain(this.layer.state.world, this.height, dt);
+  }
+}
+
 /** A small hull bar over a damaged ship; nothing at full health. */
 function hullBar(bar: Graphics, hp: number, max: number): void {
   bar.clear();
@@ -781,6 +848,8 @@ export class EntityLayer {
   readonly lights = new Container();
   /** 0 by day up to 1 at midnight. */
   night = 0;
+  /** The colour of a player (0xRRGGBB), for their character's cape; the game fills this in. */
+  playerColour: (playerId: string) => number = () => 0xffffff;
   private views = new Map<number, View>();
   private smoke: Smoke[] = [];
   private sparkles: Sparkle[] = [];
@@ -862,8 +931,9 @@ export class EntityLayer {
       case "node":
         return new NodeView(this);
       case "villager":
-      case "character":
         return new VillagerView(this);
+      case "character":
+        return new HeroView(this);
       case "ship":
         return new ShipView(this);
       case "pirate":
@@ -888,6 +958,7 @@ export class EntityLayer {
       // Big or fast things are always kept up to date; the rest only while they are on screen.
       if (
         v instanceof VillagerView ||
+        v instanceof HeroView ||
         v instanceof ShipView ||
         v instanceof PirateView ||
         v instanceof StormView ||

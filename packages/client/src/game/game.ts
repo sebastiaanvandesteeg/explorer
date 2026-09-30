@@ -92,9 +92,9 @@ export class Game {
   private pointer: { x: number; y: number } | null = null;
   private drag: Drag | null = null;
   private keys = new Set<string>();
-  /** Adventure worlds: the camera follows your character until you look around on your own. */
-  private follow: boolean;
-  private followHintShown = false;
+  /** WASD walking: the direction being held (tile steps, "" when none) and when it was last sent. */
+  private walkDir = "";
+  private walkSentAt = 0;
   private myCharacterId: number | null = null;
   private status: SessionStatus = "connecting";
   private minimapTimer = 0;
@@ -117,7 +117,6 @@ export class Game {
     root: HTMLElement,
   ) {
     const state = session.state;
-    this.follow = state.mode === "adventure";
     this.camera = new Camera(state.world.width, state.world.height);
     this.terrain = new TerrainLayer(app.renderer, atlas, state);
     this.entities = new EntityLayer(
@@ -126,6 +125,10 @@ export class Game {
       (r) => this.terrain.invalidateRect(r.x, r.y, r.w, r.h),
       () => this.terrain.syncBuildings(),
     );
+    this.entities.playerColour = (id) => {
+      const colour = session.players.find((p) => p.id === id)?.color;
+      return colour ? Number.parseInt(colour.slice(1), 16) : 0xffffff;
+    };
     this.overlay = new Overlay(atlas);
     this.fog = new FogLayer(state);
     this.world.addChild(
@@ -181,9 +184,7 @@ export class Game {
     if (me) this.centerOnTile(me.x, me.y);
     else this.centerOnTile(th.x + 1.5, th.y + 1.5);
     if (state.mode === "adventure")
-      this.hud.toast(
-        "Adventure: right-click to walk. The camera follows you: drag or WASD to look around, C to come back",
-      );
+      this.hud.toast("Adventure: walk with WASD or right-click. The camera stays on you");
 
     session.on({
       patch: (p) => this.onPatch(p),
@@ -410,20 +411,57 @@ export class Game {
     return found;
   }
 
-  /** Send your character walking; the camera follows it again. */
+  /** Adventure worlds bind the camera to your character: it never wanders off on its own. */
+  private get locked(): boolean {
+    return this.myCharacter() !== undefined;
+  }
+
+  /** Send your character walking. */
   private walkTo(x: number, y: number): void {
-    this.follow = true;
     void this.send({ kind: "move-character", x, y });
   }
 
-  /** Looking around on your own lets go of your character until you press C. */
-  private detachCamera(): void {
-    if (!this.follow) return;
-    this.follow = false;
-    if (!this.followHintShown) {
-      this.followHintShown = true;
-      this.hud.toast("Press C to follow your character again");
+  /**
+   * Walk with the keys: while a direction is held, keep sending your character a few tiles that
+   * way (W is up the screen, which is -x -y on the map). Letting go stops it where it stands.
+   */
+  private walkWithKeys(now: number): void {
+    const me = this.myCharacter();
+    if (!me) return;
+    const k = this.keys;
+    const right =
+      (k.has("d") || k.has("arrowright") ? 1 : 0) - (k.has("a") || k.has("arrowleft") ? 1 : 0);
+    const down =
+      (k.has("s") || k.has("arrowdown") ? 1 : 0) - (k.has("w") || k.has("arrowup") ? 1 : 0);
+    // Screen right is (+1, -1) on the map and screen down is (+1, +1).
+    const step = { x: Math.sign(right + down), y: Math.sign(-right + down) };
+    const dir = step.x === 0 && step.y === 0 ? "" : `${step.x},${step.y}`;
+    const quiet = (cmd: Command) => void this.session.command(cmd);
+    const here = { x: Math.floor(me.x), y: Math.floor(me.y) };
+    if (dir === "") {
+      if (this.walkDir !== "") quiet({ kind: "move-character", x: here.x, y: here.y });
+      this.walkDir = "";
+      return;
     }
+    if (dir === this.walkDir && now - this.walkSentAt < 350) return;
+    this.walkDir = dir;
+    this.walkSentAt = now;
+    // As far as six tiles along the direction, stopping at the first thing in the way. Against a
+    // wall, slide along it: try each half of the direction on its own.
+    const state = this.session.state;
+    const reach = (dx: number, dy: number) => {
+      let target: { x: number; y: number } | null = null;
+      for (let i = 1; i <= 6; i++) {
+        const x = here.x + dx * i;
+        const y = here.y + dy * i;
+        if (!walkable(state, x, y)) break;
+        target = { x, y };
+      }
+      return target;
+    };
+    const target =
+      reach(step.x, step.y) ?? (step.x && step.y ? (reach(step.x, 0) ?? reach(0, step.y)) : null);
+    if (target) quiet({ kind: "move-character", ...target });
   }
 
   private followCharacter(dt: number): void {
@@ -624,10 +662,7 @@ export class Game {
       if (!d.moved && Math.hypot(p.x - d.startX, p.y - d.startY) > 5) d.moved = true;
       const panning =
         d.button === 1 || d.button === 2 || (d.button === 0 && this.tool.kind === "select");
-      if (d.moved && panning) {
-        this.camera.panBy(p.x - d.lastX, p.y - d.lastY);
-        this.detachCamera();
-      }
+      if (d.moved && panning && !this.locked) this.camera.panBy(p.x - d.lastX, p.y - d.lastY);
       if (d.button === 0 && this.tool.kind === "build" && this.tool.building === "path")
         this.paintPath();
       d.lastX = p.x;
@@ -688,8 +723,7 @@ export class Game {
         e.preventDefault();
         this.hud.focusChat();
       } else if (k === "c") {
-        if (this.myCharacter()) this.follow = true;
-        else {
+        if (!this.locked) {
           const th = this.session.state.world.start.townHall;
           this.centerOnTile(th.x + 1.5, th.y + 1.5);
         }
@@ -812,17 +846,19 @@ export class Game {
       this.graded.filterArea = new Rectangle(0, 0, this.app.screen.width, this.app.screen.height);
     }
 
-    let dx = 0;
-    let dy = 0;
-    if (this.keys.has("a") || this.keys.has("arrowleft")) dx += 1;
-    if (this.keys.has("d") || this.keys.has("arrowright")) dx -= 1;
-    if (this.keys.has("w") || this.keys.has("arrowup")) dy += 1;
-    if (this.keys.has("s") || this.keys.has("arrowdown")) dy -= 1;
-    if (dx || dy) {
-      this.camera.panBy(dx * PAN_SPEED * dt, dy * PAN_SPEED * dt);
-      this.detachCamera();
+    if (this.locked) {
+      // The camera is bound to your character, and the keys walk it.
+      this.walkWithKeys(now);
+      this.followCharacter(dt);
+    } else {
+      let dx = 0;
+      let dy = 0;
+      if (this.keys.has("a") || this.keys.has("arrowleft")) dx += 1;
+      if (this.keys.has("d") || this.keys.has("arrowright")) dx -= 1;
+      if (this.keys.has("w") || this.keys.has("arrowup")) dy += 1;
+      if (this.keys.has("s") || this.keys.has("arrowdown")) dy -= 1;
+      if (dx || dy) this.camera.panBy(dx * PAN_SPEED * dt, dy * PAN_SPEED * dt);
     }
-    if (this.follow) this.followCharacter(dt);
 
     this.camera.apply(this.world);
     // The night glows live outside the graded world but must follow the camera exactly.

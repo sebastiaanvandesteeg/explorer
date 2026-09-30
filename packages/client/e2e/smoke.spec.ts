@@ -180,7 +180,7 @@ test("adventure offline: right-click walks your character, and colony worlds hav
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("/play?offline&mode=adventure&seed=e2e");
   await expect(page.locator("#app > canvas")).toBeVisible();
-  await expect(page.locator(".toast")).toContainText("right-click to walk");
+  await expect(page.locator(".toast")).toContainText("WASD or right-click");
   expect(await charactersIn(page)).toHaveLength(1);
   const target = await page.evaluate(() =>
     (window as unknown as { __game: GameHandle }).__game.findWalkTarget(),
@@ -198,6 +198,48 @@ test("adventure offline: right-click walks your character, and colony worlds hav
       { timeout: 40_000 },
     )
     .toBe(true);
+  // The camera is bound to the character: it sits at the middle of the screen, however it got
+  // there. Dragging the ground does not pull it away.
+  const offCentre = () =>
+    page.evaluate(() => {
+      const g = (
+        window as unknown as {
+          __game: {
+            myCharacter(): { id: number };
+            entities: { position(id: number): { x: number; y: number } };
+            camera: {
+              width: number;
+              height: number;
+              worldToScreen(x: number, y: number): { x: number; y: number };
+            };
+          };
+        }
+      ).__game;
+      const p = g.entities.position(g.myCharacter().id);
+      const s = g.camera.worldToScreen(p.x, p.y - 10);
+      return Math.hypot(s.x - g.camera.width / 2, s.y - g.camera.height / 2);
+    });
+  await expect.poll(offCentre).toBeLessThan(40);
+  await page.mouse.move(700, 500);
+  await page.mouse.down();
+  await page.mouse.move(400, 300, { steps: 8 });
+  await page.mouse.up();
+  await expect.poll(offCentre).toBeLessThan(40);
+  // WASD walks the character: hold S (down the screen) and it moves.
+  const at = async () => (await charactersIn(page))[0]!;
+  const start = await at();
+  await page.keyboard.down("s");
+  await page.waitForTimeout(1200);
+  await page.keyboard.up("s");
+  await expect
+    .poll(
+      async () => {
+        const now = await at();
+        return Math.hypot(now.x - start.x, now.y - start.y);
+      },
+      { timeout: 40_000 },
+    )
+    .toBeGreaterThan(1);
   // The colony's own controls are untouched: a colony world has no character at all.
   await page.goto("/play?offline&seed=e2e");
   await expect(page.locator("#app > canvas")).toBeVisible();

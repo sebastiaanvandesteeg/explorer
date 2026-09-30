@@ -27,6 +27,7 @@ import {
 import { releaseTask } from "./commands";
 import { faceTowards, stepAlong, tileOf } from "./walk";
 import { greatWorkStages } from "./greatwork";
+import { assignBuilders, pickJob, rebalance, takeJob } from "./jobs";
 import { collectWreck, updateThreats } from "./pirates";
 import { stormOnRoute, updateWeather } from "./weather";
 import { disembark, dockSpawn, embark, hasRoom, shipMoving, shoreBeside } from "./ferry";
@@ -68,6 +69,11 @@ export function tick(state: GameState, dt = TICK_SECONDS): void {
   for (const e of all) {
     if (e.type === "building") updateBuilding(state, e, dt);
     else if (e.type === "node" && e.stage !== "grown") updateNode(state, e, dt);
+  }
+  if (state.mode === "adventure") {
+    // Nobody commands the villagers here: they raise what needs raising and share out the jobs.
+    assignBuilders(state);
+    rebalance(state);
   }
   for (const e of all) {
     if (!state.entities.has(e.id)) continue;
@@ -482,6 +488,7 @@ function sameIsland(state: GameState, v: VillagerEntity, x: number, y: number): 
 
 /** Idle villagers pick up work: construction first, then staffing, then marked resources. */
 function findJob(state: GameState, v: VillagerEntity): void {
+  if (state.mode === "adventure") return findJobByBalance(state, v);
   let best: { task: Task; prio: number; d: number } | null = null;
   const consider = (task: Task, prio: number, x: number, y: number) => {
     const d = Math.hypot(x - v.x, y - v.y);
@@ -512,6 +519,27 @@ function findJob(state: GameState, v: VillagerEntity): void {
   }
   v.task = task;
   markDirty(state, v.id);
+}
+
+/**
+ * Adventure worlds: a building site that still wants builders comes first; after that, whichever
+ * job the settlement has the fewest workers on for its needs.
+ */
+function findJobByBalance(state: GameState, v: VillagerEntity): void {
+  let site: { b: BuildingEntity; d: number } | null = null;
+  for (const e of state.entities.values()) {
+    if (e.type !== "building" || e.complete || !sameIsland(state, v, e.x, e.y)) continue;
+    if (builders(state, e) >= VILLAGER.maxBuildersPerSite) continue;
+    const d = Math.hypot(e.x + e.w / 2 - v.x, e.y + e.h / 2 - v.y);
+    if (!site || d < site.d) site = { b: e, d };
+  }
+  if (site) {
+    v.task = { kind: "build", buildingId: site.b.id };
+    markDirty(state, v.id);
+    return;
+  }
+  const offer = pickJob(state, v);
+  if (offer) takeJob(state, v, offer);
 }
 
 /** A worker at a camp, quarry or mine picks the nearest suitable node within its radius. */

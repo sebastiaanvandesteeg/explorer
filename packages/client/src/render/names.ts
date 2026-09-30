@@ -83,6 +83,16 @@ export function scaffoldSprite(w: number, h: number): string {
   return `scaffold_${SCAFFOLDS.has(key) ? key : "2x2"}`;
 }
 
+/** A player's character: the villager's figure a quarter larger (standing or walking only). */
+export function heroSprite(tribe: TribeId, tunic: number, back: boolean, pose: string): string {
+  return `hero_${tribe}_${tunic % 3}_${back ? "back" : "front"}_${pose}`;
+}
+
+/** The tintable cape layers of a hero; `under` is only drawn behind a hero seen from the front. */
+export function heroCapeSprite(back: boolean, layer: "over" | "under", pose: string): string {
+  return `herocape_${back ? "back" : "front"}_${layer}_${pose}`;
+}
+
 export function villagerSprite(tribe: TribeId, tunic: number, back: boolean, pose: string): string {
   return `villager_${tribe}_${tunic % 3}_${back ? "back" : "front"}_${pose}`;
 }
