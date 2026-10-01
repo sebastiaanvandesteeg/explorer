@@ -240,7 +240,7 @@ export function floorSound(kind: BuildingKind): SoundName {
 }
 
 /** Tiles a character covers between footfalls. */
-export const STRIDE = 1.1;
+export const STRIDE = 1.6;
 /** A jump further than this in one update is a teleport, not a walk. */
 const TELEPORT = 3;
 
@@ -281,7 +281,7 @@ export class Walkers {
       while (s.walked >= STRIDE) {
         s.walked -= STRIDE;
         s.foot ^= 1;
-        const gain = (w.you ? 0.5 : 0.3) * (s.foot ? 1 : 0.85);
+        const gain = (w.you ? 0.28 : 0.15) * (s.foot ? 1 : 0.85);
         cues.push(
           w.you ? { sound: w.sound, gain } : { sound: w.sound, gain, at: { x: w.x, y: w.y } },
         );
@@ -290,4 +290,9 @@ export class Walkers {
     for (const id of this.seen.keys()) if (!alive.has(id)) this.seen.delete(id);
     return cues;
   }
+}
+
+/** The sounds of people moving about, which can be switched off on their own. */
+export function isFoley(sound: SoundName): boolean {
+  return sound.startsWith("step_") || sound.startsWith("door_") || sound === "voice";
 }

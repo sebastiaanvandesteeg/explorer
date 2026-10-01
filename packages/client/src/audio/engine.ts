@@ -67,10 +67,15 @@ export class Engine {
     this.master = ctx.createGain();
     this.master.gain.value = volume;
     this.sfx = ctx.createGain();
-    this.sfx.gain.value = 1.5;
+    this.sfx.gain.value = 1.1;
     this.ambience = ctx.createGain();
     this.ambience.gain.value = 0.6;
-    this.sfx.connect(this.master);
+    // Nothing may sizzle: a gentle low-pass takes the top off every effect.
+    const soften = ctx.createBiquadFilter();
+    soften.type = "lowpass";
+    soften.frequency.value = 6000;
+    this.sfx.connect(soften);
+    soften.connect(this.master);
     this.ambience.connect(this.master);
     this.master.connect(compressor);
     compressor.connect(ctx.destination);

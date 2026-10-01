@@ -206,6 +206,7 @@ export class Game {
         state: () => this.session.state,
         view: () => this.viewCorners(),
         toggleSound: () => this.sound.toggle(),
+        toggleFoley: () => this.sound.toggleFoley(),
       },
       invite,
       state.world.tribe,
@@ -229,6 +230,7 @@ export class Game {
 
     this.sound = new SoundSystem((x, y) => this.heard(x, y));
     this.hud.setSound(this.sound.isMuted);
+    this.hud.setFoley(this.sound.hasFoley);
     this.disposers.push(() => this.sound.dispose());
     this.hud.setDifficulty(state.difficulty);
     this.entities.rebuild(state);
@@ -838,6 +840,7 @@ export class Game {
       else if (k === "e") this.pickUp();
       else if (k === "f") this.boardOrLeave();
       else if (k === "n") this.hud.setSound(this.sound.toggle());
+      else if (k === "j") this.hud.setFoley(this.sound.toggleFoley());
       else if (k === "escape") {
         if (this.tool.kind !== "select") this.setTool({ kind: "select" });
         else if (this.selected !== null) this.select(null);

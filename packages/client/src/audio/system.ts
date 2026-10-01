@@ -4,16 +4,33 @@
 import type { GameEvent, Tool } from "@explorer/shared";
 import { Ambience } from "./ambience";
 import { Engine } from "./engine";
-import { soundsFor, workSound, type Cue, type Mood } from "./mix";
+import { isFoley, soundsFor, workSound, type Cue, type Mood } from "./mix";
 import { SOUNDS, type SoundName } from "./sounds";
 
 const PREF = "explorer.sound";
+const FOLEY_PREF = "explorer.sound.foley";
 
 function loadMuted(): boolean {
   try {
     return localStorage.getItem(PREF) === "off";
   } catch {
     return false;
+  }
+}
+
+function loadFoley(): boolean {
+  try {
+    return localStorage.getItem(FOLEY_PREF) !== "off";
+  } catch {
+    return true;
+  }
+}
+
+function saveFoley(on: boolean): void {
+  try {
+    localStorage.setItem(FOLEY_PREF, on ? "on" : "off");
+  } catch {
+    /* private mode: the preference just does not stick */
   }
 }
 
@@ -57,6 +74,7 @@ export class SoundSystem {
   private engine: Engine | null = null;
   private ambience: Ambience | null = null;
   private muted = loadMuted();
+  private foley = loadFoley();
   private readonly lastPlayed = new Map<SoundName, number>();
   private readonly listeners: (() => void)[] = [];
 
@@ -71,6 +89,17 @@ export class SoundSystem {
     const visibility = () => this.follow();
     document.addEventListener("visibilitychange", visibility);
     this.listeners.push(() => document.removeEventListener("visibilitychange", visibility));
+  }
+
+  /** Whether footsteps, doors and voices are heard. */
+  get hasFoley(): boolean {
+    return this.foley;
+  }
+
+  toggleFoley(): boolean {
+    this.foley = !this.foley;
+    saveFoley(this.foley);
+    return this.foley;
   }
 
   get isMuted(): boolean {
@@ -119,7 +148,7 @@ export class SoundSystem {
   /** Play a sound now, at a place in the world if it has one. */
   cue(cue: Cue): void {
     const e = this.live;
-    if (!e) return;
+    if (!e || (!this.foley && isFoley(cue.sound))) return;
     const now = e.now;
     const gap = MIN_GAP[cue.sound] ?? 0;
     const last = this.lastPlayed.get(cue.sound) ?? -1;
@@ -149,9 +178,9 @@ export class SoundSystem {
 
   /** Someone says a line: a few soft syllables. */
   voice(at?: { x: number; y: number }): void {
-    const n = 2 + Math.floor(Math.random() * 3);
+    const n = 2 + Math.floor(Math.random() * 2);
     for (let i = 0; i < n; i++) {
-      this.cue({ sound: "voice", ...(at ? { at } : {}), gain: 0.7, delay: i * 0.075 });
+      this.cue({ sound: "voice", ...(at ? { at } : {}), gain: 0.7, delay: i * 0.09 });
     }
   }
 

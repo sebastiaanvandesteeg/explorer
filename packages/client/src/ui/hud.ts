@@ -77,6 +77,8 @@ export interface HudActions {
   view(): { x: number; y: number }[];
   /** Mute or unmute the sound; returns whether it is muted now. */
   toggleSound(): boolean;
+  /** Switch footsteps, doors and voices on or off; returns whether they are on now. */
+  toggleFoley(): boolean;
 }
 
 export function discoveryText(name: string, biome: BiomeId): string {
@@ -123,6 +125,7 @@ export class Hud {
   private alertEl: HTMLElement;
   private titleEl: HTMLElement;
   private soundBtn: HTMLButtonElement;
+  private foleyBtn: HTMLButtonElement;
   private alertKey = "";
 
   constructor(
@@ -200,6 +203,14 @@ export class Hud {
       },
       "Sound: on",
     ) as HTMLButtonElement;
+    this.foleyBtn = h(
+      "button.btn.mini.sound",
+      {
+        title: "Footsteps, doors and voices on or off (J)",
+        onclick: () => this.setFoley(actions.toggleFoley()),
+      },
+      "Footsteps: on",
+    ) as HTMLButtonElement;
     this.titleEl = h(
       "h3",
       { title: `${tribeDef.description} ${tribeDef.bonusText}.` },
@@ -231,6 +242,7 @@ export class Hud {
         : null,
       this.statusEl,
       this.soundBtn,
+      this.foleyBtn,
     );
 
     this.minimap = new Minimap((x, y) => actions.focusTile(x, y));
@@ -289,6 +301,12 @@ export class Hud {
     const fit = () => this.root.style.setProperty("--hud-top", `${resources.offsetHeight + 24}px`);
     fit();
     if (typeof ResizeObserver !== "undefined") new ResizeObserver(fit).observe(resources);
+  }
+
+  /** Show whether footsteps, doors and voices are on. */
+  setFoley(on: boolean): void {
+    this.foleyBtn.textContent = on ? "Footsteps: on" : "Footsteps: off";
+    this.foleyBtn.classList.toggle("off", !on);
   }
 
   /** Show whether the sound is muted. */

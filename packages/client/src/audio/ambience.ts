@@ -25,9 +25,9 @@ export class Ambience {
     ]);
     this.swell(wind.gain, 0.06, 0.5);
     // Rain: a bright, steady hiss.
-    const rain = e.hiss("white", [
-      { type: "highpass", freq: 1800 },
-      { type: "lowpass", freq: 9000 },
+    const rain = e.hiss("pink", [
+      { type: "highpass", freq: 1200 },
+      { type: "lowpass", freq: 4500 },
     ]);
     // Deep drones (fire, fungus, distant thunder).
     const rumble = e.hiss("brown", [{ type: "lowpass", freq: 110 }]);
@@ -36,7 +36,7 @@ export class Ambience {
     const crickets = ctx.createGain();
     crickets.gain.value = 0;
     const carrier = ctx.createOscillator();
-    carrier.frequency.value = 4300;
+    carrier.frequency.value = 3200;
     const chop = ctx.createGain();
     chop.gain.value = 0.5;
     const fast = ctx.createOscillator();
