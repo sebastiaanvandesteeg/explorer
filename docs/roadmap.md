@@ -23,7 +23,7 @@ All three run on one deterministic simulation (10 Hz) shared by the server and t
    other. Items in your pack are not used by anything yet.
 3. **A fleet you command.** Scouts, cargo routes, diving and raids still assume ships obey orders;
    a ship with a crew is only another way of moving the same ship.
-4. **Size.** A few files mix many concerns (`render/entities.ts`, `game/game.ts`, `ui/hud.ts`, the
+4. **Size.** A few files mix many concerns (`game/game.ts`, `ui/hud.ts`, the
    building sprites), which makes every new feature slower than it should be.
 
 ## Suggested order
