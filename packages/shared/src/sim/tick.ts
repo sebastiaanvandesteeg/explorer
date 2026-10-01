@@ -124,7 +124,7 @@ function updateBuilding(state: GameState, b: BuildingEntity, dt: number): void {
           );
           ship.angle = slot.angle;
           addEntity(state, ship);
-          lookAround(state, ship.x, ship.y, shipReveal(state));
+          lookAround(state, ship.x, ship.y, shipReveal(state, ship));
           state.events.push({ type: "ship", kind: ship.kind, x: ship.x, y: ship.y });
           b.queue.shift();
         }
@@ -692,7 +692,7 @@ function moveShipAlong(state: GameState, s: ShipEntity, dt: number): void {
       s.y = ty;
       budget -= dist;
       s.path.shift();
-      lookAround(state, s.x, s.y, shipReveal(state));
+      lookAround(state, s.x, s.y, shipReveal(state, s));
     } else {
       s.x += (dx / dist) * budget;
       s.y += (dy / dist) * budget;

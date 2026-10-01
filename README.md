@@ -220,6 +220,7 @@ Night is not only scenery:
 
 - **Raids come at dusk.** A raid that falls due by day waits for the sun to go down.
 - **Lookouts go blind.** By day your buildings keep watch over 14 tiles of sea and your ships over 10. After dark that shrinks to what their own lamps light: 6 and 4 tiles. Raiders outside that are unseen: they don't show on the screen, the minimap or the chart, don't raise the alert, and patrol boats won't chase them.
+- **Sailing sees far.** A ship with someone aboard reveals 16 tiles around it (an empty one, 8), nearly the whole screen at the sailing zoom; Far Sight adds 60%.
 - **Ships and villagers see less** of the sea at night (up to 40% less), so exploring in the dark reveals less.
 - **The lighthouse** (60 wood, 60 stone, 10 tools) fixes all three: its beam watches 24 tiles, day and night, sweeping over the sea after dark. Within its reach raiders are seen, patrol boats keep hunting and ships keep their full sight. Finishing one also reveals 16 tiles around it. Every tribe builds its own.
 

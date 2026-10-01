@@ -69,6 +69,7 @@ export const RELEASES: Release[] = [
           "The pier is one continuous deck of planks on timber piles, 3 wide and 5 long, growing to 10 and 15 with the harbour upgrades. Ships tie up along both sides of it, so a longer pier holds more ships.",
           "The harbourmaster's house stands on a platform of piles in the water beside the pier.",
           "Ships now sit in the water: no keel showing, the lowest planks fade into the sea, a shadow lies beneath the hull, foam laps at the waterline, and the hull heaves on the swell.",
+          "A ship with a crew aboard sees twice as far (16 tiles, about the width of the screen while sailing), so sailing uncovers the map much faster.",
           "The camera pulls back a little while you sail, and the people on deck no longer flicker.",
           "Old saves keep working: each old dock gets a harbour on the water beside it.",
         ],

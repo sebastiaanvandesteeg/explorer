@@ -135,6 +135,7 @@ export function embarkCharacter(state: GameState, c: CharacterEntity, ship: Ship
   c.steer = null;
   c.action = "idle";
   ship.riders.push(c.id);
+  lookAround(state, ship.x, ship.y, shipReveal(state, ship));
   syncRiders(state, ship);
   markDirty(state, ship.id);
   markDirty(state, c.id);
@@ -260,7 +261,7 @@ export function steerStep(state: GameState, ship: ShipEntity, dt: number): boole
   );
   ship.x = to.x;
   ship.y = to.y;
-  lookAround(state, ship.x, ship.y, shipReveal(state));
+  lookAround(state, ship.x, ship.y, shipReveal(state, ship));
   markDirty(state, ship.id);
   return true;
 }

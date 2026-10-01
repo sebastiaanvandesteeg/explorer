@@ -10,6 +10,7 @@ import {
   generateWorld,
   newShip,
   sailable,
+  shipReveal,
   tick,
   toSnapshot,
   toWire,
@@ -101,6 +102,19 @@ describe("boarding", () => {
 });
 
 describe("sailing", () => {
+  it("sees much further with a crew aboard", () => {
+    const { s, ship } = harbourScene();
+    const idle = shipReveal(s, ship);
+    cmd(s, "p1", { kind: "board-ship", shipId: ship.id });
+    expect(idle).toBe(8);
+    expect(shipReveal(s, ship)).toBe(16);
+    expect(shipReveal(s)).toBe(8);
+    // Boarding reveals the sea around the ship at once.
+    const edge = Math.floor(ship.x) + 15;
+    const k = Math.floor(ship.y) * world.width + edge;
+    if (sailable(s, edge, Math.floor(ship.y))) expect(s.explored[k]).toBe(1);
+  });
+
   it("steers, turns smoothly and slides along the shore", () => {
     const { s, ship, a } = harbourScene();
     cmd(s, "p1", { kind: "board-ship", shipId: ship.id });

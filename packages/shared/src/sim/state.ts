@@ -461,9 +461,10 @@ export function newBuilding(
 
 export const hasUpgrade = (state: GameState, id: UpgradeId): boolean => state.upgrades.has(id);
 
-/** How far ships see around them, in tiles. */
-export function shipReveal(state: GameState): number {
-  return SHIP.reveal * (hasUpgrade(state, "far_sight") ? 1.6 : 1);
+/** How far a ship sees around it, in tiles: further with a crew aboard. */
+export function shipReveal(state: GameState, ship?: ShipEntity): number {
+  const base = ship && ship.riders.length > 0 ? SHIP.sailReveal : SHIP.reveal;
+  return base * (hasUpgrade(state, "far_sight") ? 1.6 : 1);
 }
 
 /** Hull points of a pirate ship in this world. */

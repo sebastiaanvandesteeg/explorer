@@ -368,6 +368,8 @@ export const SHIP = {
   buildSeconds: 20,
   speed: 4,
   reveal: 8,
+  /** With a crew aboard: about 95% of a 1080p screen at the sailing zoom (2.5). */
+  sailReveal: 16,
   max: 3,
   capacity: 4,
 };
