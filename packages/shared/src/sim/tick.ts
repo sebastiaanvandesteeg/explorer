@@ -35,7 +35,7 @@ import { assignBuilders, pickJob, rebalance, takeJob } from "./jobs";
 import { collectWreck, updateThreats } from "./pirates";
 import { stormOnRoute, updateWeather } from "./weather";
 import { disembark, dockSpawn, embark, hasRoom, shipMoving, shoreBeside } from "./ferry";
-import { berthOf, growPiers, isBerth } from "./harbour";
+import { berthOf, freeBerth, growPiers, isBerth } from "./harbour";
 import { checkBoarded, steerStep as steerShipStep, syncRiders } from "./sailing";
 import { landPath, sailable, seaPath } from "./navigation";
 import { buildingAround, isAdjacentTo, tilesAround } from "./rules";
@@ -112,15 +112,17 @@ function updateBuilding(state: GameState, b: BuildingEntity, dt: number): void {
           b.queue.shift();
         }
       } else if (job.what !== "villager") {
-        const at = berthOf(state, b);
-        if (sailable(state, Math.floor(at.x), Math.floor(at.y))) {
+        // The new ship ties up in a free slot beside the pier; with none free it waits in the queue.
+        const slot = freeBerth(state, b);
+        if (slot) {
           const ship = newShip(
             state,
             job.what === "cargo" ? "cargo" : job.what === "patrol" ? "patrol" : "scout",
-            at.x,
-            at.y,
-            { "+x": 0, "+y": 2, "-x": 4, "-y": 6 }[b.dir ?? "+x"],
+            slot.x,
+            slot.y,
+            (Math.round(slot.angle / (Math.PI / 4)) + 8) % 8,
           );
+          ship.angle = slot.angle;
           addEntity(state, ship);
           lookAround(state, ship.x, ship.y, shipReveal(state));
           state.events.push({ type: "ship", kind: ship.kind, x: ship.x, y: ship.y });
@@ -759,7 +761,7 @@ function runRoute(state: GameState, s: ShipEntity): void {
   if (!home) return rest(5);
   if (s.leg === null) s.leg = cargoLoad(s) > 0 ? "drop" : "pickup";
   const dock = s.leg === "pickup" ? pickup : home;
-  const spot = berthOf(state, dock);
+  const spot = berthOf(state, dock, s, s.id);
   const tile = { x: Math.floor(spot.x), y: Math.floor(spot.y) };
   if (Math.hypot(s.x - spot.x, s.y - spot.y) > 1.5) {
     // Wait in port while a storm sits on the way.

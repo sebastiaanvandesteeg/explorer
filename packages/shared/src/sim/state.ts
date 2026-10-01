@@ -5,7 +5,7 @@ import { DIFFICULTY_DEFS, type Difficulty } from "./difficulty";
 import { scatterLoot } from "./inventory";
 import type { ItemKind, ItemStack } from "./items";
 import type { CharacterLook } from "./looks";
-import { startHarbour } from "./harbour";
+import { rootOf, startHarbour } from "./harbour";
 import { sightFactor } from "./light";
 import type { BiomeId } from "../world/biomes";
 import { Terrain, type Dir, type NodeKind, type SiteKind, type WorldMap } from "../world/types";
@@ -639,8 +639,14 @@ export function createInitialState(
   // The home harbour: its body on the shore behind the start pier (or just the pier, if no body fits).
   if (!startHarbour(state))
     addEntity(state, newBuilding(state, "dock", s.dock.x, s.dock.y, true, s.dock.dir));
+  // Keep the shore at the start pier's root clear, so people can walk out onto it.
+  const hb = [...state.entities.values()].find(
+    (e): e is BuildingEntity => e.type === "building" && e.kind === "dock",
+  );
+  const root = hb ? rootOf(hb, hb.dir ?? "+x") : null;
   for (const n of world.nodes) {
     if (state.occupancy[tileIndex(world, n.x, n.y)] !== 0) continue;
+    if (root && Math.abs(n.x - root.x) <= 1 && Math.abs(n.y - root.y) <= 1) continue;
     addEntity(state, {
       id: state.nextId++,
       type: "node",

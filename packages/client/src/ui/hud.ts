@@ -22,6 +22,7 @@ import {
   populationCap,
   RESOURCES,
   SHIP,
+  berthSlots,
   scoutCapacity,
   sellPrice,
   shipCost,
@@ -1047,8 +1048,10 @@ export class Hud {
               : VILLAGER.trainSeconds;
         progress = 1 - job.remaining / total;
         status =
-          `${job.what === "villager" ? "Training a villager" : job.what === "cargo" ? "Building a cargo ship" : "Building a ship"}… ${Math.ceil(job.remaining)}s` +
-          (e.queue.length > 1 ? ` (+${e.queue.length - 1} queued)` : "");
+          job.what !== "villager" && job.remaining === 0
+            ? "Ship ready: waiting for a free berth (sail one away, or upgrade the pier)"
+            : `${job.what === "villager" ? "Training a villager" : job.what === "cargo" ? "Building a cargo ship" : "Building a ship"}… ${Math.ceil(job.remaining)}s`;
+        if (e.queue.length > 1) status += ` (+${e.queue.length - 1} queued)`;
       } else if (worker && e.workerId === null) {
         status = "Waiting for a worker (needs an idle villager)";
         progress = 0;
@@ -1083,7 +1086,12 @@ export class Hud {
         status = "Ready";
       }
       if (refs.status) refs.status.textContent = status;
-      if (refs.extra) refs.extra.textContent = stockpileText(state, e);
+      if (refs.extra) {
+        const slots = e.kind === "harbour" ? berthSlots(state, e) : [];
+        refs.extra.textContent =
+          (slots.length > 0 ? `Berths: ${berthsFree(state, e)}/${slots.length} free. ` : "") +
+          stockpileText(state, e);
+      }
       if (refs.great) this.renderGreatWork(state, e, refs);
       for (const u of refs.upgrades ?? []) {
         const owned = state.upgrades.has(u.id);
@@ -1124,6 +1132,14 @@ export class Hud {
     }
     this.refreshSelectionButtons();
   }
+}
+
+/** How many of a harbour's moorings have no ship in them. */
+function berthsFree(state: GameState, b: BuildingEntity): number {
+  const ships = [...state.entities.values()].filter((e) => e.type === "ship");
+  return berthSlots(state, b).filter(
+    (s) => !ships.some((e) => Math.hypot(e.x - s.x, e.y - s.y) < 1.7),
+  ).length;
 }
 
 /** What a dock or storehouse holds on its island, and whether it still needs collecting. */

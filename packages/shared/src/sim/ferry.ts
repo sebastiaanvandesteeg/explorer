@@ -24,20 +24,20 @@ export function shoreBeside(state: GameState, ship: ShipEntity): Tile[] {
   return out;
 }
 
-/** Where a dock launches ships and receives them: just past the end of the pier. */
+/** Where a pier's open end is: the water just past its tip, in line with its middle. */
 export function dockSpawn(b: { x: number; y: number; w: number; h: number; dir?: Dir }): {
   x: number;
   y: number;
 } {
   switch (b.dir) {
     case "-x":
-      return { x: b.x - 0.5, y: b.y + 1 };
+      return { x: b.x - 0.5, y: b.y + b.h / 2 };
     case "+y":
-      return { x: b.x + 1, y: b.y + b.h + 0.5 };
+      return { x: b.x + b.w / 2, y: b.y + b.h + 0.5 };
     case "-y":
-      return { x: b.x + 1, y: b.y - 0.5 };
+      return { x: b.x + b.w / 2, y: b.y - 0.5 };
     default:
-      return { x: b.x + b.w + 0.5, y: b.y + 1 };
+      return { x: b.x + b.w + 0.5, y: b.y + b.h / 2 };
   }
 }
 

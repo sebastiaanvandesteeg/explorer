@@ -1,12 +1,13 @@
 import { HALF_H, HALF_W } from "@explorer/shared";
 import { Rectangle, type Container } from "pixi.js";
 
-/** The world is drawn at one fixed zoom; there is no zooming in or out. */
+/** The world is drawn at one fixed zoom (there is no zooming by hand), a little wider at sea. */
 export const ZOOM = 3.5;
+export const SAIL_ZOOM = 2.5;
 
 /** Whole-pixel positions keep the pixel art as crisp as a fractional zoom allows. */
 export class Camera {
-  readonly zoom = ZOOM;
+  zoom = ZOOM;
   /** World pixel at the centre of the screen. */
   x = 0;
   y = 0;
@@ -17,6 +18,13 @@ export class Camera {
     private readonly worldWidth: number,
     private readonly worldHeight: number,
   ) {}
+
+  /** Ease the zoom towards a level; the point at the middle of the screen stays where it is. */
+  easeZoom(target: number, dt: number, rate = 5): void {
+    const k = 1 - Math.exp(-dt * rate);
+    this.zoom += (target - this.zoom) * k;
+    if (Math.abs(target - this.zoom) < 0.005) this.zoom = target;
+  }
 
   resize(width: number, height: number): void {
     this.width = width;

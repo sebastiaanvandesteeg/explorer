@@ -395,10 +395,13 @@ export const SHIP_HP: Record<ShipKind, number> = { scout: 30, cargo: 45, patrol:
  * Quay and the Grand Pier. Ships launch from just past its end.
  */
 export const PIER_TIERS = [
-  { length: 3, width: 2 },
   { length: 5, width: 3 },
-  { length: 8, width: 4 },
+  { length: 10, width: 3 },
+  { length: 15, width: 3 },
 ] as const;
+
+/** Ships moor along both sides of a pier, one for every this many tiles of its length. */
+export const BERTH_SPACING = 3;
 
 /** Extra room the harbour's upgrades give ships, by pier tier (0 = none, 1 = quay, 2 = grand). */
 export const HARBOUR_BONUS = {

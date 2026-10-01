@@ -48,7 +48,7 @@ import { Application, Container, Rectangle } from "pixi.js";
 import type { Atlas } from "../assets";
 import type { Session, SessionStatus } from "../net/session";
 import { AtmosphereLayer } from "../render/atmosphere";
-import { Camera } from "../render/camera";
+import { Camera, SAIL_ZOOM, ZOOM } from "../render/camera";
 import { daylight } from "../render/daylight";
 import { EntityLayer } from "../render/entities";
 import { buildingThumb } from "../render/names";
@@ -976,6 +976,8 @@ export class Game {
     const dt = Math.min(0.1, dtMs / 1000);
     const state = this.session.state;
     this.camera.resize(this.app.screen.width, this.app.screen.height);
+    // A little wider at sea, so exploring feels natural; back to the usual zoom on land.
+    this.camera.easeZoom(this.myCharacter()?.aboard != null ? SAIL_ZOOM : ZOOM, dt);
     const area = this.graded.filterArea!;
     if (area.width !== this.app.screen.width || area.height !== this.app.screen.height) {
       this.graded.filterArea = new Rectangle(0, 0, this.app.screen.width, this.app.screen.height);

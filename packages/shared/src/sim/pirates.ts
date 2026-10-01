@@ -15,7 +15,7 @@ import {
 } from "./catalogue";
 import { nightLevel } from "./daylight";
 import { DIFFICULTY_DEFS } from "./difficulty";
-import { berthOf, berths } from "./harbour";
+import { nearBerth } from "./harbour";
 import { dropRiders } from "./sailing";
 import { watched } from "./light";
 import { sailable, seaPath } from "./navigation";
@@ -434,12 +434,9 @@ function fireGuns(state: GameState, s: ShipEntity): void {
 /** Ships mend slowly while moored beside a finished dock. */
 function repair(state: GameState, s: ShipEntity, dt: number): void {
   if (s.hp >= shipMaxHp(state, s.kind) || s.path.length > 0) return;
-  for (const b of berths(state)) {
-    if (dist(s, berthOf(state, b)) > 4) continue;
-    s.hp = Math.min(shipMaxHp(state, s.kind), s.hp + 2 * dt);
-    markDirty(state, s.id);
-    return;
-  }
+  if (!nearBerth(state, s, 4)) return;
+  s.hp = Math.min(shipMaxHp(state, s.kind), s.hp + 2 * dt);
+  markDirty(state, s.id);
 }
 
 /** Patrol boats chase pirates within reach whenever they are not following an order. */

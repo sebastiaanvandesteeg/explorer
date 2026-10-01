@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   applyCommand,
   berthOf,
+  berthSlots,
   berths,
   BUILDINGS,
   cargoCapacity,
@@ -16,6 +17,7 @@ import {
   pierTier,
   PIER_TIERS,
   removeEntity,
+  rootOf,
   rebuildOccupancy,
   sailable,
   tick,
@@ -74,6 +76,22 @@ describe("the home harbour", () => {
     expect(landPath(s, from, [end])).not.toBeNull();
   });
 
+  it("is reachable on foot and has berths in every kind of world", () => {
+    for (const seed of ["a", "b", "zz9", "reef", "kelp-12", "north-3"]) {
+      const w = generateWorld(seed);
+      const s = createInitialState(w);
+      const h = [...s.entities.values()].find(
+        (e): e is BuildingEntity => e.type === "building" && e.kind === "harbour",
+      );
+      expect(h, seed).toBeDefined();
+      const pier = pierOf(s, h!)!;
+      const root = rootOf(pier, pier.dir!);
+      const spawn = w.start.spawn[0]!;
+      expect(landPath(s, spawn, [root]), seed).not.toBeNull();
+      expect(berthSlots(s, h!).length, seed).toBeGreaterThanOrEqual(1);
+    }
+  }, 60_000);
+
   it("cannot be demolished, but a second harbour at home can", () => {
     const s = fresh();
     expect(applyCommand(s, { kind: "remove-building", buildingId: harbourOf(s).id }).ok).toBe(
@@ -85,29 +103,77 @@ describe("the home harbour", () => {
 });
 
 describe("harbour upgrades and the pier", () => {
-  it("makes the pier longer and wider with the Stone Quay and the Grand Pier", () => {
-    const s = fresh();
+  it("makes the pier longer with the Stone Quay and the Grand Pier", () => {
+    // A seed whose start harbour has open sea all along its pier.
+    const open = generateWorld("harbour");
+    const s = createInitialState(open);
+    s.stock = { ...s.stock, wood: 999, stone: 999, tools: 99 };
     const pier = pierOf(s, harbourOf(s))!;
+    const length = () => Math.max(pier.w, pier.h);
     expect(pierTier(s)).toBe(0);
-    const area = () => pier.w * pier.h;
-    const before = area();
-    expect(before).toBe(PIER_TIERS[0].length * PIER_TIERS[0].width);
+    expect([length(), Math.min(pier.w, pier.h)]).toEqual([5, 3]);
     expect(applyCommand(s, { kind: "buy-upgrade", upgrade: "quay" })).toEqual({ ok: true });
     expect(pierTier(s)).toBe(1);
-    expect(area()).toBeGreaterThan(before);
-    const quay = area();
+    expect([length(), Math.min(pier.w, pier.h)]).toEqual([10, 3]);
     expect(applyCommand(s, { kind: "buy-upgrade", upgrade: "grand_pier" })).toEqual({ ok: true });
-    expect(area()).toBeGreaterThanOrEqual(quay);
+    expect([length(), Math.min(pier.w, pier.h)]).toEqual([15, 3]);
     // The occupancy follows the pier, so ships keep out of it and people can walk on it.
-    const grown = pierOf(s, harbourOf(s))!;
-    for (let y = grown.y; y < grown.y + grown.h; y++)
-      for (let x = grown.x; x < grown.x + grown.w; x++) {
-        expect(s.occupancy[y * world.width + x]).toBe(grown.id);
+    for (let y = pier.y; y < pier.y + pier.h; y++)
+      for (let x = pier.x; x < pier.x + pier.w; x++) {
+        expect(s.occupancy[y * open.width + x]).toBe(pier.id);
         expect(walkable(s, x, y)).toBe(true);
       }
     const at = berthOf(s, harbourOf(s));
     expect(sailable(s, Math.floor(at.x), Math.floor(at.y))).toBe(true);
     expect(applyCommand(s, { kind: "buy-upgrade", upgrade: "quay" }).ok).toBe(false);
+  });
+
+  it("moors ships on both sides of the pier: more berths on a longer pier", () => {
+    const open = generateWorld("harbour");
+    const s = createInitialState(open);
+    s.stock = { ...s.stock, wood: 999, stone: 999, tools: 99 };
+    const h = harbourOf(s);
+    const slots = () => berthSlots(s, h);
+    const counts = [slots().length];
+    applyCommand(s, { kind: "buy-upgrade", upgrade: "quay" });
+    counts.push(slots().length);
+    applyCommand(s, { kind: "buy-upgrade", upgrade: "grand_pier" });
+    counts.push(slots().length);
+    expect(counts[0]).toBeGreaterThanOrEqual(1);
+    expect(counts[1]).toBeGreaterThan(counts[0]!);
+    expect(counts[2]).toBeGreaterThan(counts[1]!);
+    // Both sides are used and every slot is open water clear of the pier.
+    const pier = pierOf(s, h)!;
+    const sides = new Set(
+      slots().map((b) =>
+        pier.w > pier.h ? Math.sign(b.y - (pier.y + 1.5)) : Math.sign(b.x - (pier.x + 1.5)),
+      ),
+    );
+    expect(sides.size).toBe(2);
+    for (const b of slots()) expect(sailable(s, Math.floor(b.x), Math.floor(b.y))).toBe(true);
+  });
+
+  it("launches new ships into free berths and holds them back when the pier is full", () => {
+    const open = generateWorld("harbour");
+    const s = createInitialState(open);
+    s.stock = { ...s.stock, wood: 9999, stone: 9999, tools: 999 };
+    s.nextRaid = s.nextStorm = 1e9;
+    const h = harbourOf(s);
+    const slots = berthSlots(s, h).length;
+    for (let i = 0; i < slots + 1; i++) h.queue.push({ what: "ship", remaining: 0 });
+    run(s, 1);
+    const ships = [...s.entities.values()].filter((e) => e.type === "ship");
+    expect(ships).toHaveLength(slots);
+    expect(h.queue).toHaveLength(1);
+    // No two ships share a slot.
+    const spots = new Set(ships.map((e) => `${Math.round(e.x * 2)},${Math.round(e.y * 2)}`));
+    expect(spots.size).toBe(slots);
+    // Sail one away and the waiting ship takes its place.
+    const first = ships[0]!;
+    first.x += 8;
+    first.y += 8;
+    run(s, 1);
+    expect(h.queue).toHaveLength(0);
   });
 
   it("gives cargo ships more room and lets the fleet grow", () => {

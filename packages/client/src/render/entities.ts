@@ -1,4 +1,5 @@
 import {
+  deckSlot,
   hash2d,
   PATROL,
   CARGO,
@@ -43,8 +44,8 @@ import {
 } from "./names";
 
 const INTERP_MS = TICK_SECONDS * 1000;
-/** Pier decks sit a few pixels above the water. */
-const DECK_PX = 5;
+/** Pier decks sit a few pixels above the water (the pier and harbour art bake in the same figure). */
+const DECK_PX = 7;
 /** How high above the water a ship's deck is, for the people standing on it. */
 const DECK_HEIGHT = 11;
 
@@ -56,7 +57,7 @@ function tileHeight(state: GameState, x: number, y: number): number {
   const land = isLandTerrain(w.terrain[k]!);
   if (!land) {
     const e = state.entities.get(state.occupancy[k]!);
-    if (e?.type === "building" && e.kind === "dock") return DECK_PX;
+    if (e?.type === "building" && (e.kind === "dock" || e.kind === "harbour")) return DECK_PX;
   }
   return surfaceHeight(land, w.elevation[k]!);
 }
@@ -159,7 +160,11 @@ class BuildingView extends View {
   update(e: Entity): void {
     const b = e as BuildingEntity;
     const state = this.layer.state;
-    const h = tileHeight(state, b.x, b.y);
+    // Piers and harbours standing in the water have their deck baked into the art: no lifting.
+    const inWater =
+      (b.kind === "dock" || b.kind === "harbour") &&
+      !isLandTerrain(state.world.terrain[tileIndex(state.world, b.x, b.y)]!);
+    const h = inWater ? 0 : tileHeight(state, b.x, b.y);
     this.rect = { x: b.x, y: b.y, w: b.w, h: b.h };
     this.kind = b.kind;
     const tribe = state.world.tribe;
@@ -308,6 +313,13 @@ class BuildingView extends View {
     const length = axisX ? b.w : b.h;
     const width = axisX ? b.h : b.w;
     const tier = up.has("grand_pier") ? 2 : up.has("quay") ? 1 : 0;
+    // One continuous picture of the whole pier (older, odd-sized ones keep the plain tiles).
+    const whole = `pier_${axisX ? "x" : "y"}_${length}`;
+    if (width === 3 && this.layer.atlas.has(whole)) {
+      this.root.addChildAt(this.layer.atlas.sprite(whole), 0);
+    } else {
+      this.buildDock(b);
+    }
     const side = (across: number): "+x" | "-x" | "+y" | "-y" => {
       // The edge with the lower across index looks towards -across.
       const low = across === 0;
@@ -320,10 +332,6 @@ class BuildingView extends View {
         const across = axisX ? ty : tx;
         const edge = across === 0 || across === width - 1;
         const end = along === length - 1;
-        const name = `pier_${axisX ? "x" : "y"}${end ? "_end" : ""}${across === 0 ? "_a" : ""}${across === width - 1 ? "_b" : ""}`;
-        const tile = this.layer.atlas.sprite(name);
-        tile.position.set(screenX(tx, ty), screenY(tx, ty));
-        this.root.addChildAt(tile, 0);
         if (!edge || along === 0) continue;
         const r = hash2d(b.x + tx, b.y + ty, 71);
         let prop: string | null = null;
@@ -338,7 +346,7 @@ class BuildingView extends View {
         const sprite = this.layer.atlas.sprite(prop);
         const wx = b.x + tx;
         const wy = b.y + ty;
-        sprite.position.set(screenX(wx, wy), screenY(wx, wy) - DECK_PX + 5);
+        sprite.position.set(screenX(wx, wy), screenY(wx, wy));
         sprite.zIndex = wx + wy + 0.6;
         this.layer.container.addChild(sprite);
         this.props.push(sprite);
@@ -560,7 +568,8 @@ class HeroView extends MovingView {
 
   update(e: Entity, now: number): void {
     const c = e as CharacterEntity;
-    this.root.visible = c.inside === null;
+    // On a ship the ship's own view draws you, standing on its deck.
+    this.root.visible = c.inside === null && c.aboard === null;
     this.track(c.x, c.y, now, this.c === null);
     if (this.c === null) this.height = tileHeight(this.layer.state, c.x, c.y);
     this.c = c;
@@ -570,10 +579,7 @@ class HeroView extends MovingView {
     const c = this.c;
     if (!c) return;
     this.interpolate(now);
-    // On a ship a character stands on the deck, a little above the water.
-    const ship = c.aboard !== null ? this.layer.state.entities.get(c.aboard) : undefined;
-    const targetH =
-      ship?.type === "ship" ? DECK_HEIGHT : tileHeight(this.layer.state, this.x, this.y);
+    const targetH = tileHeight(this.layer.state, this.x, this.y);
     this.height +=
       Math.sign(targetH - this.height) * Math.min(Math.abs(targetH - this.height), dt * 48);
     const phase = Math.floor(now / 160 + c.id) % 2;
@@ -583,11 +589,8 @@ class HeroView extends MovingView {
       Math.round(screenX(this.x, this.y)),
       Math.round(screenY(this.x, this.y) - this.height),
     );
-    // A hair in front of any villager on the same tile; above the ship they ride on.
-    this.root.zIndex =
-      ship?.type === "ship"
-        ? ship.x + ship.y + 0.5 + ship.riders.indexOf(c.id) * 0.01
-        : this.x + this.y + 0.02;
+    // A hair in front of any villager on the same tile.
+    this.root.zIndex = this.x + this.y + 0.02;
     this.root.alpha = this.fadeBehindTerrain(this.layer.state.world, this.height, dt);
   }
 }
@@ -896,11 +899,48 @@ class ShipView extends MovingView {
   private speed = 0;
   private lastX = 0;
   private lastY = 0;
+  /** The people on deck: drawn as part of the ship so they move, bob and turn with it exactly. */
+  private readonly crew = new Map<number, HeroRig>();
+  /** Where each rider stands, in world-layer pixels (for their name tag and the camera). */
+  readonly spots = new Map<number, { x: number; y: number }>();
 
   constructor(private readonly layer: EntityLayer) {
     super();
     this.sprite = layer.atlas.sprite("ship_0");
+    this.root.sortableChildren = true;
+    this.bar.zIndex = 1000;
     this.root.addChild(this.sprite, this.bar);
+  }
+
+  /** Draw everyone aboard standing at their places on the deck, relative to the ship. */
+  private drawCrew(s: ShipEntity): void {
+    const state = this.layer.state;
+    const facing = ((Math.round(this.angle / (Math.PI / 2)) % 4) + 4) % 4;
+    const seen = new Set<number>();
+    s.riders.forEach((id, i) => {
+      const c = state.entities.get(id);
+      if (c?.type !== "character") return;
+      seen.add(id);
+      let rig = this.crew.get(id);
+      if (!rig) {
+        rig = new HeroRig(this.layer.atlas);
+        this.crew.set(id, rig);
+        this.root.addChild(rig.root);
+      }
+      rig.set(c.look, this.layer.playerColour(c.playerId), facing, "stand");
+      const slot = deckSlot({ angle: this.angle, kind: s.kind }, i);
+      const x = screenX(slot.x, slot.y);
+      const y = screenY(slot.x, slot.y) - DECK_HEIGHT;
+      rig.root.position.set(Math.round(x), Math.round(y));
+      rig.root.zIndex = 1 + y;
+      this.spots.set(id, { x: this.root.x + Math.round(x), y: this.root.y + Math.round(y) });
+    });
+    for (const [id, rig] of this.crew)
+      if (!seen.has(id)) {
+        rig.root.destroy({ children: true });
+        this.crew.delete(id);
+        this.spots.delete(id);
+      }
   }
 
   update(e: Entity, now: number): void {
@@ -937,6 +977,7 @@ class ShipView extends MovingView {
     );
     this.root.zIndex = this.x + this.y;
     this.root.alpha = this.fadeBehindTerrain(this.layer.state.world, 0, dt);
+    this.drawCrew(s);
     // Waves: a bow wave and two trailing streams while under way, slow ripples when still.
     const half = s.kind === "cargo" ? 1.45 : 1.3;
     const ux = Math.cos(this.angle);
@@ -1033,6 +1074,12 @@ export class EntityLayer {
   }
 
   position(id: number): { x: number; y: number } | null {
+    const e = this.state.entities.get(id);
+    if (e?.type === "character" && e.aboard !== null) {
+      const ship = this.views.get(e.aboard);
+      const spot = ship instanceof ShipView ? ship.spots.get(id) : undefined;
+      if (spot) return spot;
+    }
     const v = this.views.get(id);
     return v ? { x: v.root.x, y: v.root.y } : null;
   }

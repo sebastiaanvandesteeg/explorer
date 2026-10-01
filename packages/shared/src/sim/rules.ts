@@ -25,12 +25,11 @@ export type PlaceCheck = { ok: true; site?: HarbourSite } | { ok: false; reason:
 const PIER_DIRS: Dir[] = ["+x", "+y", "-x", "-y"];
 
 /**
- * The pier of a harbour whose water-side land tile is (ax, ay): `length` tiles out to sea in
- * direction `dir`, `width` tiles across, lined up with the middle of the harbour's body (two wide
- * starts at the anchor, wider ones reach one tile back along the shore).
+ * The pier of a harbour whose water-side shore tile is (ax, ay): `length` tiles out to sea in
+ * direction `dir`, `width` tiles across, with the shore tile in line with its middle.
  */
 export function pierRect(ax: number, ay: number, dir: Dir, length: number, width: number): Rect {
-  const back = width >= 3 ? 1 : 0;
+  const back = Math.floor((width - 1) / 2);
   switch (dir) {
     case "+x":
       return { x: ax + 1, y: ay - back, w: length, h: width };
@@ -43,42 +42,59 @@ export function pierRect(ax: number, ay: number, dir: Dir, length: number, width
   }
 }
 
-/**
- * The harbour's body: 3 tiles along the shore, 2 deep, on the land side of the anchor. `side` slides
- * it along the shore (-1 or +1) so that one edge of the pier stays beside open shore: that is how
- * people walk from the land onto the pier.
- */
-export function harbourBody(ax: number, ay: number, dir: Dir, side: -1 | 1 = -1): Rect {
-  const across = side < 0 ? -2 : 0;
+/** How far along a pier (0 at the shore) and across it (below 0 or past its width: beside it). */
+export function pierLocal(
+  pier: Rect,
+  dir: Dir,
+  x: number,
+  y: number,
+): { along: number; across: number } {
   switch (dir) {
     case "+x":
-      return { x: ax - 1, y: ay + across, w: 2, h: 3 };
+      return { along: x - pier.x, across: y - pier.y };
     case "-x":
-      return { x: ax, y: ay + across, w: 2, h: 3 };
+      return { along: pier.x + pier.w - 1 - x, across: y - pier.y };
     case "+y":
-      return { x: ax + across, y: ay - 1, w: 3, h: 2 };
+      return { along: y - pier.y, across: x - pier.x };
     default:
-      return { x: ax + across, y: ay, w: 3, h: 2 };
+      return { along: pier.y + pier.h - 1 - y, across: x - pier.x };
   }
 }
 
-/** Whether people can walk onto the pier from free shore (not through the harbour's body). */
-export function pierAccess(state: GameState, pier: Rect, body: Rect): boolean {
-  const w = state.world;
-  const inside = (r: Rect, x: number, y: number) =>
-    x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h;
-  for (let y = pier.y - 1; y <= pier.y + pier.h; y++)
-    for (let x = pier.x - 1; x <= pier.x + pier.w; x++) {
-      if (inside(pier, x, y) || inside(body, x, y)) continue;
-      // Only tiles that share an edge with the pier count.
-      const edge = x >= pier.x && x < pier.x + pier.w ? true : y >= pier.y && y < pier.y + pier.h;
-      if (!edge || !inBounds(w, x, y)) continue;
-      if (isLandTerrain(w.terrain[tileIndex(w, x, y)]!) && walkable(state, x, y)) return true;
-    }
-  return false;
+/** The harbour's body: a platform on piles in the water beside the pier's root, `side` 0 or 1. */
+export function bodyBeside(pier: Rect, dir: Dir, side: 0 | 1): Rect {
+  const alongX = dir === "+x" || dir === "-x";
+  const along = 2;
+  const depth = 3;
+  if (alongX) {
+    const x = dir === "+x" ? pier.x : pier.x + pier.w - along;
+    return { x, y: side === 0 ? pier.y - depth : pier.y + pier.h, w: along, h: depth };
+  }
+  const y = dir === "+y" ? pier.y : pier.y + pier.h - along;
+  return { x: side === 0 ? pier.x - depth : pier.x + pier.w, y, w: depth, h: along };
 }
 
-/** Open, explored water for a pier and the berth just past its end (`ignore`: the pier's own id). */
+/** Whether every tile of a rectangle is open, free water (explored, unless told otherwise). */
+export function openWater(
+  state: GameState,
+  r: Rect,
+  opts: { ignore?: number; explored?: boolean } = {},
+): boolean {
+  const w = state.world;
+  for (let y = r.y; y < r.y + r.h; y++)
+    for (let x = r.x; x < r.x + r.w; x++) {
+      if (!inBounds(w, x, y)) return false;
+      const k = tileIndex(w, x, y);
+      if ((opts.explored ?? true) && !state.explored[k]) return false;
+      if (isLandTerrain(w.terrain[k]!)) return false;
+      const occ = state.occupancy[k]!;
+      if (occ !== 0 && occ !== opts.ignore) return false;
+      if (occ === 0 && !sailable(state, x, y)) return false;
+    }
+  return true;
+}
+
+/** Open water for a pier and the berth just past its end (`ignore`: the pier's own id). */
 export function pierWater(
   state: GameState,
   pier: Rect,
@@ -86,21 +102,12 @@ export function pierWater(
   ignore?: number,
   explored = true,
 ): boolean {
-  const w = state.world;
   const spawn = dockSpawn({ ...pier, dir });
-  const tiles: { x: number; y: number }[] = [{ x: Math.floor(spawn.x), y: Math.floor(spawn.y) }];
-  for (let y = pier.y; y < pier.y + pier.h; y++)
-    for (let x = pier.x; x < pier.x + pier.w; x++) tiles.push({ x, y });
-  for (const t of tiles) {
-    if (!inBounds(w, t.x, t.y)) return false;
-    const k = tileIndex(w, t.x, t.y);
-    if (explored && !state.explored[k]) return false;
-    if (isLandTerrain(w.terrain[k]!)) return false;
-    const occ = state.occupancy[k]!;
-    if (occ !== 0 && occ !== ignore) return false;
-    if (occ === 0 && !sailable(state, t.x, t.y)) return false;
-  }
-  return true;
+  const tip = { x: Math.floor(spawn.x), y: Math.floor(spawn.y), w: 1, h: 1 };
+  return (
+    openWater(state, pier, { ...(ignore !== undefined ? { ignore } : {}), explored }) &&
+    openWater(state, tip, { explored })
+  );
 }
 
 /** Where a harbour would go if the land tile (lx, ly) is clicked, or null. */
@@ -249,7 +256,7 @@ export function nearestWater(
   return null;
 }
 
-/** Harbours are placed by clicking a shore tile; the body and the pier are worked out around it. */
+/** Harbours are placed by clicking a shore tile; the pier and the body on piles are worked out. */
 function canPlaceHarbour(
   state: GameState,
   x: number,
@@ -264,20 +271,17 @@ function canPlaceHarbour(
     return { ok: false, reason: "Click the shore to place a harbour" };
   if (!settledIslands(state).has(w.island[k]!))
     return { ok: false, reason: "Ferry villagers to this island by ship first" };
-  let why = "Needs open water and flat land on the coast";
+  if (!walkable(state, x, y)) return { ok: false, reason: "Clear the shore first" };
   for (const dir of PIER_DIRS) {
     const pier = pierRect(x, y, dir, PIER_TIERS[0].length, PIER_TIERS[0].width);
     if (!pierWater(state, pier, dir)) continue;
-    for (const side of [-1, 1] as const) {
-      const body = harbourBody(x, y, dir, side);
-      if (!pierAccess(state, pier, body)) {
-        why = "The pier needs open shore beside it to walk onto";
-        continue;
-      }
-      const check = checkFootprint(state, "harbour", body, opts);
-      if (check.ok) return { ok: true, site: { body, pier, dir } };
-      why = check.reason;
+    for (const side of [0, 1] as const) {
+      const body = bodyBeside(pier, dir, side);
+      if (!openWater(state, body)) continue;
+      if (!opts.ignoreCost && !canAfford(state.stock, BUILDINGS.harbour.cost))
+        return { ok: false, reason: "Not enough resources" };
+      return { ok: true, site: { body, pier, dir } };
     }
   }
-  return { ok: false, reason: why };
+  return { ok: false, reason: "Needs open water along the coast for a pier and a platform" };
 }

@@ -66,7 +66,10 @@ export const RELEASES: Release[] = [
         items: [
           "Ships are much bigger and look medieval: a caravel, a cog with castles, a carrack with gun ports, and black-sailed pirate galleons, in 16 headings so turns look smooth.",
           "Ships now make waves: a bow wave and foam wakes when under way, and slow ripples when at rest.",
-          "Old saves keep working: each old dock gets a harbour on the shore behind it.",
+          "The pier is one continuous deck of planks on timber piles, 3 wide and 5 long, growing to 10 and 15 with the harbour upgrades. Ships tie up along both sides of it, so a longer pier holds more ships.",
+          "The harbourmaster's house stands on a platform of piles in the water beside the pier.",
+          "The camera pulls back a little while you sail, and the people on deck no longer flicker.",
+          "Old saves keep working: each old dock gets a harbour on the water beside it.",
         ],
       },
     ],
