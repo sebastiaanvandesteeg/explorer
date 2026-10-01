@@ -20,6 +20,7 @@ packages/art      @explorer/art: the colour palette and the per-pixel terrain pa
   terrain/          smooth fields from the tile data, ray-marched land, cliffs and water
 packages/server   @explorer/server: node:http + ws, world rooms, JSON persistence
 packages/client   @explorer/client: PixiJS v8 renderer, input, DOM HUD, map screen, synthesised sound, sessions
+  render/entities/  one view class per kind of entity (building, resource, people, ships, storm) and the EntityLayer that owns them
   index.html        the landing page (src/landing/): the game's own sprites, tribes and biomes, no PixiJS
   play/index.html   the game, served for every page under /play (routes in shared/src/routes.ts)
 tools/sprites     palette extraction and the sprite generator → client/public/assets
