@@ -7,12 +7,12 @@ import { renderSprite, trimmed, type Sprite } from "../sprite";
 import { TRIBES, type TribeId } from "@explorer/shared";
 import { boulder } from "./nature";
 
-export const TUNICS = [0, 1, 2] as const;
-export type Tunic = (typeof TUNICS)[number];
-export const VILLAGER_POSES = ["stand", "walk0", "walk1", "work0", "work1"] as const;
-export type VillagerPose = (typeof VILLAGER_POSES)[number];
-export const TOOLS = ["axe", "pick", "hammer", "hoe"] as const;
-export type Tool = (typeof TOOLS)[number];
+const TUNICS = [0, 1, 2] as const;
+type Tunic = (typeof TUNICS)[number];
+const VILLAGER_POSES = ["stand", "walk0", "walk1", "work0", "work1"] as const;
+type VillagerPose = (typeof VILLAGER_POSES)[number];
+const TOOLS = ["axe", "pick", "hammer", "hoe"] as const;
+type Tool = (typeof TOOLS)[number];
 
 type Hat = "none" | "helmet" | "wrap" | "hood" | "mushroom" | "bandana" | "reed" | "cap" | "cowl";
 
@@ -93,7 +93,7 @@ const OUTFITS: Record<TribeId, { tunics: [string, string, string][]; hat: Hat }>
 };
 
 /** Villagers and what they carry are drawn at twice the world's pixel density. */
-export const FIGURE_RES = 2;
+const FIGURE_RES = 2;
 
 /** Skin (shadow, base, light) and hair (dark, base, light) per tunic, for a varied crowd. */
 const SKINS: [number, number, number][] = [
@@ -632,19 +632,6 @@ function carried(kind: CarriedKind): Sprite {
   }
   outline(c, 0.35);
   return { name: `carry_${kind}`, canvas: c, anchorX: 12, anchorY: 16, meta: { res: FIGURE_RES } };
-}
-
-/** Wooden crate with darker banding along its edges. */
-function crateMaterial(min: [number, number, number], max: [number, number, number]): Material {
-  return (c) => {
-    const [x, y, z] = c.lp;
-    const ex = Math.min(x - min[0], max[0] - x) < 0.03;
-    const ey = Math.min(y - min[1], max[1] - y) < 0.03;
-    const ez = Math.min(z - min[2], max[2] - z) < 0.9;
-    const f = c.ln;
-    const edge = Math.abs(f[2]) > 0.7 ? ex || ey : Math.abs(f[0]) > 0.7 ? ey || ez : ex || ez;
-    return shade(edge ? "timber" : "thatch", lit(c, edge ? 0 : 0.05), c.px, c.py, 0.2);
-  };
 }
 
 /** Planes for a hull pointed at both ends, lying along x from x0 to x1 around y = cy. */

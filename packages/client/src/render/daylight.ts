@@ -1,7 +1,6 @@
 // How the time of day colours the world: a grade (tint, brightness, saturation, contrast) that is
 // multiplied into the biome's own grade, and how dark the night is for everything that reacts to
 // it (windows glow, fireflies come out, the vignette closes in).
-import { dayPhase } from "@explorer/shared";
 
 export interface DayGrade {
   tint: [number, number, number];
@@ -110,9 +109,4 @@ export function daylight(phase: number): DayGrade {
     contrast: mix(a.grade.contrast, b.grade.contrast),
     night: mix(a.grade.night, b.grade.night),
   };
-}
-
-/** The grade for a moment of game time. */
-export function daylightAt(time: number): DayGrade {
-  return daylight(dayPhase(time));
 }

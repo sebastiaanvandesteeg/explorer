@@ -24,7 +24,7 @@ const isIntOrNull = (v: unknown): v is number | null => v === null || isInt(v);
 export const WORLD_ID = /^[a-z0-9]{4,32}$/;
 const TOKEN = /^[a-f0-9]{16,64}$/;
 
-export function cleanName(raw: unknown): string | null {
+function cleanName(raw: unknown): string | null {
   if (typeof raw !== "string") return null;
   const name = raw
     .replace(/[\u0000-\u001f\u007f]/g, "")
@@ -33,7 +33,7 @@ export function cleanName(raw: unknown): string | null {
   return name.length > 0 ? name : null;
 }
 
-export function parseCommand(v: unknown): Command | null {
+function parseCommand(v: unknown): Command | null {
   if (!isObj(v) || typeof v.kind !== "string") return null;
   switch (v.kind) {
     case "place-building":

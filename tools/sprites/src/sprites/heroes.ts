@@ -13,9 +13,9 @@ import { hexToRgba, type Rgba } from "../palette";
 import type { Sprite } from "../sprite";
 import { trimmed } from "../sprite";
 
-export const HERO_POSES = ["stand", "walk0", "walk1"] as const;
+const HERO_POSES = ["stand", "walk0", "walk1"] as const;
 export type HeroPose = (typeof HERO_POSES)[number];
-export const HERO_RES = 2;
+const HERO_RES = 2;
 export const HERO_LAYERS = [
   "prop",
   "outfit",
@@ -941,9 +941,6 @@ export function heroSprites(): Sprite[] {
   }
   return out;
 }
-
-/** Which layer frames exist for a class, for the client's name helper and tests. */
-export const heroFrame = (layer: HeroLayer): string => layer;
 
 /** One figure with every layer, for the contact sheet tool. */
 export function heroFigure(

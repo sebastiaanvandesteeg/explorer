@@ -1151,7 +1151,7 @@ const crateLike = (st: Style): Material => planks(st.wood, "x", 0.07);
  * along both edges, bollards where ships tie up and a stone landing where it meets the shore.
  * `axis` is the way it runs; length and width are in tiles.
  */
-export function pierSprite(axis: "x" | "y", length: number, width = 3): Sprite {
+function pierSprite(axis: "x" | "y", length: number, width = 3): Sprite {
   const s = new Scene();
   const W = axis === "x" ? length : width;
   const D = axis === "x" ? width : length;
@@ -1218,7 +1218,7 @@ export function pierSprite(axis: "x" | "y", length: number, width = 3): Sprite {
 }
 
 /** Things that stand on a pier: drawn on one tile, placed by the game according to the upgrades. */
-export function pierProps(): Sprite[] {
+function pierProps(): Sprite[] {
   const out: Sprite[] = [];
   const deck = DECK_Z;
   const prop = (name: string, draw: (s: Scene) => void, height = 30): void => {
@@ -1300,7 +1300,7 @@ export function pierProps(): Sprite[] {
 // Shared pieces
 
 /** Pier tile; planks run along `dir`. */
-export function dockTile(dir: "x" | "y", end: boolean): Sprite {
+function dockTile(dir: "x" | "y", end: boolean): Sprite {
   const s = new Scene();
   const deck = 5;
   s.box([0, 0, deck - 1.5], [1, 1, deck], planks("plank", dir === "x" ? "y" : "x", 0.11));
@@ -1326,7 +1326,7 @@ export function dockTile(dir: "x" | "y", end: boolean): Sprite {
   });
 }
 
-export function scaffold(w: number, h: number): Sprite {
+function scaffold(w: number, h: number): Sprite {
   const s = new Scene();
   s.groundShadow = { x0: -0.1, y0: -0.1, x1: w + 0.2, y1: h + 0.2 };
   const height = 12 + Math.max(w, h) * 5;
@@ -1363,7 +1363,7 @@ const LIGHT_COLOURS = new Set(
  * small clusters, as offsets from the sprite's anchor with a glow radius. The game turns each
  * into a soft glow that comes up at dusk.
  */
-export function findLights(sprite: Sprite): { x: number; y: number; r: number }[] {
+function findLights(sprite: Sprite): { x: number; y: number; r: number }[] {
   // Offsets and radii are in world pixels; the sprite's own pixels may be finer.
   const res = (sprite.meta?.res as number | undefined) ?? 1;
   const cell = 6 * res;

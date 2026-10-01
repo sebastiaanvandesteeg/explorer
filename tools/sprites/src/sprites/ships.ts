@@ -9,8 +9,8 @@ import { flat, lit, Scene, type Material } from "../raytrace";
 import { renderSprite, type Sprite } from "../sprite";
 import { strand } from "./nature";
 
-export const SHIP_HEADINGS = 16;
-export type ShipStyle = "scout" | "cargo" | "patrol" | "pirate";
+const SHIP_HEADINGS = 16;
+type ShipStyle = "scout" | "cargo" | "patrol" | "pirate";
 
 interface Design {
   L: number;
@@ -109,7 +109,7 @@ function crateMaterial(min: [number, number, number], max: [number, number, numb
   };
 }
 
-export function shipScene(k: number, style: ShipStyle, hullOnly = false): Scene {
+function shipScene(k: number, style: ShipStyle, hullOnly = false): Scene {
   const d = DESIGNS[style];
   const pirate = style === "pirate";
   const s = new Scene();
@@ -296,7 +296,7 @@ export function shipScene(k: number, style: ShipStyle, hullOnly = false): Scene 
   return s;
 }
 
-export function shipSprite(style: ShipStyle, k: number): Sprite {
+function shipSprite(style: ShipStyle, k: number): Sprite {
   const name = `${style === "scout" ? "ship" : style}_${k}`;
   return renderSprite(name, shipScene(k, style), 1, 1, 110, 80);
 }
@@ -426,7 +426,7 @@ export function shipSprites(): Sprite[] {
 }
 
 /** Foam and ripples for a ship's wake: soft translucent blobs the game spawns, spreads and fades. */
-export function wakeSprites(): Sprite[] {
+function wakeSprites(): Sprite[] {
   const out: Sprite[] = [];
   const foam = rampColor("foam", 4);
   const blob = (name: string, rx: number, ry: number, peak: number, hollow = 0) => {

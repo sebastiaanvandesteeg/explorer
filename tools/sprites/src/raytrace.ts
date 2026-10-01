@@ -12,13 +12,13 @@ export type Vec3 = [number, number, number];
 
 const dot = (a: Vec3, b: Vec3) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 const add = (a: Vec3, b: Vec3, k = 1): Vec3 => [a[0] + b[0] * k, a[1] + b[1] * k, a[2] + b[2] * k];
-export function normalize(v: Vec3): Vec3 {
+function normalize(v: Vec3): Vec3 {
   const l = Math.hypot(v[0], v[1], v[2]) || 1;
   return [v[0] / l, v[1] / l, v[2] / l];
 }
 
 /** Direction towards the light: from the upper left, like the concept art. */
-export const LIGHT: Vec3 = normalize([-0.35, 0.55, 0.9]);
+const LIGHT: Vec3 = normalize([-0.35, 0.55, 0.9]);
 /** Un-normalised view direction; moving along it keeps the screen position fixed. */
 const VIEW: Vec3 = [-1, -1, -(2 * HALF_H) / Z_SCALE];
 const RAY_START_HEIGHT = 12; // metric units above the water plane (≈235 px)

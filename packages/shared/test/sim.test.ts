@@ -33,7 +33,6 @@ import {
   populationCap,
   sailable,
   removeEntity,
-  RESOURCES,
   sailSpeedFactor,
   sightFactor,
   shipCost,

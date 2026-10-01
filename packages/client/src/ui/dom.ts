@@ -23,7 +23,3 @@ export function h<T extends HTMLElement = HTMLElement>(
   for (const c of children) if (c !== null && c !== undefined && c !== false) el.append(c);
   return el;
 }
-
-export function clear(el: HTMLElement): void {
-  while (el.firstChild) el.firstChild.remove();
-}

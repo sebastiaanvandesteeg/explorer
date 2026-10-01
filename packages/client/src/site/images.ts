@@ -14,4 +14,3 @@ export const IMAGES = {
   },
   hero: { src: "/hero.webp", width: 1920, height: 1080, alt: "A village at golden hour" },
 } as const;
-export type ImageId = keyof typeof IMAGES;

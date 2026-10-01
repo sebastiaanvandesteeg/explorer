@@ -16,7 +16,6 @@ import {
   NODES,
   REGROW,
   SALVAGE_SECONDS,
-  SHIP,
   shipSpeed,
   SMITH,
   smithSeconds,

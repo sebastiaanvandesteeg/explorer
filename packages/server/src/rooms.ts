@@ -37,7 +37,7 @@ const hashToken = (token: string) => createHash("sha256").update(token).digest("
 const ID_ALPHABET = "abcdefghijkmnpqrstuvwxyz23456789";
 
 /** Short, unambiguous invite code (no 0/o or 1/l). */
-export function newWorldId(): string {
+function newWorldId(): string {
   return [...randomBytes(8)].map((b) => ID_ALPHABET[b % ID_ALPHABET.length]).join("");
 }
 

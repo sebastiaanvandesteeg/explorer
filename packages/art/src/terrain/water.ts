@@ -24,7 +24,7 @@ function glowTile(world: TerrainWorld, x: number, y: number): number {
 }
 
 /** Shallow-water glow at a point: tile values interpolated between tile centres. */
-export function shoreGlow(world: TerrainWorld, u: number, v: number): number {
+function shoreGlow(world: TerrainWorld, u: number, v: number): number {
   const pu = u + warpU(u, v) * 0.6 - 0.5;
   const pv = v + warpV(u, v) * 0.6 - 0.5;
   const i = Math.floor(pu);

@@ -17,7 +17,6 @@ import {
   ROOM_WALL_PX,
   SLAB_VARIANTS,
   TRIBES,
-  WALL_KINDS,
   doorSprite,
   floorSprite,
   furnitureSprite,

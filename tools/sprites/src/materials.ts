@@ -2,19 +2,16 @@
 import { noise3, hash3 } from "./noise3";
 import { rampColor, shade, type RampName, type Rgba } from "./palette";
 import { lit, type Material, type ShadeContext } from "./raytrace";
-import { SPRITE_RES } from "./sprite";
 
 /**
  * Courses of shingles, planks and bricks are this much finer than they were at the world's own
  * pixel density: with `SPRITE_RES` texels to the world pixel the art can carry smaller detail.
  */
 export const FINE = 0.6;
-/** One texel in world pixels: the thinnest line that can be drawn. */
-const TEXEL = 1 / SPRITE_RES;
 const frac = (v: number): number => v - Math.floor(v);
 
 /** Streaks of rain and grime running down a wall, and darker damp near the ground. */
-export function weather(u: number, z: number): number {
+function weather(u: number, z: number): number {
   const streak = noise3(u * 34, z * 0.07, 0.6, 41);
   return (streak - 0.5) * 0.1 - (z < 9 ? ((9 - z) / 9) * 0.08 : 0);
 }
@@ -30,7 +27,7 @@ export function faceOf(c: ShadeContext): Face {
 }
 
 /** Horizontal coordinate along a wall face (tiles). */
-export function along(c: ShadeContext): number {
+function along(c: ShadeContext): number {
   const f = faceOf(c);
   return f === "+x" || f === "-x" ? c.lp[1] : c.lp[0];
 }

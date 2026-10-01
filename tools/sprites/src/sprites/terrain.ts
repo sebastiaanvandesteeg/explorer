@@ -3,7 +3,7 @@
 import { HALF_H, HALF_W, TILE_H, TILE_W } from "@explorer/shared";
 import { Canvas } from "../canvas";
 import { hash3, prng } from "../noise3";
-import { bayer, rampColor, shade, type Rgba } from "../palette";
+import { rampColor, shade, type Rgba } from "../palette";
 import type { Sprite } from "../sprite";
 
 /** Pixel (px, py) of a 32×16 tile → position inside the tile in world units (0..1). */
@@ -14,14 +14,14 @@ function tileLocal(px: number, py: number): { fx: number; fy: number } {
 }
 
 /** Exact seamless 2:1 diamond (rows are 2, 6, …, 30, 30, …, 2 pixels wide). */
-export function inDiamond(px: number, py: number): boolean {
+function inDiamond(px: number, py: number): boolean {
   const r = py < HALF_H ? py : TILE_H - 1 - py;
   const hw = 2 * r + 1;
   return px >= HALF_W - hw && px < HALF_W + hw;
 }
 
 /** Noise that repeats every tile, so all variants of a terrain type join seamlessly. */
-export function periodicNoise(fx: number, fy: number, cells: number, seed: number): number {
+function periodicNoise(fx: number, fy: number, cells: number, seed: number): number {
   const x = fx * cells;
   const y = fy * cells;
   const x0 = Math.floor(x);

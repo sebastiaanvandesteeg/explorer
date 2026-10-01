@@ -54,7 +54,7 @@ You choose one of nine tribes when you start a world, and the whole co-op team p
 
 ## The world
 
-The archipelago is **768 × 576 tiles**: a grid of 4 × 3 regions, each 192 × 192 tiles, about the size of a whole world in earlier versions. Ten of the twelve regions belong to a biome and the two furthest from home are open sea. Every biome gets **three islands of its own** (one wooded, one fertile, one rocky, so each region has wood, food and stone), plus five to nine islets; the home biome's three include your own island. The tribe's biome sits in the middle of the map, the gentle biomes around it, the hostile and magical ones towards the edges.
+The archipelago is **768 × 576 tiles**: a grid of 4 × 3 regions, each 192 × 192 tiles. Ten of the twelve regions belong to a biome and the two furthest from home are open sea. Every biome gets **three islands of its own** (one wooded, one fertile, one rocky, so each region has wood, food and stone), plus five to nine islets; the home biome's three include your own island. The tribe's biome sits in the middle of the map, the gentle biomes around it, the hostile and magical ones towards the edges.
 
 - **Regions are big.** The sea belongs to a biome too, out to borders that wander instead of following the grid: sail out of Greenlands water and the fog, the colour grade, the ambience and the mood change on the way to the next region. The whole map is about ten times the area of the old one, so a scout takes a couple of minutes to cross it.
 - **Ships plan long routes.** Sea routes are searched with an exact-distance heuristic and a budget big enough to cross the map corner to corner.

@@ -15,7 +15,6 @@ import {
   landPath,
   pierOf,
   pierTier,
-  PIER_TIERS,
   removeEntity,
   rootOf,
   rebuildOccupancy,

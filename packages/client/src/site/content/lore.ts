@@ -3,7 +3,7 @@
 // the game data (TRIBE_DEFS / BIOME_DEFS); the stories are told here.
 import type { BiomeId } from "@explorer/shared";
 
-export interface Chapter {
+interface Chapter {
   id: string;
   title: string;
   /** The biome the page is dressed in while this chapter is on screen. */

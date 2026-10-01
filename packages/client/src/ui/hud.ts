@@ -1159,7 +1159,7 @@ function selectionKey(e: Entity): string {
   return `${e.type}${e.id}`;
 }
 
-export function describeVillager(state: GameState, v: VillagerEntity): string {
+function describeVillager(state: GameState, v: VillagerEntity): string {
   const carrying = v.carrying ? ` · carrying ${v.carrying.amount} ${v.carrying.resource}` : "";
   const t = v.task;
   if (v.aboard !== null) return "At sea";

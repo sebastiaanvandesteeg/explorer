@@ -18,7 +18,7 @@ import {
   type Resource,
 } from "@explorer/shared";
 
-export interface GoodRow {
+interface GoodRow {
   res: Resource;
   need: number;
   have: number;

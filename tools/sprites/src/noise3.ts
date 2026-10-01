@@ -7,10 +7,6 @@ export function hash3(x: number, y: number, z: number, seed = 0): number {
   return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
 }
 
-export function hash2(x: number, y: number, seed = 0): number {
-  return hash3(x, y, 0, seed);
-}
-
 const smooth = (t: number) => t * t * (3 - 2 * t);
 
 export function noise3(x: number, y: number, z: number, seed = 0): number {
@@ -27,10 +23,6 @@ export function noise3(x: number, y: number, z: number, seed = 0): number {
     lerp(lerp(c(0, 0, 1), c(1, 0, 1), fx), lerp(c(0, 1, 1), c(1, 1, 1), fx), fy),
     fz,
   );
-}
-
-export function noise2(x: number, y: number, seed = 0): number {
-  return noise3(x, y, 0.5, seed);
 }
 
 /** Small seeded PRNG for sprite variation. */

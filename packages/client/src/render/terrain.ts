@@ -27,7 +27,7 @@ import { biomeOfTile, decorSprite, tileJitter } from "./names";
 import { coverAt } from "./occlusion";
 import type { Pixels } from "./paintProtocol";
 
-export const CHUNK = 16;
+const CHUNK = 16;
 const MAX_CACHED = 40;
 /** How long each step of the wave animation lasts. */
 const WAVE_MS = 550;

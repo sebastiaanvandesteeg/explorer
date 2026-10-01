@@ -7,7 +7,6 @@ import {
   RESOURCES,
   inHarbour,
   settledIslands,
-  stockOf,
   stormStrength,
   tileIndex,
   watched,

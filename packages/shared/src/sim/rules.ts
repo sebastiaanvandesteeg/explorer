@@ -1,5 +1,5 @@
 import { inBounds, isLandTerrain, tileIndex } from "../world/grid";
-import { DIR_VECTORS, Terrain, type Dir } from "../world/types";
+import { Terrain, type Dir } from "../world/types";
 import { BUILDINGS, PIER_TIERS, canAfford, type BuildingKind } from "./catalogue";
 import { dockSpawn } from "./ferry";
 import { sailable } from "./navigation";
@@ -131,7 +131,6 @@ export function canPlaceBuilding(
 ): PlaceCheck {
   const def = BUILDINGS[kind];
   if (!def.buildable) return { ok: false, reason: "That can't be built" };
-  const w = state.world;
   if (kind === "harbour") return canPlaceHarbour(state, x, y, opts);
   if (kind === "great_work") {
     for (const e of state.entities.values())

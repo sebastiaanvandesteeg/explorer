@@ -17,7 +17,6 @@ import {
 import {
   addEntity,
   markDirty,
-  removeEntity,
   newBuilding,
   occupy,
   pierTier,

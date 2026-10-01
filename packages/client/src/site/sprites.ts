@@ -17,7 +17,7 @@ const SVG = "http://www.w3.org/2000/svg";
 const atlas = fetchAtlasFiles();
 
 /** An atlas frame as a pixelated element; it stays empty if the atlas or the frame is missing. */
-export function sprite(name: string, scale: number): HTMLElement {
+function sprite(name: string, scale: number): HTMLElement {
   const el = h("span.sprite");
   void atlas.then((a) => {
     const meta = a.sprites[name];
@@ -28,7 +28,7 @@ export function sprite(name: string, scale: number): HTMLElement {
 }
 
 /** A block of land as the game draws it: a diamond of ground `tiles` tiles across on a cliff. */
-export function islet(tiles: number, biome: BiomeId, scale: number): SVGSVGElement {
+function islet(tiles: number, biome: BiomeId, scale: number): SVGSVGElement {
   const w = tiles * TILE_W;
   const d = tiles * TILE_H;
   const { ground, rock } = ATMOSPHERE[biome].map;

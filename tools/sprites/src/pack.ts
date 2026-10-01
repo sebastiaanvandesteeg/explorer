@@ -1,7 +1,7 @@
 import { Canvas } from "./canvas";
 import type { Sprite } from "./sprite";
 
-export interface PackedFrame {
+interface PackedFrame {
   frame: { x: number; y: number; w: number; h: number };
   rotated: false;
   trimmed: false;

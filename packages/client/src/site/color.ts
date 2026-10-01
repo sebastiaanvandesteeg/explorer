@@ -2,17 +2,9 @@
 
 export type Rgb = [number, number, number];
 
-export function parseHex(hex: string): Rgb {
+function parseHex(hex: string): Rgb {
   const v = Number.parseInt(hex.replace("#", ""), 16);
   return [(v >> 16) & 255, (v >> 8) & 255, v & 255];
-}
-
-export function toHex([r, g, b]: Rgb): string {
-  const c = (n: number) =>
-    Math.round(Math.min(255, Math.max(0, n)))
-      .toString(16)
-      .padStart(2, "0");
-  return `#${c(r)}${c(g)}${c(b)}`;
 }
 
 /** `t` of the way from colour `a` to colour `b`. */

@@ -10,7 +10,7 @@ import type { ThemeVar } from "../theme";
 
 export type NoteKind = "new" | "improved" | "fixed";
 
-export interface ReleaseSection {
+interface ReleaseSection {
   kind: NoteKind;
   /** Shown as the section's heading; defaults to the kind's own label. */
   title?: string;

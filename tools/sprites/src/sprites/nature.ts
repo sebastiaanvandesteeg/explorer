@@ -1,7 +1,7 @@
 // Harvestable plants and rocks for every biome, plus stumps, saplings and sea rocks.
 // Names: n_<kind>_<variant> when grown, n_<kind>_bare for picked food plants,
 // n_stump_<style> and n_sapling_<style> for regrowth stages.
-import { NODE_VARIANTS, Z_SCALE, type NodeKind } from "@explorer/shared";
+import { NODE_VARIANTS, Z_SCALE } from "@explorer/shared";
 import { Canvas } from "../canvas";
 import { rocky } from "../materials";
 import { hash3, noise3, prng } from "../noise3";
@@ -67,7 +67,7 @@ function rampLength(ramp: RampName): number {
   return RAMPS[ramp].length;
 }
 
-export const barkOf =
+const barkOf =
   (ramp: RampName, bias = 0.1): Material =>
   (c) => {
     const streak = hash3(Math.floor((c.p[0] - c.p[1]) * 60), 0, 0, 3) < 0.3 ? -0.15 : 0;
@@ -829,13 +829,7 @@ function shoreRock(variant: number): Sprite {
 
 // --- Regrowth stages --------------------------------------------------------------------------
 
-export type RegrowStyle = "wood" | "charred" | "stalk" | "silver";
-
-export const REGROW_STYLE: Partial<Record<NodeKind, RegrowStyle>> = {
-  charred_tree: "charred",
-  giant_mushroom: "stalk",
-  silver_tree: "silver",
-};
+type RegrowStyle = "wood" | "charred" | "stalk" | "silver";
 
 function stump(style: RegrowStyle): Sprite {
   const s = new Scene();

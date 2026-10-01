@@ -10,7 +10,7 @@ export interface PackActions {
 const hex = (n: number) => `#${n.toString(16).padStart(6, "0")}`;
 
 /** A little gem-shaped icon in an item's own colours. */
-export function itemIcon(kind: ItemKind): HTMLElement {
+function itemIcon(kind: ItemKind): HTMLElement {
   const [body, light] = ITEMS[kind].colour;
   const el = h("span.item-icon", { dataset: { rarity: ITEMS[kind].rarity } });
   el.style.setProperty("--item-body", hex(body));
