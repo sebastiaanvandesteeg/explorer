@@ -109,7 +109,7 @@ function crateMaterial(min: [number, number, number], max: [number, number, numb
   };
 }
 
-export function shipScene(k: number, style: ShipStyle): Scene {
+export function shipScene(k: number, style: ShipStyle, hullOnly = false): Scene {
   const d = DESIGNS[style];
   const pirate = style === "pirate";
   const s = new Scene();
@@ -119,7 +119,8 @@ export function shipScene(k: number, style: ShipStyle): Scene {
     const hull: Material = (c) => {
       const z = c.lp[2];
       if (c.ln[2] > 0.8) return planks(d.deck, "x", 0.07)(c);
-      if (z < 3.5) return shade("hull", lit(c, 0.1), c.px, c.py, 0.2);
+      // Below the waterline line the planks run on, a little darker: no keel shows, the sea hides it.
+      if (z < 3.5) return shade(d.hull, lit(c, 0.02), c.px, c.py, 0.2);
       // Clinker planking: overlapping strakes, each with a dark lower edge.
       const strake = (z / 1.9) % 1 < 0.3 ? -0.2 : 0;
       if (z > hullTop - 1.6) return shade(d.deck, lit(c, 0.18), c.px, c.py, 0.2);
@@ -140,6 +141,7 @@ export function shipScene(k: number, style: ShipStyle): Scene {
       ],
       hull,
     );
+    if (hullOnly) return;
     // The rail: a thin dark wale along both sides of the deck.
     for (const side of [-1, 1]) {
       s.box(
@@ -299,10 +301,126 @@ export function shipSprite(style: ShipStyle, k: number): Sprite {
   return renderSprite(name, shipScene(k, style), 1, 1, 110, 80);
 }
 
+/**
+ * Where the hull meets the sea: the lowest opaque pixel of each column of the hull alone. The
+ * waterline layers (the wet band on the planks, the shadow on the water, the lapping foam) all
+ * follow this profile, so they hug the hull whatever its heading.
+ */
+function waterProfile(hull: Sprite): { bottom: (number | null)[]; first: number; last: number } {
+  const c = hull.canvas;
+  const bottom: (number | null)[] = [];
+  let first = -1;
+  let last = -1;
+  for (let x = 0; x < c.width; x++) {
+    let yb: number | null = null;
+    for (let y = c.height - 1; y >= 0; y--)
+      if (c.alpha(x, y) > 128) {
+        yb = y;
+        break;
+      }
+    bottom.push(yb);
+    if (yb !== null) {
+      if (first < 0) first = x;
+      last = x;
+    }
+  }
+  return { bottom, first, last };
+}
+
+const hash = (x: number, y: number, seed: number): number => {
+  const h = Math.sin(x * 127.1 + y * 311.7 + seed * 74.7) * 43758.5453;
+  return h - Math.floor(h);
+};
+
+/**
+ * The layers that put a ship in the water, from its hull alone: `wet` darkens and blurs the
+ * lowest planks into the sea, `shadow` is a dark patch of water under the hull, and `foam` is a
+ * broken ring of white lapping at the waterline in two frames.
+ */
+function waterlineSprites(style: ShipStyle, k: number): Sprite[] {
+  const hull = renderSprite("hull", shipScene(k, style, true), 1, 1, 110, 80);
+  const { bottom, first, last } = waterProfile(hull);
+  const pad = 8;
+  const w = hull.canvas.width + pad * 2;
+  const h = hull.canvas.height + pad * 2;
+  const profile = (x: number): number | null => {
+    // Beyond the bow and stern the waterline carries on at the nearest column's level.
+    const cx = Math.min(last, Math.max(first, x));
+    return bottom[cx] ?? null;
+  };
+  const make = (name: string, paint: (c: Canvas) => void): Sprite => {
+    const c = new Canvas(w, h);
+    paint(c);
+    return {
+      name,
+      canvas: c,
+      anchorX: hull.anchorX + pad,
+      anchorY: hull.anchorY + pad,
+      meta: { res: 2 },
+    };
+  };
+  const water = rampColor("deepWater", 3);
+  const foam = rampColor("foam", 3);
+  const out: Sprite[] = [];
+  // The wet band: the lowest rows of the planks take on the colour of the sea, dithered upwards.
+  out.push(
+    make(`shipwet_${style}_${k}`, (c) => {
+      for (let x = first; x <= last; x++) {
+        const yb = bottom[x];
+        if (yb === null || yb === undefined) continue;
+        for (let dy = 0; dy < 10; dy++) {
+          const y = yb - dy;
+          const keep = dy < 4 ? 1 : dy < 7 ? 0.65 : 0.3;
+          if (hash(x, y, 1) > keep) continue;
+          c.set(x + pad, y + pad, [water[0], water[1], water[2], dy < 4 ? 205 : 130]);
+        }
+      }
+    }),
+  );
+  // The shadow: dark water under and just beside the hull, fading downwards.
+  out.push(
+    make(`shipshadow_${style}_${k}`, (c) => {
+      for (let x = first - 4; x <= last + 4; x++) {
+        const yb = profile(x);
+        if (yb === null) continue;
+        const edge = x < first ? first - x : x > last ? x - last : 0;
+        for (let dy = -3; dy < 9 - edge; dy++) {
+          const y = yb + dy;
+          const a = (1 - (dy + 3) / (12 - edge)) * 0.55;
+          if (hash(x, y, 2) > a * 1.6) continue;
+          c.set(x + pad, y + pad, [8, 40, 52, 110]);
+        }
+      }
+    }),
+  );
+  // The foam: a thin broken line along the waterline, shifting between two frames as it laps.
+  for (const f of [0, 1]) {
+    out.push(
+      make(`shipfoam_${style}_${k}_${f}`, (c) => {
+        for (let x = first - 3; x <= last + 3; x++) {
+          const yb = profile(x);
+          if (yb === null) continue;
+          const edge = x < first ? first - x : x > last ? x - last : 0;
+          for (let dy = -1; dy < 4 - edge; dy++) {
+            const y = yb + dy + (f === 1 && (x >> 2) % 2 === 0 ? 1 : 0);
+            if (hash(x, y, 3 + f) > 0.7) continue;
+            const col = hash(x, y, 9) > 0.5 ? foam : rampColor("foam", 2);
+            c.set(x + pad, y + pad, [col[0], col[1], col[2], dy < 2 ? 230 : 150]);
+          }
+        }
+      }),
+    );
+  }
+  return out;
+}
+
 export function shipSprites(): Sprite[] {
   const out: Sprite[] = [];
   for (const style of ["scout", "cargo", "patrol", "pirate"] as const)
-    for (let k = 0; k < SHIP_HEADINGS; k++) out.push(shipSprite(style, k));
+    for (let k = 0; k < SHIP_HEADINGS; k++) {
+      out.push(shipSprite(style, k));
+      out.push(...waterlineSprites(style, k));
+    }
   out.push(...wakeSprites());
   return out;
 }

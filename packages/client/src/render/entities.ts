@@ -609,6 +609,8 @@ function hullBar(bar: Graphics, hp: number, max: number): void {
 
 class PirateView extends MovingView {
   readonly root = new Container();
+  private readonly body = new Container({ sortableChildren: true });
+  private readonly water: Waterline;
   private sprite: Sprite;
   private bar = new Graphics();
   private p: PirateEntity | null = null;
@@ -617,7 +619,14 @@ class PirateView extends MovingView {
   constructor(private readonly layer: EntityLayer) {
     super();
     this.sprite = layer.atlas.sprite("pirate_0");
-    this.root.addChild(this.sprite, this.bar);
+    this.body.addChild(this.sprite);
+    this.root.addChild(this.body, this.bar);
+    this.water = new Waterline(layer, this.body);
+  }
+
+  override destroy(): void {
+    this.water.destroy();
+    super.destroy();
   }
 
   update(e: Entity, now: number): void {
@@ -639,13 +648,25 @@ class PirateView extends MovingView {
     this.root.visible =
       this.layer.state.explored[tileIndex(world, Math.floor(this.x), Math.floor(this.y))] === 1 &&
       watched(this.layer.state, this.x, this.y);
-    const bob = Math.round(Math.sin(now / 480 + p.id) * 1);
+    const heave = Math.round(Math.sin(now / 420 + p.id) * 1.3);
     this.root.position.set(
       Math.round(screenX(this.x, this.y)),
-      Math.round(screenY(this.x, this.y)) + bob,
+      Math.round(screenY(this.x, this.y)),
     );
+    this.body.y = heave;
     this.root.zIndex = this.x + this.y;
-    this.root.alpha = this.fadeBehindTerrain(world, 0, dt);
+    const fade = this.fadeBehindTerrain(world, 0, dt);
+    this.root.alpha = fade;
+    this.water.set(
+      "pirate",
+      ((p.heading % 8) * 2) % 16,
+      this.root.x,
+      this.root.y,
+      now,
+      p.id,
+      this.root.visible,
+    );
+    this.water.setAlpha(fade);
     if (this.moving && this.root.visible) {
       this.wakeTimer -= dt;
       if (this.wakeTimer <= 0) {
@@ -887,8 +908,64 @@ class ItemView extends View {
   }
 }
 
+/**
+ * What puts a hull in the water: a shadow on the sea under it and a ring of lapping foam (both in
+ * the wake layer, beneath everything), and a wet band over its lowest planks (part of the ship).
+ */
+class Waterline {
+  private readonly shadow: Sprite;
+  private readonly foam: Sprite;
+  private readonly wet: Sprite;
+
+  constructor(
+    private readonly layer: EntityLayer,
+    body: Container,
+  ) {
+    const atlas = layer.atlas;
+    this.shadow = atlas.sprite("shipshadow_scout_0");
+    this.foam = atlas.sprite("shipfoam_scout_0_0");
+    this.wet = atlas.sprite("shipwet_scout_0");
+    layer.wakes.addChild(this.shadow, this.foam);
+    this.wet.zIndex = 0.5;
+    this.wet.y = 1;
+    body.addChild(this.wet);
+  }
+
+  /** `x`, `y`: where the hull meets the water (it does not heave), `k`: the hull frame's heading. */
+  set(
+    style: string,
+    k: number,
+    x: number,
+    y: number,
+    now: number,
+    phase: number,
+    visible: boolean,
+  ) {
+    const atlas = this.layer.atlas;
+    const f = Math.floor(now / 460 + phase) % 2;
+    atlas.setFrame(this.shadow, `shipshadow_${style}_${k}`);
+    atlas.setFrame(this.foam, `shipfoam_${style}_${k}_${f}`);
+    atlas.setFrame(this.wet, `shipwet_${style}_${k}`);
+    this.shadow.position.set(x, y);
+    this.foam.position.set(x, y);
+    this.shadow.visible = this.foam.visible = visible;
+  }
+
+  setAlpha(a: number): void {
+    this.shadow.alpha = this.foam.alpha = a;
+  }
+
+  destroy(): void {
+    this.shadow.destroy();
+    this.foam.destroy();
+  }
+}
+
 class ShipView extends MovingView {
   readonly root = new Container();
+  /** Hull, wet band and crew: they heave together on the swell while the waterline stays put. */
+  private readonly body = new Container({ sortableChildren: true });
+  private readonly water: Waterline;
   private sprite: Sprite;
   private s: ShipEntity | null = null;
   private wakeTimer = 0;
@@ -907,9 +984,15 @@ class ShipView extends MovingView {
   constructor(private readonly layer: EntityLayer) {
     super();
     this.sprite = layer.atlas.sprite("ship_0");
-    this.root.sortableChildren = true;
     this.bar.zIndex = 1000;
-    this.root.addChild(this.sprite, this.bar);
+    this.body.addChild(this.sprite);
+    this.root.addChild(this.body, this.bar);
+    this.water = new Waterline(layer, this.body);
+  }
+
+  override destroy(): void {
+    this.water.destroy();
+    super.destroy();
   }
 
   /** Draw everyone aboard standing at their places on the deck, relative to the ship. */
@@ -925,7 +1008,7 @@ class ShipView extends MovingView {
       if (!rig) {
         rig = new HeroRig(this.layer.atlas);
         this.crew.set(id, rig);
-        this.root.addChild(rig.root);
+        this.body.addChild(rig.root);
       }
       rig.set(c.look, this.layer.playerColour(c.playerId), facing, "stand");
       const slot = deckSlot({ angle: this.angle, kind: s.kind }, i);
@@ -933,7 +1016,10 @@ class ShipView extends MovingView {
       const y = screenY(slot.x, slot.y) - DECK_HEIGHT;
       rig.root.position.set(Math.round(x), Math.round(y));
       rig.root.zIndex = 1 + y;
-      this.spots.set(id, { x: this.root.x + Math.round(x), y: this.root.y + Math.round(y) });
+      this.spots.set(id, {
+        x: this.root.x + Math.round(x),
+        y: this.root.y + this.body.y + Math.round(y),
+      });
     });
     for (const [id, rig] of this.crew)
       if (!seen.has(id)) {
@@ -964,19 +1050,25 @@ class ShipView extends MovingView {
     this.angle += diff * (1 - Math.exp(-dt * 9));
     const k = ((Math.round(this.angle / (Math.PI / 8)) % 16) + 16) % 16;
     this.layer.atlas.setFrame(this.sprite, `${s.kind === "scout" ? "ship" : s.kind}_${k}`);
+    const style = s.kind;
     // How fast it is going (tiles a second), smoothed.
     const v = dt > 0 ? Math.hypot(this.x - this.lastX, this.y - this.lastY) / dt : 0;
     this.lastX = this.x;
     this.lastY = this.y;
     this.speed += (v - this.speed) * (1 - Math.exp(-dt * 6));
     const moving = this.speed > 0.3;
-    const bob = Math.round(Math.sin(now / (moving ? 330 : 520) + s.id) * (moving ? 1.6 : 1));
+    // The hull heaves on the swell (a little more under way); the waterline stays where it is.
+    const heave = Math.round(Math.sin(now / (moving ? 380 : 700) + s.id) * (moving ? 1.6 : 1.2));
     this.root.position.set(
       Math.round(screenX(this.x, this.y)),
-      Math.round(screenY(this.x, this.y)) + bob,
+      Math.round(screenY(this.x, this.y)),
     );
+    this.body.y = heave;
     this.root.zIndex = this.x + this.y;
-    this.root.alpha = this.fadeBehindTerrain(this.layer.state.world, 0, dt);
+    const fade = this.fadeBehindTerrain(this.layer.state.world, 0, dt);
+    this.root.alpha = fade;
+    this.water.set(style, k, this.root.x, this.root.y, now, s.id, true);
+    this.water.setAlpha(fade);
     this.drawCrew(s);
     // Waves: a bow wave and two trailing streams while under way, slow ripples when still.
     const half = s.kind === "cargo" ? 1.45 : 1.3;
