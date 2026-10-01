@@ -88,6 +88,7 @@ All the sound is synthesised in the browser with the Web Audio API: oscillators 
 - **Ambience** follows where the camera is and what the world is doing: the sea and wind, rain in storms, insects at night, birds by day and owls after dark, and each biome's own voice (frogs in Murkmire, bubbling in the Fungal Hollows, crackling embers, crystal sparkles, blossom wind chimes).
 - **Things you can hear happen**: hammering when a building goes up, chopping and picking as villagers work, coins when cargo comes home, a horn for a new ship, an arpeggio for a new island, bells for a spell, cannon fire, thunder, a ship going down, a sonar ping for a sunken site, an alarm when raiders are sighted or rob you, and a slow chord for the Great Work.
 - **Placed in the world**: sounds on screen play at full volume and pan left or right by where they are; those off screen fade with distance.
+- **Footsteps and doors**: every character is heard walking, in steps that change with the ground (grass, sand, stone, earth, shallow water, wooden piers and the floors of rooms); your own are clearer than other players'. Doors creak open and thud shut as you go in or out, and people inside speak in soft blips.
 
 ## The map
 

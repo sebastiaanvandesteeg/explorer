@@ -30,7 +30,16 @@ export type SoundName =
   | "sparkle"
   | "bubble"
   | "crackle"
-  | "windchime";
+  | "windchime"
+  | "step_grass"
+  | "step_sand"
+  | "step_stone"
+  | "step_wood"
+  | "step_dirt"
+  | "step_water"
+  | "door_open"
+  | "door_close"
+  | "voice";
 
 type Play = (e: Engine, p: Place) => void;
 
@@ -336,5 +345,103 @@ export const SOUNDS: Record<SoundName, Play> = {
   windchime: (e, p) => {
     const n = [84, 88, 91, 93][Math.floor(((p.pan ?? 0) + 1) * 1.99)]!;
     e.tone({ ...p, type: "sine", freq: hz(n), decay: 1.4, level: 0.12 });
+  },
+  /** A footfall on grass: a soft, dull tick. */
+  step_grass: (e, p) => {
+    e.noise({
+      ...p,
+      decay: 0.07,
+      level: 0.22,
+      filter: { type: "lowpass", freq: 900 + Math.random() * 300, freqEnd: 350 },
+    });
+  },
+  /** A footfall on sand: a short dry hush. */
+  step_sand: (e, p) => {
+    e.noise({
+      ...p,
+      decay: 0.11,
+      level: 0.18,
+      filter: { type: "bandpass", freq: 2200 + Math.random() * 500, q: 0.7 },
+    });
+  },
+  /** A footfall on stone: a dry click with a little ring. */
+  step_stone: (e, p) => {
+    e.noise({ ...p, decay: 0.03, level: 0.3, filter: { type: "highpass", freq: 1800 } });
+    e.tone({ ...p, type: "triangle", freq: 420 + Math.random() * 80, decay: 0.05, level: 0.08 });
+  },
+  /** A footfall on boards: a hollow knock. */
+  step_wood: (e, p) => {
+    e.noise({
+      ...p,
+      decay: 0.05,
+      level: 0.3,
+      filter: { type: "bandpass", freq: 700, freqEnd: 400, q: 1.4 },
+    });
+    e.tone({
+      ...p,
+      type: "triangle",
+      freq: 160 + Math.random() * 25,
+      freqEnd: 100,
+      decay: 0.08,
+      level: 0.2,
+    });
+  },
+  /** A footfall on bare earth: a muffled thud. */
+  step_dirt: (e, p) => {
+    e.noise({
+      ...p,
+      decay: 0.06,
+      level: 0.26,
+      filter: { type: "lowpass", freq: 600, freqEnd: 250 },
+    });
+    e.tone({ ...p, type: "sine", freq: 90, freqEnd: 60, decay: 0.07, level: 0.14 });
+  },
+  /** A footfall in shallow water: a tiny splash. */
+  step_water: (e, p) => {
+    e.noise({
+      ...p,
+      decay: 0.14,
+      level: 0.22,
+      filter: { type: "bandpass", freq: 1500, freqEnd: 3000, q: 0.9 },
+    });
+  },
+  /** A door opening: the latch, then a short creak. */
+  door_open: (e, p) => {
+    e.noise({ ...p, decay: 0.02, level: 0.3, filter: { type: "highpass", freq: 2800 } });
+    e.tone({
+      ...later(p, 0.05),
+      type: "sawtooth",
+      freq: 180,
+      freqEnd: 260,
+      attack: 0.04,
+      decay: 0.28,
+      level: 0.07,
+      filter: { type: "bandpass", freq: 700, q: 4 },
+    });
+  },
+  /** A door closing: a dull thud and the latch. */
+  door_close: (e, p) => {
+    e.tone({ ...p, type: "triangle", freq: 130, freqEnd: 70, decay: 0.14, level: 0.32 });
+    e.noise({ ...p, decay: 0.05, level: 0.25, filter: { type: "lowpass", freq: 800 } });
+    e.noise({
+      ...later(p, 0.1),
+      decay: 0.02,
+      level: 0.2,
+      filter: { type: "highpass", freq: 2800 },
+    });
+  },
+  /** One syllable of someone talking: a soft, pitched blip. */
+  voice: (e, p) => {
+    const f = 260 + Math.random() * 240;
+    e.tone({
+      ...p,
+      type: "triangle",
+      freq: f,
+      freqEnd: f * (0.85 + Math.random() * 0.4),
+      attack: 0.01,
+      decay: 0.08,
+      level: 0.14,
+      filter: { type: "lowpass", freq: 1800 },
+    });
   },
 };

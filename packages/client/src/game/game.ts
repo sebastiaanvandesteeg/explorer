@@ -57,7 +57,15 @@ import { Overlay, type Footprint } from "../render/overlay";
 import { TerrainLayer, visibleHeight } from "../render/terrain";
 import { discoveryText, Hud, type Tool } from "../ui/hud";
 import { compassFrom, currentThreat } from "../ui/mapData";
-import { spatialMix, stormLevel, type Mood } from "../audio/mix";
+import {
+  floorSound,
+  spatialMix,
+  stormLevel,
+  surfaceSound,
+  Walkers,
+  type Mood,
+  type Walker,
+} from "../audio/mix";
 import { SoundSystem } from "../audio/system";
 
 interface Drag {
@@ -120,6 +128,9 @@ export class Game {
   private raidersSeen = false;
   private readonly sound: SoundSystem;
   private workTimer = 0;
+  private readonly walkers = new Walkers();
+  /** The line the NPC you are talking to last said, so a new one is heard as speech. */
+  private lastLine = "";
   private moodTimer = 0;
   private selectionDirty = true;
   private disposers: (() => void)[] = [];
@@ -1025,6 +1036,7 @@ export class Game {
       this.sound.update(this.mood(), 0.5 - this.moodTimer);
       this.moodTimer = 0.5;
     }
+    for (const cue of this.walkers.update(this.walkerList(state))) this.sound.cue(cue);
     this.workTimer -= dt;
     if (this.workTimer <= 0) {
       this.workTimer = 0.4;
@@ -1043,7 +1055,15 @@ export class Game {
   private enterOrLeaveRoom(inside: number | null): void {
     if (inside === this.indoors) return;
     const going = inside !== null;
+    const door = this.session.state.entities.get((going ? inside : this.indoors) ?? -1);
+    if (door?.type === "building") {
+      this.sound.cue({
+        sound: going ? "door_open" : "door_close",
+        at: { x: door.x, y: door.y },
+      });
+    }
     this.indoors = inside;
+    this.lastLine = "";
     this.graded.visible = !going;
     this.entities.lights.visible = !going;
     this.atmosphere.overlay.visible = !going;
@@ -1082,6 +1102,11 @@ export class Game {
     this.walkInRoom(now);
     const talk = this.selected === b.id ? talkFor(state, b) : null;
     this.hud.setTalk(talk);
+    const line = talk ? `${talk.name}:${talk.line}` : "";
+    if (line !== this.lastLine) {
+      this.lastLine = line;
+      if (talk) this.sound.voice();
+    }
     if (this.selectionDirty) {
       this.selectionDirty = false;
       this.hud.setSelection(state, this.selected);
@@ -1164,6 +1189,36 @@ export class Game {
       storm: stormLevel(storms as StormEntity[], tx, ty),
       biome: this.biome,
     };
+  }
+
+  /** Every character that can be heard walking, with the ground under its feet. */
+  private walkerList(state: GameState): Walker[] {
+    const w = state.world;
+    const list: Walker[] = [];
+    for (const e of state.entities.values()) {
+      if (e.type !== "character") continue;
+      const you = e.playerId === this.session.you;
+      if (e.inside !== null) {
+        const b = state.entities.get(e.inside);
+        const sound = b?.type === "building" ? floorSound(b.kind) : "step_wood";
+        list.push({ id: e.id, x: e.room.x, y: e.room.y, you, sound, silent: !you });
+        continue;
+      }
+      const tx = Math.min(w.width - 1, Math.max(0, Math.floor(e.x)));
+      const ty = Math.min(w.height - 1, Math.max(0, Math.floor(e.y)));
+      const k = tileIndex(w, tx, ty);
+      const on = state.entities.get(state.occupancy[k]!);
+      const deck = on?.type === "building" && (on.kind === "dock" || on.kind === "harbour");
+      list.push({
+        id: e.id,
+        x: e.x,
+        y: e.y,
+        you,
+        sound: surfaceSound(w.terrain[k]!, deck),
+        silent: e.aboard !== null,
+      });
+    }
+    return list;
   }
 
   /** One villager on screen at random gets to be heard chopping, mining or hammering. */

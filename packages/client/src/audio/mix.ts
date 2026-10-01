@@ -2,7 +2,9 @@
 // each event, how loud and where, what the ambience should be doing, and when.
 import {
   stormStrength,
+  Terrain,
   type BiomeId,
+  type BuildingKind,
   type GameEvent,
   type StormEntity,
   type Tool,
@@ -202,4 +204,90 @@ export function stormLevel(storms: Iterable<StormEntity>, x: number, y: number):
     level = Math.max(level, near * stormStrength(s));
   }
   return level;
+}
+
+// ---------------------------------------------------------------------------- footsteps
+
+/** The step sound for ground of a kind; a wooden deck (a pier or harbour) overrides it. */
+export function surfaceSound(terrain: number, deck: boolean): SoundName {
+  if (deck) return "step_wood";
+  switch (terrain) {
+    case Terrain.Sand:
+      return "step_sand";
+    case Terrain.Rock:
+      return "step_stone";
+    case Terrain.Dirt:
+      return "step_dirt";
+    case Terrain.Shallow:
+    case Terrain.Deep:
+      return "step_water";
+    default:
+      return "step_grass";
+  }
+}
+
+/** What a room's floor sounds like underfoot: stone in the grand and working buildings. */
+export function floorSound(kind: BuildingKind): SoundName {
+  switch (kind) {
+    case "town_hall":
+    case "church":
+    case "blacksmith":
+    case "magic_house":
+      return "step_stone";
+    default:
+      return "step_wood";
+  }
+}
+
+/** Tiles a character covers between footfalls. */
+export const STRIDE = 1.1;
+/** A jump further than this in one update is a teleport, not a walk. */
+const TELEPORT = 3;
+
+export interface Walker {
+  id: number;
+  x: number;
+  y: number;
+  /** Your own character is heard clearly; other players' steps are quieter and from a place. */
+  you: boolean;
+  /** The sound for the ground under it. */
+  sound: SoundName;
+  /** Out of the picture (inside a building or aboard a ship): reset, no steps. */
+  silent?: boolean;
+}
+
+/** Turns movement into footfalls: one every stride, alternating feet. */
+export class Walkers {
+  private readonly seen = new Map<number, { x: number; y: number; walked: number; foot: number }>();
+
+  update(walkers: readonly Walker[]): Cue[] {
+    const cues: Cue[] = [];
+    const alive = new Set<number>();
+    for (const w of walkers) {
+      alive.add(w.id);
+      const s = this.seen.get(w.id);
+      if (!s || w.silent) {
+        this.seen.set(w.id, { x: w.x, y: w.y, walked: 0, foot: s?.foot ?? 0 });
+        continue;
+      }
+      const d = Math.hypot(w.x - s.x, w.y - s.y);
+      s.x = w.x;
+      s.y = w.y;
+      if (d > TELEPORT) {
+        s.walked = 0;
+        continue;
+      }
+      s.walked += d;
+      while (s.walked >= STRIDE) {
+        s.walked -= STRIDE;
+        s.foot ^= 1;
+        const gain = (w.you ? 0.5 : 0.3) * (s.foot ? 1 : 0.85);
+        cues.push(
+          w.you ? { sound: w.sound, gain } : { sound: w.sound, gain, at: { x: w.x, y: w.y } },
+        );
+      }
+    }
+    for (const id of this.seen.keys()) if (!alive.has(id)) this.seen.delete(id);
+    return cues;
+  }
 }

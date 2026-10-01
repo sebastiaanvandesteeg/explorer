@@ -38,6 +38,15 @@ const MIN_GAP: Partial<Record<SoundName, number>> = {
   boom: 0.08,
   coin: 0.1,
   splash: 0.1,
+  step_grass: 0.1,
+  step_sand: 0.1,
+  step_stone: 0.1,
+  step_wood: 0.1,
+  step_dirt: 0.1,
+  step_water: 0.1,
+  door_open: 0.2,
+  door_close: 0.2,
+  voice: 0.05,
 };
 
 export interface Locate {
@@ -136,6 +145,14 @@ export class SoundSystem {
   work(tool: Tool | null, x: number, y: number): void {
     const sound = workSound(tool);
     if (sound) this.cue({ sound, at: { x, y }, gain: 0.55 });
+  }
+
+  /** Someone says a line: a few soft syllables. */
+  voice(at?: { x: number; y: number }): void {
+    const n = 2 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < n; i++) {
+      this.cue({ sound: "voice", ...(at ? { at } : {}), gain: 0.7, delay: i * 0.075 });
+    }
   }
 
   update(mood: Mood, dt: number): void {

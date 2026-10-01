@@ -1,7 +1,19 @@
 import { describe, expect, it } from "vitest";
 import type { GameEvent, StormEntity } from "@explorer/shared";
 import { BIOMES } from "@explorer/shared";
-import { layerTargets, soundsFor, spatialMix, stingersFor, stormLevel, workSound } from "./mix";
+import { Terrain } from "@explorer/shared";
+import {
+  floorSound,
+  layerTargets,
+  soundsFor,
+  spatialMix,
+  stingersFor,
+  stormLevel,
+  surfaceSound,
+  Walkers,
+  workSound,
+  STRIDE,
+} from "./mix";
 import { SOUNDS } from "./sounds";
 
 describe("spatial mix", () => {
@@ -139,5 +151,56 @@ describe("storm level", () => {
   it("follows the storm's own strength as it builds up", () => {
     const young = { ...storm(50, 50), age: 3 };
     expect(stormLevel([young], 50, 50)).toBeCloseTo(0.2);
+  });
+});
+
+describe("footsteps", () => {
+  it("sound like the ground, with boards winning on a pier", () => {
+    expect(surfaceSound(Terrain.Grass, false)).toBe("step_grass");
+    expect(surfaceSound(Terrain.Sand, false)).toBe("step_sand");
+    expect(surfaceSound(Terrain.Rock, false)).toBe("step_stone");
+    expect(surfaceSound(Terrain.Dirt, false)).toBe("step_dirt");
+    expect(surfaceSound(Terrain.Shallow, false)).toBe("step_water");
+    expect(surfaceSound(Terrain.Sand, true)).toBe("step_wood");
+    expect(floorSound("church")).toBe("step_stone");
+    expect(floorSound("house")).toBe("step_wood");
+  });
+
+  const at = (x: number, y: number, extra = {}) => ({
+    id: 1,
+    x,
+    y,
+    you: true,
+    sound: "step_grass" as const,
+    ...extra,
+  });
+
+  it("step once per stride and not at all when standing still", () => {
+    const w = new Walkers();
+    expect(w.update([at(0, 0)])).toEqual([]);
+    expect(w.update([at(0, 0)])).toEqual([]);
+    let steps = 0;
+    for (let i = 1; i <= 11; i++) steps += w.update([at(i * (STRIDE / 2), 0)]).length;
+    expect(steps).toBe(5);
+  });
+
+  it("alternate feet, and hear other players from where they are", () => {
+    const w = new Walkers();
+    w.update([at(0, 0), at(0, 0, { id: 2, you: false })]);
+    const [a, b] = w.update([at(STRIDE, 0), at(STRIDE, 0, { id: 2, you: false })]);
+    expect(a!.at).toBeUndefined();
+    expect(b!.at).toEqual({ x: STRIDE, y: 0 });
+    expect(b!.gain!).toBeLessThan(a!.gain!);
+    const next = w.update([at(STRIDE * 2, 0)]);
+    expect(next[0]!.gain).not.toBe(a!.gain);
+  });
+
+  it("ignore teleports, rooms and ships", () => {
+    const w = new Walkers();
+    w.update([at(0, 0)]);
+    expect(w.update([at(40, 40)])).toEqual([]);
+    expect(w.update([at(40, 42, { silent: true })])).toEqual([]);
+    expect(w.update([at(40, 44, { silent: true })])).toEqual([]);
+    expect(w.update([at(40, 44)])).toEqual([]);
   });
 });

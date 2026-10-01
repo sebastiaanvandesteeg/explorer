@@ -70,6 +70,7 @@ export const RELEASES: Release[] = [
           "The harbourmaster's house stands on a platform of piles in the water beside the pier.",
           "Ships now sit in the water: no keel showing, the lowest planks fade into the sea, a shadow lies beneath the hull, foam laps at the waterline, and the hull heaves on the swell.",
           "A ship with a crew aboard sees twice as far (16 tiles, about the width of the screen while sailing), so sailing uncovers the map much faster.",
+          "Footsteps: every character is heard walking, with a different sound on grass, sand, stone, bare earth, shallow water and wooden piers, and on the floors inside buildings. Doors creak open and thud shut as you go in and out, and the people inside speak in soft blips.",
           "The camera pulls back a little while you sail, and the people on deck no longer flicker.",
           "Old saves keep working: each old dock gets a harbour on the water beside it.",
         ],
